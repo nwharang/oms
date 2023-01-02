@@ -1,0 +1,96 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Options
+@using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared.Pages.Shared.Components.AbpPageSearchBox
+@using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared.Pages.Shared.Components.AbpPageToolbar
+@using Volo.Saas.Host
+@using Volo.Saas.Host.Navigation
+@using Volo.Saas.Host.Pages.Saas.Host.Tenants
+@using Volo.Saas.Localization
+@inject IAuthorizationService Authorization
+@inject IHtmlLocalizer<SaasResource> L
+@inject IOptions<AbpSaasHostWebOptions> SaasHostWebOptions
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = L["Tenants"].Value;
+    PageLayout.Content.BreadCrumb.Add(L["Menu:Saas"].Value);
+    PageLayout.Content.MenuItemName = SaasHostMenuNames.Tenants;
+}
+@section scripts {
+    <abp-script-bundle name="@L["Menu:Saas"].Value">
+        <abp-script src="/client-proxies/saas-proxy.js" />
+        <abp-script src="/Pages/FeatureManagement/feature-management-modal.js" />
+        <abp-script src="/Pages/Saas/Host/Tenants/ConnectionStringsModal.js" />
+        <abp-script src="/Pages/Saas/Host/Tenants/CreateModal.js" />
+        <abp-script src="/Pages/Saas/Host/Tenants/EditModal.js" />
+        <abp-script src="/Pages/Saas/Host/Tenants/Index.js" />
+        @if (SaasHostWebOptions.Value.EnableTenantImpersonation)
+        {
+            <abp-script src="/Pages/Saas/Host/Tenants/enableTenantImpersonation.js" />
+        }
+    </abp-script-bundle>
+}
+@section styles {
+    <abp-style-bundle>
+        <abp-style src="/Pages/Saas/Host/Tenants/ConnectionStringsTable.css" />
+    </abp-style-bundle>
+}
+
+@section breadcrumb {
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:Saas"].Value</a></li>
+        <li class="breadcrumb-item active">@L["Tenants"].Value</li>
+    </ol>
+}
+
+<div class="col-lg-12">
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="ui-sortable-handle">
+                <i class="subheader-icon fa fa-users"></i> @L["Tenants"].Value
+            </h2>
+        </div>
+        <div class="panel-container show">
+            <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
+                <abp-card>
+                    <abp-card-body>
+                        <abp-row>
+                            <div style="padding-left:12px" class="buttons-header-grid">
+                                <button id="ManageHostFeatures" name="ManageHostFeatures" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                    <i class="fa fa-cog"></i> <span>@L["ManageHostFeatures"]</span>
+                                </button>
+                                <button id="CreateTenant" name="CreateTenant" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                    <i class="fa fa-plus"></i> <span>@L["NewTenant"]</span>
+                                </button>
+                                <div class="dx-datagrid-search-panel dx-show-invalid-badge dx-textbox dx-texteditor dx-editor-outlined dx-searchbox dx-show-clear-button dx-texteditor-empty dx-widget dx-state-hover" style="width: 250px;">
+                                    <div class="dx-texteditor-container">
+                                        <div class="dx-texteditor-input-container">
+                                            <div class="dx-icon dx-icon-search"></div>
+                                            <input id="Search" class="dx-texteditor-input" placeholder="@L["Search"]" type="text" tabindex="0">
+                                        </div>
+                                        <div class="dx-texteditor-buttons-container">
+                                            <span class="dx-clear-button-area"><span class="dx-icon dx-icon-clear"></span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </abp-row>
+                        <div id="TenantsWrapper">
+                            <div class="dx-viewport">
+                                <div id="dataGridContainer"></div>
+                            </div>
+                        </div>
+                        @if (SaasHostWebOptions.Value.EnableTenantImpersonation)
+                        {
+                            <form method="post" data-ajaxForm="false" action="~/Account/ImpersonateTenant" id="ImpersonationForm">
+                                <input type="hidden" name="TenantId">
+                            </form>
+                        }
+                    </abp-card-body>
+                </abp-card>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.Web.Pages.GeoMasters
+@using DMSpro.OMS.MdmService.GeoMasters;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model CreateModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/GeoMasters/CreateModal" autocomplete="off">
+    <abp-modal id="GeoMasterCreateModal">
+        <abp-modal-header title="@L["NewGeoMaster"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    
+            <abp-input asp-for="GeoMaster.Code" />
+
+            <abp-input asp-for="GeoMaster.ERPCode" />
+
+            <abp-input asp-for="GeoMaster.Name" />
+
+            <abp-input asp-for="GeoMaster.Level" />
+
+                                <abp-select asp-for="GeoMaster.ParentId" asp-items="Model.GeoMasterLookupList" label="@L["Parent"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

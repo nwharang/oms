@@ -1,0 +1,36 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using DMSpro.OMS.MdmService.Web.Pages.Routes
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.Routes;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model EditModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/Routes/EditModal" autocomplete="off">
+    <abp-modal id="RouteEditModal">
+        <abp-modal-header title="@L["Update"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    <abp-input asp-for="Id" />
+                    <abp-input asp-for="Route.ConcurrencyStamp" hidden="true" suppress-label="true"/>
+                    
+            <abp-input asp-for="Route.CheckIn" />
+
+            <abp-input asp-for="Route.CheckOut" />
+
+            <abp-input asp-for="Route.GPSLock" />
+
+            <abp-input asp-for="Route.OutRoute" />
+
+                                <abp-select asp-for="Route.RouteTypeId" asp-items="Model.SystemDataLookupListRequired" label="@L["RouteType"].Value"/>            <abp-select asp-for="Route.ItemGroupId" asp-items="Model.ItemGroupLookupListRequired" label="@L["ItemGroup"].Value"/>            <abp-select asp-for="Route.SalesOrgHierarchyId" asp-items="Model.SalesOrgHierarchyLookupListRequired" label="@L["SalesOrgHierarchy"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

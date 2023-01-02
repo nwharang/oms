@@ -1,0 +1,30 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using DMSpro.OMS.MdmService.Web.Pages.CusAttributeValues
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.CusAttributeValues;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model EditModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/CusAttributeValues/EditModal" autocomplete="off">
+    <abp-modal id="CusAttributeValueEditModal">
+        <abp-modal-header title="@L["Update"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    <abp-input asp-for="Id" />
+                    <abp-input asp-for="CusAttributeValue.ConcurrencyStamp" hidden="true" suppress-label="true"/>
+                    
+            <abp-input asp-for="CusAttributeValue.AttrValName" />
+
+                                <abp-select asp-for="CusAttributeValue.CustomerAttributeId" asp-items="Model.CustomerAttributeLookupListRequired" label="@L["CustomerAttribute"].Value"/>            <abp-select asp-for="CusAttributeValue.ParentCusAttributeValueId" asp-items="Model.CusAttributeValueLookupList" label="@L["ParentCusAttributeValue"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

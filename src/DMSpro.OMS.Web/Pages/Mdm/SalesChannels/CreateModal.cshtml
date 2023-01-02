@@ -1,0 +1,34 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.Web.Pages.SalesChannels
+@using DMSpro.OMS.MdmService.SalesChannels;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model CreateModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/SalesChannels/CreateModal" autocomplete="off">
+    <abp-modal id="SalesChannelCreateModal">
+        <abp-modal-header title="@L["NewSalesChannel"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    
+            <abp-input asp-for="SalesChannel.Code" />
+
+            <abp-input asp-for="SalesChannel.Name" />
+
+            <abp-input asp-for="SalesChannel.Description" text-area/>
+
+            <abp-input asp-for="SalesChannel.Active" />
+
+                    
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

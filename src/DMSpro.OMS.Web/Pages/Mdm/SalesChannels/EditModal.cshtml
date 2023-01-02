@@ -1,0 +1,36 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using DMSpro.OMS.MdmService.Web.Pages.SalesChannels
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.SalesChannels;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model EditModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/SalesChannels/EditModal" autocomplete="off">
+    <abp-modal id="SalesChannelEditModal">
+        <abp-modal-header title="@L["Update"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    <abp-input asp-for="Id" />
+                    <abp-input asp-for="SalesChannel.ConcurrencyStamp" hidden="true" suppress-label="true"/>
+                    
+            <abp-input asp-for="SalesChannel.Code" />
+
+            <abp-input asp-for="SalesChannel.Name" />
+
+            <abp-input asp-for="SalesChannel.Description" text-area/>
+
+            <abp-input asp-for="SalesChannel.Active" />
+
+                    
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

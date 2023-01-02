@@ -1,0 +1,97 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using DMSpro.OMS.MdmService.Permissions
+@using DMSpro.OMS.MdmService.Web.Pages.SalesOrgHierarchies
+@using DMSpro.OMS.MdmService.Web.Menus
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@inject IAuthorizationService Authorization
+@model IndexModel
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = L["SalesOrgHierarchies"].Value;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.SalesOrgHierarchies;
+}
+
+@section scripts
+{
+    <abp-script src="/Pages/Mdm/SalesOrgHierarchies/index.js" />
+}
+
+@*@section content_toolbar {
+    <abp-button id="ExportToExcelButton" text="@L["ExportToExcel"].Value" icon="download" size="Small" button-type="Primary" />
+    @if (await Authorization.IsGrantedAsync(MdmServicePermissions.SalesOrgHierarchies.Create))
+    {
+        <abp-button id="NewSalesOrgHierarchyButton" text="@L["NewSalesOrgHierarchy"].Value" icon="plus" size="Small" button-type="Primary" />
+    }
+}*@
+
+<abp-card>
+    <abp-card-body>
+		<abp-row class="mb-3">
+            <abp-column size-md="_12">
+                <form id="SearchForm" autocomplete="off">
+                    <div class="input-group">
+                        <input class="form-control page-search-filter-text" id="FilterText" placeholder="@L["Search"]"/>
+                        <abp-button button-type="Primary" type="submit" icon="search"/>
+                    </div>
+                </form>
+            </abp-column>
+            <abp-column size-md="_12" class="mt-3">
+                <a href="javascript:;" id="AdvancedFilterSectionToggler" class="text-decoration-none">@L["SeeAdvancedFilters"]</a>
+            </abp-column>
+        </abp-row>
+
+        <abp-row id="AdvancedFilterSection" style="display: none;">
+            <abp-column size="_3">
+                <abp-input asp-for="CodeFilter" label="@L["Code"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="NameFilter" label="@L["Name"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="LevelFilterMin" label="@L["MinLevel"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="LevelFilterMax" label="@L["MaxLevel"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="IsRouteFilter" label="@L["IsRoute"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="IsSellingZoneFilter" label="@L["IsSellingZone"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="HierarchyCodeFilter" label="@L["HierarchyCode"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="ActiveFilter" label="@L["Active"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="SalesOrgHeaderIdFilter" label="@L["SalesOrgHeader"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="ParentIdFilter" label="@L["Parent"].Value" />
+            </abp-column>
+        </abp-row>
+
+        <abp-table striped-rows="true" id="SalesOrgHierarchiesTable">
+            <thead>
+				<tr>
+					<th>@L["Actions"]</th>
+					<th>@L["Code"]</th>
+					<th>@L["Name"]</th>
+					<th>@L["Level"]</th>
+					<th>@L["IsRoute"]</th>
+					<th>@L["IsSellingZone"]</th>
+					<th>@L["HierarchyCode"]</th>
+					<th>@L["Active"]</th>
+					<th>@L["SalesOrgHeader"]</th>
+					<th>@L["Parent"]</th>
+				</tr>
+            </thead>
+        </abp-table>
+    </abp-card-body>
+</abp-card>

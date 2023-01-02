@@ -1,0 +1,32 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.Web.Pages.PriceListDetails
+@using DMSpro.OMS.MdmService.PriceListDetails;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model CreateModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/PriceListDetails/CreateModal" autocomplete="off">
+    <abp-modal id="PriceListDetailCreateModal">
+        <abp-modal-header title="@L["NewPriceListDetail"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    
+            <abp-input asp-for="PriceListDetail.Price" />
+
+            <abp-input asp-for="PriceListDetail.BasedOnPrice" />
+
+            <abp-input asp-for="PriceListDetail.Description" />
+
+                                <abp-select asp-for="PriceListDetail.PriceListId" asp-items="Model.PriceListLookupListRequired" label="@L["PriceList"].Value"/>            <abp-select asp-for="PriceListDetail.ItemMasterId" asp-items="Model.ItemMasterLookupListRequired" label="@L["ItemMaster"].Value"/>            <abp-select asp-for="PriceListDetail.UOMId" asp-items="Model.UOMLookupListRequired" label="@L["UOM"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

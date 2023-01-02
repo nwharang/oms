@@ -1,0 +1,30 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.Web.Pages.Holidays
+@using DMSpro.OMS.MdmService.Holidays;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model CreateModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/Holidays/CreateModal" autocomplete="off">
+    <abp-modal id="HolidayCreateModal">
+        <abp-modal-header title="@L["NewHoliday"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    
+            <abp-input asp-for="Holiday.Year" />
+
+            <abp-input asp-for="Holiday.Description" text-area/>
+
+                    
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

@@ -1,0 +1,50 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.Web.Pages.CustomerContacts
+@using DMSpro.OMS.MdmService.CustomerContacts;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model CreateModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/CustomerContacts/CreateModal" autocomplete="off">
+    <abp-modal id="CustomerContactCreateModal">
+        <abp-modal-header title="@L["NewCustomerContact"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    
+            <abp-select asp-for="CustomerContact.Title" />
+
+            <abp-input asp-for="CustomerContact.FirstName" />
+
+            <abp-input asp-for="CustomerContact.LastName" />
+
+            <abp-select asp-for="CustomerContact.Gender" />
+
+            <abp-input asp-for="CustomerContact.DateOfBirth" value="" type="date"/>
+
+            <abp-input asp-for="CustomerContact.Phone" />
+
+            <abp-input asp-for="CustomerContact.Email" />
+
+            <abp-input asp-for="CustomerContact.Address" />
+
+            <abp-input asp-for="CustomerContact.IdentityNumber" />
+
+            <abp-input asp-for="CustomerContact.BankName" />
+
+            <abp-input asp-for="CustomerContact.BankAccName" />
+
+            <abp-input asp-for="CustomerContact.BankAccNumber" />
+
+                                <abp-select asp-for="CustomerContact.CustomerId" asp-items="Model.CustomerLookupListRequired" label="@L["Customer"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

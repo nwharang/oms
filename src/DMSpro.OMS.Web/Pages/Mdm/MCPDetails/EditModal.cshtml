@@ -1,0 +1,60 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using DMSpro.OMS.MdmService.Web.Pages.MCPDetails
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.MCPDetails;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model EditModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/MCPDetails/EditModal" autocomplete="off">
+    <abp-modal id="MCPDetailEditModal">
+        <abp-modal-header title="@L["Update"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    <abp-input asp-for="Id" />
+                    <abp-input asp-for="MCPDetail.ConcurrencyStamp" hidden="true" suppress-label="true"/>
+                    
+            <abp-input asp-for="MCPDetail.Code" />
+
+            <abp-input asp-for="MCPDetail.EffectiveDate" value="@(Model.MCPDetail.EffectiveDate.ToString("yyyy-MM-dd"))" type="date"/>
+
+            <abp-input asp-for="MCPDetail.EndDate" value="@(Model.MCPDetail.EndDate?.ToString("yyyy-MM-dd"))" type="date"/>
+
+            <abp-input asp-for="MCPDetail.Distance" />
+
+            <abp-input asp-for="MCPDetail.VisitOrder" />
+
+            <abp-input asp-for="MCPDetail.Monday" />
+
+            <abp-input asp-for="MCPDetail.Tuesday" />
+
+            <abp-input asp-for="MCPDetail.Wednesday" />
+
+            <abp-input asp-for="MCPDetail.Thursday" />
+
+            <abp-input asp-for="MCPDetail.Friday" />
+
+            <abp-input asp-for="MCPDetail.Saturday" />
+
+            <abp-input asp-for="MCPDetail.Sunday" />
+
+            <abp-input asp-for="MCPDetail.Week1" />
+
+            <abp-input asp-for="MCPDetail.Week2" />
+
+            <abp-input asp-for="MCPDetail.Week3" />
+
+            <abp-input asp-for="MCPDetail.Week4" />
+
+                                <abp-select asp-for="MCPDetail.CustomerId" asp-items="Model.CustomerLookupListRequired" label="@L["Customer"].Value"/>            <abp-select asp-for="MCPDetail.MCPHeaderId" asp-items="Model.MCPHeaderLookupListRequired" label="@L["MCPHeader"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

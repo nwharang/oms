@@ -1,0 +1,30 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using DMSpro.OMS.MdmService.Web.Pages.PricelistAssignments
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.PricelistAssignments;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model EditModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/PricelistAssignments/EditModal" autocomplete="off">
+    <abp-modal id="PricelistAssignmentEditModal">
+        <abp-modal-header title="@L["Update"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    <abp-input asp-for="Id" />
+                    <abp-input asp-for="PricelistAssignment.ConcurrencyStamp" hidden="true" suppress-label="true"/>
+                    
+            <abp-input asp-for="PricelistAssignment.Description" />
+
+                                <abp-select asp-for="PricelistAssignment.PriceListId" asp-items="Model.PriceListLookupListRequired" label="@L["PriceList"].Value"/>            <abp-select asp-for="PricelistAssignment.CustomerGroupId" asp-items="Model.CustomerGroupLookupListRequired" label="@L["CustomerGroup"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

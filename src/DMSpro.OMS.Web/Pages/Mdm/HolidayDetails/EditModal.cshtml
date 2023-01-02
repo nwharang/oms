@@ -1,0 +1,34 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using DMSpro.OMS.MdmService.Web.Pages.HolidayDetails
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.HolidayDetails;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model EditModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/HolidayDetails/EditModal" autocomplete="off">
+    <abp-modal id="HolidayDetailEditModal">
+        <abp-modal-header title="@L["Update"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    <abp-input asp-for="Id" />
+                    <abp-input asp-for="HolidayDetail.ConcurrencyStamp" hidden="true" suppress-label="true"/>
+                    
+            <abp-input asp-for="HolidayDetail.StartDate" value="@(Model.HolidayDetail.StartDate.ToString("yyyy-MM-dd"))" type="date"/>
+
+            <abp-input asp-for="HolidayDetail.EndDate" value="@(Model.HolidayDetail.EndDate.ToString("yyyy-MM-dd"))" type="date"/>
+
+            <abp-input asp-for="HolidayDetail.Description" text-area/>
+
+                                <abp-select asp-for="HolidayDetail.HolidayId" asp-items="Model.HolidayLookupListRequired" label="@L["Holiday"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

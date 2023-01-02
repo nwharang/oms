@@ -1,0 +1,142 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using DMSpro.OMS.MdmService.Permissions
+@using DMSpro.OMS.MdmService.Web.Pages.MCPDetails
+@using DMSpro.OMS.MdmService.Web.Menus
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@inject IAuthorizationService Authorization
+@model IndexModel
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = L["MCPDetails"].Value;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.MCPDetails;
+}
+
+@section scripts
+{
+    <abp-script src="/Pages/Mdm/MCPDetails/index.js" />
+}
+
+@*@section content_toolbar {
+    <abp-button id="ExportToExcelButton" text="@L["ExportToExcel"].Value" icon="download" size="Small" button-type="Primary" />
+    @if (await Authorization.IsGrantedAsync(MdmServicePermissions.MCPDetails.Create))
+    {
+        <abp-button id="NewMCPDetailButton" text="@L["NewMCPDetail"].Value" icon="plus" size="Small" button-type="Primary" />
+    }
+}*@
+
+<abp-card>
+    <abp-card-body>
+		<abp-row class="mb-3">
+            <abp-column size-md="_12">
+                <form id="SearchForm" autocomplete="off">
+                    <div class="input-group">
+                        <input class="form-control page-search-filter-text" id="FilterText" placeholder="@L["Search"]"/>
+                        <abp-button button-type="Primary" type="submit" icon="search"/>
+                    </div>
+                </form>
+            </abp-column>
+            <abp-column size-md="_12" class="mt-3">
+                <a href="javascript:;" id="AdvancedFilterSectionToggler" class="text-decoration-none">@L["SeeAdvancedFilters"]</a>
+            </abp-column>
+        </abp-row>
+
+        <abp-row id="AdvancedFilterSection" style="display: none;">
+            <abp-column size="_3">
+                <abp-input asp-for="CodeFilter" label="@L["Code"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="EffectiveDateFilterMin" label="@L["MinEffectiveDate"].Value" type="date"/>
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="EffectiveDateFilterMax" label="@L["MaxEffectiveDate"].Value" type="date"/>
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="EndDateFilterMin" label="@L["MinEndDate"].Value" type="date"/>
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="EndDateFilterMax" label="@L["MaxEndDate"].Value" type="date"/>
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="DistanceFilterMin" label="@L["MinDistance"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="DistanceFilterMax" label="@L["MaxDistance"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="VisitOrderFilterMin" label="@L["MinVisitOrder"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="VisitOrderFilterMax" label="@L["MaxVisitOrder"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="MondayFilter" label="@L["Monday"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="TuesdayFilter" label="@L["Tuesday"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="WednesdayFilter" label="@L["Wednesday"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="ThursdayFilter" label="@L["Thursday"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="FridayFilter" label="@L["Friday"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="SaturdayFilter" label="@L["Saturday"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="SundayFilter" label="@L["Sunday"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="Week1Filter" label="@L["Week1"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="Week2Filter" label="@L["Week2"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="Week3Filter" label="@L["Week3"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="Week4Filter" label="@L["Week4"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="CustomerIdFilter" label="@L["Customer"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="MCPHeaderIdFilter" label="@L["MCPHeader"].Value" />
+            </abp-column>
+        </abp-row>
+
+        <abp-table striped-rows="true" id="MCPDetailsTable">
+            <thead>
+				<tr>
+					<th>@L["Actions"]</th>
+					<th>@L["Code"]</th>
+					<th>@L["EffectiveDate"]</th>
+					<th>@L["EndDate"]</th>
+					<th>@L["Distance"]</th>
+					<th>@L["VisitOrder"]</th>
+					<th>@L["Monday"]</th>
+					<th>@L["Tuesday"]</th>
+					<th>@L["Wednesday"]</th>
+					<th>@L["Thursday"]</th>
+					<th>@L["Friday"]</th>
+					<th>@L["Saturday"]</th>
+					<th>@L["Sunday"]</th>
+					<th>@L["Week1"]</th>
+					<th>@L["Week2"]</th>
+					<th>@L["Week3"]</th>
+					<th>@L["Week4"]</th>
+					<th>@L["Customer"]</th>
+					<th>@L["MCPHeader"]</th>
+				</tr>
+            </thead>
+        </abp-table>
+    </abp-card-body>
+</abp-card>

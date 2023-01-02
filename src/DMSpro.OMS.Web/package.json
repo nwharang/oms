@@ -1,0 +1,11 @@
+{
+  "version": "0.1.0",
+  "name": "OMSWeb",
+  "private": true,
+  "dependencies": {
+    "@volo/abp.aspnetcore.mvc.ui.theme.leptonx": "~1.0.0",
+    "@volo/identity": "^6.0.2",
+    "@abp/chart.js": "^6.0.2",
+    "@volo/language-management": "^6.0.2"
+  }
+}

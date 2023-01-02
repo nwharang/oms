@@ -1,0 +1,30 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.Web.Pages.CompanyInZones
+@using DMSpro.OMS.MdmService.CompanyInZones;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model CreateModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/CompanyInZones/CreateModal" autocomplete="off">
+    <abp-modal id="CompanyInZoneCreateModal">
+        <abp-modal-header title="@L["NewCompanyInZone"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    
+            <abp-input asp-for="CompanyInZone.EffectiveDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" type="date"/>
+
+            <abp-input asp-for="CompanyInZone.EndDate" value="" type="date"/>
+
+                                <abp-select asp-for="CompanyInZone.SalesOrgHierarchyId" asp-items="Model.SalesOrgHierarchyLookupListRequired" label="@L["SalesOrgHierarchy"].Value"/>            <abp-select asp-for="CompanyInZone.CompanyId" asp-items="Model.CompanyLookupListRequired" label="@L["Company"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

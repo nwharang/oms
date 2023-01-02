@@ -1,0 +1,34 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.Web.Pages.EmployeeImages
+@using DMSpro.OMS.MdmService.EmployeeImages;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model CreateModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/EmployeeImages/CreateModal" autocomplete="off">
+    <abp-modal id="EmployeeImageCreateModal">
+        <abp-modal-header title="@L["NewEmployeeImage"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    
+            <abp-input asp-for="EmployeeImage.Description" />
+
+            <abp-input asp-for="EmployeeImage.url" />
+
+            <abp-input asp-for="EmployeeImage.Active" />
+
+            <abp-input asp-for="EmployeeImage.IsAvatar" />
+
+                                <abp-select asp-for="EmployeeImage.EmployeeProfileId" asp-items="Model.EmployeeProfileLookupListRequired" label="@L["EmployeeProfile"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

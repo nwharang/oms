@@ -1,0 +1,36 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.Web.Pages.ProductAttributes
+@using DMSpro.OMS.MdmService.ProductAttributes;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model CreateModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/ProductAttributes/CreateModal" autocomplete="off">
+    <abp-modal id="ProductAttributeCreateModal">
+        <abp-modal-header title="@L["NewProductAttribute"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    
+            <abp-input asp-for="ProductAttribute.AttrNo" />
+
+            <abp-input asp-for="ProductAttribute.AttrName" />
+
+            <abp-input asp-for="ProductAttribute.HierarchyLevel" />
+
+            <abp-input asp-for="ProductAttribute.Active" />
+
+            <abp-input asp-for="ProductAttribute.IsProductCategory" />
+
+                    
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

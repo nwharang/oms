@@ -1,0 +1,79 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using DMSpro.OMS.MdmService.Permissions
+@using DMSpro.OMS.MdmService.Web.Pages.ItemGroups
+@using DMSpro.OMS.MdmService.Web.Menus
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@inject IAuthorizationService Authorization
+@model IndexModel
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = L["ItemGroups"].Value;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.ItemGroups;
+}
+
+@section scripts
+{
+    <abp-script src="/Pages/Mdm/ItemGroups/index.js" />
+}
+
+@*@section content_toolbar {
+    <abp-button id="ExportToExcelButton" text="@L["ExportToExcel"].Value" icon="download" size="Small" button-type="Primary" />
+    @if (await Authorization.IsGrantedAsync(MdmServicePermissions.ItemGroups.Create))
+    {
+        <abp-button id="NewItemGroupButton" text="@L["NewItemGroup"].Value" icon="plus" size="Small" button-type="Primary" />
+    }
+}*@
+
+<abp-card>
+    <abp-card-body>
+		<abp-row class="mb-3">
+            <abp-column size-md="_12">
+                <form id="SearchForm" autocomplete="off">
+                    <div class="input-group">
+                        <input class="form-control page-search-filter-text" id="FilterText" placeholder="@L["Search"]"/>
+                        <abp-button button-type="Primary" type="submit" icon="search"/>
+                    </div>
+                </form>
+            </abp-column>
+            <abp-column size-md="_12" class="mt-3">
+                <a href="javascript:;" id="AdvancedFilterSectionToggler" class="text-decoration-none">@L["SeeAdvancedFilters"]</a>
+            </abp-column>
+        </abp-row>
+
+        <abp-row id="AdvancedFilterSection" style="display: none;">
+            <abp-column size="_3">
+                <abp-input asp-for="CodeFilter" label="@L["Code"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="NameFilter" label="@L["Name"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="DescriptionFilter" label="@L["Description"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="TypeFilter" label="@L["Type"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-select asp-for="StatusFilter" label="@L["Status"].Value" />
+            </abp-column>
+        </abp-row>
+
+        <abp-table striped-rows="true" id="ItemGroupsTable">
+            <thead>
+				<tr>
+					<th>@L["Actions"]</th>
+					<th>@L["Code"]</th>
+					<th>@L["Name"]</th>
+					<th>@L["Description"]</th>
+					<th>@L["Type"]</th>
+					<th>@L["Status"]</th>
+
+				</tr>
+            </thead>
+        </abp-table>
+    </abp-card-body>
+</abp-card>

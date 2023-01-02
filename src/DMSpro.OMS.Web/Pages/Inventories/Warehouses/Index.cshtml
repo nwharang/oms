@@ -1,0 +1,50 @@
+﻿@page
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = "Warehouse";
+    PageLayout.Content.MenuItemName = "Inventories.Warehouses";
+}
+
+@section scripts {
+    <abp-script src="/Pages/Inventories/Warehouses/index.js" />
+}
+
+@section breadcrumb {
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">Inventory</a></li>
+        <li class="breadcrumb-item active">Warehouse</li>
+    </ol>
+}
+
+<div class="col-lg-12">
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="ui-sortable-handle">
+                <i class="subheader-icon fa fa-list-ul"></i> Warehouse
+            </h2>
+        </div>
+        <div class="panel-container show">
+            <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
+                <abp-card>
+                    <abp-card-body>
+                        <abp-row>
+                            <div style="padding-left:12px" class="buttons-header-grid">
+                                <button id="NewWareHouseButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                    <i class="fa fa-plus"></i> <span>New Warehouse</span>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                    <i class="fa fa-upload"></i> <span>Import from Excel</span>
+                                </button>
+                            </div>
+                        </abp-row>
+                        <div class="dx-viewport">
+                            <div id="dataGridContainer"></div>
+                        </div>
+                    </abp-card-body>
+                </abp-card>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using Microsoft.Extensions.Configuration;
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = "Maps";
+    PageLayout.Content.MenuItemName = "MdmService.Geographical.Maps";
+    var mapsUrl = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("Maps")["Url"];
+}
+
+@section scripts {
+    <abp-script src="/Pages/Mdm/Maps/index.js" />
+}
+
+@section breadcrumb {
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">Geographical</a></li>
+        <li class="breadcrumb-item active">Maps</li>
+    </ol>
+}
+
+<div class="col-lg-12">
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="ui-sortable-handle">
+                <i class="subheader-icon fas fa-map-marked"></i> Maps
+            </h2>
+        </div>
+        <div class="panel-container show">
+            <div class="panel-content jqvmap-bg-ocean p-0" style="height: 768px;">
+                <iframe src="@mapsUrl" title="maps" style="height: 100%; width: 100%;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>

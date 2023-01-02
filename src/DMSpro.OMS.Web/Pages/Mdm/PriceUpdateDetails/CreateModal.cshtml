@@ -1,0 +1,32 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.Web.Pages.PriceUpdateDetails
+@using DMSpro.OMS.MdmService.PriceUpdateDetails;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model CreateModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/PriceUpdateDetails/CreateModal" autocomplete="off">
+    <abp-modal id="PriceUpdateDetailCreateModal">
+        <abp-modal-header title="@L["NewPriceUpdateDetail"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    
+            <abp-input asp-for="PriceUpdateDetail.PriceBeforeUpdate" />
+
+            <abp-input asp-for="PriceUpdateDetail.NewPrice" />
+
+            <abp-input asp-for="PriceUpdateDetail.UpdatedDate" value="" type="date"/>
+
+                                <abp-select asp-for="PriceUpdateDetail.PriceUpdateId" asp-items="Model.PriceUpdateLookupListRequired" label="@L["PriceUpdate"].Value"/>            <abp-select asp-for="PriceUpdateDetail.PriceListDetailId" asp-items="Model.PriceListDetailLookupListRequired" label="@L["PriceListDetail"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

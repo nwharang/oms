@@ -1,0 +1,32 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.Web.Pages.EmployeeAttachments
+@using DMSpro.OMS.MdmService.EmployeeAttachments;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model CreateModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/EmployeeAttachments/CreateModal" autocomplete="off">
+    <abp-modal id="EmployeeAttachmentCreateModal">
+        <abp-modal-header title="@L["NewEmployeeAttachment"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    
+            <abp-input asp-for="EmployeeAttachment.url" />
+
+            <abp-input asp-for="EmployeeAttachment.Description" />
+
+            <abp-input asp-for="EmployeeAttachment.Active" />
+
+                                <abp-select asp-for="EmployeeAttachment.EmployeeProfileId" asp-items="Model.EmployeeProfileLookupListRequired" label="@L["EmployeeProfile"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

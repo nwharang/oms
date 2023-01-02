@@ -1,0 +1,34 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.Web.Pages.ItemImages
+@using DMSpro.OMS.MdmService.ItemImages;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model CreateModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/ItemImages/CreateModal" autocomplete="off">
+    <abp-modal id="ItemImageCreateModal">
+        <abp-modal-header title="@L["NewItemImage"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    
+            <abp-input asp-for="ItemImage.Description" />
+
+            <abp-input asp-for="ItemImage.Active" />
+
+            <abp-input asp-for="ItemImage.URL" />
+
+            <abp-input asp-for="ItemImage.DisplayOrder" />
+
+                                <abp-select asp-for="ItemImage.ItemId" asp-items="Model.ItemMasterLookupListRequired" label="@L["Item"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>

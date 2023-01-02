@@ -1,0 +1,34 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@using DMSpro.OMS.MdmService.Web.Pages.PriceUpdateDetails
+@using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
+@using DMSpro.OMS.MdmService.PriceUpdateDetails;
+@using System.Globalization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@model EditModalModel
+@{
+    Layout = null;
+}
+
+<form data-ajaxForm="true" asp-page="/PriceUpdateDetails/EditModal" autocomplete="off">
+    <abp-modal id="PriceUpdateDetailEditModal">
+        <abp-modal-header title="@L["Update"].Value"></abp-modal-header>
+
+        <abp-modal-body>
+                    <abp-input asp-for="Id" />
+                    <abp-input asp-for="PriceUpdateDetail.ConcurrencyStamp" hidden="true" suppress-label="true"/>
+                    
+            <abp-input asp-for="PriceUpdateDetail.PriceBeforeUpdate" />
+
+            <abp-input asp-for="PriceUpdateDetail.NewPrice" />
+
+            <abp-input asp-for="PriceUpdateDetail.UpdatedDate" value="@(Model.PriceUpdateDetail.UpdatedDate?.ToString("yyyy-MM-dd"))" type="date"/>
+
+                                <abp-select asp-for="PriceUpdateDetail.PriceUpdateId" asp-items="Model.PriceUpdateLookupListRequired" label="@L["PriceUpdate"].Value"/>            <abp-select asp-for="PriceUpdateDetail.PriceListDetailId" asp-items="Model.PriceListDetailLookupListRequired" label="@L["PriceListDetail"].Value"/>
+                
+        </abp-modal-body>
+
+        <abp-modal-footer buttons="@(AbpModalButtons.Cancel|AbpModalButtons.Save)"></abp-modal-footer>
+    </abp-modal>
+</form>
