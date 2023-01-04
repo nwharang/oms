@@ -15,6 +15,14 @@
     PageLayout.Content.MenuItemName = MdmServiceMenus.SalesOrgs;
 }
 
+@section styles {
+    <style>
+        #btnActive {
+            margin-top: 7.5px;
+        }
+    </style>
+}
+
 @section scripts {
     <abp-script src="/Pages/Mdm/SalesOrganization/index.js" />
 }
@@ -44,41 +52,31 @@
                                     <i class="fa fa-plus"></i>
                                     <span>@L["Button.New.SalesOrg"].Value</span>
                                 </button>
-                                <button id="SaveButton" type="button" class="elHidden btn btn-sm btn-outline-default waves-effect waves-themed" style="display: none;">
+                                <button id="SaveButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" disabled>
                                     <i class="fa fa-check"></i>
                                     @L1["Button.Save"].Value
                                 </button>
-                                <button id="CloseButton" type="button" class="elHidden btn btn-sm btn-outline-default waves-effect waves-themed" style="display: none;">
+                                <button id="CancelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" disabled>
                                     <i class="fa fa-times"></i>
-                                    <span>@L1["Button.Close"].Value</span>
+                                    <span>@L1["Button.Cancel"].Value</span>
                                 </button>
                             </div>
                         </abp-row>
                         <div class="dx-viewport">
                             <div id="formSalesOrgHeader" class="row pt-3">
                                 <div class="form-group col-2">
-                                    <div class="form-group">
-                                        <label class="form-label">@L["EntityFieldName:MDMService:SalesOrgHeader:Code"].Value</label>
-                                        <input type="text" id="salesOrgHeaderCode" class="form-control" style="display: none;">
-                                        <div id="searchCode" class="rounded-right"></div>
-                                    </div>
+                                    <div id="salesOrgHeaderCode"></div>
                                 </div>
-                                <div class="elHide form-group col-2" style="display: none;">
-                                    <div class="form-group">
-                                        <label class="form-label">@L["EntityFieldName:MDMService:SalesOrgHeader:Name"].Value</label>
-                                        <input type="text" id="salesOrgHeaderName" class="form-control">
-                                    </div>
+                                <div class="form-group col-2">
+                                    <div id="salesOrgHeaderName"></div>
                                 </div>
-                                <div class="elHide form-group col-1" style="display: none;">
-                                    <div class="form-group">
-                                        <label class="form-label">&nbsp;</label><br />
-                                        <button id="btnActive" type="button" class="btn btn-outline-default waves-effect waves-themed">
-                                            @L["EntityFieldValue:MDMService:SalesOrgHeader:Active:False"]
-                                        </button>
-                                    </div>
+                                <div class="form-group col-1">
+                                    <button id="btnActive" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                        @L["EntityFieldValue:MDMService:SalesOrgHeader:Active:False"]
+                                    </button>
                                 </div>
                             </div>
-                            <div id="formDetail" class="elHide row border-top py-3" style="display: none;">
+                            <div id="formDetail" class="row border-top py-3">
                                 <div id="formSalesOrgHierarchy" class="col-6 px-2">
                                     <div class="col border-right px-2">
                                         <div class="row">

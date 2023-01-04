@@ -23,11 +23,11 @@ $(function () {
             const deferred = $.Deferred();
 
             var filterCode = [];
-            if (loadOptions.searchValue != undefined) {
+            if (loadOptions.searchValue != undefined && loadOptions.searchValue != "*") {
                 filterCode = JSON.stringify(['code', 'contains', loadOptions.searchValue]);
             }
 
-            salesOrgHeaderService.getListDevextremes({ filter: filterCode })
+            salesOrgHeaderService.getListDevextremes({ filter: filterCode, skip: loadOptions.skip, take: loadOptions.take })
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -171,17 +171,29 @@ $(function () {
     /****control*****/
 
     //Search Sales Org Header
-    const searchBox = $('#searchCode').dxSelectBox({
+    const salesOrgHeaderCode = $('#salesOrgHeaderCode').dxAutocomplete({
         dataSource: salesOrgHeaderStore,
-        displayExpr: 'code',
-        valueExpr: 'id',
-        searchEnabled: true,
+        valueExpr: "code",
+        label: l('EntityFieldName:MDMService:SalesOrgHeader:Code'),
+        labelMode: "floating",
         showClearButton: true,
-        noDataText: l('NoData'),
-        width: "250px",
-        onValueChanged(data) {
-            if (data.value != null) {
-                salesOrgHeaderService.get(data.value)
+        maxItemCount: 50,
+        showDropDownButton: true,
+        buttons: [{
+            name: 'btnSearch',
+            location: 'after',
+            options: {
+                icon: 'search',
+                type: 'normal',
+                stylingMode: 'text',
+                onClick() {
+                    salesOrgHeaderCode.option({ minSearchLength:0, opened: true });
+                },
+            },
+        }],
+        onSelectionChanged(data) {
+            if (data.selectedItem != undefined && data.selectedItem.id != null) {
+                salesOrgHeaderService.get(data.selectedItem.id)
                     .done(result => {
                         //change state to update
                         CheckState('edit');
@@ -196,7 +208,7 @@ $(function () {
                         dataGridContainer.refresh();
 
                         //set textbox value - Name
-                        $("#salesOrgHeaderName").val(result.name);
+                        salesOrgHeaderName.option("value", result.name);
 
                         //set button name - Active
                         if (result.active) {
@@ -218,11 +230,16 @@ $(function () {
                 dataGridContainer.refresh();
 
                 //clear textbox value - Name
-                $("#salesOrgHeaderName").val('');
+                salesOrgHeaderName.reset();
             }
+        },
+    }).dxAutocomplete("instance");
 
-        }
-    }).dxSelectBox('instance');
+    //TextBox - Sales Org Header Name
+    var salesOrgHeaderName = $('#salesOrgHeaderName').dxTextBox({
+        label: l('EntityFieldName:MDMService:SalesOrgHeader:Name'),
+        labelMode: "floating"
+    }).dxTextBox('instance');
 
     //Tree Sales Org Hierarchy
     const dataTreeContainer = $('#dataTreeContainer').dxTreeList({
@@ -485,9 +502,18 @@ $(function () {
     $("#SaveButton").click(function (e) {
         e.preventDefault();
 
+        var code = salesOrgHeaderCode.option("value");
+        var name = salesOrgHeaderName.option("value");
+
+        if (code == null) {
+            salesOrgHeaderCode.option('isValid', false);
+            salesOrgHeaderCode.focus();
+            return;
+        }
+
         var orgHeaderValue = {
-            code: $("#salesOrgHeaderCode").val(),
-            name: $("#salesOrgHeaderName").val(),
+            code: code,
+            name: name,
             active: true
         };
 
@@ -495,7 +521,7 @@ $(function () {
             salesOrgHeaderService.create(orgHeaderValue, { contentType: "application/json" })
                 .done(result => {
                     abp.message.success(l('Congratulations'));
-                    CheckState('home');
+                    CheckState('edit');
                 })
                 .fail(() => { LoadingButton("SaveButton", false); });
         } else if (stateMode == "edit") {
@@ -503,7 +529,7 @@ $(function () {
         }
     });
 
-    $("#CloseButton").click(function (e) {
+    $("#CancelButton").click(function (e) {
         e.preventDefault();
         CheckState('home');
     });
@@ -527,21 +553,29 @@ $(function () {
         stateMode = state;
         switch (stateMode) {
             case 'home': {
-                searchBox.reset();
-                $("#NewSalesOrgButton,#searchCode").show();
-                $("#SaveButton,#CloseButton,#salesOrgHeaderCode,.elHide").hide();
-                $("#NewSalesOrgHierarchyButton,#NewSalesOrgEmpAssignmentButton").prop('disabled', false);
+                salesOrgHeaderCode.reset();
+                salesOrgHeaderCode.getButton("btnSearch").option("visible", true);
+                salesOrgHeaderCode.option('isValid', true);
+                salesOrgHeaderName.reset();
+                $("#NewSalesOrgButton").prop('disabled', false);
+                $("#SaveButton, #CancelButton").prop('disabled', true);
+                //$("#NewSalesOrgHierarchyButton,#NewSalesOrgEmpAssignmentButton").prop('disabled', false);
                 break;
             }
             case 'add': {
-                $("#NewSalesOrgButton,#searchCode").hide();
-                $("#SaveButton,#CloseButton,#salesOrgHeaderCode,.elHide").show();
-                $("#NewSalesOrgHierarchyButton,#NewSalesOrgEmpAssignmentButton").prop('disabled', true);
+                salesOrgHeaderCode.reset();
+                salesOrgHeaderCode.getButton("btnSearch").option("visible", false);
+                salesOrgHeaderCode.option('isValid', true);
+                salesOrgHeaderName.reset();
+                $("#NewSalesOrgButton").prop('disabled', true);
+                $("#SaveButton, #CancelButton").prop('disabled', false);
+                //$("#NewSalesOrgHierarchyButton,#NewSalesOrgEmpAssignmentButton").prop('disabled', true);
                 break;
             }
             case 'edit': {
-                $("#NewSalesOrgButton").hide();
-                $("#SaveButton,#CloseButton,.elHide").show();
+                salesOrgHeaderCode.getButton("btnSearch").option("visible", true);
+                //$("#NewSalesOrgButton").prop('disabled', true);
+                $("#SaveButton, #CancelButton").prop('disabled', false);
                 break;
             }
             default:
