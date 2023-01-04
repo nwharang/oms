@@ -1,0 +1,9 @@
+﻿#txtBarCode {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-left: 7px;
+}
+
+    #txtBarCode .dx-placeholder::before {
+        padding: 5px 9px 8px;
+    }

@@ -1,49 +1,80 @@
 ﻿
 $(function () {
     var l = abp.localization.getResource("MdmService");
+    DevExpress.config({
+        editorStylingMode: 'underlined',
+    });
 
-   // DevExpress.setTemplateEngine('underscore');
-   $('#tabpanel-container').dxTabPanel({
+    // DevExpress.setTemplateEngine('underscore');
+    $('#tabpanel-container').dxTabPanel({
         height: 260,
         items: [{
             title: "Details",
             icon: "detailslayout",
             template: function () {
-                return $('#details1') 
+                return $('#details1')
             }
         }, {
             title: "Promotional Information",
             icon: "money",
             template: function () {
-                return $('#details2') 
+                return $('#details2')
             }
         }]
     }).dxTabPanel('instance');
-   
-    $("#form").dxForm({
+
+    $("#top-section").dxForm({
         formData: {
             // Docdate: currentDate(),
             // PostingDate: currentDate()
         },
+        labelMode: 'floating',
         colCount: 4,
         items: [
             {
                 itemType: "group",
-                items: ["RPONbr", "Status",
+                items: [
                     {
-                        dataField: 'DocDate',
-                        editorType: 'dxDateBox',
-                    }]
+                        dataField: 'RPONbr',
+                        editorType: 'dxSelectBox',
+                        editorOptions: {
+                           // items: positions,
+                            searchEnabled: true,
+                            value: '',
+                        },
+                        validationRules: [{
+                            type: 'required',
+                            message: 'RPONbr is required',
+                        }],
+                        message:"xx",
+                        label: {
+                            template: function () {
+                                return (data) => $(`<div>ffff</div>`);
+                            },
+                        }
+                    },
+                    {
+                        dataField: 'Status',
+                        editorOptions: {
+                            readOnly: true,
+                        },
+                    }
+                ]
             },
             {
                 itemType: "group",
-                items: [{
-                    dataField: 'RequiredDate',
-                    editorType: 'dxDateBox'
-                }, {
-                    dataField: 'PostingDate',
-                    editorType: 'dxDateBox'
-                }, "Remark"]
+                items: [
+                    {
+                        dataField: 'DocDate',
+                        editorType: 'dxDateBox',
+                    },
+                    {
+                        dataField: 'RequiredDate',
+                        editorType: 'dxDateBox'
+                    }, {
+                        dataField: 'PostingDate',
+                        editorType: 'dxDateBox'
+                    }]
             },
             {
                 itemType: "group",
@@ -55,13 +86,38 @@ $(function () {
             }
         ]
     });
+    $("#bottom-remark").dxForm({
+        labelMode: 'floating',
+        colCount: 2,
+        items: [
+            {
+                itemType: "group",
+                items: [
+                    {
+                        textField: "xx",
+                        dataField: 'ReMark',
+                        colSpan: 2,
+                        labelMode: 'floating',
+                        editorType: 'dxTextArea',
+                        editorOptions: {
+                            height: 90,
+                            labelMode: 'floating'
+                        },
+                    }]
+            }
+        ]
+    });
+    const resizable = $('#resizable').dxResizable({
+        minHeight: 150,
 
-    
+        area: '.wrapper-resizable',
+    }).dxResizable('instance');
+
     $('#txtBarCode').dxTextBox({
         value: '',
         placeholder: "Type barcode...",
         height: 32,
-        width:200,
+        width: 200,
         showClearButton: true,
     });
     //$("#cbBarCodes").dxAutocomplete({
@@ -78,21 +134,34 @@ $(function () {
         dataSource: inventoryDatas,
         keyExpr: "id",
         showBorders: true,
-       // focusedRowEnabled: true,
-       // columnWidth: 100,
-         scrolling: {
-             columnRenderingMode: 'virtual',
-          },
+        columnAutoWidth: true,
+        scrolling: {
+            columnRenderingMode: 'virtual',
+        },
         searchPanel: {
             visible: true
         },
         allowColumnResizing: true,
-        allowColumnReordering: false, 
+        allowColumnReordering: true,
         paging: {
             enabled: true,
             pageSize: 10
-        }, 
+        },
         rowAlternationEnabled: true,
+        filterRow: {
+            visible: true,
+            applyFilter: 'auto',
+        },
+        headerFilter: {
+            visible: false,
+        },
+        columnChooser: {
+            enabled: true,
+            mode: "select" // or "select"
+        },
+        //columnFixing: {
+        //    enabled: true
+        //},
         pager: {
             visible: true,
             showPageSizeSelector: true,
@@ -122,7 +191,7 @@ $(function () {
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
-        }, 
+        },
         onEditorPreparing: function (e) {
             if (e.dataField == "code" && e.parentType == "dataRow") {
                 e.editorName = "dxDropDownBox";
@@ -161,17 +230,19 @@ $(function () {
 
                         dataGrid.selectRows(value, false);
                     });
-                    container.append($dataGrid); 
-                    return container; 
+                    container.append($dataGrid);
+                    return container;
                 };
             }
         },
         columns: [
             {
+                width: 100,
                 type: 'buttons',
                 caption: l('Actions'),
                 buttons: ['edit', 'delete'],
-            }, 
+                //fixed: true,
+            },
             {
                 width: 300,
                 caption: "Item Code",
@@ -180,8 +251,8 @@ $(function () {
                     var displayText = products.filter(function (item) { return item.ID == rowData.code })[0].Name;
                     if (displayText)
                         return displayText;
-                    return ""; 
-                }, 
+                    return "";
+                },
                 lookup: {
                     dataSource: {
                         store: {
@@ -192,30 +263,39 @@ $(function () {
                     },
                     displayExpr: "Name",
                     valueExpr: "ID"
-                }
-            } ,
-            {
-                caption: "Item Name",
-                dataField: "ItemName"
+                },
+                //fixed: true,
             },
             {
+                width: 200,
+                caption: "Item Name",
+                dataField: "ItemName",
+                //  fixed: true,
+            },
+            {
+
                 caption: "UOM",
                 dataField: "UOM"
             },
             {
+
                 caption: "Price",
                 dataField: "Price"
             }, {
+
                 caption: "Qty",
                 dataField: "Qty"
             }, {
+
                 caption: "BaseQty",
                 dataField: "BaseQty"
             }, {
+
                 caption: "BaseUOM",
                 dataField: "BaseUOM"
             },
             {
+
                 caption: "IsFree",
                 dataField: "IsFree",
                 dataType: "boolean",
@@ -229,109 +309,24 @@ $(function () {
                 }
             },
             {
+
                 caption: "Desc",
                 dataField: "Desc"
             }, {
+
                 caption: "TaxCode",
                 dataField: "TaxCode"
             }, {
+
                 caption: "TaxRate",
                 dataField: "TaxRate"
             }, {
+
                 caption: "LineAmt",
                 dataField: "LineAmt"
             }
         ],
     }).dxDataGrid("instance");
-      $('#dataGridContainer2').dxDataGrid({
-        dataSource: inventoryDatas,
-        keyExpr: "id",
-        showBorders: true,
-        focusedRowEnabled: true,
-        //columnWidth: 100,
-        // scrolling: {
-        //     columnRenderingMode: 'virtual',
-        //  },
-        searchPanel: {
-            visible: true
-        },
-        allowColumnReordering: false,
-        scrolling: {
-            mode: 'standard'
-        },
-        paging: {
-            enabled: true,
-            pageSize: 10
-        },
-        pager: {
-            visible: true,
-            showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
-            showInfo: true,
-            showNavigationButtons: true
-        },
-        toolbar: {
-            items: [
-                {
-                    name: "searchPanel",
-                    location: 'after'
-                }
-            ]
-        },
-        columns: [
-            {
-                caption: "Item Code",
-                dataField: "code"
-            },
-            {
-                caption: "Item Name",
-                dataField: "ItemName"
-            },
-            {
-                caption: "UOM",
-                dataField: "UOM"
-            },
-            {
-                caption: "Price",
-                dataField: "Price"
-            }, {
-                caption: "Qty",
-                dataField: "Qty"
-            }, {
-                caption: "BaseQty",
-                dataField: "BaseQty"
-            }, {
-                caption: "BaseUOM",
-                dataField: "BaseUOM"
-            },
-            {
-                caption: "IsFree",
-                dataField: "IsFree",
-                dataType: "boolean",
-                calculateCellValue: function (rowData) {
-                    let _val;
-                    rowData.IsFree === "TRUE" ? _val = true : _val = false;
-                    return _val;
-                },
-                setCellValue: function (newData, value, currentRowData) {
-                    value ? newData.IsFree = "TRUE" : newData.IsFree = "FALSE";
-                }
-            },
-            {
-                caption: "Desc",
-                dataField: "Desc"
-            }, {
-                caption: "TaxCode",
-                dataField: "TaxCode"
-            }, {
-                caption: "TaxRate",
-                dataField: "TaxRate"
-            }, {
-                caption: "LineAmt",
-                dataField: "LineAmt"
-            }
-        ],
-      }).dxDataGrid("instance");
 
 
     $("#ExportToExcelButton").click(function (e) {
@@ -342,7 +337,7 @@ $(function () {
 
     $("button[name=btnAddRow]").click(function (e) {
         var grid = $('#' + $(this).attr('data-target')).data('dxDataGrid');
-        grid.addRow(); 
+        grid.addRow();
     });
     function currentDate() {
         var today = new Date();
@@ -376,7 +371,7 @@ var products = [{
     "BarCode": "45-0060-Z"
 }];
 var inventoryDatas = [
-    { 
+    {
         id: 1,
         code: 5,//product id
         ItemName: "Sản phẩm 1",
@@ -400,7 +395,7 @@ var inventoryDatas = [
         IsFree: "TRUE",
     },
     {
-        
+
         id: 2,
         code: 2,//product id
         ItemName: "Sản phẩm 2",
@@ -423,7 +418,7 @@ var inventoryDatas = [
         Desc: "Mỹ phẩm",
         IsFree: "TRUE",
     },
-    { 
+    {
         id: 3,
         code: 4,//product id
         ItemName: "Sản phẩm 3",

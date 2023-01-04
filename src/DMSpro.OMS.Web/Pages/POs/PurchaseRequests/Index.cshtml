@@ -8,16 +8,7 @@
 }
 
 @section styles {
-    <style>
-        #txtBarCode{
-            display: inline-block;
-            vertical-align: bottom;
-        }
-
-            #txtBarCode .dx-placeholder::before {
-            padding: 5px 9px 8px;
-        }
-    </style>
+     <abp-style src="/Pages/POs/PurchaseRequests/index.css" />
 }
 @section scripts {
     <abp-script src="/Pages/POs/PurchaseRequests/index.js" />
@@ -59,11 +50,13 @@
                             </div>
                         </abp-row>
                         <div class="dx-viewport">
-                            <div class="py-3">
-                                @*<div class="dx-fieldset-header">Purchase Requests</div>*@
-                                <div id="form"></div>
+                            <div class="py-3 wrapper-resizable">
+                                <div id="resizable">
+                                    <div id="top-section"></div>
+                                    <div id="bottom-remark"></div>
+                                </div> 
                             </div>
-                            <div class="border-top py-2">
+                            <div class=" py-2">
                                 @*<div class="dx-fieldset-header">Detail</div>*@
 
                                 <div id="MDMtabpanel">
@@ -84,9 +77,9 @@
                                             <button type="button" class="btn btn-sm btn-outline-default" name="btnAddRow" data-target="gridDetails"><i class="dx-icon dx-icon-plus"></i>
                                                 <span class="dx-button-text">Add Row</span>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-outline-default"><i class="dx-icon dx-icon-remove"></i>
+                                          @*  <button type="button" class="btn btn-sm btn-outline-default"><i class="dx-icon dx-icon-remove"></i>
                                                 <span class="dx-button-text">Delete Row</span>
-                                            </button>
+                                            </button>*@
                                           <div id="txtBarCode" ></div>
                                             
                                         </div>
@@ -99,7 +92,7 @@
                                     <div id="gridDetails"></div>
                                 </script>
                                 <script id="details2" type="text/html">
-                                    <div id="dataGridContainer2"></div>
+                                     
                                 </script>
                             </div>
                         </div>
