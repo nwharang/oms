@@ -5,6 +5,9 @@
     "Login": "Login",
     "Menu:Dashboard": "Dashboard",
     "hac": "KAlick",
-    "kalick": "thuy"
+    "kalick": "thuy",
+    "NoData": "No data to display",
+    "Button.Save": "Save",
+    "Button.Close": "Close"
   }
 }
