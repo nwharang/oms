@@ -1,102 +1,276 @@
 $(function () {
-    // language texts
     var l = abp.localization.getResource("MdmService");
-    // load mdmService
-    //var salesOrgService = window.dMSpro.oMS.mdmService.controllers.salesOrgs.salesOrg;
-    //var salesOrgValueService = window.dMSpro.oMS.mdmService.controllers.salesOrgValues.salesOrgValue;
-    //var salesOrgEmpAssignmentService = window.dMSpro.oMS.mdmService.controllers.salesOrgEmpAssignments.salesOrgEmpAssignment;
+    var salesOrgHeaderService = window.dMSpro.oMS.mdmService.controllers.salesOrgHeaders.salesOrgHeader;
+    var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
+    var salesOrgEmpAssignmentService = window.dMSpro.oMS.mdmService.controllers.salesOrgEmpAssignments.salesOrgEmpAssignment;
+    var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
 
-    $("#form").dxForm({
-        colCount: 2,
-        items: [
-            {
-                itemType: "group",
-                items: [
-                    {
-                        caption: "Code",
-                        dataField: 'code',
-                        editorOptions: {
-                            width: '300px',
-                        }
-                    },
-                    {
-                        caption: "Name",
-                        dataField: 'name',
-                        editorOptions: {
-                            width: '300px',
-                        }
-                    },
-                    {
-                        caption: "IsActive",
-                        dataField: "active",
-                        editorType: "dxCheckBox",
-                        editorOptions: {
-                            width: '300px',
-                        }
-                    }
-                ]
-            },
-            {
-                itemType: "group",
-                items: [
-                    {
-                        caption: "Channel",
-                        dataField: 'channel',
-                        editorOptions: {
-                            width: '300px',
-                        }
-                    },
-                    {
-                        caption: "Product Category",
-                        dataField: 'productcategory',
-                        editorOptions: {
-                            width: '300px',
-                        }
-                    },
-                    {
-                        caption: "Sales Employee",
-                        dataField: 'salesemployee',
-                        editorOptions: {
-                            width: '300px',
-                        }
-                    }
-                ]
+    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const menuItems = [
+        { id: '1', text: 'Edit' },
+        { id: '2', text: 'Add sub Org Hierarchy' },
+        { id: '3', text: 'Delete' }
+    ];
+
+    var stateMode = "home"; //value: home || add || edit; default: home
+    var salesOrgHeaderIdFilter = null;
+    var salesOrgHierarchyIdFilter = null;
+
+    /****custom store*****/
+    var salesOrgHeaderStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+
+            var filterCode = [];
+            if (loadOptions.searchValue != undefined && loadOptions.searchValue != "*") {
+                filterCode = JSON.stringify(['code', 'contains', loadOptions.searchValue]);
             }
-        ]
+
+            salesOrgHeaderService.getListDevextremes({ filter: filterCode, skip: loadOptions.skip, take: loadOptions.take })
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            salesOrgHeaderService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
     });
 
-    $("#dataTreeListContainer").dxTreeView({
-        items: salesOrgValueDatas,
-        dataStructure: 'plain',
-        parentIdExpr: 'parentId',
-        keyExpr: 'id',
-        displayExpr: 'name',
-        onItemClick(e) {
-            const item = e.itemData;
-            if (item.id) {
-                dataGridContainer.filter(['salesorgvaluecode', '=', item.id]);
+    var salesOrgHierarchyStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            salesOrgHierarchyService.getListDevextremes({ filter: JSON.stringify([["salesOrgHeaderId", "=", salesOrgHeaderIdFilter], "and", ["isDeleted", "=", false]]) })
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            salesOrgHierarchyService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        },
+        insert(values) {
+            return salesOrgHierarchyService.create(values, { contentType: "application/json" });
+        },
+        update(key, values) {
+            return salesOrgHierarchyService.update(key, values, { contentType: "application/json" });
+        },
+        remove(key) {
+            return salesOrgHierarchyService.delete(key);
+        }
+    });
+
+    var salesOrgEmpAssignmentStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+
+            if (loadOptions.filter == null) {
+                loadOptions.filter = ["salesOrgHierarchyId", "=", salesOrgHierarchyIdFilter];
+            }
+
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            salesOrgEmpAssignmentService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            salesOrgEmpAssignmentService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        },
+        insert(values) {
+            return salesOrgEmpAssignmentService.create(values, { contentType: "application/json" });
+        },
+        update(key, values) {
+            return salesOrgEmpAssignmentService.update(key, values, { contentType: "application/json" });
+        },
+        remove(key) {
+            return salesOrgEmpAssignmentService.delete(key);
+        }
+    });
+
+    var employeeProfileStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            employeeProfileService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            employeeProfileService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
+
+    /****control*****/
+
+    //Search Sales Org Header
+    const salesOrgHeaderCode = $('#salesOrgHeaderCode').dxAutocomplete({
+        dataSource: salesOrgHeaderStore,
+        valueExpr: "code",
+        label: l('EntityFieldName:MDMService:SalesOrgHeader:Code'),
+        labelMode: "floating",
+        showClearButton: true,
+        maxItemCount: 50,
+        showDropDownButton: true,
+        buttons: [{
+            name: 'btnSearch',
+            location: 'after',
+            options: {
+                icon: 'search',
+                type: 'normal',
+                stylingMode: 'text',
+                onClick() {
+                    salesOrgHeaderCode.option({ minSearchLength:0, opened: true });
+                },
+            },
+        }],
+        onSelectionChanged(data) {
+            if (data.selectedItem != undefined && data.selectedItem.id != null) {
+                salesOrgHeaderService.get(data.selectedItem.id)
+                    .done(result => {
+                        //change state to update
+                        CheckState('edit');
+
+                        //load data for Sales Org Hierarchy
+                        salesOrgHeaderIdFilter = result.id;
+                        dataTreeContainer.refresh();
+                        dataTreeContainer.option({ focusedRowIndex: 0 })
+
+                        //clear data for Sales Org Employee Assignment
+                        salesOrgHierarchyIdFilter = null;
+                        dataGridContainer.refresh();
+
+                        //set textbox value - Name
+                        salesOrgHeaderName.option("value", result.name);
+
+                        //set button name - Active
+                        if (result.active) {
+                            $("#btnActive").html(l('EntityFieldValue:MDMService:SalesOrgHeader:Active:False'));
+                        } else {
+                            $("#btnActive").html(l('EntityFieldValue:MDMService:SalesOrgHeader:Active:True'));
+                        }
+                    });
             } else {
-                dataGridContainer.filter(['salesorgvaluecode', '=', 0]);
+                //change state to home
+                CheckState('home');
+
+                //clear data for Sales Org Hierarchy
+                salesOrgHeaderIdFilter = null;
+                dataTreeContainer.refresh();
+
+                //clear data for Sales Org Employee Assignment
+                salesOrgHierarchyIdFilter = null;
+                dataGridContainer.refresh();
+
+                //clear textbox value - Name
+                salesOrgHeaderName.reset();
             }
         },
-    }).dxTreeView('instance');
+    }).dxAutocomplete("instance");
 
-    var dataGridContainer = $('#dataGridContainer').dxDataGrid({
-        dataSource: employeeDatas,
-        keyExpr: "id",
-        showBorders: true,
+    //TextBox - Sales Org Header Name
+    var salesOrgHeaderName = $('#salesOrgHeaderName').dxTextBox({
+        label: l('EntityFieldName:MDMService:SalesOrgHeader:Name'),
+        labelMode: "floating"
+    }).dxTextBox('instance');
+
+    //Tree Sales Org Hierarchy
+    const dataTreeContainer = $('#dataTreeContainer').dxTreeList({
+        dataSource: salesOrgHierarchyStore,
+        keyExpr: 'id',
+        parentIdExpr: "parentId",
+        remoteOperations: true,
+        autoExpandAll: true,
         focusedRowEnabled: true,
-        searchPanel: {
-            visible: true
-        },
         allowColumnReordering: false,
-        rowAlternationEnabled: true,
+        rowAlternationEnabled: false,
+        columnAutoWidth: true,
+        columnHidingEnabled: true,
+        showColumnHeaders: false,
+        showRowLines: false,
+        showBorders: false,
+        errorRowEnabled: false,
+        focusedRowEnabled: true,
+        focusedRowIndex: 0,
+        filterRow: {
+            visible: false
+        },
+        searchPanel: {
+            visible: false
+        },
         scrolling: {
             mode: 'standard'
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: 20
         },
         pager: {
             visible: true,
@@ -105,288 +279,319 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
+        editing: {
+            mode: 'row',
+            allowAdding: true,
+            allowUpdating: true,
+            allowDeleting: true,
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            }
+        },
+        onRowInserting: function (e) {
+            // for create first data - if parentId = 0, update parentId = null
+            if (e.data && e.data.parentId == 0) {
+                e.data.parentId = null;
+            }
+            e.data.salesOrgHeaderId = salesOrgHeaderIdFilter;
+            e.data.code = '001';
+            e.data.hierarchyCode = '001';
+        },
+        onRowUpdating: function (e) {
+            var objectRequire = ['salesOrgHeaderId', 'parentId', 'name'];
+            for (var property in e.oldData) {
+                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+                    e.newData[property] = e.oldData[property];
+                }
+            }
+
+            e.newData['salesOrgHeaderId'] = salesOrgHeaderIdFilter;
+            e.newData['code'] = '001';
+            e.newData['hierarchyCode'] = '001';
+        },
+        onFocusedRowChanged: function (e) {
+            //load data for Sales Org Employee Assignment
+            salesOrgHierarchyIdFilter = dataTreeContainer.option("focusedRowKey");
+            dataGridContainer.refresh();
+        },
+        onSaved() {
+            UpdateDetailButton();
+        },
+        onContentReady() {
+            UpdateDetailButton();
+        },
+        toolbar: {
+            items: [
+                {
+                    name: "searchPanel",
+                    location: 'after'
+                }
+            ]
+        },
         columns: [
             {
-                caption: "Employee Code",
-                dataField: "employeecode",
-            },
-            {
-                caption: "Name",
-                dataField: "name"
-            },
-            {
-                caption: "Base",
-                dataField: "base"
-            },
-            {
-                caption: "Effective Date",
-                dataField: "effectivedate"
-            },
-            {
-                caption: "End Date",
-                dataField: "enddate"
-            },
-            {
-                dataField: "salesorgvaluecode",
+                caption: l("Actions"),
+                type: 'buttons',
+                width: 120,
+                buttons: ['add', 'edit', 'delete'],
                 visible: false
+            },
+            {
+                caption: 'Name',
+                dataField: "name",
+                validationRules: [{ type: "required" }]
             }
-        ],
+        ]
+    }).dxTreeList("instance");
+
+
+    //Grid Sales Org Employee Assignment
+    const dataGridContainer = $('#dataGridContainer').dxDataGrid({
+        dataSource: salesOrgEmpAssignmentStore,
+        remoteOperations: true,
+        showBorders: true,
+        focusedRowEnabled: true,
+        allowColumnReordering: false,
+        rowAlternationEnabled: true,
+        columnAutoWidth: true,
+        columnHidingEnabled: true,
+        errorRowEnabled: false,
+        filterRow: {
+            visible: false
+        },
+        searchPanel: {
+            visible: false
+        },
+        scrolling: {
+            mode: 'standard'
+        },
+        paging: {
+            enabled: true,
+            pageSize: 20
+        },
+        pager: {
+            visible: true,
+            showPageSizeSelector: true,
+            allowedPageSizes: [10, 20, 50, 100],
+            showInfo: true,
+            showNavigationButtons: true
+        },
+        editing: {
+            mode: 'row',
+            allowAdding: true,
+            allowUpdating: true,
+            allowDeleting: true,
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            }
+        },
+        onInitNewRow(e) {
+            e.data.salesOrgHierarchyId = dataTreeContainer.option("focusedRowKey");
+        },
+        onRowUpdating: function (e) {
+            var objectRequire = ['employeeProfileId', 'name', 'valueCode', 'valueName'];
+            for (var property in e.oldData) {
+                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+                    e.newData[property] = e.oldData[property];
+                }
+            }
+        },
+        columns: [
+            {
+                caption: l("Actions"),
+                type: 'buttons',
+                width: 100,
+                buttons: ['edit', 'delete']
+            },
+            {
+                caption: l('EntityFieldName:MDMService:SalesOrgEmpAssignment:EmployeeFullName'),
+                dataField: "employeeProfileId",
+                validationRules: [{ type: "required" }],
+                lookup: {
+                    dataSource() {
+                        return {
+                            store: employeeProfileStore
+                        };
+                    },
+                    displayExpr: 'firstName',
+                    valueExpr: 'id',
+                }
+            },
+            {
+                caption: l('EntityFieldName:MDMService:SalesOrgEmpAssignment:IsBase'),
+                dataField: "isBase",
+                dataType: 'boolean'
+            },
+            {
+                caption: l('EntityFieldName:MDMService:SalesOrgEmpAssignment:Effective Date'),
+                dataField: "effectiveDate",
+                dataType: 'date',
+                validationRules: [{ type: "required" }],
+                editorOptions: {
+                    min: new Date()
+                }
+            },
+            {
+                caption: l('EntityFieldName:MDMService:SalesOrgEmpAssignment:EndDate'),
+                dataField: "endDate",
+                dataType: 'date',
+                editorOptions: {
+                    min: new Date()
+                }
+            },
+            {
+                caption: l('EntityFieldName:MDMService:SalesOrgEmpAssignment:SalesOrgHierarchy'),
+                dataField: "salesOrgHierarchyId",
+                validationRules: [{ type: "required" }],
+                visible: false,
+                allowEditing: false,
+                lookup: {
+                    dataSource() {
+                        return {
+                            store: salesOrgHierarchyStore,
+                            filter: ["id", "=", dataTreeContainer.option("focusedRowKey")]
+                        };
+                    },
+                    displayExpr: 'name',
+                    valueExpr: 'id',
+                }
+            }
+        ]
     }).dxDataGrid("instance");
 
-    dataGridContainer.filter(['salesorgvaluecode', '=', 0]);
-});
 
-var salesOrgValueDatas = [
-    {
-        id: 1,
-        parentId: null,
-        name: "GT",
-        islastelevel: true
-    },
-    {
-        id: 2,
-        parentId: 1,
-        name: "MD",
-        islastelevel: true
-    },
-    {
-        id: 3,
-        parentId: 2,
-        name: "MB1",
-        islastelevel: false
-    },
-    {
-        id: 4,
-        parentId: 2,
-        name: "MB2",
-        islastelevel: false
-    },
-    {
-        id: 5,
-        parentId: 3,
-        name: "Hà Nội",
-        islastelevel: false
-    },
-    {
-        id: 6,
-        parentId: 3,
-        name: "Quảng Ninh",
-        islastelevel: false
+    //Menu context
+    $('#contextMenu').dxContextMenu({
+        dataSource: menuItems,
+        target: '#dataTreeContainer .dx-row.dx-data-row',
+        onItemClick: function (e) {
+            var rowKey = dataTreeContainer.option("focusedRowKey");
+            var rowIndex = dataTreeContainer.option("focusedRowIndex");
+            switch (e.itemData.id) {
+                case '1': {
+                    dataTreeContainer.editRow(rowIndex);
+                    break;
+                }
+                case '2': {
+                    dataTreeContainer.addRow(rowKey);
+                    break;
+                }
+                case '3': {
+                    dataTreeContainer.deleteRow(rowIndex);
+                    break;
+                }
+                default:
+                    break;
+            }
+        },
+    }).dxContextMenu('instance');
+
+    /****button*****/
+    $("#NewSalesOrgButton").click(function (e) {
+        e.preventDefault();
+        CheckState('add');
+        UpdateDetailButton();
+    });
+
+    $("#SaveButton").click(function (e) {
+        e.preventDefault();
+
+        var code = salesOrgHeaderCode.option("value");
+        var name = salesOrgHeaderName.option("value");
+
+        if (code == null) {
+            salesOrgHeaderCode.option('isValid', false);
+            salesOrgHeaderCode.focus();
+            return;
+        }
+
+        var orgHeaderValue = {
+            code: code,
+            name: name,
+            active: true
+        };
+
+        if (stateMode == "add") {
+            salesOrgHeaderService.create(orgHeaderValue, { contentType: "application/json" })
+                .done(result => {
+                    abp.message.success(l('Congratulations'));
+                    CheckState('edit');
+                })
+                .fail(() => { LoadingButton("SaveButton", false); });
+        } else if (stateMode == "edit") {
+            console.log('edit');
+        }
+    });
+
+    $("#CancelButton").click(function (e) {
+        e.preventDefault();
+        CheckState('home');
+    });
+
+    $("#NewSalesOrgHierarchyButton").click(function (e) {
+        e.preventDefault();
+        dataTreeContainer.addRow();
+    });
+
+    $("#NewSalesOrgEmpAssignmentButton").click(function (e) {
+        e.preventDefault();
+        dataGridContainer.addRow();
+    });
+
+    /****function*****/
+    function isNotEmpty(value) {
+        return value !== undefined && value !== null && value !== '';
     }
-];
 
-var employeeDatas = [
-    {
-        id: 1,
-        employeecode: "RSM 01",
-        name: "Le Van A",
-        Base: true,
-        effectivedate: "10/12/2022",
-        enddate: "10/01/2023",
-        salesorgvaluecode: 5
-    },
-    {
-        id: 2,
-        employeecode: "RSM 02",
-        name: "Nguyen Van B",
-        Base: false,
-        effectivedate: "14/11/2021",
-        enddate: "13/11/2025",
-        salesorgvaluecode: 4
-    },
-    {
-        id: 3,
-        employeecode: "Admin 01",
-        name: "Admin 1",
-        Base: true,
-        effectivedate: "10/12/2022",
-        enddate: "10/01/2023",
-        salesorgvaluecode: 3
-    },
-    {
-        id: 4,
-        employeecode: "Admin 02",
-        name: "Admin 2",
-        Base: false,
-        effectivedate: "10/12/2022",
-        enddate: "10/01/2023",
-        salesorgvaluecode: 2
-    },
-    {
-        id: 5,
-        employeecode: "RSM 03",
-        name: "Nguyen Ngoc C",
-        Base: false,
-        effectivedate: "03/02/2022",
-        enddate: "28/01/2023",
-        salesorgvaluecode: 1
-    },
-    {
-        id: 6,
-        employeecode: "Admin 02",
-        name: "Admin 2",
-        Base: false,
-        effectivedate: "10/12/2022",
-        enddate: "10/01/2023",
-        salesorgvaluecode: 3
-    },
-    {
-        id: 7,
-        employeecode: "NV01",
-        name: "Tran Van Ti",
-        Base: false,
-        effectivedate: "10/12/2022",
-        enddate: "10/01/2023",
-        salesorgvaluecode: 3
-    },
-];
+    function CheckState(state) {
+        stateMode = state;
+        switch (stateMode) {
+            case 'home': {
+                salesOrgHeaderCode.reset();
+                salesOrgHeaderCode.getButton("btnSearch").option("visible", true);
+                salesOrgHeaderCode.option('isValid', true);
+                salesOrgHeaderName.reset();
+                $("#NewSalesOrgButton").prop('disabled', false);
+                $("#SaveButton, #CancelButton").prop('disabled', true);
+                //$("#NewSalesOrgHierarchyButton,#NewSalesOrgEmpAssignmentButton").prop('disabled', false);
+                break;
+            }
+            case 'add': {
+                salesOrgHeaderCode.reset();
+                salesOrgHeaderCode.getButton("btnSearch").option("visible", false);
+                salesOrgHeaderCode.option('isValid', true);
+                salesOrgHeaderName.reset();
+                $("#NewSalesOrgButton").prop('disabled', true);
+                $("#SaveButton, #CancelButton").prop('disabled', false);
+                //$("#NewSalesOrgHierarchyButton,#NewSalesOrgEmpAssignmentButton").prop('disabled', true);
+                break;
+            }
+            case 'edit': {
+                salesOrgHeaderCode.getButton("btnSearch").option("visible", true);
+                //$("#NewSalesOrgButton").prop('disabled', true);
+                $("#SaveButton, #CancelButton").prop('disabled', false);
+                break;
+            }
+            default:
+                break;
+        }
+    }
 
-//$(function () {
-//    var l = abp.localization.getResource("MdmService");
-//	var salesOrgService = window.dMSpro.oMS.mdmService.controllers.salesOrgs.salesOrg;
-
-
-
-//    var createModal = new abp.ModalManager({
-//        viewUrl: abp.appPath + "SalesOrgs/CreateModal",
-//        scriptUrl: "/Pages/SalesOrgs/createModal.js",
-//        modalClass: "salesOrgCreate"
-//    });
-
-//	var editModal = new abp.ModalManager({
-//        viewUrl: abp.appPath + "SalesOrgs/EditModal",
-//        scriptUrl: "/Pages/SalesOrgs/editModal.js",
-//        modalClass: "salesOrgEdit"
-//    });
-
-//	var getFilter = function() {
-//        return {
-//            filterText: $("#FilterText").val(),
-//            code: $("#CodeFilter").val(),
-//			name: $("#NameFilter").val(),
-//			channelId: $("#ChannelIdFilter").val(),
-//			productCategoryId: $("#ProductCategoryIdFilter").val(),
-//            active: (function () {
-//                var value = $("#ActiveFilter").val();
-//                if (value === undefined || value === null || value === '') {
-//                    return '';
-//                }
-//                return value === 'true';
-//            })(),
-//			employeeId: $("#EmployeeIdFilter").val()
-//        };
-//    };
-
-//    var dataTable = $("#SalesOrgsTable").DataTable(abp.libs.datatables.normalizeConfiguration({
-//        processing: true,
-//        serverSide: true,
-//        paging: true,
-//        searching: false,
-//        scrollX: true,
-//        autoWidth: true,
-//        scrollCollapse: true,
-//        order: [[1, "asc"]],
-//        ajax: abp.libs.datatables.createAjax(salesOrgService.getList, getFilter),
-//        columnDefs: [
-//            {
-//                rowAction: {
-//                    items:
-//                        [
-//                            {
-//                                text: l("Edit"),
-//                                visible: abp.auth.isGranted('MdmService.SalesOrgs.Edit'),
-//                                action: function (data) {
-//                                    editModal.open({
-//                                     id: data.record.id
-//                                     });
-//                                }
-//                            },
-//                            {
-//                                text: l("Delete"),
-//                                visible: abp.auth.isGranted('MdmService.SalesOrgs.Delete'),
-//                                confirmMessage: function () {
-//                                    return l("DeleteConfirmationMessage");
-//                                },
-//                                action: function (data) {
-//                                    salesOrgService.delete(data.record.id)
-//                                        .then(function () {
-//                                            abp.notify.info(l("SuccessfullyDeleted"));
-//                                            dataTable.ajax.reload();
-//                                        });
-//                                }
-//                            }
-//                        ]
-//                }
-//            },
-//			{ data: "code" },
-//			{ data: "name" },
-//			{ data: "channelId" },
-//			{ data: "productCategoryId" },
-//            {
-//                data: "active",
-//                render: function (active) {
-//                    return active ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
-//                }
-//            },
-//			{ data: "employeeId" }
-//        ]
-//    }));
-
-//    createModal.onResult(function () {
-//        dataTable.ajax.reload();
-//    });
-
-//    editModal.onResult(function () {
-//        dataTable.ajax.reload();
-//    });
-
-//    $("#NewSalesOrgButton").click(function (e) {
-//        e.preventDefault();
-//        createModal.open();
-//    });
-
-//	$("#SearchForm").submit(function (e) {
-//        e.preventDefault();
-//        dataTable.ajax.reload();
-//    });
-
-//    $("#ExportToExcelButton").click(function (e) {
-//        e.preventDefault();
-
-//        salesOrgService.getDownloadToken().then(
-//            function(result){
-//                    var input = getFilter();
-//                    var url =  abp.appPath + 'api/mdm-service/sales-orgs/as-excel-file' +
-//                        abp.utils.buildQueryString([
-//                            { name: 'downloadToken', value: result.token },
-//                            { name: 'filterText', value: input.filterText },
-//                            { name: 'code', value: input.code },
-//                            { name: 'name', value: input.name },
-//                            { name: 'channelId', value: input.channelId },
-//                            { name: 'productCategoryId', value: input.productCategoryId },
-//                            { name: 'active', value: input.active },
-//                            { name: 'employeeId', value: input.employeeId }
-//                            ]);
-
-//                    var downloadWindow = window.open(url, '_blank');
-//                    downloadWindow.focus();
-//            }
-//        )
-//    });
-
-//    $('#AdvancedFilterSectionToggler').on('click', function (e) {
-//        $('#AdvancedFilterSection').toggle();
-//    });
-
-//    $('#AdvancedFilterSection').on('keypress', function (e) {
-//        if (e.which === 13) {
-//            dataTable.ajax.reload();
-//        }
-//    });
-
-//    $('#AdvancedFilterSection select').change(function() {
-//        dataTable.ajax.reload();
-//    });
-
-
-//});
+    function UpdateDetailButton() {
+        //disable NewSalesOrgHierarchyButton if Sales Org Header have data
+        //disable NewSalesOrgEmpAssignmentButton if Sales Org Hierarchy have't data
+        if ($('#dataTreeContainer span[class="dx-treelist-nodata"]').length == 0) {
+            $("#NewSalesOrgHierarchyButton").prop('disabled', true);
+            $("#NewSalesOrgEmpAssignmentButton").prop('disabled', false);
+        } else {
+            $("#NewSalesOrgHierarchyButton").prop('disabled', false);
+            $("#NewSalesOrgEmpAssignmentButton").prop('disabled', true);
+        }
+    }
+});
