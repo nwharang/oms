@@ -46,19 +46,25 @@
 
         <abp-row id="AdvancedFilterSection" style="display: none;">
             <abp-column size="_3">
+                <abp-input asp-for="CustomerGroupIdFilter" label="@L["CustomerGroupId"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="GeoTypeFilterMin" label="@L["MinGeoType"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="GeoTypeFilterMax" label="@L["MaxGeoType"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="ValueFilter" label="@L["Value"].Value" />
+            </abp-column>
+            <abp-column size="_3">
                 <abp-select asp-for="ActiveFilter" label="@L["Active"].Value" />
             </abp-column>
             <abp-column size="_3">
-                <abp-input asp-for="EffectiveDateFilterMin" label="@L["MinEffectiveDate"].Value" type="date"/>
+                <abp-input asp-for="EffDateFilterMin" label="@L["MinEffDate"].Value" type="date"/>
             </abp-column>
             <abp-column size="_3">
-                <abp-input asp-for="EffectiveDateFilterMax" label="@L["MaxEffectiveDate"].Value" type="date"/>
-            </abp-column>
-            <abp-column size="_3">
-                <abp-select asp-for="CustomerGroupIdFilter" label="@L["CustomerGroup"].Value" />
-            </abp-column>
-            <abp-column size="_3">
-                <abp-select asp-for="GeoMasterIdFilter" label="@L["GeoMaster"].Value" />
+                <abp-input asp-for="EffDateFilterMax" label="@L["MaxEffDate"].Value" type="date"/>
             </abp-column>
         </abp-row>
 
@@ -66,10 +72,12 @@
             <thead>
 				<tr>
 					<th>@L["Actions"]</th>
+					<th>@L["CustomerGroupId"]</th>
+					<th>@L["GeoType"]</th>
+					<th>@L["Value"]</th>
 					<th>@L["Active"]</th>
-					<th>@L["EffectiveDate"]</th>
-					<th>@L["CustomerGroup"]</th>
-					<th>@L["GeoMaster"]</th>
+					<th>@L["EffDate"]</th>
+
 				</tr>
             </thead>
         </abp-table>

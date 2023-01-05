@@ -2,24 +2,7 @@ $(function () {
     var l = abp.localization.getResource("MdmService");
 	var customerGroupByAttService = window.dMSpro.oMS.mdmService.controllers.customerGroupByAtts.customerGroupByAtt;
 	
-        var lastNpIdId = '';
-        var lastNpDisplayNameId = '';
-
-        var _lookupModal = new abp.ModalManager({
-            viewUrl: abp.appPath + "Shared/LookupModal",
-            scriptUrl: "/Pages/Shared/lookupModal.js",
-            modalClass: "navigationPropertyLookup"
-        });
-
-        $('.lookupCleanButton').on('click', '', function () {
-            $(this).parent().find('input').val('');
-        });
-
-        _lookupModal.onClose(function () {
-            var modal = $(_lookupModal.getModal());
-            $('#' + lastNpIdId).val(modal.find('#CurrentLookupId').val());
-            $('#' + lastNpDisplayNameId).val(modal.find('#CurrentLookupDisplayName').val());
-        });
+	
 	
     var createModal = new abp.ModalManager({
         viewUrl: abp.appPath + "CustomerGroupByAtts/CreateModal",
@@ -36,9 +19,10 @@ $(function () {
 	var getFilter = function() {
         return {
             filterText: $("#FilterText").val(),
-            valueCode: $("#ValueCodeFilter").val(),
-			valueName: $("#ValueNameFilter").val(),
-			customerGroupId: $("#CustomerGroupIdFilter").val(),			cusAttributeValueId: $("#CusAttributeValueIdFilter").val()
+            customerGroupId: $("#CustomerGroupIdFilter").val(),
+			attributeCode: $("#AttributeCodeFilter").val(),
+			valueCode: $("#ValueCodeFilter").val(),
+			valueName: $("#ValueNameFilter").val()
         };
     };
 
@@ -62,7 +46,7 @@ $(function () {
                                 visible: abp.auth.isGranted('MdmService.CustomerGroupByAtts.Edit'),
                                 action: function (data) {
                                     editModal.open({
-                                     id: data.record.customerGroupByAtt.id
+                                     id: data.record.id
                                      });
                                 }
                             },
@@ -73,7 +57,7 @@ $(function () {
                                     return l("DeleteConfirmationMessage");
                                 },
                                 action: function (data) {
-                                    customerGroupByAttService.delete(data.record.customerGroupByAtt.id)
+                                    customerGroupByAttService.delete(data.record.id)
                                         .then(function () {
                                             abp.notify.info(l("SuccessfullyDeleted"));
                                             dataTable.ajax.reload();
@@ -83,16 +67,10 @@ $(function () {
                         ]
                 }
             },
-			{ data: "customerGroupByAtt.valueCode" },
-			{ data: "customerGroupByAtt.valueName" },
-            {
-                data: "customerGroup.code",
-                defaultContent : ""
-            },
-            {
-                data: "cusAttributeValue.attrValName",
-                defaultContent : ""
-            }
+			{ data: "customerGroupId" },
+			{ data: "attributeCode" },
+			{ data: "valueCode" },
+			{ data: "valueName" }
         ]
     }));
 
@@ -124,11 +102,10 @@ $(function () {
                         abp.utils.buildQueryString([
                             { name: 'downloadToken', value: result.token },
                             { name: 'filterText', value: input.filterText }, 
+                            { name: 'customerGroupId', value: input.customerGroupId }, 
+                            { name: 'attributeCode', value: input.attributeCode }, 
                             { name: 'valueCode', value: input.valueCode }, 
-                            { name: 'valueName', value: input.valueName }, 
-                            { name: 'customerGroupId', value: input.customerGroupId }
-, 
-                            { name: 'cusAttributeValueId', value: input.cusAttributeValueId }
+                            { name: 'valueName', value: input.valueName }
                             ]);
                             
                     var downloadWindow = window.open(url, '_blank');

@@ -1,33 +1,30 @@
-@page
+﻿@page
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using DMSpro.OMS.MdmService.Permissions
-@using DMSpro.OMS.MdmService.Web.Pages.CusAttributeValues
+@using DMSpro.OMS.MdmService.Web.Pages.Customers
 @using DMSpro.OMS.MdmService.Web.Menus
 @using Microsoft.AspNetCore.Mvc.Localization
 @using DMSpro.OMS.MdmService.Localization
 @inject IHtmlLocalizer<MdmServiceResource> L
 @inject IAuthorizationService Authorization
-@model IndexModel
 @inject IPageLayout PageLayout
 @{
-    PageLayout.Content.Title = L["CusAttributeValues"].Value;
-    PageLayout.Content.MenuItemName = MdmServiceMenus.CusAttributeValues;
-
+    PageLayout.Content.Title = L["CustomerProfiles"].Value;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.CustomerProfiles;
 }
 
 @section scripts
 {
-    <abp-script src="/Pages/Mdm/CusAttributeValues/index.js" />
+    <abp-script src="/Pages/Mdm/CustomerProfile/index.js" />
 }
-
 
 @section breadcrumb
     {
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
         <li class="breadcrumb-item">@L["Menu:MdmService:Customer"].Value</li>
-        <li class="breadcrumb-item active">@L["Page.Title.CusAttributeValues"].Value</li>
+        <li class="breadcrumb-item active">@L["Page.Title.CustomerProfiles"].Value</li>
     </ol>
 
     }
@@ -35,7 +32,7 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fal fa-credit-card-front"></i> @L["Page.Title.CusAttributeValues"].Value</span>
+                <i class="subheader-icon fal fa-credit-card-front"></i> @L["Page.Title.CustomerProfiles"].Value
             </h2>
         </div>
         <div class="panel-container show">
@@ -44,10 +41,10 @@
                     <abp-card-body>
                         <abp-row>
                             <div style="padding-left:12px" class="buttons-header-grid">
-                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.CustomerAttributes.Create))
+                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.Customers.Create))
                                 {
-                                    <button id="btnNewCusAttributeValue" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                        <i class="fa fa-plus"></i> <span>@L["Button.New.CusAttributeValue"].Value</span>
+                                    <button id="btnNewCustomerProfile" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                        <i class="fa fa-plus"></i> <span>@L["Button.New.Customer"].Value</span>
                                     </button>
                                 }
                                 <button id="ExportToExcelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
@@ -70,7 +67,9 @@
                             </div>
                         </abp-row>
                         <div class="dx-viewport" style="overflow: auto;">
-                            <div id="dgCusAttributeValues"></div>
+                            <!--<div id="frmCusProfile" class="mb-3"></div>
+                            <div id="tabPanel"></div>-->
+                            <div id="dgCustomers"></div>
                         </div>
                     </abp-card-body>
                 </abp-card>

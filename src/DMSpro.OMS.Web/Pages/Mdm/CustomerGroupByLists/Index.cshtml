@@ -46,13 +46,19 @@
 
         <abp-row id="AdvancedFilterSection" style="display: none;">
             <abp-column size="_3">
+                <abp-input asp-for="CustomerGroupIdFilter" label="@L["CustomerGroupId"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="BPIdFilter" label="@L["BPId"].Value" />
+            </abp-column>
+            <abp-column size="_3">
                 <abp-select asp-for="ActiveFilter" label="@L["Active"].Value" />
             </abp-column>
             <abp-column size="_3">
-                <abp-select asp-for="CustomerGroupIdFilter" label="@L["CustomerGroup"].Value" />
+                <abp-input asp-for="EffDateFilterMin" label="@L["MinEffDate"].Value" type="date"/>
             </abp-column>
             <abp-column size="_3">
-                <abp-select asp-for="CustomerIdFilter" label="@L["Customer"].Value" />
+                <abp-input asp-for="EffDateFilterMax" label="@L["MaxEffDate"].Value" type="date"/>
             </abp-column>
         </abp-row>
 
@@ -60,9 +66,11 @@
             <thead>
 				<tr>
 					<th>@L["Actions"]</th>
+					<th>@L["CustomerGroupId"]</th>
+					<th>@L["BPId"]</th>
 					<th>@L["Active"]</th>
-					<th>@L["CustomerGroup"]</th>
-					<th>@L["Customer"]</th>
+					<th>@L["EffDate"]</th>
+
 				</tr>
             </thead>
         </abp-table>

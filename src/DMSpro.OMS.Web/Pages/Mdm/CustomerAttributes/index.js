@@ -53,7 +53,6 @@ $(function () {
         }
     });
 	
-
     var gridCusAttribute = $('#dgCusAttributes').dxDataGrid({
         dataSource: customStore,
         keyExpr: "id",
@@ -76,6 +75,14 @@ $(function () {
                 var value = grid.cellValue(index, "active");
                 if (!value)
                     e.editorOptions.disabled = true;
+            }
+        },
+        onRowUpdating: function (e) {
+            var objectRequire = ["attrNo", "attrName", "active", "hierarchyLevel"];
+            for (var property in e.oldData) {
+                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+                    e.newData[property] = e.oldData[property];
+                }
             }
         },
         remoteOperations: true,
@@ -132,11 +139,12 @@ $(function () {
                 dataType: 'string',
             },
             {
-                dataField: 'isActive',
+                dataField: 'active',
                 caption: l("EntityFieldName:MDMService:CustomerAttribute:Active"),
-                allowEditing: false,
+                //allowEditing: false,
                 width: 110,
                 alignment: 'center',
+                dataType: 'boolean',
                 cellTemplate(container, options) {
                     $('<div>')
                         .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))

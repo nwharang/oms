@@ -1,184 +1,342 @@
 $(function () {
     var l = abp.localization.getResource("MdmService");
 	
-	var vendorService = window.dMSpro.oMS.mdmService.controllers.vendors.vendor;
-	
-        var lastNpIdId = '';
-        var lastNpDisplayNameId = '';
+    var vendorService = window.dMSpro.oMS.mdmService.controllers.vendors.vendor;
+    var isNotEmpty = function (value) {
+        return value !== undefined && value !== null && value !== '';
+    }
 
-        var _lookupModal = new abp.ModalManager({
-            viewUrl: abp.appPath + "Shared/LookupModal",
-            scriptUrl: "/Pages/Shared/lookupModal.js",
-            modalClass: "navigationPropertyLookup"
-        });
 
-        $('.lookupCleanButton').on('click', '', function () {
-            $(this).parent().find('input').val('');
-        });
+    var geosLookup = [];
+    var pricelistLookup = [];
+    var companiesLookup = [];
 
-        _lookupModal.onClose(function () {
-            var modal = $(_lookupModal.getModal());
-            $('#' + lastNpIdId).val(modal.find('#CurrentLookupId').val());
-            $('#' + lastNpDisplayNameId).val(modal.find('#CurrentLookupDisplayName').val());
-        });
-	
-    var createModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "Vendors/CreateModal",
-        scriptUrl: "/Pages/Vendors/createModal.js",
-        modalClass: "vendorCreate"
+    var urlGeo = abp.appPath + 'api/mdm-service/vendors/geo-master-lookup' +
+        abp.utils.buildQueryString([
+            { name: 'maxResultCount', value: 1000 }
+        ]);
+    var urlPriceList = abp.appPath + 'api/mdm-service/vendors/price-list-lookup' +
+        abp.utils.buildQueryString([
+            { name: 'maxResultCount', value: 1000 }
+        ]);
+    var urlCompany = abp.appPath + 'api/mdm-service/vendors/company-lookup' +
+        abp.utils.buildQueryString([
+            { name: 'maxResultCount', value: 1000 }
+        ]);
+    $.ajax({
+        url: `${urlGeo}`,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            console.log('data call geosLookup ajax: ', data);
+            geosLookup = data.items;
+        }
+    });
+    $.ajax({
+        url: `${urlPriceList}`,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            console.log('data call pricelistLookup ajax: ', data);
+            pricelistLookup = data.items;
+        }
+    });
+    $.ajax({
+        url: `${urlCompany}`,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            console.log('data call companiesLookup ajax: ', data);
+            companiesLookup = data.items;
+        }
     });
 
-	var editModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "Vendors/EditModal",
-        scriptUrl: "/Pages/Vendors/editModal.js",
-        modalClass: "vendorEdit"
-    });
-
-	var getFilter = function() {
-        return {
-            filterText: $("#FilterText").val(),
-            code: $("#CodeFilter").val(),
-			name: $("#NameFilter").val(),
-			shortName: $("#ShortNameFilter").val(),
-			phone1: $("#Phone1Filter").val(),
-			phone2: $("#Phone2Filter").val(),
-			erpCode: $("#ERPCodeFilter").val(),
-            active: (function () {
-                var value = $("#ActiveFilter").val();
-                if (value === undefined || value === null || value === '') {
-                    return '';
-                }
-                return value === 'true';
-            })(),
-			endDateMin: $("#EndDateFilterMin").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			endDateMax: $("#EndDateFilterMax").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			warehouseId: $("#WarehouseIdFilter").val(),
-			street: $("#StreetFilter").val(),
-			address: $("#AddressFilter").val(),
-			latitude: $("#LatitudeFilter").val(),
-			longitude: $("#LongitudeFilter").val(),
-			linkedCompanyId: $("#LinkedCompanyIdFilter").val(),			priceListId: $("#PriceListIdFilter").val(),			geoMaster0Id: $("#GeoMaster0IdFilter").val(),			geoMaster1Id: $("#GeoMaster1IdFilter").val(),			geoMaster2Id: $("#GeoMaster2IdFilter").val(),			geoMaster3Id: $("#GeoMaster3IdFilter").val(),			geoMaster4Id: $("#GeoMaster4IdFilter").val()
-        };
+    var getGEOLevel = function (level) {
+        //return geosLookup.filter(x => x.level === level);
+        return geosLookup;
     };
 
-    var dataTable = $("#VendorsTable").DataTable(abp.libs.datatables.normalizeConfiguration({
-        processing: true,
-        serverSide: true,
-        paging: true,
-        searching: false,
-        scrollX: true,
-        autoWidth: true,
-        scrollCollapse: true,
-        order: [[1, "asc"]],
-        ajax: abp.libs.datatables.createAjax(vendorService.getList, getFilter),
-        columnDefs: [
-            {
-                rowAction: {
-                    items:
-                        [
-                            {
-                                text: l("Edit"),
-                                visible: abp.auth.isGranted('MdmService.Vendors.Edit'),
-                                action: function (data) {
-                                    editModal.open({
-                                     id: data.record.vendor.id
-                                     });
-                                }
-                            },
-                            {
-                                text: l("Delete"),
-                                visible: abp.auth.isGranted('MdmService.Vendors.Delete'),
-                                confirmMessage: function () {
-                                    return l("DeleteConfirmationMessage");
-                                },
-                                action: function (data) {
-                                    vendorService.delete(data.record.vendor.id)
-                                        .then(function () {
-                                            abp.notify.info(l("SuccessfullyDeleted"));
-                                            dataTable.ajax.reload();
-                                        });
-                                }
-                            }
-                        ]
+    //Custom store - for load, update, delete
+    var customStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            [
+                'skip',
+                'take',
+                'requireTotalCount',
+                'requireGroupCount',
+                'sort',
+                'filter',
+                'totalSummary',
+                'group',
+                'groupSummary',
+            ].forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
                 }
-            },
-			{ data: "vendor.code" },
-			{ data: "vendor.name" },
-			{ data: "vendor.shortName" },
-			{ data: "vendor.phone1" },
-			{ data: "vendor.phone2" },
-			{ data: "vendor.erpCode" },
-            {
-                data: "vendor.active",
-                render: function (active) {
-                    return active ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
-                }
-            },
-            {
-                data: "vendor.endDate",
-                render: function (endDate) {
-                    if (!endDate) {
-                        return "";
-                    }
-                    
-					var date = Date.parse(endDate);
-                    return (new Date(date)).toLocaleDateString(abp.localization.currentCulture.name);
-                }
-            },
-			{ data: "vendor.warehouseId" },
-			{ data: "vendor.street" },
-			{ data: "vendor.address" },
-			{ data: "vendor.latitude" },
-			{ data: "vendor.longitude" },
-            {
-                data: "company.code",
-                defaultContent : ""
-            },
-            {
-                data: "priceList.code",
-                defaultContent : ""
-            },
-            {
-                data: "geoMaster.code",
-                defaultContent : ""
-            },
-            {
-                data: "geoMaster1.code",
-                defaultContent : ""
-            },
-            {
-                data: "geoMaster2.code",
-                defaultContent : ""
-            },
-            {
-                data: "geoMaster3.code",
-                defaultContent : ""
-            },
-            {
-                data: "geoMaster4.code",
-                defaultContent : ""
+            });
+
+            vendorService.getListDevextremes(args)
+                .done(result => {
+                    dataCusAttributes = result.data;
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            return key == 0 ? vendorService.get(key) : null;
+        },
+        insert(values) {
+            return vendorService.create(values, { contentType: "application/json" });
+        },
+        update(key, values) {
+            return vendorService.update(key, values, { contentType: "application/json" });
+        },
+        remove(key) {
+            return vendorService.delete(key);
+        }
+    });
+
+    var gridVendors = $('#dgVendors').dxDataGrid({
+        dataSource: customStore,
+        keyExpr: "id",
+        editing: {
+            mode: "popup",
+            allowAdding: abp.auth.isGranted('MdmService.Vendors.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.Vendors.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.Vendors.Delete'),
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
-        ]
-    }));
+        },
+        onInitNewRow: function (e) {
+            e.data.active = true;
+        },
+        remoteOperations: true,
+        showBorders: true,
+        focusedRowEnabled: true,
+        allowColumnReordering: false,
+        rowAlternationEnabled: true,
+        columnAutoWidth: true,
+        //columnHidingEnabled: true,
+        errorRowEnabled: false,
+        filterRow: {
+            visible: false
+        },
+        searchPanel: {
+            visible: true
+        },
+        scrolling: {
+            mode: 'standard'
+        },
+        paging: {
+            enabled: true,
+            pageSize: 10
+        },
+        pager: {
+            visible: true,
+            showPageSizeSelector: true,
+            allowedPageSizes: [10, 20, 50, 100],
+            showInfo: true,
+            showNavigationButtons: true
+        },
+        columns: [
+            {
+                type: 'buttons',
+                caption: l("Actions"),
+                width: 90,
+                buttons: ['edit'],
+            },
+            {
+                dataField: 'code',
+                caption: l("EntityFieldName:MDMService:Vendor:Code"),
+                dataType: 'string',
+                validationRules: [{ type: "required" }]
+            },
+            {
+                dataField: 'name',
+                caption: l("EntityFieldName:MDMService:Vendor:Name"),
+                dataType: 'string',
+                validationRules: [{ type: "required" }]
+            },
+            {
+                dataField: 'shortName',
+                caption: l("EntityFieldName:MDMService:Vendor:ShortName"),
+                dataType: 'string',
+                validationRules: [{ type: "required" }]
+            },
+            {
+                dataField: 'phone1',
+                caption: l("EntityFieldName:MDMService:Vendor:Phone1"),
+                dataType: 'string',
+            },
+            {
+                dataField: 'phone2',
+                caption: l("EntityFieldName:MDMService:Vendor:Phone2"),
+                dataType: 'string',
+            },
+            {
+                dataField: 'erpCode',
+                caption: l("EntityFieldName:MDMService:Vendor:ERPCode"),
+                dataType: 'string',
+            },
+            {
+                dataField: 'active',
+                caption: l("EntityFieldName:MDMService:Vendor:Active"),
+                width: 70,
+                alignment: 'center',
+                dataType: 'boolean',
+                validationRules: [{ type: "required" }],
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                        .appendTo(container);
+                },
+            },
+            {
+                dataField: 'creationTime',
+                caption: l("EntityFieldName:MDMService:Vendor:CreationTime"),
+                dataType: 'date',
+                validationRules: [{ type: "required" }]
+            },
+            {
+                dataField: 'endDate',
+                caption: l("EntityFieldName:MDMService:Vendor:EndDate"),
+                dataType: 'date',
+            },
+            {
+                dataField: 'linkedCompanyId',
+                caption: l("EntityFieldName:MDMService:Vendor:LinkedCompany"),
+                validationRules: [{ type: "required" }],
+                lookup: {
+                    dataSource: companiesLookup,
+                    valueExpr: "id",
+                    displayExpr: "displayName"
+                }
+            },
+            //{
+            //    dataField: 'warehouseId',
+            //    caption: l("EntityFieldName:MDMService:Vendor:Warehouse"),
+            //    dataType: 'string',
+            //    validationRules: [{ type: "required" }],
+            //    lookup: {
+            //        dataSource: companiesLookup,
+            //        valueExpr: "id",
+            //        displayExpr: "displayName"
+            //    }
+            //},
+            {
+                dataField: 'priceListId',
+                caption: l("EntityFieldName:MDMService:Vendor:Pricelist"),
+                dataType: 'string',
+                validationRules: [{ type: "required" }],
+                lookup: {
+                    dataSource: pricelistLookup,
+                    valueExpr: "id",
+                    displayExpr: "displayName"
+                }
+            },
+            {
+                dataField: "geoLevel0Id",
+                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel0Id"),
+                width: 110,
+                lookup: {
+                    dataSource: getGEOLevel(0),
+                    valueExpr: "id",
+                    displayExpr: "displayName"
+                }
+            },
+            {
+                dataField: "geoLevel1Id",
+                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel1Id"),
+                width: 110,
+                lookup: {
+                    dataSource(options) {
+                        return {
+                            store: getGEOLevel(1),
+                            //filter: options.data ? ['geoLevel0Id', '=', options.data.parentId] : null,
+                        };
+                    },
+                    valueExpr: 'id',
+                    displayExpr: 'displayName',
+                },
+            },
+            {
+                dataField: "geoLevel2Id",
+                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel2Id"),
+                width: 110,
+                lookup: {
+                    dataSource(options) {
+                        return {
+                            store: getGEOLevel(2),
+                            //filter: options.data ? ['geoLevel1Id', '=', options.data.parentId] : null,
+                        };
+                    },
+                    valueExpr: 'id',
+                    displayExpr: 'displayName',
+                },
+            },
+            {
+                dataField: "geoLevel3Id",
+                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel3Id"),
+                width: 110,
+                lookup: {
+                    dataSource(options) {
+                        return {
+                            store: getGEOLevel(3),
+                            //filter: options.data ? ['geoLevel2Id', '=', options.data.parentId] : null,
+                        };
+                    },
+                    valueExpr: 'id',
+                    displayExpr: 'displayName',
+                }
+            },
+            {
+                dataField: 'street',
+                caption: l("EntityFieldName:MDMService:CompanyProfile:Street"),
+                width: 150,
+                dataType: 'string',
+            },
+            {
+                dataField: 'address',
+                caption: l("EntityFieldName:MDMService:CompanyProfile:Address"),
+                width: 150,
+                dataType: 'string',
+            },
+            {
+                dataField: 'latitude',
+                caption: l("EntityFieldName:MDMService:CompanyProfile:Latitude"),
+                width: 110,
+                dataType: 'string',
+            },
+            {
+                dataField: 'longitude',
+                caption: l("EntityFieldName:MDMService:CompanyProfile:Longitude"),
+                width: 110,
+                dataType: 'string',
+            },
+        ],
+    }).dxDataGrid("instance");
 
-    createModal.onResult(function () {
-        dataTable.ajax.reload();
+    $("#btnNewVendor").click(function (e) {
+        gridVendors.addRow();
     });
 
-    editModal.onResult(function () {
-        dataTable.ajax.reload();
+    $("input#Search").on("input", function () {
+        gridVendors.searchByText($(this).val());
     });
 
-    $("#NewVendorButton").click(function (e) {
-        e.preventDefault();
-        createModal.open();
-    });
-
-	$("#SearchForm").submit(function (e) {
-        e.preventDefault();
-        dataTable.ajax.reload();
-    });
-
+	
     $("#ExportToExcelButton").click(function (e) {
         e.preventDefault();
 
@@ -223,20 +381,4 @@ $(function () {
             }
         )
     });
-
-    $('#AdvancedFilterSectionToggler').on('click', function (e) {
-        $('#AdvancedFilterSection').toggle();
-    });
-
-    $('#AdvancedFilterSection').on('keypress', function (e) {
-        if (e.which === 13) {
-            dataTable.ajax.reload();
-        }
-    });
-
-    $('#AdvancedFilterSection select').change(function() {
-        dataTable.ajax.reload();
-    });
-    
-    
 });

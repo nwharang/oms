@@ -26,9 +26,9 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerAttachments
                 new SelectListItem("Yes", "true"),
                 new SelectListItem("No", "false"),
             };
-        [SelectItems(nameof(CustomerLookupList))]
+        [SelectItems(nameof(CustomerProfileLookupList))]
         public Guid CustomerIdFilter { get; set; }
-        public List<SelectListItem> CustomerLookupList { get; set; } = new List<SelectListItem>
+        public List<SelectListItem> CustomerProfileLookupList { get; set; } = new List<SelectListItem>
         {
             new SelectListItem(string.Empty, "")
         };
@@ -42,7 +42,7 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerAttachments
 
         public async Task OnGetAsync()
         {
-            CustomerLookupList.AddRange((
+            CustomerProfileLookupList.AddRange((
                     await _customerAttachmentsAppService.GetCustomerLookupAsync(new LookupRequestDto
                     {
                         MaxResultCount = LimitedResultRequestDto.MaxMaxResultCount

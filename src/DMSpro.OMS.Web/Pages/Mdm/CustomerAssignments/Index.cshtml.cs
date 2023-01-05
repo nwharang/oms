@@ -27,9 +27,9 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerAssignments
             new SelectListItem(string.Empty, "")
         };
 
-        [SelectItems(nameof(CustomerLookupList))]
+        [SelectItems(nameof(CustomerProfileLookupList))]
         public Guid CustomerIdFilter { get; set; }
-        public List<SelectListItem> CustomerLookupList { get; set; } = new List<SelectListItem>
+        public List<SelectListItem> CustomerProfileLookupList { get; set; } = new List<SelectListItem>
         {
             new SelectListItem(string.Empty, "")
         };
@@ -50,7 +50,7 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerAssignments
                     })).Items.Select(t => new SelectListItem(t.DisplayName, t.Id.ToString())).ToList()
             );
 
-            CustomerLookupList.AddRange((
+            CustomerProfileLookupList.AddRange((
                             await _customerAssignmentsAppService.GetCustomerLookupAsync(new LookupRequestDto
                             {
                                 MaxResultCount = LimitedResultRequestDto.MaxMaxResultCount

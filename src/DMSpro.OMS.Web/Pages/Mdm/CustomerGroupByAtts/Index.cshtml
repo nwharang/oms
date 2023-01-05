@@ -46,16 +46,16 @@
 
         <abp-row id="AdvancedFilterSection" style="display: none;">
             <abp-column size="_3">
+                <abp-input asp-for="CustomerGroupIdFilter" label="@L["CustomerGroupId"].Value" />
+            </abp-column>
+            <abp-column size="_3">
+                <abp-input asp-for="AttributeCodeFilter" label="@L["AttributeCode"].Value" />
+            </abp-column>
+            <abp-column size="_3">
                 <abp-input asp-for="ValueCodeFilter" label="@L["ValueCode"].Value" />
             </abp-column>
             <abp-column size="_3">
                 <abp-input asp-for="ValueNameFilter" label="@L["ValueName"].Value" />
-            </abp-column>
-            <abp-column size="_3">
-                <abp-select asp-for="CustomerGroupIdFilter" label="@L["CustomerGroup"].Value" />
-            </abp-column>
-            <abp-column size="_3">
-                <abp-select asp-for="CusAttributeValueIdFilter" label="@L["CusAttributeValue"].Value" />
             </abp-column>
         </abp-row>
 
@@ -63,10 +63,11 @@
             <thead>
 				<tr>
 					<th>@L["Actions"]</th>
+					<th>@L["CustomerGroupId"]</th>
+					<th>@L["AttributeCode"]</th>
 					<th>@L["ValueCode"]</th>
 					<th>@L["ValueName"]</th>
-					<th>@L["CustomerGroup"]</th>
-					<th>@L["CusAttributeValue"]</th>
+
 				</tr>
             </thead>
         </abp-table>

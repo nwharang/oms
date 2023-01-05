@@ -28,9 +28,9 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerContacts
         public string BankNameFilter { get; set; }
         public string BankAccNameFilter { get; set; }
         public string BankAccNumberFilter { get; set; }
-        [SelectItems(nameof(CustomerLookupList))]
+        [SelectItems(nameof(CustomerProfileLookupList))]
         public Guid CustomerIdFilter { get; set; }
-        public List<SelectListItem> CustomerLookupList { get; set; } = new List<SelectListItem>
+        public List<SelectListItem> CustomerProfileLookupList { get; set; } = new List<SelectListItem>
         {
             new SelectListItem(string.Empty, "")
         };
@@ -44,7 +44,7 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerContacts
 
         public async Task OnGetAsync()
         {
-            CustomerLookupList.AddRange((
+            CustomerProfileLookupList.AddRange((
                     await _customerContactsAppService.GetCustomerLookupAsync(new LookupRequestDto
                     {
                         MaxResultCount = LimitedResultRequestDto.MaxMaxResultCount

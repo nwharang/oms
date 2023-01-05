@@ -9,7 +9,6 @@ using Volo.Abp.AspNetCore.Mvc.UI.RazorPages;
 using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Form;
 using DMSpro.OMS.MdmService.CustomerGroups;
 using DMSpro.OMS.MdmService.Shared;
-using Type = DMSpro.OMS.MdmService.CustomerGroups.Type;
 
 namespace DMSpro.OMS.MdmService.Web.Pages.CustomerGroups
 {
@@ -27,11 +26,15 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerGroups
                 new SelectListItem("Yes", "true"),
                 new SelectListItem("No", "false"),
             };
-        public DateTime? EffectiveDateFilterMin { get; set; }
+        public DateTime? EffDateFilterMin { get; set; }
 
-        public DateTime? EffectiveDateFilterMax { get; set; }
-        public Type? GroupByFilter { get; set; }
-        public Status? StatusFilter { get; set; }
+        public DateTime? EffDateFilterMax { get; set; }
+        public short? GroupByModeFilterMin { get; set; }
+
+        public short? GroupByModeFilterMax { get; set; }
+        public short? CustomerTypeFilterMin { get; set; }
+
+        public short? CustomerTypeFilterMax { get; set; }
 
         private readonly ICustomerGroupsAppService _customerGroupsAppService;
 

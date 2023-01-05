@@ -71,7 +71,7 @@ $(function () {
                         [
                             {
                                 text: l("Edit"),
-                                visible: abp.auth.isGranted('MdmService.Customers.Edit'),
+                                visible: abp.auth.isGranted('MdmService.CustomerContacts.Edit'),
                                 action: function (data) {
                                     editModal.open({
                                      id: data.record.customerContact.id
@@ -80,7 +80,7 @@ $(function () {
                             },
                             {
                                 text: l("Delete"),
-                                visible: abp.auth.isGranted('MdmService.Customers.Delete'),
+                                visible: abp.auth.isGranted('MdmService.CustomerContacts.Delete'),
                                 confirmMessage: function () {
                                     return l("DeleteConfirmationMessage");
                                 },
@@ -154,7 +154,7 @@ $(function () {
 			{ data: "customerContact.bankAccName" },
 			{ data: "customerContact.bankAccNumber" },
             {
-                data: "customer.code",
+                data: "customerProfile.code",
                 defaultContent : ""
             }
         ]

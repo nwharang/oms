@@ -14,6 +14,8 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerGroupByLists
 {
     public class IndexModel : AbpPageModel
     {
+        public string CustomerGroupIdFilter { get; set; }
+        public string BPIdFilter { get; set; }
         [SelectItems(nameof(ActiveBoolFilterItems))]
         public string ActiveFilter { get; set; }
 
@@ -24,19 +26,9 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerGroupByLists
                 new SelectListItem("Yes", "true"),
                 new SelectListItem("No", "false"),
             };
-        [SelectItems(nameof(CustomerGroupLookupList))]
-        public Guid CustomerGroupIdFilter { get; set; }
-        public List<SelectListItem> CustomerGroupLookupList { get; set; } = new List<SelectListItem>
-        {
-            new SelectListItem(string.Empty, "")
-        };
+        public DateTime? EffDateFilterMin { get; set; }
 
-        [SelectItems(nameof(CustomerLookupList))]
-        public Guid CustomerIdFilter { get; set; }
-        public List<SelectListItem> CustomerLookupList { get; set; } = new List<SelectListItem>
-        {
-            new SelectListItem(string.Empty, "")
-        };
+        public DateTime? EffDateFilterMax { get; set; }
 
         private readonly ICustomerGroupByListsAppService _customerGroupByListsAppService;
 
@@ -47,19 +39,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerGroupByLists
 
         public async Task OnGetAsync()
         {
-            CustomerGroupLookupList.AddRange((
-                    await _customerGroupByListsAppService.GetCustomerGroupLookupAsync(new LookupRequestDto
-                    {
-                        MaxResultCount = LimitedResultRequestDto.MaxMaxResultCount
-                    })).Items.Select(t => new SelectListItem(t.DisplayName, t.Id.ToString())).ToList()
-            );
-
-            CustomerLookupList.AddRange((
-                            await _customerGroupByListsAppService.GetCustomerLookupAsync(new LookupRequestDto
-                            {
-                                MaxResultCount = LimitedResultRequestDto.MaxMaxResultCount
-                            })).Items.Select(t => new SelectListItem(t.DisplayName, t.Id.ToString())).ToList()
-                    );
 
             await Task.CompletedTask;
         }

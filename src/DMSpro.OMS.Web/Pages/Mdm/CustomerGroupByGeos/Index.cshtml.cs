@@ -14,6 +14,11 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerGroupByGeos
 {
     public class IndexModel : AbpPageModel
     {
+        public string CustomerGroupIdFilter { get; set; }
+        public short? GeoTypeFilterMin { get; set; }
+
+        public short? GeoTypeFilterMax { get; set; }
+        public string ValueFilter { get; set; }
         [SelectItems(nameof(ActiveBoolFilterItems))]
         public string ActiveFilter { get; set; }
 
@@ -24,22 +29,9 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerGroupByGeos
                 new SelectListItem("Yes", "true"),
                 new SelectListItem("No", "false"),
             };
-        public DateTime? EffectiveDateFilterMin { get; set; }
+        public DateTime? EffDateFilterMin { get; set; }
 
-        public DateTime? EffectiveDateFilterMax { get; set; }
-        [SelectItems(nameof(CustomerGroupLookupList))]
-        public Guid CustomerGroupIdFilter { get; set; }
-        public List<SelectListItem> CustomerGroupLookupList { get; set; } = new List<SelectListItem>
-        {
-            new SelectListItem(string.Empty, "")
-        };
-
-        [SelectItems(nameof(GeoMasterLookupList))]
-        public Guid GeoMasterIdFilter { get; set; }
-        public List<SelectListItem> GeoMasterLookupList { get; set; } = new List<SelectListItem>
-        {
-            new SelectListItem(string.Empty, "")
-        };
+        public DateTime? EffDateFilterMax { get; set; }
 
         private readonly ICustomerGroupByGeosAppService _customerGroupByGeosAppService;
 
@@ -50,19 +42,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerGroupByGeos
 
         public async Task OnGetAsync()
         {
-            CustomerGroupLookupList.AddRange((
-                    await _customerGroupByGeosAppService.GetCustomerGroupLookupAsync(new LookupRequestDto
-                    {
-                        MaxResultCount = LimitedResultRequestDto.MaxMaxResultCount
-                    })).Items.Select(t => new SelectListItem(t.DisplayName, t.Id.ToString())).ToList()
-            );
-
-            GeoMasterLookupList.AddRange((
-                            await _customerGroupByGeosAppService.GetGeoMasterLookupAsync(new LookupRequestDto
-                            {
-                                MaxResultCount = LimitedResultRequestDto.MaxMaxResultCount
-                            })).Items.Select(t => new SelectListItem(t.DisplayName, t.Id.ToString())).ToList()
-                    );
 
             await Task.CompletedTask;
         }

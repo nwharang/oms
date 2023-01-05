@@ -14,21 +14,10 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerGroupByAtts
 {
     public class IndexModel : AbpPageModel
     {
+        public string CustomerGroupIdFilter { get; set; }
+        public string AttributeCodeFilter { get; set; }
         public string ValueCodeFilter { get; set; }
         public string ValueNameFilter { get; set; }
-        [SelectItems(nameof(CustomerGroupLookupList))]
-        public Guid CustomerGroupIdFilter { get; set; }
-        public List<SelectListItem> CustomerGroupLookupList { get; set; } = new List<SelectListItem>
-        {
-            new SelectListItem(string.Empty, "")
-        };
-
-        [SelectItems(nameof(CusAttributeValueLookupList))]
-        public Guid CusAttributeValueIdFilter { get; set; }
-        public List<SelectListItem> CusAttributeValueLookupList { get; set; } = new List<SelectListItem>
-        {
-            new SelectListItem(string.Empty, "")
-        };
 
         private readonly ICustomerGroupByAttsAppService _customerGroupByAttsAppService;
 
@@ -39,19 +28,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerGroupByAtts
 
         public async Task OnGetAsync()
         {
-            CustomerGroupLookupList.AddRange((
-                    await _customerGroupByAttsAppService.GetCustomerGroupLookupAsync(new LookupRequestDto
-                    {
-                        MaxResultCount = LimitedResultRequestDto.MaxMaxResultCount
-                    })).Items.Select(t => new SelectListItem(t.DisplayName, t.Id.ToString())).ToList()
-            );
-
-            CusAttributeValueLookupList.AddRange((
-                            await _customerGroupByAttsAppService.GetCusAttributeValueLookupAsync(new LookupRequestDto
-                            {
-                                MaxResultCount = LimitedResultRequestDto.MaxMaxResultCount
-                            })).Items.Select(t => new SelectListItem(t.DisplayName, t.Id.ToString())).ToList()
-                    );
 
             await Task.CompletedTask;
         }

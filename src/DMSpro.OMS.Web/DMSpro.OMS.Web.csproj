@@ -262,6 +262,10 @@
   </ItemGroup>
 	
   <ItemGroup>
+    <None Include="Pages\Mdm\CustomerProfile\index.cshtml" />
+  </ItemGroup>
+	
+  <ItemGroup>
     <None Update="Pages\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
