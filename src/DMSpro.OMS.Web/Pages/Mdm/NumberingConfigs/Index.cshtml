@@ -23,9 +23,9 @@
 @section breadcrumb
     {
     <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="javascript:void(0);">MDM</a></li>
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
         <li class="breadcrumb-item">System</li>
-        <li class="breadcrumb-item active">@L["Page.Title.NumberingConfigs"].Value</li>
+        <li class="breadcrumb-item active">@L["Menu:MdmService:NumberingConfigs"].Value</li>
     </ol>
 }
 
@@ -33,13 +33,13 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fal fa-credit-card-front"></i>  
+                <i class="subheader-icon fal fa-credit-card-front"></i>
             </h2>
         </div>
         <div class="panel-container show">
             <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
                 <abp-card>
-                    <abp-card-body> 
+                    <abp-card-body>
                         <abp-row>
                             <div style="padding-left:12px" class="buttons-header-grid">
                                 @if (await Authorization.IsGrantedAsync(MdmServicePermissions.NumberingConfigs.Create))
@@ -69,6 +69,7 @@
                             </div>
                         </abp-row>
                         <div class="dx-viewport">
+                            <div id="loadPanel"></div>
                             <div id="gridNumberingConfigs"></div>
                         </div>
                     </abp-card-body>
