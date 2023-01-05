@@ -60,7 +60,9 @@ using Volo.Abp.Identity;
 
 using Volo.Forms;
 using Volo.Forms.Web;
-
+using Volo.Abp.Localization;
+using Volo.Abp.Validation;
+using Volo.Abp.Validation.Localization;
 namespace DMSpro.OMS.Web;
 
 [DependsOn(
@@ -94,7 +96,8 @@ namespace DMSpro.OMS.Web;
     typeof(InventoryServiceHttpApiClientModule),
     //typeof(AbpAccountPublicWebModule),
     //typeof(AbpAccountPublicHttpApiClientModule),
-    typeof(AbpIdentityHttpApiClientModule)
+    typeof(AbpIdentityHttpApiClientModule),
+    typeof(AbpLocalizationModule)
 
 )]
 
@@ -250,6 +253,7 @@ public class OMSWebModule : AbpModule
                 // options.FileSets.ReplaceEmbeddedByPhysical<ProductServiceWebModule>(Path.Combine(
                 //     hostingEnvironment.ContentRootPath,
                 //     $"..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}services{Path.DirectorySeparatorChar}product{Path.DirectorySeparatorChar}src{Path.DirectorySeparatorChar}DMSpro.OMS.ProductService.Web"));
+                options.FileSets.AddEmbedded<OMSWebModule>("DMSpro.OMS.Web");
             });
         }
 
@@ -257,7 +261,28 @@ public class OMSWebModule : AbpModule
         {
             options.DefaultStyle = LeptonXStyleNames.System;
         });
-    }
+        Configure<AbpLocalizationOptions>(options =>
+        {
+            //Define a new localization resource (TestResource)
+            // options.Resources
+            //     .Add<OMSWebResource>("en")
+            //     .AddBaseTypes(
+            //         typeof(AbpValidationResource)
+            //     ).AddVirtualJson("/Localization/OMSWeb");
+
+            // options.DefaultResourceType = typeof(OMSWebResource);
+            // options.Resources
+            //     .Add<OMSWebResource>("en") //Define the resource by "en" default culture
+            //     .AddVirtualJson("/Localization/OMSWeb") //Add strings from virtual json files
+            //     .AddBaseTypes(typeof(AbpValidationResource));
+            options.Resources
+                .Add<OMSWebResource>("en")
+                .AddBaseTypes(typeof(AbpValidationResource))
+                .AddVirtualJson("/Localization/OMSWeb");
+            options.DefaultResourceType = typeof(OMSWebResource);
+            });
+            
+        }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
     {

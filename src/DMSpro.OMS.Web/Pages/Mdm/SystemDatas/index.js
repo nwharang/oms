@@ -1,129 +1,167 @@
 $(function () {
+    // language
     var l = abp.localization.getResource("MdmService");
+    // load mdmService
     var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
-	
-	
-
-    var createModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "Mdm/SystemDatas/CreateModal",
-        scriptUrl: "/Pages/Mdm/SystemDatas/createModal.js",
-        modalClass: "systemDataCreate"
-    });
-
-	var editModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "Mdm/SystemDatas/EditModal",
-        scriptUrl: "/Pages/Mdm/SystemDatas/editModal.js",
-        modalClass: "systemDataEdit"
-    });
-
-	var getFilter = function() {
-        return {
-            filterText: $("#FilterText").val(),
-            code: $("#CodeFilter").val(),
-			valueCode: $("#ValueCodeFilter").val(),
-			valueName: $("#ValueNameFilter").val()
-        };
-    };
-
-    var dataTable = $("#SystemDatasTable").DataTable(abp.libs.datatables.normalizeConfiguration({
-        processing: true,
-        serverSide: true,
-        paging: true,
-        searching: false,
-        scrollX: true,
-        autoWidth: true,
-        scrollCollapse: true,
-        order: [[1, "asc"]],
-        ajax: abp.libs.datatables.createAjax(systemDataService.getList, getFilter),
-        columnDefs: [
-            {
-                rowAction: {
-                    items:
-                        [
-                            {
-                                text: l("Edit"),
-                                visible: abp.auth.isGranted('MdmService.SystemData.Edit'),
-                                action: function (data) {
-                                    editModal.open({
-                                     id: data.record.id
-                                     });
-                                }
-                            },
-                            {
-                                text: l("Delete"),
-                                visible: abp.auth.isGranted('MdmService.SystemData.Delete'),
-                                confirmMessage: function () {
-                                    return l("DeleteConfirmationMessage");
-                                },
-                                action: function (data) {
-                                    systemDataService.delete(data.record.id)
-                                        .then(function () {
-                                            abp.notify.info(l("SuccessfullyDeleted"));
-                                            dataTable.ajax.reload();
-                                        });
-                                }
-                            }
-                        ]
+    // custom store
+    var customStore = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'raw',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            [
+                'skip',
+                'take',
+                'requireTotalCount',
+                'requireGroupCount',
+                'sort',
+                'filter',
+                'totalSummary',
+                'group',
+                'groupSummary',
+            ].forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
                 }
+            });
+            const args2 = { 'loadOptions': args };
+            systemDataService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+            var d = new $.Deferred();
+            systemDataService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
+        },
+        insert(values) {
+            return systemDataService.create(values, { contentType: 'application/json' });
+        },
+        update(key, values) {
+            return systemDataService.update(key, values, { contentType: 'application/json' });
+        },
+        remove(key) {
+            return systemDataService.delete(key);
+        }
+    });
+
+    var gridSystemData = $('#gridSystemDatas').dxDataGrid({
+        dataSource: customStore,
+        keyExpr: 'id',
+        remoteOperations: true,
+        showBorders: true,
+        autoExpandAll: true,
+        focusedRowEnabled: true,
+        allowColumnReordering: false,
+        rowAlternationEnabled: true,
+        columnAutoWidth: true,
+        columnHidingEnabled: true,
+        errorRowEnabled: false,
+        filterRow: {
+            visible: true
+        },
+        searchPanel: {
+            visible: true
+        },
+        scrolling: {
+            mode: 'standard'
+        },
+        paging: {
+            enabled: true,
+            pageSize: 10
+        },
+        pager: {
+            visible: true,
+            showPageSizeSelector: true,
+            allowedPageSizes: [10, 20, 50, 100],
+            showInfo: true,
+            showNavigationButtons: true
+        },
+        editing: {
+            mode: 'row',
+            allowAdding: true,
+            allowUpdating: true,
+            allowDeleting: true,
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            }
+        },
+        //onRowInserting: function (e) {
+        //    debugger
+        //    if (e.data && e.data.code == null) {
+        //        e.data.code = e.data.Code;
+        //    }
+        //},
+        onRowUpdating: function (e) {
+            var objectRequire = ['code', 'valueCode', 'valueName'];
+            for (var property in e.oldData) {
+                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+                    e.newData[property] = e.oldData[property];
+                }
+            }
+        },
+        toolbar: {
+            items: [
+                {
+                    name: "searchPanel",
+                    location: 'after'
+                }
+            ]
+        },
+        columns: [
+            {
+                type: 'buttons',
+                caption: l('Actions'),
+                buttons: ['edit', 'delete'],
             },
-			{ data: "code" },
-			{ data: "valueCode" },
-			{ data: "valueName" }
+            {
+                dataField: 'code',
+                caption: l("EntityFieldName:MDMService:SystemData:Code"),
+                dataType: 'string'
+            },
+            {
+                dataField: 'valueCode',
+                caption: l("EntityFieldName:MDMService:SystemData:ValueCode"),
+                dataType: 'string'
+            },
+            {
+                dataField: 'valueName',
+                caption: l("EntityFieldName:MDMService:SystemData:ValueName"),
+                dataType: 'string'
+            }
         ]
-    }));
+    }).dxDataGrid('instance');
 
-    createModal.onResult(function () {
-        dataTable.ajax.reload();
-    });
-
-    editModal.onResult(function () {
-        dataTable.ajax.reload();
-    });
-
-    $("#NewSystemDataButton").click(function (e) {
-        e.preventDefault();
-        createModal.open();
-    });
-
-	$("#SearchForm").submit(function (e) {
-        e.preventDefault();
-        dataTable.ajax.reload();
+    $("#NewSystemDataButton").click(function () {
+        gridSystemData.addRow();
     });
 
     $("#ExportToExcelButton").click(function (e) {
         e.preventDefault();
 
         systemDataService.getDownloadToken().then(
-            function(result){
-                    var input = getFilter();
-                    var url =  abp.appPath + 'api/mdm-service/system-datas/as-excel-file' + 
-                        abp.utils.buildQueryString([
-                            { name: 'downloadToken', value: result.token },
-                            { name: 'filterText', value: input.filterText }, 
-                            { name: 'code', value: input.code }, 
-                            { name: 'valueCode', value: input.valueCode }, 
-                            { name: 'valueName', value: input.valueName }
-                            ]);
-                            
-                    var downloadWindow = window.open(url, '_blank');
-                    downloadWindow.focus();
+            function (result) {
+                var url = abp.appPath + 'api/mdm-service/system-datas/as-excel-file' + abp.utils.buildQueryString([
+                    { name: 'downloadToken', value: result.token }
+                ]);
+
+                var downloadWindow = window.open(url, '_blank');
+                downloadWindow.focus();
             }
         )
     });
-
-    $('#AdvancedFilterSectionToggler').on('click', function (e) {
-        $('#AdvancedFilterSection').toggle();
-    });
-
-    $('#AdvancedFilterSection').on('keypress', function (e) {
-        if (e.which === 13) {
-            dataTable.ajax.reload();
-        }
-    });
-
-    $('#AdvancedFilterSection select').change(function() {
-        dataTable.ajax.reload();
-    });
-    
-    
 });

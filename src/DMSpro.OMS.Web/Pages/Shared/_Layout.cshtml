@@ -50,216 +50,20 @@
     @await Component.InvokeAsync(typeof(WidgetStylesViewComponent))
     
     <!-- base css --> 
-    <link rel="stylesheet" media="screen, print" href="~/dmstheme/css/vendors.bundle.css">
-    <link rel="stylesheet" media="screen, print" href="~/dmstheme/css/app.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="/dmstheme/css/vendors.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="/dmstheme/css/app.bundle.css">
     <!-- Place favicon.ico in the root directory -->
     <link rel="apple-touch-icon" sizes="180x180" href="/dmstheme/img/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/dmstheme/img/favicon/favicon-32x32.png">
     <link rel="mask-icon" href="/dmstheme/img/favicon/safari-pinned-tab.svg" color="#5bbad5">
-    <link rel="stylesheet" media="screen, print" href="~/dmstheme/css/miscellaneous/reactions/reactions.css">
-    <link rel="stylesheet" media="screen, print" href="~/dmstheme/css/miscellaneous/fullcalendar/fullcalendar.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="/dmstheme/css/miscellaneous/reactions/reactions.css">
+    <link rel="stylesheet" media="screen, print" href="/dmstheme/css/miscellaneous/fullcalendar/fullcalendar.bundle.css">
 
     <link rel="stylesheet" href="/libs/@@fortawesome/fontawesome-free/css/all.css">
     <link rel="stylesheet" href="/libs/@@fortawesome/fontawesome-free/css/v4-shims.css">
     <link rel="stylesheet" href="/css/devextreme/dx.light.css" /> 
     
-    <style type="text/css">
-       
-       span.dx-button-text{
-           line-height: 1.2858;
-           vertical-align: top;
-       } 
-        #btnActions > i, #btnActions >span.dx-button-text {
-            vertical-align: middle;
-        }
-        #MDMtabpanel > #tabpanel-container{
-            height:auto !important;
-        } #MDMtabpanel > #tabpanel-container > div.dx-tabpanel-container > div.dx-multiview-wrapper{
-            padding:7px;
-            padding-top:15px;
-        }
-        #js-page-content > ol > li.breadcrumb-item.active
-        {
-            overflow:unset;
-        } 
-
-         div.dx-datagrid  table tbody > tr.dx-header-row > td,
-         div.dx-treelist-container table tbody > tr.dx-header-row > td{
-             padding: 12px;
-            font-weight: 500; 
-            font-size:13px;
-         } 
-         div.dx-datagrid div.dx-datagrid-header-panel  div.dx-datagrid-search-panel.dx-searchbox{
-             width: 250px !important;
-         }
-         div.panel-container.show > div.panel-content  button.buttons-collection,
-         div.panel-container.show > div.panel-content  button.buttons-csv,
-         div.panel-container.show > div.panel-content  button.buttons-copy,
-         div.panel-container.show > div.panel-content  button.buttons-print{
-             padding: 0.35rem 1.125rem !important;
-         }
-       div.dx-datagrid .dx-toolbar-items-container,
-       div.dx-treelist-container div.dx-toolbar-items-container {
-           display:none;
-       } 
-        div.buttons-header-grid{
-            width:100%;
-            padding-right:12px;
-        }
-        div.buttons-header-grid > .dx-datagrid-search-panel{
-            float:right;
-        }
-        div.panel-container.show > div.panel-content.jqvmap-bg-ocean.p-0 > div{
-             border: none;
-             box-shadow: none;
-        } 
-        .dx-datagrid .dx-header-filter-empty {
-            color: rgb(255 255 255);
-        }
-        .dx-datagrid-headers .dx-datagrid-content {
-            margin: -1px 0 -1px -1px; 
-        }
-
-        .dx-datagrid-scroll-container {
-            overflow: hidden;
-            width: calc(100% + 1px);
-        }
-        .dx-datagrid-borders .dx-datagrid-rowsview, .dx-datagrid-headers + .dx-datagrid-rowsview, .dx-datagrid-rowsview.dx-datagrid-after-headers {
-            margin: -1px 0 -1px -1px;
-        } 
-        .dx-datagrid .dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-edit-with-icons .dx-link,
-        .dx-treelist .dx-treelist-content .dx-treelist-table .dx-row .dx-command-edit-with-icons .dx-link {
-            width: 28px;
-            height: 28px;
-            background-position: 0 0;
-            background-size: 28px 28px;
-            padding: 0;
-            font-size: 28px;
-            text-align: center;
-            line-height: 28px;
-            margin: 0 3px;
-        }
-        .btn {
-
-            -webkit-box-shadow: none !important;
-            box-shadow: none !important;
-        }
-        .buttons-header-grid .btn{
-            border-radius: 0 !important;
-        }
-
-        .dx-datagrid .dx-header-filter-empty {
-            color: rgb(255 255 255);
-        }
-
-        div.dx-datagrid table tbody > tr.dx-header-row > td ,
-        div.dx-treelist  table tbody > tr.dx-header-row > td{ 
-            border-color: #dedede;
-        }
-
-
-        div.dx-datagrid td.dx-command-edit.dx-command-edit-with-icons > a.dx-link.dx-link-delete.dx-icon-trash.dx-link-icon,
-        div.dx-treelist td.dx-command-edit.dx-command-edit-with-icons > a.dx-link.dx-link-delete.dx-icon-trash.dx-link-icon{
-            color: #ff64f9;
-            background: transparent;
-        }
-
-        .dx-datagrid-rowsview .dx-row-focused.dx-data-row .dx-command-edit:not(.dx-focused) .dx-link,
-        .dx-datagrid-rowsview .dx-row-focused.dx-data-row > td:not(.dx-focused),
-        .dx-datagrid-rowsview .dx-row-focused.dx-data-row > tr > td:not(.dx-focused),
-        div.dx-datagrid table tbody > tr.dx-header-row > td,
-
-
-        .dx-treelist-rowsview .dx-row-focused.dx-data-row .dx-command-edit:not(.dx-focused) .dx-link,
-        .dx-treelist-rowsview .dx-row-focused.dx-data-row > td:not(.dx-focused),
-        .dx-treelist-rowsview .dx-row-focused.dx-data-row > tr > td:not(.dx-focused),
-        div.dx-treelist table tbody > tr.dx-header-row > td 
-
-        {
-            color:#fff;
-        }
-
-        .dx-datagrid-content .dx-datagrid-table .dx-row > td,
-        .dx-datagrid-content .dx-datagrid-table .dx-row > tr > td {
-            vertical-align: middle;
-        }
-
-        .swal2-container {
-            z-index: 3000 !important;
-        }
-
-        .form-check-input {
-            margin-top: unset;
-            margin-top: 0.2rem;
-        }
-
-        .nav-pills .nav-link.active {
-            color: #2b4c81;
-            background-color: unset;
-            opacity: 1;
-        }
-
-        .nav-pills .nav-link {
-            color: #2b4c81;
-            opacity: 0.7;
-        }
-
-            .nav-pills .nav-link:hover, .nav-pills .nav-link:focus {
-                color: #2b4c81;
-                opacity: 1;
-            }
-           /* #form div.dx-item-content.dx-box-item-content 
-            div.dx-collection 
-            div.dx-item-content.dx-box-item-content{
-                height: 32px !important;
-            }*/
-            div.dx-fieldset-header{
-                margin-bottom:15px !important;
-            }
-            #js-page-content{
-                /*padding: 0.1rem 0.6rem !important;*/
-                padding-left: 8px;
-                padding-top: 0px;
-                padding-right: 12px;
-            }
-            div.panel-container div.dx-viewport > div.py-3{
-                padding-top:10px !important;
-            }
-         
-            li.breadcrumb-item.active{
-                overflow: unset !important;
-            }
-            ol.breadcrumb.page-breadcrumb{
-                margin: 0;
-                display: -webkit-inline-box;
-                margin-left:5px;
-                text-shadow:unset;
-            }
-             ol.breadcrumb.page-breadcrumb > li.breadcrumb-item{
-                 color:inherit;
-             }
-             div.panel-hdr.bg-faded > div:nth-child(1) 
-            {
-                width:100%;
-            } 
-           div.dx-form div.dx-item-content.dx-box-item-content 
-           div.dx-field-item-content 
-           div.dx-box-flex.dx-box.dx-collection 
-           div.dx-item.dx-box-item 
-           {
-                 height: 42px;
-           }
-           div.dx-form div.dx-item-content.dx-box-item-content 
-           div.dx-field-item-content 
-           div.dx-box-flex.dx-box.dx-collection 
-           div.dx-item.dx-box-item:nth-child(1)
-           {
-                 height: 32px;
-           }
-           #js-page-content > ol{
-               display:none;
-           }
-    </style> 
+     <link rel="stylesheet" href="/Pages/Shared/_Layout.css" /> 
     @RenderSection("styles", required: false) 
     @await Component.InvokeLayoutHookAsync(LayoutHooks.Head.Last, StandardLayouts.Empty)
 </head>
@@ -274,7 +78,7 @@
         <div class="page-wrapper">
             <div class="page-inner">
                 <!-- BEGIN Left Aside -->
-                <aside class="page-sidebar">
+                <aside class="page-sidebar list-filter-active">
                     <div class="page-logo">
                         <a href="#" class="page-logo-link press-scale-down d-flex align-items-center position-relative" data-toggle="modal" data-target="#modal-shortcut">
                             <img src="/dmstheme/img/logo.png" alt="OMS Pro WebApp" aria-roledescription="logo">
@@ -311,33 +115,33 @@
                         <ul id="js-nav-menu" class="nav-menu">
                             @*Home*@
                             <li>
-                                <a href="/" title="Home" data-filter-tags="Home">
+                                <a href="/" title="Home" data-filter-tags="home">
                                     <i class=" fal fa-home"></i>
                                     <span class="nav-link-text" data-i18n="nav.font_icons">Home</span>
                                 </a>
                             </li>
                             @*Dashboard*@
                             <li>
-                                <a href="/HostDashboard" title="Dashboard" data-filter-tags="Dashboard">
+                                <a href="/HostDashboard" title="Dashboard" data-filter-tags="dashboard">
                                     <i class=" fal fa-chart-area"></i>
                                     <span class="nav-link-text" data-i18n="nav.font_icons">Dashboard</span>
                                 </a>
                             </li>
                             @*Saas*@
                             <li>
-                                <a href="#" title="Saas" data-filter-tags="Saas">
+                                <a href="#" title="Saas" data-filter-tags="saas">
                                     <i class=" fal fa-globe"></i>
                                     <span class="nav-link-text" data-i18n="nav.font_icons">Saas</span>
                                 </a>
                                 <ul>
                                     <li>
-                                        <a href="/Saas/Host/Tenants" title="Tenants" data-filter-tags="Tenants">
+                                        <a href="/Saas/Host/Tenants" title="Tenants" data-filter-tags="tenants">
                                             <i class=" fa fa-users"></i>
                                             <span class="nav-link-text" data-i18n="nav.application_intel_analytics_dashboard">Tenants</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/Saas/Host/Editions" title="Editions" data-filter-tags="Editions">
+                                        <a href="/Saas/Host/Editions" title="Editions" data-filter-tags="editions">
                                             <i class=" fa fa-th"></i>
                                             <span class="nav-link-text" data-i18n="nav.application_intel_analytics_dashboard">Editions</span>
                                         </a>
@@ -346,43 +150,43 @@
                             </li>
                             @*Admin*@
                             <li>
-                                <a href="#" title="Administration" data-filter-tags="Administration">
+                                <a href="#" title="Administration" data-filter-tags="administration">
                                     <i class=" fal fa-wrench"></i>
                                     <span class="nav-link-text" data-i18n="nav.font_icons">Administration</span>
                                 </a>
                                 <ul>
                                     <li>
-                                        <a href="#" title="Identity Management" data-filter-tags="Identity Management">
+                                        <a href="#" title="Identity Management" data-filter-tags="administration identity management">
                                             <i class=" fa fa-id-card-o"></i>
                                             <span class="nav-link-text" data-i18n="nav.application_intel_analytics_dashboard">Identity Management</span>
                                         </a>
                                         <ul>
                                             <li>
-                                                <a href="/Identity/OrganizationUnits" title="Organization Units" data-filter-tags="Organization Units">
+                                                <a href="/Identity/OrganizationUnits" title="Organization Units" data-filter-tags="administration identity management organization units">
                                                     <i class=" fa fa-sitemap"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_light">Organization Units</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Identity/Roles" name="Roles" title="Roles" data-filter-tags="font icons fontawesome regular">
+                                                <a href="/Identity/Roles" name="Roles" title="Roles" data-filter-tags="administration identity management roles">
                                                     <i class=" fa fa-user-plus"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">Roles</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Identity/Users" name="Users" title="Users" data-filter-tags="Users">
+                                                <a href="/Identity/Users" name="Users" title="Users" data-filter-tags="administration identity management users">
                                                     <i class=" fa fa-user"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">Users</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Identity/ClaimTypes" name="Claim Types" title="Claim Types" data-filter-tags="Claim Types">
+                                                <a href="/Identity/ClaimTypes" name="Claim Types" title="Claim Types" data-filter-tags="administration identity management claim types">
                                                     <i class=" fa fa-file-text-o"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">Claim Types</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Identity/SecurityLogs" name="Security Logs" title="Security Logs" data-filter-tags="Security Logs">
+                                                <a href="/Identity/SecurityLogs" name="Security Logs" title="Security Logs" data-filter-tags="administration identity management security logs">
                                                     <i class=" fa fa-lock"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">Security Logs</span>
                                                 </a>
@@ -390,19 +194,19 @@
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="#" title="OpenId" data-filter-tags="OpenId">
+                                        <a href="#" title="OpenId" data-filter-tags="administration openid">
                                             <i class=" fa fa-id-badge"></i>
                                             <span class="nav-link-text" data-i18n="nav.application_intel_analytics_dashboard">OpenId</span>
                                         </a>
                                         <ul>
                                             <li>
-                                                <a href="/openIddict/Applications" name="Applications" title="Applications" data-filter-tags="Applications">
+                                                <a href="/openIddict/Applications" name="Applications" title="Applications" data-filter-tags="administration openid applications">
                                                     <i class=" fal fal fa-window"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">Applications</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/openIddict/Scopes" name="Scopes" title="Scopes" data-filter-tags="Scopes">
+                                                <a href="/openIddict/Scopes" name="Scopes" title="Scopes" data-filter-tags="administration openid scopes">
                                                     <i class=" fa fa-check-square-o"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">Scopes</span>
                                                 </a>
@@ -410,19 +214,19 @@
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="#" title="Language Management" data-filter-tags="Language Management">
+                                        <a href="#" title="Language Management" data-filter-tags="administration language management">
                                             <i class=" fal fa-globe"></i>
                                             <span class="nav-link-text" data-i18n="nav.application_intel_analytics_dashboard">Language Management</span>
                                         </a>
                                         <ul>
                                             <li>
-                                                <a href="/LanguageManagement" name="Languages" title="Languages" data-filter-tags="Languages">
+                                                <a href="/LanguageManagement" name="Languages" title="Languages" data-filter-tags="administration language management">
                                                     <i class=" fa fa-language"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">Languages</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/LanguageManagement/Texts" name="Language Texts" title="Language Texts" data-filter-tags="Language Texts">
+                                                <a href="/LanguageManagement/Texts" name="Language Texts" title="Language Texts" data-filter-tags="administration language management texts">
                                                     <i class=" fa fa-file-text-o"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">Language Texts</span>
                                                 </a>
@@ -430,19 +234,19 @@
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="/TextTemplates" title="Text Templates" data-filter-tags="Text Templates">
+                                        <a href="/TextTemplates" title="Text Templates" data-filter-tags="administration text templates">
                                             <i class=" fa fa-text-width"></i>
                                             <span class="nav-link-text" data-i18n="nav.application_intel_analytics_dashboard">Text Templates</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/AuditLogs" title="Audit Logs" data-filter-tags="Audit Logs">
+                                        <a href="/AuditLogs" title="Audit Logs" data-filter-tags="administration audit logs">
                                             <i class=" fa fa-file-text"></i>
                                             <span class="nav-link-text" data-i18n="nav.application_intel_analytics_dashboard">Audit Logs</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/SettingManagement" title="Settings" data-filter-tags="Settings">
+                                        <a href="/SettingManagement" title="Settings" data-filter-tags="administration setting management">
                                             <i class=" fa fa-cog"></i>
                                             <span class="nav-link-text" data-i18n="nav.application_intel_analytics_dashboard">Settings</span>
                                         </a>
@@ -451,19 +255,19 @@
                             </li>
                             @*Payment*@
                             <li>
-                                <a href="#" title="Payment" data-filter-tags="Payment">
+                                <a href="#" title="Payment" data-filter-tags="payment">
                                     <i class=" fa fa-money-check"></i>
                                     <span class="nav-link-text" data-i18n="nav.font_icons">Payment</span>
                                 </a>
                                 <ul>
                                     <li>
-                                        <a href="/Payment/Plans" title="Payment Plans" data-filter-tags="Payment Plans">
+                                        <a href="/Payment/Plans" title="Payment Plans" data-filter-tags="payment plans">
                                             <i class=" fa fa-file-alt"></i>
                                             <span class="nav-link-text" data-i18n="nav.application_intel_analytics_dashboard">Payment Plans</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/Payment/Requests" title="Payment Requests" data-filter-tags="Payment Requests">
+                                        <a href="/Payment/Requests" title="Payment Requests" data-filter-tags="payment requests">
                                             <i class=" fa fa-exchange"></i>
                                             <span class="nav-link-text" data-i18n="nav.application_intel_analytics_dashboard">Payment Requests</span>
                                         </a>
@@ -472,13 +276,13 @@
                             </li>
                             @*Product service*@
                             <li>
-                                <a href="#" title="Product Service" data-filter-tags="Product Service">
+                                <a href="#" title="Product Service" data-filter-tags="product service">
                                     <i class=" fal fa-cog"></i>
                                     <span class="nav-link-text" data-i18n="nav.font_icons">Product Service</span>
                                 </a>
                                 <ul>
                                     <li>
-                                        <a href="/Products" title="Product" data-filter-tags="Product">
+                                        <a href="/Products" title="Product" data-filter-tags="product">
                                             <i class=" fa fa-product-hunt"></i>
                                             <span class="nav-link-text" data-i18n="nav.application_intel_analytics_dashboard">Product</span>
                                         </a>
@@ -487,26 +291,26 @@
                             </li>
                             @*MDM*@
                             <li class="">
-                                <a href="#" title="MDM" data-filter-tags="font icons">
+                                <a href="#" title="MDM" data-filter-tags="mdm">
                                     <i class="fal fal fa-window"></i>
                                     <span class="nav-link-text" data-i18n="nav.font_icons">MDM</span>
                                 </a>
                                 <ul>
                                     @*System*@
                                     <li>
-                                        <a href="javascript:void(0);" title="System" data-filter-tags="font icons fontawesome">
+                                        <a href="javascript:void(0);" title="System" data-filter-tags="mdm system">
                                             <i class=" fa fa-cogs"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome">System</span>
                                         </a>
                                         <ul>
                                             <li>
-                                                <a href="/Mdm/SystemDatas" title="System Datas" data-filter-tags="font icons fontawesome light">
+                                                <a href="/Mdm/SystemDatas" title="System Datas" data-filter-tags="mdm system data">
                                                     <i class="fa fa-database"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_light">System Datas</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/NumberingConfigs" name="System-NumberingConfigs" title="Numbering Configs" data-filter-tags="font icons fontawesome regular">
+                                                <a href="/Mdm/NumberingConfigs" name="System-NumberingConfigs" title="Numbering Configs" data-filter-tags="mdm numbering congigs">
                                                     <i class=" fa fa-file-code-o"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">Numbering Configs</span>
                                                 </a>
@@ -515,19 +319,19 @@
                                     </li>
                                     @*Geographical*@
                                     <li>
-                                        <a href="javascript:void(0);" title="Geographical" data-filter-tags="font icons fontawesome">
+                                        <a href="javascript:void(0);" title="Geographical" data-filter-tags="mdm geographical">
                                             <i class="fa fa-map-pin"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome">Geographical</span>
                                         </a>
                                         <ul>
                                             <li>
-                                                <a href="/Mdm/GeoMasters" title="Geo Master" data-filter-tags="font icons fontawesome light">
+                                                <a href="/Mdm/GeoMasters" title="Geo Master" data-filter-tags="mdm geomasters">
                                                     <i class="fa fa-map"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_light">Geo Master</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/Maps" title="Maps" data-filter-tags="font icons fontawesome light">
+                                                <a href="/Mdm/Maps" title="Maps" data-filter-tags="mdm maps">
                                                     <i class="fas fa-map-marked"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_light">Maps</span>
                                                 </a>
@@ -542,37 +346,37 @@
                                     </li>
                                     @*Company*@
                                     <li>
-                                        <a href="javascript:void(0);" title="Company" data-filter-tags="font icons nextgen icons">
+                                        <a href="javascript:void(0);" title="Company" data-filter-tags="mdm company">
                                             <i class="fa fa-building"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons_nextgen_icons">Company</span>
                                         </a>
                                         <ul>
                                             <li>
-                                                <a href="/Mdm/Companies" title="Company Profile" data-filter-tags="Company Profile">
+                                                <a href="/Mdm/Companies" title="Company Profile" data-filter-tags="mdm company profile">
                                                     <i class="fa fa-id-card-o"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_nextgen_icons_general">Company Profile</span>
                                                 </a>
                                             </li>
-                                            @*<li>
-                                                <a href="/Mdm/DimensionMeasurements" title="Dimension Measurements" data-filter-tags="Dimension Measurements">
+                                            <li>
+                                                <a href="/Mdm/DimensionMeasurements" title="Dimension Measurements" data-filter-tags="mdm company dimension measurements">
                                                     <i class="fa fa-tachometer"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_nextgen_icons_base">Dimension Measurements</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/WeightMeasurements" title="Weight Measurements" data-filter-tags="Weight Measurements">
+                                                <a href="/Mdm/WeightMeasurements" title="Weight Measurements" data-filter-tags="mdm company weight measurements">
                                                     <i class="fa fa-balance-scale"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_nextgen_icons_base">Weight Measurements</span>
                                                 </a>
-                                            </li>*@
+                                            </li>
                                             <li>
-                                                <a href="/Mdm/VATs" title="VATs" data-filter-tags="VATs">
+                                                <a href="/Mdm/VATs" title="VATs" data-filter-tags="mdm company vats">
                                                     <i class="fa fa-file-alt"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_nextgen_icons_base">VATs</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/SalesChannels" title="Sales Channels" data-filter-tags="Sales Channels">
+                                                <a href="/Mdm/SalesChannels" title="Sales Channels" data-filter-tags="mdm company sales channels">
                                                     <i class="fa fa-file-alt"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_nextgen_icons_base">Sales Channels</span>
                                                 </a>
@@ -581,19 +385,19 @@
                                     </li>
                                     @*Product*@
                                     <li>
-                                        <a href="javascript:void(0);" title="Product" data-filter-tags="Product">
+                                        <a href="javascript:void(0);" title="Item" data-filter-tags="mdm product">
                                             <i class="fa fa-product-hunt"></i>
-                                            <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons">Product</span>
+                                            <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons">Item</span>
                                         </a>
                                         <ul>
                                             <li>
-                                                <a href="/Mdm/UOMs" title="UOMs" data-filter-tags="UOMs">
+                                                <a href="/Mdm/UOMs" title="UOMs" data-filter-tags="mdm product uoms">
                                                     <i class="fa fa-cube"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_showcase">UOMs</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/UOMGroups" title="UOM GROUPs" data-filter-tags="UOM GROUPs">
+                                                <a href="/Mdm/UOMGroups" title="UOM GROUPs" data-filter-tags="mdm product mdm product uom groups">
                                                     <i class="fa fa-cubes"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">UOM GROUPs</span>
                                                 </a>
@@ -605,13 +409,13 @@
                                                 </a>
                                             </li>*@
                                             <li>
-                                                <a href="/Mdm/ProductAttributes" title="Product Attributes" data-filter-tags="Product Attributes">
+                                                <a href="/Mdm/ProductAttributes" title="Product Attributes" data-filter-tags="mdm product attributes">
                                                     <i class="fa fa-indent"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Product Attributes</span>
+                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Attributes</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/ProdAttributeValues" title="Product Attribute Values" data-filter-tags="Product Attribute Values">
+                                                <a href="/Mdm/ProdAttributeValues" title="Product Attribute Values" data-filter-tags="mdm product attribute values">
                                                     <i class="fa fa-check"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Product Attribute Values</span>
                                                 </a>
@@ -623,148 +427,148 @@
                                                 </a>
                                             </li>*@
                                             <li>
-                                                <a href="/Mdm/ItemMasters" title="Item Masters" data-filter-tags="Item Masters">
+                                                <a href="/Mdm/ItemMasters" title="Item Masters" data-filter-tags="mdm product item masters">
                                                     <i class="fa fa-folder-open"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Masters</span>
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a href="/Mdm/ItemImages" title="Item Images" data-filter-tags="Item Images">
+                                            @*<li>
+                                                <a href="/Mdm/ItemImages" title="Item Images" data-filter-tags="mdm product item images">
                                                     <i class="fa fa-file-image-o"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Images</span>
                                                 </a>
-                                            </li>
-                                            <li>
-                                                <a href="/Mdm/ItemAttachments" title="Item Attachments" data-filter-tags="Item Attachments">
+                                            </li>*@
+                                            @*<li>
+                                                <a href="/Mdm/ItemAttachments" title="Item Attachments" data-filter-tags="mdm product item attachments">
                                                     <i class="fa fa-paperclip"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Attachments</span>
                                                 </a>
-                                            </li>
+                                            </li>*@
                                             <li>
-                                                <a href="/Mdm/ItemGroups" title="Item Groups" data-filter-tags="Item Groups">
+                                                <a href="/Mdm/ItemGroups" title="Item Groups" data-filter-tags="mdm product item groups">
                                                     <i class="fa fa-object-group"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Groups</span>
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a href="/Mdm/ItemGroupAttrs" title="Item Group Attributes" data-filter-tags="Item Group Attributes">
+                                            @*<li>
+                                                <a href="/Mdm/ItemGroupAttrs" title="Item Group Attributes" data-filter-tags="mdm product item group attributes">
                                                     <i class="fa fa-clone"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Group Attributes</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/ItemGroupLists" title="Item Group Lists" data-filter-tags="Item Group Lists">
+                                                <a href="/Mdm/ItemGroupLists" title="Item Group Lists" data-filter-tags="mdm product item group lists">
                                                     <i class="fa fa-list-alt"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Group Lists</span>
                                                 </a>
-                                            </li>
+                                            </li>*@
                                             <li>
-                                                <a href="/Mdm/PriceLists" title="Price Lists" data-filter-tags="Price Lists">
+                                                <a href="/Mdm/PriceLists" title="Price Lists" data-filter-tags="mdm product price lists">
                                                     <i class="fa fa-money"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Price Lists</span>
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a href="/Mdm/PriceListDetails" title="Price List Details" data-filter-tags="Price List Details">
+                                            @*<li>
+                                                <a href="/Mdm/PriceListDetails" title="Price List Details" data-filter-tags="mdm product price list details">
                                                     <i class="fa fa-list"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Price List Details</span>
                                                 </a>
-                                            </li>
+                                            </li>*@
                                             <li>
-                                                <a href="/Mdm/PriceUpdates" title="Price Update" data-filter-tags="Price Update">
+                                                <a href="/Mdm/PriceUpdates" title="Price Update" data-filter-tags="mdm product price update">
                                                     <i class="fa fa-pencil-square-o"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Price Update</span>
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a href="/Mdm/PriceUpdateDetails" title="Price Update Details" data-filter-tags="Price Update Details">
+                                            @*<li>
+                                                <a href="/Mdm/PriceUpdateDetails" title="Price Update Details" data-filter-tags="mdm product price update details">
                                                     <i class="fa fa-info-circle"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Price Update Details</span>
                                                 </a>
-                                            </li>
+                                            </li>*@
                                             <li>
-                                                <a href="/Mdm/PricelistAssignments" title="Price List Assignments" data-filter-tags="Price List Assignments">
+                                                <a href="/Mdm/PricelistAssignments" title="Price List Assignments" data-filter-tags="mdm product price list assignments">
                                                     <i class="fa fa-table"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Price List Assignments</span>
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a href="/Mdm/PricelistAssignmentDetails" title="Price List Assignment Details" data-filter-tags="Price List Assignment Details">
+                                            @*<li>
+                                                <a href="/Mdm/PricelistAssignmentDetails" title="Price List Assignment Details" data-filter-tags="mdm product price list assignment details">
                                                     <i class="fa fa-asterisk"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Price List Assignment Details</span>
                                                 </a>
-                                            </li>
+                                            </li>*@
                                         </ul>
                                     </li>
                                     @*Sales Organization*@
                                     <li>
-                                        <a href="javascript:void(0);" title="Sales Organization" data-filter-tags="font icons stack icons">
+                                        <a href="javascript:void(0);" title="Sales Organization" data-filter-tags="mdm sales organization">
                                             <i class="fa fa-sitemap"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons">Sales Organization</span>
                                         </a>
                                         <ul>
                                              <li>
-                                                <a href="/Mdm/EmployeeTypes" title="Employee Types" data-filter-tags="Employee Types">
+                                                <a href="/Mdm/EmployeeTypes" title="Employee Types" data-filter-tags="mdm sales organization employee types">
                                                     <i class="fa fa-users"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_showcase">Employee Types</span>
                                                 </a>
                                             </li> 
                                             <li>
-                                                <a href="/Mdm/WorkingPositions" title="Working Positions" data-filter-tags="Working Positions">
+                                                <a href="/Mdm/WorkingPositions" title="Working Positions" data-filter-tags="mdm sales organization working positions">
                                                     <i class="fa fa-archive"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_showcase">Working Positions</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/EmployeeProfiles" title="Employee Profiles" data-filter-tags="Employee Profiles">
+                                                <a href="/Mdm/EmployeeProfiles" title="Employee Profiles" data-filter-tags="mdm sales organization employee profiles">
                                                     <i class="fa fa-user"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Employee Profiles</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/SalesOrgs" title="Sales Organization Masters" data-filter-tags="Sales Organization Masters">
+                                                <a href="/Mdm/SalesOrgs" title="Sales Organization Masters" data-filter-tags="mdm sales organization sales organization masters">
                                                     <i class="fa fa-check-square"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Sales Organization Masters</span>
                                                 </a>
                                             </li>
                                             <li class="d-none">
-                                                <a href="/Mdm/SalesOrgValues" title="Sales Organization Values" data-filter-tags="Sales Organization Values">
+                                                <a href="/Mdm/SalesOrgValues" title="Sales Organization Values" data-filter-tags="mdm sales organization sales organization values">
                                                     <i class="fa fa-check-square"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Sales Organization Values</span>
                                                 </a>
                                             </li>
                                             <li class="d-none">
-                                                <a href="/Mdm/SalesOrgEmpAssignments" title="Sales Organization Employee Assignments" data-filter-tags="Sales Organization Employee Assignments">
+                                                <a href="/Mdm/SalesOrgEmpAssignments" title="Sales Organization Employee Assignments" data-filter-tags="mdm sales organization sales employee assignments">
                                                     <i class="fa fa-asterisk"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Sales Organization Employee Assignments</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/SellingZones" title="Selling Zones" data-filter-tags="Selling Zones">
+                                                <a href="/Mdm/SellingZones" title="Selling Zones" data-filter-tags="mdm sales organization selling zones">
                                                     <i class="fa fa-map-marker"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Selling Zones</span>
                                                 </a>
                                             </li>
                                             <li class="d-none">
-                                                <a href="/Mdm/SSHistoryInZones" title="Supervisor Selling Zone Assignments" data-filter-tags="Supervisor Selling Zone Assignments">
+                                                <a href="/Mdm/SSHistoryInZones" title="Supervisor Selling Zone Assignments" data-filter-tags="mdm sales organization supervisor selling zone assignments">
                                                     <i class="fa fa-thumb-tack"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Supervisor Selling Zone Assignments</span>
                                                 </a>
                                             </li>
                                             <li class="d-none">
-                                                <a href="/Mdm/CompanyInZones" title="Company Selling Zone Assignments" data-filter-tags="Company Selling Zone Assignments">
+                                                <a href="/Mdm/CompanyInZones" title="Company Selling Zone Assignments" data-filter-tags="mdm sales organization company selling zone assignments">
                                                     <i class="fa fa-building"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Company Selling Zone Assignments</span>
                                                 </a>
                                             </li>
                                             <li class="d-none">
-                                                <a href="/Mdm/CustomerInZones" title="Customer Selling Zone Assignments" data-filter-tags="Customer Selling Zone Assignments">
+                                                <a href="/Mdm/CustomerInZones" title="Customer Selling Zone Assignments" data-filter-tags="mdm sales organization customer selling zone assignments">
                                                     <i class="fa fa-user-secret"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Customer Selling Zone Assignments</span>
                                                 </a>
                                             </li>
                                             <li class="d-none">
-                                                <a href="/Mdm/EmployeeInZones" title="Employee Selling Zone Assignments" data-filter-tags="Employee Selling Zone Assignments">
+                                                <a href="/Mdm/EmployeeInZones" title="Employee Selling Zone Assignments" data-filter-tags="mdm sales organization employee selling zone assignments">
                                                     <i class="fa fa-users"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Employee Selling Zone Assignments</span>
                                                 </a>
@@ -773,31 +577,31 @@
                                     </li>
                                     @*Customer*@
                                     <li>
-                                        <a href="javascript:void(0);" title="Customer" data-filter-tags="font icons stack icons">
+                                        <a href="javascript:void(0);" title="Customer" data-filter-tags="mdm customer">
                                             <i class="fa fa-user-secret"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons">Customer</span>
                                         </a>
                                         <ul>
                                             <li>
-                                                <a href="/Mdm/CustomerAttributes" title="Customer Attributes" data-filter-tags="Customer Attributes">
+                                                <a href="/Mdm/CustomerAttributes" title="Customer Attributes" data-filter-tags="mdm customer attributes">
                                                     <i class="fa fa-id-card"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_showcase">Customer Attributes</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/CusAttributesValues" title="Customer Attribute Values" data-filter-tags="Customer Attribute Values">
+                                                <a href="/Mdm/CusAttributesValues" title="Customer Attribute Values" data-filter-tags="mdm customer attribute values">
                                                     <i class="fa fa-check-square"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Customer Attribute Values</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/CustomerProfile" title="Customer Profile" data-filter-tags="Customer Profile">
+                                                <a href="/Mdm/CustomerProfile" title="Customer Profile" data-filter-tags="mdm customer profile">
                                                     <i class="fa fa-user"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_showcase">Customer Profile</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/Vendors" title="Vendor" data-filter-tags="Vendor">
+                                                <a href="/Mdm/Vendors" title="Vendor" data-filter-tags="mdm customer vendor">
                                                     <i class="fa fa-user-secret"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_showcase">Vendor</span>
                                                 </a>
@@ -809,7 +613,7 @@
                                                 </a>
                                             </li>*@
                                             <li>
-                                                <a href="/Mdm/CustomerAssignments" title="Customer Assignments" data-filter-tags="Customer Assignments">
+                                                <a href="/Mdm/CustomerAssignments" title="Customer Assignments" data-filter-tags="mdm customer assignments">
                                                     <i class="fa fa-tasks"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Customer Assignments</span>
                                                 </a>
@@ -851,19 +655,19 @@
                                                 </a>
                                             </li>*@
                                             <li>
-                                                <a href="/Mdm/CustomerGroups" title="Customer Groups" data-filter-tags="Customer Groups">
+                                                <a href="/Mdm/CustomerGroups" title="Customer Groups" data-filter-tags="mdm customer groups">
                                                     <i class="fa fa-users"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Customer Groups</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="#" title="New Customer Approval" data-filter-tags="New Customer Approval">
+                                                <a href="#" title="New Customer Approval" data-filter-tags="mdm customer approval">
                                                     <i class="fa fa-list-alt"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">New Customer Approval</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="#" title="Update Customer Approval" data-filter-tags="Update Customer Approval">
+                                                <a href="#" title="Update Customer Approval" data-filter-tags="mdm customer approval">
                                                     <i class="fa fa-list-ol"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Update Customer Approval</span>
                                                 </a>
@@ -873,49 +677,49 @@
 
                                     @*Route & MCP*@
                                     <li>
-                                        <a href="javascript:void(0);" title="Route & MCP" data-filter-tags="font icons stack icons">
+                                        <a href="javascript:void(0);" title="Route & MCP" data-filter-tags="mdm route & mcp">
                                             <i class="fa fa-calendar"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons">Route & MCP</span>
                                         </a>
                                         <ul>
                                             <li>
-                                                <a href="/Mdm/Holidays" title="Holiday Years" data-filter-tags="Holiday Years">
+                                                <a href="/Mdm/Holidays" title="Holiday Years" data-filter-tags="mdm route & mcp holiday years">
                                                     <i class="fa fa-calendar-check-o"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_showcase">Holiday Years</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/HolidayDetails" title="Holiday Details" data-filter-tags="Holiday Details">
+                                                <a href="/Mdm/HolidayDetails" title="Holiday Details" data-filter-tags="mdm route & mcp holiday details">
                                                     <i class="fa fa-info-circle"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Holiday Details</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/Routes" title="Routes" data-filter-tags="Routes">
+                                                <a href="/Mdm/Routes" title="Routes" data-filter-tags="mdm route & mcp routes">
                                                     <i class="fa fa-list-ol"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Routes</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/MCPHeaders" title="MCP Headers" data-filter-tags="MCP Headers">
+                                                <a href="/Mdm/MCPHeaders" title="MCP Headers" data-filter-tags="mdm route & mcp headers">
                                                     <i class="fa fa-calendar-minus-o"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">MCP Headers</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/MCPDetails" title="MCP Details" data-filter-tags="MCP Details">
+                                                <a href="/Mdm/MCPDetails" title="MCP Details" data-filter-tags="mdm route & mcp details">
                                                     <i class="fa fa-info-circle"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">MCP Details</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/VisitPlans" title="Visit Plans" data-filter-tags="Visit Plans">
+                                                <a href="/Mdm/VisitPlans" title="Visit Plans" data-filter-tags="mdm route & mcp visit plans">
                                                     <i class="fa fa-calendar-check-o"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Visit Plans</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/RouteAssignments" title="Route Assignments" data-filter-tags="Route Assignments">
+                                                <a href="/Mdm/RouteAssignments" title="Route Assignments" data-filter-tags="mdm route & mcp route assignments">
                                                     <i class="fa fa-thumb-tack"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Route Assignments</span>
                                                 </a>
@@ -923,14 +727,14 @@
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="/Mdm/SystemDataTemplates" title="System Data Templates" data-filter-tags="System Data Templates">
+                                        <a href="/Mdm/SystemDataTemplates" title="System Data Templates" data-filter-tags="mdm system data templates">
                                             <i class="fa fa-file-code-o"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons">System Data Templates</span>
                                         </a>
                                     </li>
                                     @* Sales Material*@
                                     <li>
-                                        <a href="javascript:void(0);" title="Sales Material" data-filter-tags="font icons stack icons">
+                                        <a href="javascript:void(0);" title="Sales Material" data-filter-tags="mdm sales material">
                                             <i class="fa fa-book"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons">Sales Material</span>
                                         </a>
@@ -939,49 +743,49 @@
                             </li>
                             @*INVENTORY*@
                             <li>
-                                <a href="#" title="INVENTORY" data-filter-tags="INVENTORY">
+                                <a href="#" title="INVENTORY" data-filter-tags="inventory">
                                     <i class="fa fa-bookmark"></i>
                                     <span class="nav-link-text" data-i18n="nav.font_icons">INVENTORY</span>
                                 </a>
                                 <ul>
                                     <li>
-                                        <a href="/Inventories/Warehouses" title="Warehouse" data-filter-tags="Warehouse">
+                                        <a href="/Inventories/Warehouses" title="Warehouse" data-filter-tags="inventory warehouse">
                                             <i class="fa fa-list-ul"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Warehouse</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/Inventories/Inventories" title="Inventory" data-filter-tags="Inventory">
+                                        <a href="/Inventories/Inventories" title="Inventory" data-filter-tags="inventory">
                                             <i class="fa fa-file-alt"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Inventory</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/Inventories/GoodsReceipt" title="Good Receipt" data-filter-tags="Good Receipt">
+                                        <a href="/Inventories/GoodsReceipt" title="Good Receipt" data-filter-tags="inventory good receipt">
                                             <i class="fa fa-thumbs-up"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Good Receipt</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/Inventories/GoodsIssue" title="Good Issue" data-filter-tags="Good Issue">
+                                        <a href="/Inventories/GoodsIssue" title="Good Issue" data-filter-tags="inventory good issue">
                                             <i class="fa fa-thumbs-o-up"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Good Issue</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/Inventories/InventoryTransfers" title="Inventory Transfer" data-filter-tags="Inventory Transfer">
+                                        <a href="/Inventories/InventoryTransfers" title="Inventory Transfer" data-filter-tags="inventory transfer">
                                             <i class="fa fa-truck"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Inventory Transfer</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/Inventories/InventoryCounting" title="Inventory Counting" data-filter-tags="Inventory Counting">
+                                        <a href="/Inventories/InventoryCounting" title="Inventory Counting" data-filter-tags="inventory counting">
                                             <i class="fa fa-list-ol"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Inventory Counting</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/Inventories/InventoryAdjustment" title="Inventory Adjustment" data-filter-tags="Inventory Adjustment">
+                                        <a href="/Inventories/InventoryAdjustment" title="Inventory Adjustment" data-filter-tags="inventory adjustment">
                                             <i class="fa fa-adjust"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Inventory Adjustment</span>
                                         </a>
@@ -990,43 +794,43 @@
                             </li>
                             @*PO*@
                             <li>
-                                <a href="#" title="PO" data-filter-tags="PO">
+                                <a href="#" title="PO" data-filter-tags="po">
                                     <i class="fa fa-sort"></i>
                                     <span class="nav-link-text" data-i18n="nav.font_icons">PO</span>
                                 </a>
                                 <ul>
                                     <li>
-                                        <a href="/POs/PurchaseRequests" title="Purchase Request" data-filter-tags="Purchase Request">
+                                        <a href="/POs/PurchaseRequests" title="Purchase Request" data-filter-tags="po purchase request">
                                             <i class="fa fa-th-list"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Purchase Request</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/POs/PurchaseOrders" title="Purchase Order" data-filter-tags="Purchase Order">
+                                        <a href="/POs/PurchaseOrders" title="Purchase Order" data-filter-tags="po purchase order">
                                             <i class="fa fa-list-alt"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Purchase Order</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/POs/PurchaseReceipts" title="Purchase Receipt" data-filter-tags="Purchase Receipt">
+                                        <a href="/POs/PurchaseReceipts" title="Purchase Receipt" data-filter-tags="po purchase receipt">
                                             <i class="fa fa-file-text-o"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Purchase Receipt</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/POs/PurchaseReceiptConfirmations" title="Purchase Receipt Confirmation" data-filter-tags="Purchase Receipt Confirmation">
+                                        <a href="/POs/PurchaseReceiptConfirmations" title="Purchase Receipt Confirmation" data-filter-tags="po purchase receipt confirmation">
                                             <i class="fa fa-check-square-o"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Purchase Receipt Confirmation</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/POs/GoodsReturnRequests" title="Goods Return Request" data-filter-tags="Goods Return Request">
+                                        <a href="/POs/GoodsReturnRequests" title="Goods Return Request" data-filter-tags="po goods return request">
                                             <i class="fa fa-bars"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Goods Return Request</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/POs/GoodsReturns" title="Goods Return" data-filter-tags="Goods Return">
+                                        <a href="/POs/GoodsReturns" title="Goods Return" data-filter-tags="po goods return">
                                             <i class="fa fa-arrows-h"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Goods Return</span>
                                         </a>
@@ -1035,85 +839,85 @@
                             </li>
                             @*SO*@
                             <li>
-                                <a href="#" title="SO" data-filter-tags="SO">
+                                <a href="#" title="SO" data-filter-tags="so">
                                     <i class="fal fa-tag"></i>
                                     <span class="nav-link-text" data-i18n="nav.font_icons">SO</span>
                                 </a>
                                 <ul>
                                     <li>
-                                        <a href="/SO/SalesRequest" title="Sales Request" data-filter-tags="Sales Request">
+                                        <a href="/SO/SalesRequest" title="Sales Request" data-filter-tags="so sales request">
                                             <i class="fa fa-list-ul"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Sales Request</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/SO/SalesOrders" title="Sales Orders" data-filter-tags="Sales Orders">
+                                        <a href="/SO/SalesOrders" title="Sales Orders" data-filter-tags="so sales orders">
                                             <i class="fa fa-bars"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Sales Orders</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/SO/Delivery" title="Delivery" data-filter-tags="Delivery">
+                                        <a href="/SO/Delivery" title="Delivery" data-filter-tags="so delivery">
                                             <i class="fa fa-truck"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Delivery</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/SO/ARInvoice" title="A/R Invoice" data-filter-tags="A/R Invoice">
+                                        <a href="/SO/ARInvoice" title="A/R Invoice" data-filter-tags="so a/r invoice">
                                             <i class="fa fa-check-circle-o"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">A/R Invoice</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/SO/ReturnRequest" title="Return Request" data-filter-tags="Return Request">
+                                        <a href="/SO/ReturnRequest" title="Return Request" data-filter-tags="so return request">
                                             <i class="fa fa-arrows-h"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Return Request</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/SO/ReturnOrder" title="Return Order" data-filter-tags="Return Order">
+                                        <a href="/SO/ReturnOrder" title="Return Order" data-filter-tags="so return order">
                                             <i class="fa fa-arrows-v"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Return Order</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/SO/ARCreditMemo" title="A/R Credit Memo" data-filter-tags="A/R Credit Memo">
+                                        <a href="/SO/ARCreditMemo" title="A/R Credit Memo" data-filter-tags="so a/r credit memo">
                                             <i class="fa fa-credit-card"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">A/R Credit Memo</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/SO/ProcessSalesOrder" title="Process Sales Order" data-filter-tags="Process Sales Order">
+                                        <a href="/SO/ProcessSalesOrder" title="Process Sales Order" data-filter-tags="so process sales order">
                                             <i class="fa fa-list-ol"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Process Sales Order</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/SO/ProcessDelivery" title="Process Delivery" data-filter-tags="Process Delivery">
+                                        <a href="/SO/ProcessDelivery" title="Process Delivery" data-filter-tags="so process delivery">
                                             <i class="fa fa-archive"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Process Delivery</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#" title="Delivery Vehicle" data-filter-tags="Delivery Vehicle">
+                                        <a href="#" title="Delivery Vehicle" data-filter-tags="so delivery vehicle">
                                             <i class="fa fa-sitemap"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Delivery Vehicle</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#" title="Receipt Memo" data-filter-tags="Receipt Memo">
+                                        <a href="#" title="Receipt Memo" data-filter-tags="so receipt memo">
                                             <i class="fa fa-list-alt"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Receipt Memo</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#" title="Payment Memo" data-filter-tags="Payment Memo">
+                                        <a href="#" title="Payment Memo" data-filter-tags="so payment memo">
                                             <i class="fa fa-credit-card-alt"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Payment Memo</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#" title="Process Payment" data-filter-tags="Process Payment">
+                                        <a href="#" title="Process Payment" data-filter-tags="so process payment">
                                             <i class="fa fa-list-ul"></i>
                                             <span class="nav-link-text" data-i18n="nav.font_icons">Process Payment</span>
                                         </a>
@@ -1122,13 +926,13 @@
                             </li>
                             @*KPI*@
                             <li>
-                                <a href="#" title="KPI" data-filter-tags="KPI">
+                                <a href="#" title="KPI" data-filter-tags="kpi">
                                     <i class="fa fa-tachometer"></i>
                                     <span class="nav-link-text" data-i18n="nav.font_icons">KPI</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="/Forms" title="Survey" data-filter-tags="Survey">
+                                <a href="/Forms" title="Survey" data-filter-tags="survey">
                                     <i class="fa fa-tachometer"></i>
                                     <span class="nav-link-text" data-i18n="nav.font_icons">Survey</span>
                                 </a>
@@ -1199,7 +1003,7 @@
                                 <i class="ni ni-menu"></i>
                             </a>
                         </div>
-                        <div class="search">
+                        <div class="search" style="display:none">
                             <form class="app-forms hidden-xs-down" role="search" action="page_search.html" autocomplete="off">
                                 <input type="text" id="search-field" placeholder="Search for anything" class="form-control" tabindex="1">
                                 <a href="#" onclick="return false;" class="btn-danger btn-search-close js-waves-off d-none" data-action="toggle" data-class="mobile-search-on">
@@ -1221,7 +1025,7 @@
                                 </a>
                             </div>
                             <!-- app shortcuts -->
-                            <div>
+                            <div style="display:none">
                                 <a href="#" class="header-icon" data-toggle="dropdown" title="My Apps">
                                     <i class="fal fa-cube"></i>
                                 </a>
@@ -1388,12 +1192,12 @@
                                 </div>
                             </div>
                             <!-- app message -->
-                            <a href="#" class="header-icon" data-toggle="modal" data-target=".js-modal-messenger">
+                            <a style="display:none" href="#" class="header-icon" data-toggle="modal" data-target=".js-modal-messenger">
                                 <i class="fal fa-globe"></i>
                                 <span class="badge badge-icon">!</span>
                             </a>
                             <!-- app notification -->
-                            <div>
+                            <div style="display:none">
                                 <a href="#" class="header-icon" data-toggle="dropdown" title="You got 11 notifications">
                                     <i class="fal fa-bell"></i>
                                     <span class="badge badge-icon">11</span>
@@ -1906,7 +1710,7 @@
             <a href="#" class="menu-item btn" data-toggle="tooltip" data-placement="left" title="Scroll Top">
                 <i class="fal fa-arrow-up"></i>
             </a>
-            <a href="page_login-alt.html" class="menu-item btn" data-toggle="tooltip" data-placement="left" title="Logout">
+            <a href="/Account/Logout" class="menu-item btn" data-toggle="tooltip" data-placement="left" title="Logout">
                 <i class="fal fa-sign-out"></i>
             </a>
             <a href="#" class="menu-item btn" data-action="app-fullscreen" data-toggle="tooltip" data-placement="left" title="Full Screen">
@@ -2422,19 +2226,19 @@
                             <div class="expanded theme-colors pl-5 pr-3">
                                 <ul class="m-0">
                                     <li><a href="#" id="myapp-0" data-action="theme-update" data-themesave data-theme="" data-toggle="tooltip" data-placement="top" title="Wisteria (base css)" data-original-title="Wisteria (base css)"></a></li>
-                                    <li><a href="#" id="myapp-1" data-action="theme-update" data-themesave data-theme="~/dmstheme/css/themes/cust-theme-1.css" data-toggle="tooltip" data-placement="top" title="Tapestry" data-original-title="Tapestry"></a></li>
-                                    <li><a href="#" id="myapp-2" data-action="theme-update" data-themesave data-theme="~/dmstheme/css/themes/cust-theme-2.css" data-toggle="tooltip" data-placement="top" title="Atlantis" data-original-title="Atlantis"></a></li>
-                                    <li><a href="#" id="myapp-3" data-action="theme-update" data-themesave data-theme="~/dmstheme/css/themes/cust-theme-3.css" data-toggle="tooltip" data-placement="top" title="Indigo" data-original-title="Indigo"></a></li>
-                                    <li><a href="#" id="myapp-4" data-action="theme-update" data-themesave data-theme="~/dmstheme/css/themes/cust-theme-4.css" data-toggle="tooltip" data-placement="top" title="Dodger Blue" data-original-title="Dodger Blue"></a></li>
-                                    <li><a href="#" id="myapp-5" data-action="theme-update" data-themesave data-theme="~/dmstheme/css/themes/cust-theme-5.css" data-toggle="tooltip" data-placement="top" title="Tradewind" data-original-title="Tradewind"></a></li>
-                                    <li><a href="#" id="myapp-6" data-action="theme-update" data-themesave data-theme="~/dmstheme/css/themes/cust-theme-6.css" data-toggle="tooltip" data-placement="top" title="Cranberry" data-original-title="Cranberry"></a></li>
-                                    <li><a href="#" id="myapp-7" data-action="theme-update" data-themesave data-theme="~/dmstheme/css/themes/cust-theme-7.css" data-toggle="tooltip" data-placement="top" title="Oslo Gray" data-original-title="Oslo Gray"></a></li>
-                                    <li><a href="#" id="myapp-8" data-action="theme-update" data-themesave data-theme="~/dmstheme/css/themes/cust-theme-8.css" data-toggle="tooltip" data-placement="top" title="Chetwode Blue" data-original-title="Chetwode Blue"></a></li>
-                                    <li><a href="#" id="myapp-9" data-action="theme-update" data-themesave data-theme="~/dmstheme/css/themes/cust-theme-9.css" data-toggle="tooltip" data-placement="top" title="Apricot" data-original-title="Apricot"></a></li>
-                                    <li><a href="#" id="myapp-10" data-action="theme-update" data-themesave data-theme="~/dmstheme/css/themes/cust-theme-10.css" data-toggle="tooltip" data-placement="top" title="Blue Smoke" data-original-title="Blue Smoke"></a></li>
-                                    <li><a href="#" id="myapp-11" data-action="theme-update" data-themesave data-theme="~/dmstheme/css/themes/cust-theme-11.css" data-toggle="tooltip" data-placement="top" title="Green Smoke" data-original-title="Green Smoke"></a></li>
-                                    <li><a href="#" id="myapp-12" data-action="theme-update" data-themesave data-theme="~/dmstheme/css/themes/cust-theme-12.css" data-toggle="tooltip" data-placement="top" title="Wild Blue Yonder" data-original-title="Wild Blue Yonder"></a></li>
-                                    <li><a href="#" id="myapp-13" data-action="theme-update" data-themesave data-theme="~/dmstheme/css/themes/cust-theme-13.css" data-toggle="tooltip" data-placement="top" title="Emerald" data-original-title="Emerald"></a></li>
+                                    <li><a href="#" id="myapp-1" data-action="theme-update" data-themesave data-theme="/dmstheme/css/themes/cust-theme-1.css" data-toggle="tooltip" data-placement="top" title="Tapestry" data-original-title="Tapestry"></a></li>
+                                    <li><a href="#" id="myapp-2" data-action="theme-update" data-themesave data-theme="/dmstheme/css/themes/cust-theme-2.css" data-toggle="tooltip" data-placement="top" title="Atlantis" data-original-title="Atlantis"></a></li>
+                                    <li><a href="#" id="myapp-3" data-action="theme-update" data-themesave data-theme="/dmstheme/css/themes/cust-theme-3.css" data-toggle="tooltip" data-placement="top" title="Indigo" data-original-title="Indigo"></a></li>
+                                    <li><a href="#" id="myapp-4" data-action="theme-update" data-themesave data-theme="/dmstheme/css/themes/cust-theme-4.css" data-toggle="tooltip" data-placement="top" title="Dodger Blue" data-original-title="Dodger Blue"></a></li>
+                                    <li><a href="#" id="myapp-5" data-action="theme-update" data-themesave data-theme="/dmstheme/css/themes/cust-theme-5.css" data-toggle="tooltip" data-placement="top" title="Tradewind" data-original-title="Tradewind"></a></li>
+                                    <li><a href="#" id="myapp-6" data-action="theme-update" data-themesave data-theme="/dmstheme/css/themes/cust-theme-6.css" data-toggle="tooltip" data-placement="top" title="Cranberry" data-original-title="Cranberry"></a></li>
+                                    <li><a href="#" id="myapp-7" data-action="theme-update" data-themesave data-theme="/dmstheme/css/themes/cust-theme-7.css" data-toggle="tooltip" data-placement="top" title="Oslo Gray" data-original-title="Oslo Gray"></a></li>
+                                    <li><a href="#" id="myapp-8" data-action="theme-update" data-themesave data-theme="/dmstheme/css/themes/cust-theme-8.css" data-toggle="tooltip" data-placement="top" title="Chetwode Blue" data-original-title="Chetwode Blue"></a></li>
+                                    <li><a href="#" id="myapp-9" data-action="theme-update" data-themesave data-theme="/dmstheme/css/themes/cust-theme-9.css" data-toggle="tooltip" data-placement="top" title="Apricot" data-original-title="Apricot"></a></li>
+                                    <li><a href="#" id="myapp-10" data-action="theme-update" data-themesave data-theme="/dmstheme/css/themes/cust-theme-10.css" data-toggle="tooltip" data-placement="top" title="Blue Smoke" data-original-title="Blue Smoke"></a></li>
+                                    <li><a href="#" id="myapp-11" data-action="theme-update" data-themesave data-theme="/dmstheme/css/themes/cust-theme-11.css" data-toggle="tooltip" data-placement="top" title="Green Smoke" data-original-title="Green Smoke"></a></li>
+                                    <li><a href="#" id="myapp-12" data-action="theme-update" data-themesave data-theme="/dmstheme/css/themes/cust-theme-12.css" data-toggle="tooltip" data-placement="top" title="Wild Blue Yonder" data-original-title="Wild Blue Yonder"></a></li>
+                                    <li><a href="#" id="myapp-13" data-action="theme-update" data-themesave data-theme="/dmstheme/css/themes/cust-theme-13.css" data-toggle="tooltip" data-placement="top" title="Emerald" data-original-title="Emerald"></a></li>
                                 </ul>
                             </div>
                             <hr class="mb-0 mt-4">
@@ -2457,11 +2261,11 @@
 
         <abp-script-bundle name="@BasicThemeBundles.Scripts.Global" />
 
-        <script src="~/Abp/ApplicationConfigurationScript"></script>
-        <script src="~/Abp/ServiceProxyScript"></script>
+        <script src="/Abp/ApplicationConfigurationScript"></script>
+        <script src="/Abp/ServiceProxyScript"></script>
 
-        <script src="~/dmstheme/js/vendors.bundle.js"></script>
-        <script src="~/dmstheme/js/app.bundle.js"></script>
+        <script src="/dmstheme/js/vendors.bundle.js"></script>
+        <script src="/dmstheme/js/app.bundle.js"></script>
         <script type="text/javascript">
             'use strict';
             var classHolder = document.getElementsByTagName("BODY")[0],
@@ -2534,7 +2338,7 @@
                
             });
         </script>
-        <script src="~/pages/shared/_Layout.js"></script>
+        <script src="/pages/shared/_Layout.js"></script>
 
         @*
          <script src="/libs/abp/utils/abp-utils.umd.min.js"></script>
@@ -2549,7 +2353,7 @@
 
         @if (pageTitle != "Tenants | OMS" && pageTitle != "Editions | OMS" && pageTitle != "Organization Units | OMS" && pageTitle != "Roles | OMS" && pageTitle != "Users | OMS" && pageTitle != "Claim Types | OMS" && pageTitle != "Security Logs | OMS" && pageTitle != "Applications | OMS" && pageTitle != "Scopes | OMS" && pageTitle != "Languages | OMS" && pageTitle != "Language Texts | OMS" && pageTitle != "Text Templates | OMS" && pageTitle != "Audit Logs | OMS" && pageTitle != "Settings | OMS")
         {
-            <script src="~/pages/shared/dxconvert.js"></script>
+            <script src="/pages/shared/dxconvert.js"></script>
         }
         @RenderSection("scripts", false)
 
