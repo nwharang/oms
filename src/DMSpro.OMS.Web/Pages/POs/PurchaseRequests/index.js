@@ -12,13 +12,13 @@ $(function () {
             title: "Details",
             icon: "detailslayout",
             template: function () {
-                return $('#details1')
+                return $('#details-1')
             }
         }, {
             title: "Promotional Information",
             icon: "money",
             template: function () {
-                return $('#details2')
+                return $('#details-2')
             }
         }]
     }).dxTabPanel('instance');
@@ -86,6 +86,7 @@ $(function () {
             }
         ]
     });
+    
     $("#bottom-remark").dxForm({
         labelMode: 'floating',
         colCount: 2,
@@ -93,24 +94,21 @@ $(function () {
             {
                 itemType: "group",
                 items: [
-                    {
-                        textField: "xx",
+                    { 
                         dataField: 'ReMark',
-                        colSpan: 2,
-                        labelMode: 'floating',
+                        colSpan: 2, 
                         editorType: 'dxTextArea',
                         editorOptions: {
-                            height: 90,
-                            labelMode: 'floating'
+                            height: 90, 
                         },
                     }]
             }
         ]
     });
     const resizable = $('#resizable').dxResizable({
-        minHeight: 150,
-
-        area: '.wrapper-resizable',
+        minHeight: 120,
+        height:235,
+       // area: '.wrapper-resizable',
     }).dxResizable('instance');
 
     $('#txtBarCode').dxTextBox({
@@ -133,6 +131,11 @@ $(function () {
     const dataGridContainer = $('#gridDetails').dxDataGrid({
         dataSource: inventoryDatas,
         keyExpr: "id",
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'storage',
+        },
         showBorders: true,
         columnAutoWidth: true,
         scrolling: {
@@ -170,12 +173,47 @@ $(function () {
             showNavigationButtons: true
         },
         toolbar: {
-            items: [
+            items: [ {
+                location: 'before',
+                widget: 'dxButton',
+                options: {
+                    icon: 'fa fa-plus',
+                    text: 'Add Row',
+                    onClick() {
+                        dataGridContainer.addRow();
+                    },
+                },
+            },{
+                location: 'before',
+                widget: 'dxTextBox',
+                options: { 
+                   // text: 'Add Row',
+                    placeholder: "Type barcode..."
+                },
+            },
+                 {
+                    location: 'after',
+                     widget: 'dxButton', 
+                    options: {
+                        icon: 'refresh', 
+                        onClick() {
+                            dataGridContainer.refresh();
+                        },
+                    },
+                },
+                'columnChooserButton',
                 {
-                    name: "searchPanel",
-                    location: 'after'
-                }
-            ]
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'fa fa-upload',
+                        text:"Import From Excel",
+                        onClick() {
+                            //dataGridContainer.refresh();
+                        },
+                    },
+                },
+            ],
         },
         editing: {
             mode: "row",
@@ -248,6 +286,8 @@ $(function () {
                 caption: "Item Code",
                 dataField: "code",
                 calculateDisplayValue: function (rowData) {
+                    if (!rowData || !rowData.code) return "";
+
                     var displayText = products.filter(function (item) { return item.ID == rowData.code })[0].Name;
                     if (displayText)
                         return displayText;
@@ -328,25 +368,7 @@ $(function () {
         ],
     }).dxDataGrid("instance");
 
-
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
-
-        console.log("ExportToExcelButton is called.");
-    });
-
-    $("button[name=btnAddRow]").click(function (e) {
-        var grid = $('#' + $(this).attr('data-target')).data('dxDataGrid');
-        grid.addRow();
-    });
-    function currentDate() {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
-
-        return mm + '/' + dd + '/' + yyyy;
-    }
+   
 });
 
 var products = [{
