@@ -9,6 +9,9 @@
     "NoData": "No data to display",
     "Button.Save": "Save",
     "Button.Close": "Close",
-    "Button.Cancel": "Cancel"
+    "Button.Cancel": "Cancel",
+    "SalesOrgHierarchies.Context.Edit": "Edit",
+    "SalesOrgHierarchies.Context.AddSub": "Add sub org hierarchy",
+    "SalesOrgHierarchies.Context.Delete": "Delete"
   }
 }
