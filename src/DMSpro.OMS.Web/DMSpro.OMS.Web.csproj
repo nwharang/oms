@@ -8,19 +8,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="6.0.5" />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="7.0.0" />
   </ItemGroup>
 
     <!-- <ItemGroup>
-        <PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.EventBus.RabbitMQ" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.AspNetCore.Mvc.Client" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.AspNetCore.Authentication.OpenIdConnect" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.Http.Client.Web" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.Http.Client.IdentityModel.Web" Version="6.0.2" />
+        <PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.EventBus.RabbitMQ" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.AspNetCore.Mvc.Client" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.AspNetCore.Authentication.OpenIdConnect" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.Http.Client.Web" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.Http.Client.IdentityModel.Web" Version="7.0.0" />
         
-        <PackageReference Include="Volo.Abp.Account.Pro.Public.HttpApi.Client" Version="6.0.2" />
+        <PackageReference Include="Volo.Abp.Account.Pro.Public.HttpApi.Client" Version="7.0.0" />
         
     </ItemGroup> -->
     <ItemGroup>
@@ -70,25 +70,25 @@
 
   <!-- Product -->
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Http.Client" Version="6.0.2" />
+    <PackageReference Include="Volo.Abp.Http.Client" Version="7.0.0" />
     <!-- <ProjectReference Include="..\DMSpro.OMS.ProductService.Application.Contracts\DMSpro.OMS.ProductService.Application.Contracts.csproj" /> -->
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.AutoMapper" Version="6.0.2" />
-    <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared" Version="6.0.2" />
+    <PackageReference Include="Volo.Abp.AutoMapper" Version="7.0.0" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared" Version="7.0.0" />
   </ItemGroup>
   <!-- Mdm -->
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Ddd.Application.Contracts" Version="6.0.2" />
-    <PackageReference Include="Volo.Abp.Authorization" Version="6.0.2" />
-    <PackageReference Include="Volo.Abp.Features" Version="6.0.2" />
+    <PackageReference Include="Volo.Abp.Ddd.Application.Contracts" Version="7.0.0" />
+    <PackageReference Include="Volo.Abp.Authorization" Version="7.0.0" />
+    <PackageReference Include="Volo.Abp.Features" Version="7.0.0" />
     <!-- <ProjectReference Include="..\DMSpro.OMS.MdmService.Domain.Shared\DMSpro.OMS.MdmService.Domain.Shared.csproj" /> -->
     <!-- <ProjectReference Include="..\..\..\..\shared\DMSpro.OMS.Shared.Domain\DMSpro.OMS.Shared.Domain.csproj" /> -->
     
   </ItemGroup>
   <!-- MDM Domain shard -->
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Commercial.SuiteTemplates" Version="6.0.2" />
+    <PackageReference Include="Volo.Abp.Commercial.SuiteTemplates" Version="7.0.0" />
     
   </ItemGroup>
 
@@ -101,8 +101,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.Swashbuckle" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="6.0.2" />
+        <PackageReference Include="Volo.Abp.Swashbuckle" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="7.0.0" />
         <!-- <ProjectReference Include="..\DMSpro.OMS.Shared.Hosting\DMSpro.OMS.Shared.Hosting.csproj" /> -->
     </ItemGroup>
     <ItemGroup>
@@ -113,104 +113,104 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.Autofac" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.Data" Version="6.0.2" />
+        <PackageReference Include="Volo.Abp.Autofac" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.Data" Version="7.0.0" />
     </ItemGroup>
 
     <!-- Localization -->
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="6.0.5" />
+      <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Volo.Abp.Validation" Version="6.0.2" />
+      <PackageReference Include="Volo.Abp.Validation" Version="7.0.0" />
     </ItemGroup>
 
     <!-- Administration -->
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.PermissionManagement.HttpApi.Client" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.FeatureManagement.HttpApi.Client" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.SettingManagement.HttpApi.Client" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.AuditLogging.HttpApi.Client" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.LanguageManagement.HttpApi.Client" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.TextTemplateManagement.HttpApi.Client" Version="6.0.2" />
+        <PackageReference Include="Volo.Abp.PermissionManagement.HttpApi.Client" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.FeatureManagement.HttpApi.Client" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.SettingManagement.HttpApi.Client" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.AuditLogging.HttpApi.Client" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.LanguageManagement.HttpApi.Client" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.TextTemplateManagement.HttpApi.Client" Version="7.0.0" />
     </ItemGroup>
     <!-- Administration.Contracts -->
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.PermissionManagement.Application.Contracts" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.FeatureManagement.Application.Contracts" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.SettingManagement.Application.Contracts" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.AuditLogging.Application.Contracts" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.LanguageManagement.Application.Contracts" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.TextTemplateManagement.Application.Contracts" Version="6.0.2" />        
+        <PackageReference Include="Volo.Abp.PermissionManagement.Application.Contracts" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.FeatureManagement.Application.Contracts" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.SettingManagement.Application.Contracts" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.AuditLogging.Application.Contracts" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.LanguageManagement.Application.Contracts" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.TextTemplateManagement.Application.Contracts" Version="7.0.0" />        
     </ItemGroup>
     <!-- Administration.Web -->
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.AuditLogging.Web" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.LanguageManagement.Web" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.TextTemplateManagement.Web" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.Account.Pro.Admin.Web" Version="6.0.2" />
+        <PackageReference Include="Volo.Abp.AuditLogging.Web" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.LanguageManagement.Web" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.TextTemplateManagement.Web" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.Account.Pro.Admin.Web" Version="7.0.0" />
     </ItemGroup>
     <!-- Admin.Domain.Shared -->
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.PermissionManagement.Domain.Shared" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.FeatureManagement.Domain.Shared" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.SettingManagement.Domain.Shared" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.AuditLogging.Domain.Shared" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.LanguageManagement.Domain.Shared" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.TextTemplateManagement.Domain.Shared" Version="6.0.2" />
+        <PackageReference Include="Volo.Abp.PermissionManagement.Domain.Shared" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.FeatureManagement.Domain.Shared" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.SettingManagement.Domain.Shared" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.AuditLogging.Domain.Shared" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.LanguageManagement.Domain.Shared" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.TextTemplateManagement.Domain.Shared" Version="7.0.0" />
     </ItemGroup>
     <!-- Identity.Http.Client -->
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.Identity.Pro.HttpApi.Client" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.OpenIddict.Pro.HttpApi.Client" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.Account.Pro.Admin.HttpApi.Client" Version="6.0.2" />
+        <PackageReference Include="Volo.Abp.Identity.Pro.HttpApi.Client" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.OpenIddict.Pro.HttpApi.Client" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.Account.Pro.Admin.HttpApi.Client" Version="7.0.0" />
     </ItemGroup>
     <!-- Identity.Contracts -->
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.Identity.Pro.Application.Contracts" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.OpenIddict.Pro.Application.Contracts" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.Account.Pro.Admin.Application.Contracts" Version="6.0.2" />
+        <PackageReference Include="Volo.Abp.Identity.Pro.Application.Contracts" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.OpenIddict.Pro.Application.Contracts" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.Account.Pro.Admin.Application.Contracts" Version="7.0.0" />
     </ItemGroup>
     <!-- Identity Domain Shared -->
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.Identity.Pro.Domain.Shared" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.OpenIddict.Domain.Shared" Version="6.0.2" />
+        <PackageReference Include="Volo.Abp.Identity.Pro.Domain.Shared" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.OpenIddict.Domain.Shared" Version="7.0.0" />
     </ItemGroup>
 
     <!-- Identity.web -->
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.Identity.Pro.Web" Version="6.0.2" />
-        <PackageReference Include="Volo.Abp.OpenIddict.Pro.Web" Version="6.0.2" />
+        <PackageReference Include="Volo.Abp.Identity.Pro.Web" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.OpenIddict.Pro.Web" Version="7.0.0" />
     </ItemGroup>
 
     <!-- Saas.HttpClient -->
     <ItemGroup>
-        <PackageReference Include="Volo.Saas.Host.HttpApi.Client" Version="6.0.2" />
-        <PackageReference Include="Volo.Saas.Tenant.HttpApi.Client" Version="6.0.2" />
-        <PackageReference Include="Volo.Payment.Admin.HttpApi.Client" Version="6.0.2" />
+        <PackageReference Include="Volo.Saas.Host.HttpApi.Client" Version="7.0.0" />
+        <PackageReference Include="Volo.Saas.Tenant.HttpApi.Client" Version="7.0.0" />
+        <PackageReference Include="Volo.Payment.Admin.HttpApi.Client" Version="7.0.0" />
     </ItemGroup>
     <!-- Saas.Contracts -->
     <ItemGroup>
-        <PackageReference Include="Volo.Saas.Host.Application.Contracts" Version="6.0.2" />
-        <PackageReference Include="Volo.Saas.Tenant.Application.Contracts" Version="6.0.2" />
-        <PackageReference Include="Volo.Payment.Admin.Application.Contracts" Version="6.0.2" />
+        <PackageReference Include="Volo.Saas.Host.Application.Contracts" Version="7.0.0" />
+        <PackageReference Include="Volo.Saas.Tenant.Application.Contracts" Version="7.0.0" />
+        <PackageReference Include="Volo.Payment.Admin.Application.Contracts" Version="7.0.0" />
     </ItemGroup>
     <!-- Saas.Web -->
     <ItemGroup>
-        <PackageReference Include="Volo.Saas.Host.Web" Version="6.0.2" />
-        <PackageReference Include="Volo.Saas.Tenant.Web" Version="6.0.2" />
-        <PackageReference Include="Volo.Payment.Admin.Web" Version="6.0.2" />
+        <PackageReference Include="Volo.Saas.Host.Web" Version="7.0.0" />
+        <PackageReference Include="Volo.Saas.Tenant.Web" Version="7.0.0" />
+        <PackageReference Include="Volo.Payment.Admin.Web" Version="7.0.0" />
     </ItemGroup>
     <!-- Saas DomainShared -->
     <ItemGroup>
-        <PackageReference Include="Volo.Saas.Domain.Shared" Version="6.0.2" />
-        <PackageReference Include="Volo.Payment.Domain.Shared" Version="6.0.2" />
+        <PackageReference Include="Volo.Saas.Domain.Shared" Version="7.0.0" />
+        <PackageReference Include="Volo.Payment.Domain.Shared" Version="7.0.0" />
     </ItemGroup>
     <!-- Inventory domain shared -->
     <ItemGroup>
       
-      <PackageReference Include="Volo.Abp.FluentValidation" Version="6.0.2" />
+      <PackageReference Include="Volo.Abp.FluentValidation" Version="7.0.0" />
       
     </ItemGroup>
   <ItemGroup>
