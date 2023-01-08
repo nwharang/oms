@@ -12,6 +12,15 @@
     "Button.Cancel": "Cancel",
     "SalesOrgHierarchies.Context.Edit": "Edit",
     "SalesOrgHierarchies.Context.AddSub": "Add sub org hierarchy",
-    "SalesOrgHierarchies.Context.Delete": "Delete"
+    "SalesOrgHierarchies.Context.Delete": "Delete",
+    "CompanyProfile.geoLevel0Id": "Country",
+    "CompanyProfile.geoLevel1Id": "Area",
+    "CompanyProfile.geoLevel2Id": "Province",
+    "CompanyProfile.geoLevel3Id": "District",
+    "CompanyProfile.geoLevel4Id": "Ward",
+    "CustomerAttribute.Code": "Attribute Code",
+    "CustomerAttribute.Name": "Attribute Name",
+    "CustomerAttribute.Active": "Active",
+    "CustomerAttribute.HierarchyLevel": "Hierarchy Level"
   }
 }

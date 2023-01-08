@@ -22,18 +22,18 @@
             displayName: "User 03"
         }
     ];
-    var customerTemps = [
+    var companyTemps = [
         {
             id: 1,
-            displayName: "Customer 01"
+            displayName: "Company 01"
         },
         {
             id: 2,
-            displayName: "Customer 02"
+            displayName: "Company 02"
         },
         {
             id: 3,
-            displayName: "Customer 03"
+            displayName: "Company 03"
         }
     ];
 
@@ -265,7 +265,7 @@
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource: customerTemps,
+                    dataSource: companyTemps,
                     valueExpr: "id",
                     displayExpr: "displayName"
                 }

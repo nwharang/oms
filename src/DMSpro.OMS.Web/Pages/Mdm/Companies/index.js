@@ -1,5 +1,6 @@
 ﻿$(function () {
     var l = abp.localization.getResource("MdmService");
+    var l1 = abp.localization.getResource("OMSWeb");
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
 
@@ -281,7 +282,7 @@
             },
             {
                 dataField: "geoLevel0Id",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel0Id"),
+                caption: l1("CompanyProfile.geoLevel0Id"),
                 width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel0Id = value;
@@ -300,7 +301,7 @@
             },
             {
                 dataField: "geoLevel1Id",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel1Id"),
+                caption: l1("CompanyProfile.geoLevel1Id"),
                 width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel1Id = value;
@@ -321,7 +322,7 @@
             },
             {
                 dataField: "geoLevel2Id",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel2Id"),
+                caption: l1("CompanyProfile.geoLevel2Id"),
                 width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel2Id = value;
@@ -341,7 +342,7 @@
             },
             {
                 dataField: "geoLevel3Id",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel3Id"),
+                caption: l1("CompanyProfile.geoLevel3Id"),
                 width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel3Id = value;
@@ -358,21 +359,21 @@
                     displayExpr: 'name',
                 }
             },
-            //{
-            //    dataField: "geoLevel4Id",
-            //    caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel4Id"),
-            //    width: 110,
-            //    lookup: {
-            //        dataSource(options) {
-            //            return {
-            //                store: geoMasterStore,
-            //                filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : null,
-            //            };
-            //        },
-            //        valueExpr: 'id',
-            //        displayExpr: 'name',
-            //    }
-            //},
+            {
+                dataField: "geoLevel4Id",
+                caption: l1("CompanyProfile.geoLevel4Id"),
+                width: 110,
+                lookup: {
+                    dataSource(options) {
+                        return {
+                            store: geoMasterStore,
+                            filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : null,
+                        };
+                    },
+                    valueExpr: 'id',
+                    displayExpr: 'name',
+                }
+            },
             {
                 dataField: 'street',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Street"),
