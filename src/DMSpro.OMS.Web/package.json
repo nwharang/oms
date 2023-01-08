@@ -3,9 +3,9 @@
   "name": "OMSWeb",
   "private": true,
   "dependencies": {
-    "@volo/abp.aspnetcore.mvc.ui.theme.leptonx": "~1.0.0",
-    "@volo/identity": "^6.0.2",
-    "@abp/chart.js": "^6.0.2",
-    "@volo/language-management": "^6.0.2"
+    "@volo/abp.aspnetcore.mvc.ui.theme.leptonx": "~2.0.0-rc.4",
+    "@volo/identity": "^7.0.0",
+    "@abp/chart.js": "^7.0.0",
+    "@volo/language-management": "^7.0.0"
   }
 }

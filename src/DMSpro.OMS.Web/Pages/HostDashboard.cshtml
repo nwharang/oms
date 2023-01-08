@@ -35,24 +35,13 @@
         <form method="get" id="DashboardFilterForm">
             <abp-row h-align="Center" v-align="Center" id="datepicker" class="input-daterange">
                 <div class="col-12 col-lg-5 col-md-6 mb-3 mb-lg-0">
-                    <div class="form-group mb-0">
+                    <div class="mb-0">
                         <div class="input-group">
-                            <label class="input-group-text">@L["StartDate"].Value</label>
+                            <span class="input-group-text">@L["Date"].Value</span>
                             <input type="text"
-                                   class="form-control"
-                                   name="StartDate"
-                                   value="@DateTime.Now.AddMonths(-1).Date.ToString(CultureInfo.CurrentUICulture.DateTimeFormat.ShortDatePattern)" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-lg-5 col-md-6 mb-3 mb-lg-0">
-                    <div class="form-group mb-0">
-                        <div class="input-group">
-                            <label class="input-group-text">@L["EndDate"].Value</label>
-                            <input type="text"
-                                   class="form-control"
-                                   name="EndDate"
-                                   value="@DateTime.Now.Date.ToString(CultureInfo.CurrentUICulture.DateTimeFormat.ShortDatePattern)" />
+                                   class="form-control date-range-picker"
+                                   name="When"
+                                   autocomplete="off"/>
                         </div>
                     </div>
                 </div>

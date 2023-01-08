@@ -30,6 +30,7 @@ using DMSpro.OMS.Shared.Hosting.AspNetCore;
 using DMSpro.OMS.Web.Navigation;
 using Polly;
 using Prometheus;
+using Serilog;
 using StackExchange.Redis;
 using Volo.Abp;
 using Volo.Abp.Account;
@@ -222,7 +223,7 @@ public class OMSWebModule : AbpModule
                 {
                     // Intercept the redirection for signout so the browser navigates to the right URL in your host
                     ctx.ProtocolMessage.IssuerAddress = configuration["AuthServer:Authority"].EnsureEndsWith('/') +
-                                                        "connect/endsession";
+                                                        "connect/logout";
 
                     if (previousOnRedirectToIdentityProviderForSignOut != null)
                     {
@@ -319,7 +320,7 @@ public class OMSWebModule : AbpModule
         app.UseAbpSecurityHeaders();
         app.UseStaticFiles();
         app.UseRouting();
-        app.UseHttpMetrics();
+        // app.UseHttpMetrics();
         app.UseAuthentication();
         app.UseMultiTenancy();
         app.UseAbpSerilogEnrichers();

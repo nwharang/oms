@@ -17,6 +17,7 @@
     },
     "DMSpro.OMS.Web": {
       "commandName": "Project",
+      "dotnetRunMessages": "true",
       "launchBrowser": true,
       "applicationUrl": "https://localhost:44321",
       "environmentVariables": {
