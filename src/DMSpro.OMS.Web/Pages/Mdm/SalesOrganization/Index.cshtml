@@ -1,4 +1,5 @@
 @page
+@using DMSpro.OMS.Localization;
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using DMSpro.OMS.MdmService.Permissions
@@ -6,6 +7,7 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @using DMSpro.OMS.MdmService.Localization
 @inject IHtmlLocalizer<MdmServiceResource> L
+@inject IHtmlLocalizer<OMSWebResource> L1
 @inject IAuthorizationService Authorization
 @inject IPageLayout PageLayout
 @{
@@ -13,8 +15,15 @@
     PageLayout.Content.MenuItemName = MdmServiceMenus.SalesOrgs;
 }
 
-@section scripts
-    {
+@section styles {
+    <style>
+        #btnActive {
+            margin-top: 7.5px;
+        }
+    </style>
+}
+
+@section scripts {
     <abp-script src="/Pages/Mdm/SalesOrganization/index.js" />
 }
 
@@ -40,19 +49,66 @@
                         <abp-row>
                             <div style="padding-left:12px" class="buttons-header-grid">
                                 <button id="NewSalesOrgButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                    <i class="fa fa-plus"></i> <span>@L["NewSalesOrg"].Value</span>
+                                    <i class="fa fa-plus"></i>
+                                    <span>@L["Button.New.SalesOrg"].Value</span>
+                                </button>
+                                <button id="SaveButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" disabled>
+                                    <i class="fa fa-check"></i>
+                                    @L1["Button.Save"].Value
+                                </button>
+                                <button id="CancelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" disabled>
+                                    <i class="fa fa-times"></i>
+                                    <span>@L1["Button.Cancel"].Value</span>
                                 </button>
                             </div>
                         </abp-row>
                         <div class="dx-viewport">
-                            <div id="form" class="d-flex justify-content-center py-3"></div>
-                            <div class="border-top d-flex justify-content-center py-3">
-                                <div class="flex-1 border-right px-2">
-                                    <div class="dx-fieldset-header">Organization Tree</div>
-                                    <div id="dataTreeListContainer"></div>
+                            <div id="formSalesOrgHeader" class="row pt-3">
+                                <div class="form-group col-2">
+                                    <div id="salesOrgHeaderCode"></div>
                                 </div>
-                                <div class="flex-1 px-2">
-                                    <div class="dx-fieldset-header">Employee</div>
+                                <div class="form-group col-2">
+                                    <div id="salesOrgHeaderName"></div>
+                                </div>
+                                <div class="form-group col-1">
+                                    <button id="btnSalesOrgHeaderActive" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                        @L["EntityFieldValue:MDMService:SalesOrgHeader:Active:True"]
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="formDetail" class="row border-top py-3">
+                                <div id="formSalesOrgHierarchy" class="col-6 px-2">
+                                    <div class="col border-right px-2">
+                                        <div class="row">
+                                            <div id="salesOrgHierarchyModal"></div>
+                                            <div class="col-auto mr-auto">
+                                                <div class="dx-fieldset-header d-flex">Organization Tree</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <div class="buttons-header-grid">
+                                                    <button id="NewSalesOrgHierarchyButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" disabled>
+                                                        <i class="fa fa-plus"></i> <span>@L["Button.New.SalesOrgHierarchy"].Value</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="contextMenu"></div>
+                                        <div id="dataTreeContainer"></div>
+                                    </div>
+                                </div>
+                                <div id="formSalesOrgEmpAssignment" class="col-6 px-2">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="dx-fieldset-header d-flex">Employee</div>
+                                        </div>
+                                        <div class="col-auto mr-auto">
+                                            <div class="buttons-header-grid">
+                                                <button id="NewSalesOrgEmpAssignmentButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" disabled>
+                                                    <i class="fa fa-plus"></i> <span>@L["Button.New.SalesOrgEmpAssignment"].Value</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div id="dataGridContainer"></div>
                                 </div>
                             </div>
