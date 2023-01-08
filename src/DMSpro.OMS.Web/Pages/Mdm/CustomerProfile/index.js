@@ -97,6 +97,11 @@
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             },
+            //popup: {
+            //    title: l("Page.Title.CustomerProfiles"),
+            //    showTitle: true,
+            //    height: 900
+            //},
             form: {
                 colCount: 1,
                 items: [{

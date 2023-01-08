@@ -3,6 +3,10 @@
   "texts": {
     "Menu:Home": "Hogar",
     "Login": "Acceso",
-    "Menu:Dashboard": "Tablero"
+    "Menu:Dashboard": "Tablero",
+    "EntityFieldName:MDMService:CustomerAttribute:Code": "Customer Attr Code",
+    "EntityFieldName:MDMService:CustomerAttribute:Name": "Customer Attr Name",
+    "EntityFieldName:MDMService:CustomerAttribute:Level": "Hierarchy Level",
+    "EntityFieldName:MDMService:CustomerAttribute:Active":  "Active"
   }
 }

@@ -358,21 +358,21 @@
                     displayExpr: 'name',
                 }
             },
-            {
-                dataField: "geoLevel4Id",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel4Id"),
-                width: 110,
-                lookup: {
-                    dataSource(options) {
-                        return {
-                            store: geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : null,
-                        };
-                    },
-                    valueExpr: 'id',
-                    displayExpr: 'name',
-                }
-            },
+            //{
+            //    dataField: "geoLevel4Id",
+            //    caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel4Id"),
+            //    width: 110,
+            //    lookup: {
+            //        dataSource(options) {
+            //            return {
+            //                store: geoMasterStore,
+            //                filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : null,
+            //            };
+            //        },
+            //        valueExpr: 'id',
+            //        displayExpr: 'name',
+            //    }
+            //},
             {
                 dataField: 'street',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Street"),

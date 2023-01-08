@@ -1,5 +1,6 @@
 $(function () {
     var l = abp.localization.getResource("MdmService");
+    var l1 = abp.localization.getResource("OMSWeb");
     var customerAttributeService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
@@ -122,25 +123,25 @@ $(function () {
             },
             {
                 dataField: 'attrNo',
-                caption: l("EntityFieldName:MDMService:CustomerAttribute:Code"),
+                caption: l1("EntityFieldName:MDMService:CustomerAttribute:Code"),
                 allowEditing: false,
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'attrName',
-                caption: l("EntityFieldName:MDMService:CustomerAttribute:Name"),
+                caption: l1("EntityFieldName:MDMService:CustomerAttribute:Name"),
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'hierarchyLevel ',
-                caption: l("EntityFieldName:MDMService:CustomerAttribute:Level"),
+                caption: l1("EntityFieldName:MDMService:CustomerAttribute:Level"),
                 dataType: 'string',
             },
             {
                 dataField: 'active',
-                caption: l("EntityFieldName:MDMService:CustomerAttribute:Active"),
+                caption: l1("EntityFieldName:MDMService:CustomerAttribute:Active"),
                 //allowEditing: false,
                 width: 110,
                 alignment: 'center',
