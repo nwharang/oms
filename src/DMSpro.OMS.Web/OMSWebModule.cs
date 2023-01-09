@@ -280,7 +280,7 @@ public class OMSWebModule : AbpModule
                 .Add<OMSWebResource>("en")
                 .AddBaseTypes(typeof(AbpValidationResource))
                 .AddVirtualJson("/Localization/OMSWeb");
-            options.DefaultResourceType = typeof(OMSWebResource);
+            //options.DefaultResourceType = typeof(OMSWebResource);
             });
             
         }

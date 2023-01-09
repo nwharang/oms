@@ -8,12 +8,36 @@
 @using Volo.Abp.AspNetCore.Mvc.UI.Widgets.Components.WidgetStyles
 @using Volo.Abp.Localization
 @using Volo.Abp.Ui.Branding
- 
-@using Volo.Abp.Users 
+
+@using Volo.Abp.Users
+@*ThuyLC *@
+@using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Options
+
+@using Volo.Abp.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Components.LayoutHook
+
+
+
+@using Volo.Abp.AspNetCore.Mvc.AntiForgery
+@using Volo.Abp.AspNetCore.Mvc.UI.MultiTenancy.Localization
+@using Volo.Abp.AspNetCore.MultiTenancy
+@using Volo.Abp.MultiTenancy
+@using Volo.Abp.Ui.LayoutHooks
+@inject IAbpAntiForgeryManager AbpAntiForgeryManager
+@inject IBrandingProvider BrandingProvider
+
+@inject IStringLocalizer<AbpUiMultiTenancyResource> MultiTenancyStringLocalizer
+@inject ITenantResolveResultAccessor TenantResolveResultAccessor
+@inject IOptions<AbpMultiTenancyOptions> MultiTenancyOptions
+@inject ICurrentTenant CurrentTenant
 @inject IBrandingProvider BrandingProvider
 @inject IPageLayout PageLayout
 @{
     Layout = null;
+    AbpAntiForgeryManager.SetCookie();
+    var langDir = CultureHelper.IsRtl ? "rtl" : string.Empty;
+
     var containerClass = ViewBag.FluidLayout == true ? "container-fluid" : "container"; //TODO: Better and type-safe options
 
     var pageTitle = ViewBag.Title == null ? BrandingProvider.AppName : ViewBag.Title; //TODO: Discard to get from Title
@@ -50,7 +74,8 @@
 
     @await Component.InvokeAsync(typeof(WidgetStylesViewComponent))
     
-    <!-- base css --> 
+
+    <!-- base css -->
     <link rel="stylesheet" media="screen, print" href="~/dmstheme/css/vendors.bundle.css">
     <link rel="stylesheet" media="screen, print" href="~/dmstheme/css/app.bundle.css">
     <!-- Place favicon.ico in the root directory -->
@@ -62,72 +87,86 @@
 
     <link rel="stylesheet" href="/libs/@@fortawesome/fontawesome-free/css/all.css">
     <link rel="stylesheet" href="/libs/@@fortawesome/fontawesome-free/css/v4-shims.css">
-    <link rel="stylesheet" href="/css/devextreme/dx.light.css" /> 
-    
+    <link rel="stylesheet" href="/css/devextreme/dx.light.css" />
+
     <style type="text/css">
-       
-       span.dx-button-text{
-           line-height: 1.2858;
-           vertical-align: top;
-       } 
-        #btnActions > i, #btnActions >span.dx-button-text {
+
+        span.dx-button-text {
+            line-height: 1.2858;
+            vertical-align: top;
+        }
+
+        #btnActions > i, #btnActions > span.dx-button-text {
             vertical-align: middle;
         }
-        #MDMtabpanel > #tabpanel-container{
-            height:auto !important;
-        } #MDMtabpanel > #tabpanel-container > div.dx-tabpanel-container > div.dx-multiview-wrapper{
-            padding:7px;
-            padding-top:15px;
-        }
-        #js-page-content > ol > li.breadcrumb-item.active
-        {
-            overflow:unset;
-        } 
 
-         div.dx-datagrid  table tbody > tr.dx-header-row > td,
-         div.dx-treelist-container table tbody > tr.dx-header-row > td{
-             padding: 12px;
-            font-weight: 500; 
-            font-size:13px;
-         } 
-         div.dx-datagrid div.dx-datagrid-header-panel  div.dx-datagrid-search-panel.dx-searchbox{
-             width: 250px !important;
-         }
-         div.panel-container.show > div.panel-content  button.buttons-collection,
-         div.panel-container.show > div.panel-content  button.buttons-csv,
-         div.panel-container.show > div.panel-content  button.buttons-copy,
-         div.panel-container.show > div.panel-content  button.buttons-print{
-             padding: 0.35rem 1.125rem !important;
-         }
-       div.dx-datagrid .dx-toolbar-items-container,
-       div.dx-treelist-container div.dx-toolbar-items-container {
-           display:none;
-       } 
-        div.buttons-header-grid{
-            width:100%;
-            padding-right:12px;
+        #MDMtabpanel > #tabpanel-container {
+            height: auto !important;
         }
-        div.buttons-header-grid > .dx-datagrid-search-panel{
-            float:right;
+
+            #MDMtabpanel > #tabpanel-container > div.dx-tabpanel-container > div.dx-multiview-wrapper {
+                padding: 7px;
+                padding-top: 15px;
+            }
+
+        #js-page-content > ol > li.breadcrumb-item.active {
+            overflow: unset;
         }
-        div.panel-container.show > div.panel-content.jqvmap-bg-ocean.p-0 > div{
-             border: none;
-             box-shadow: none;
-        } 
+
+        div.dx-datagrid table tbody > tr.dx-header-row > td,
+        div.dx-treelist-container table tbody > tr.dx-header-row > td {
+            padding: 12px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        div.dx-datagrid div.dx-datagrid-header-panel div.dx-datagrid-search-panel.dx-searchbox {
+            width: 250px !important;
+        }
+
+        div.panel-container.show > div.panel-content button.buttons-collection,
+        div.panel-container.show > div.panel-content button.buttons-csv,
+        div.panel-container.show > div.panel-content button.buttons-copy,
+        div.panel-container.show > div.panel-content button.buttons-print {
+            padding: 0.35rem 1.125rem !important;
+        }
+
+        div.dx-datagrid .dx-toolbar-items-container,
+        div.dx-treelist-container div.dx-toolbar-items-container {
+            display: none;
+        }
+
+        div.buttons-header-grid {
+            width: 100%;
+            padding-right: 12px;
+        }
+
+            div.buttons-header-grid > .dx-datagrid-search-panel {
+                float: right;
+            }
+
+        div.panel-container.show > div.panel-content.jqvmap-bg-ocean.p-0 > div {
+            border: none;
+            box-shadow: none;
+        }
+
         .dx-datagrid .dx-header-filter-empty {
             color: rgb(255 255 255);
         }
+
         .dx-datagrid-headers .dx-datagrid-content {
-            margin: -1px 0 -1px -1px; 
+            margin: -1px 0 -1px -1px;
         }
 
         .dx-datagrid-scroll-container {
             overflow: hidden;
             width: calc(100% + 1px);
         }
+
         .dx-datagrid-borders .dx-datagrid-rowsview, .dx-datagrid-headers + .dx-datagrid-rowsview, .dx-datagrid-rowsview.dx-datagrid-after-headers {
             margin: -1px 0 -1px -1px;
-        } 
+        }
+
         .dx-datagrid .dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-edit-with-icons .dx-link,
         .dx-treelist .dx-treelist-content .dx-treelist-table .dx-row .dx-command-edit-with-icons .dx-link {
             width: 28px;
@@ -140,12 +179,13 @@
             line-height: 28px;
             margin: 0 3px;
         }
-        .btn {
 
+        .btn {
             -webkit-box-shadow: none !important;
             box-shadow: none !important;
         }
-        .buttons-header-grid .btn{
+
+        .buttons-header-grid .btn {
             border-radius: 0 !important;
         }
 
@@ -153,14 +193,14 @@
             color: rgb(255 255 255);
         }
 
-        div.dx-datagrid table tbody > tr.dx-header-row > td ,
-        div.dx-treelist  table tbody > tr.dx-header-row > td{ 
+        div.dx-datagrid table tbody > tr.dx-header-row > td,
+        div.dx-treelist table tbody > tr.dx-header-row > td {
             border-color: #dedede;
         }
 
 
         div.dx-datagrid td.dx-command-edit.dx-command-edit-with-icons > a.dx-link.dx-link-delete.dx-icon-trash.dx-link-icon,
-        div.dx-treelist td.dx-command-edit.dx-command-edit-with-icons > a.dx-link.dx-link-delete.dx-icon-trash.dx-link-icon{
+        div.dx-treelist td.dx-command-edit.dx-command-edit-with-icons > a.dx-link.dx-link-delete.dx-icon-trash.dx-link-icon {
             color: #ff64f9;
             background: transparent;
         }
@@ -169,15 +209,11 @@
         .dx-datagrid-rowsview .dx-row-focused.dx-data-row > td:not(.dx-focused),
         .dx-datagrid-rowsview .dx-row-focused.dx-data-row > tr > td:not(.dx-focused),
         div.dx-datagrid table tbody > tr.dx-header-row > td,
-
-
         .dx-treelist-rowsview .dx-row-focused.dx-data-row .dx-command-edit:not(.dx-focused) .dx-link,
         .dx-treelist-rowsview .dx-row-focused.dx-data-row > td:not(.dx-focused),
         .dx-treelist-rowsview .dx-row-focused.dx-data-row > tr > td:not(.dx-focused),
-        div.dx-treelist table tbody > tr.dx-header-row > td 
-
-        {
-            color:#fff;
+        div.dx-treelist table tbody > tr.dx-header-row > td {
+            color: #fff;
         }
 
         .dx-datagrid-content .dx-datagrid-table .dx-row > td,
@@ -209,64 +245,69 @@
                 color: #2b4c81;
                 opacity: 1;
             }
-           /* #form div.dx-item-content.dx-box-item-content 
-            div.dx-collection 
+        /* #form div.dx-item-content.dx-box-item-content
+            div.dx-collection
             div.dx-item-content.dx-box-item-content{
                 height: 32px !important;
             }*/
-            div.dx-fieldset-header{
-                margin-bottom:15px !important;
+        div.dx-fieldset-header {
+            margin-bottom: 15px !important;
+        }
+
+        #js-page-content {
+            /*padding: 0.1rem 0.6rem !important;*/
+            padding-left: 8px;
+            padding-top: 0px;
+            padding-right: 12px;
+        }
+
+        div.panel-container div.dx-viewport > div.py-3 {
+            padding-top: 10px !important;
+        }
+
+        li.breadcrumb-item.active {
+            overflow: unset !important;
+        }
+
+        ol.breadcrumb.page-breadcrumb {
+            margin: 0;
+            display: -webkit-inline-box;
+            margin-left: 5px;
+            text-shadow: unset;
+        }
+
+            ol.breadcrumb.page-breadcrumb > li.breadcrumb-item {
+                color: inherit;
             }
-            #js-page-content{
-                /*padding: 0.1rem 0.6rem !important;*/
-                padding-left: 8px;
-                padding-top: 0px;
-                padding-right: 12px;
+
+        div.panel-hdr.bg-faded > div:nth-child(1) {
+            width: 100%;
+        }
+
+        div.dx-form div.dx-item-content.dx-box-item-content
+        div.dx-field-item-content
+        div.dx-box-flex.dx-box.dx-collection
+        div.dx-item.dx-box-item {
+            height: 42px;
+        }
+
+            div.dx-form div.dx-item-content.dx-box-item-content
+            div.dx-field-item-content
+            div.dx-box-flex.dx-box.dx-collection
+            div.dx-item.dx-box-item:nth-child(1) {
+                height: 32px;
             }
-            div.panel-container div.dx-viewport > div.py-3{
-                padding-top:10px !important;
-            }
-         
-            li.breadcrumb-item.active{
-                overflow: unset !important;
-            }
-            ol.breadcrumb.page-breadcrumb{
-                margin: 0;
-                display: -webkit-inline-box;
-                margin-left:5px;
-                text-shadow:unset;
-            }
-             ol.breadcrumb.page-breadcrumb > li.breadcrumb-item{
-                 color:inherit;
-             }
-             div.panel-hdr.bg-faded > div:nth-child(1) 
-            {
-                width:100%;
-            } 
-           div.dx-form div.dx-item-content.dx-box-item-content 
-           div.dx-field-item-content 
-           div.dx-box-flex.dx-box.dx-collection 
-           div.dx-item.dx-box-item 
-           {
-                 height: 42px;
-           }
-           div.dx-form div.dx-item-content.dx-box-item-content 
-           div.dx-field-item-content 
-           div.dx-box-flex.dx-box.dx-collection 
-           div.dx-item.dx-box-item:nth-child(1)
-           {
-                 height: 32px;
-           }
-           #js-page-content > ol{
-               display:none;
-           }
-    </style> 
-    @RenderSection("styles", required: false) 
+
+        #js-page-content > ol {
+            display: none;
+        }
+    </style>
+    @RenderSection("styles", required: false)
     @await Component.InvokeLayoutHookAsync(LayoutHooks.Head.Last, StandardLayouts.Empty)
 </head>
 <body class="abp-empty-layout @rtl">
     @await Component.InvokeLayoutHookAsync(LayoutHooks.Body.First, StandardLayouts.Empty)
-     
+
     <div>
         @(await Component.InvokeAsync<PageAlertsViewComponent>())
         @await Component.InvokeLayoutHookAsync(LayoutHooks.PageContent.First, StandardLayouts.Empty)
@@ -534,11 +575,11 @@
                                                 </a>
                                             </li>
                                             @*<li>
-                                                <a href="/Mdm/Streets" title="Street" data-filter-tags="font icons fontawesome regular">
-                                                    <i class="fa fa-road"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">Street - Pending</span>
-                                                </a>
-                                            </li>*@
+                                                    <a href="/Mdm/Streets" title="Street" data-filter-tags="font icons fontawesome regular">
+                                                        <i class="fa fa-road"></i>
+                                                        <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">Street - Pending</span>
+                                                    </a>
+                                                </li>*@
                                         </ul>
                                     </li>
                                     @*Company*@
@@ -600,11 +641,11 @@
                                                 </a>
                                             </li>
                                             @*<li>
-                                                <a href="/Mdm/UOMGroupDetails" title="UOM Group Details" data-filter-tags="UOM Group Details">
-                                                    <i class="fa fa-info"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">UOM Group Details</span>
-                                                </a>
-                                            </li>*@
+                                                    <a href="/Mdm/UOMGroupDetails" title="UOM Group Details" data-filter-tags="UOM Group Details">
+                                                        <i class="fa fa-info"></i>
+                                                        <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">UOM Group Details</span>
+                                                    </a>
+                                                </li>*@
                                             <li>
                                                 <a href="/Mdm/ProductAttributes" title="Product Attributes" data-filter-tags="Product Attributes">
                                                     <i class="fa fa-indent"></i>
@@ -618,11 +659,11 @@
                                                 </a>
                                             </li>
                                             @*<li>
-                                                <a href="/Mdm/ProductHierarchies" title="Product Hierarchies" data-filter-tags="Product Hierarchies">
-                                                    <i class="fa fa-sitemap"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Product Hierarchies</span>
-                                                </a>
-                                            </li>*@
+                                                    <a href="/Mdm/ProductHierarchies" title="Product Hierarchies" data-filter-tags="Product Hierarchies">
+                                                        <i class="fa fa-sitemap"></i>
+                                                        <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Product Hierarchies</span>
+                                                    </a>
+                                                </li>*@
                                             <li>
                                                 <a href="/Mdm/ItemMasters" title="Item Masters" data-filter-tags="Item Masters">
                                                     <i class="fa fa-folder-open"></i>
@@ -704,12 +745,12 @@
                                             <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons">Sales Organization</span>
                                         </a>
                                         <ul>
-                                             <li>
+                                            <li>
                                                 <a href="/Mdm/EmployeeTypes" title="Employee Types" data-filter-tags="Employee Types">
                                                     <i class="fa fa-users"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_showcase">Employee Types</span>
                                                 </a>
-                                            </li> 
+                                            </li>
                                             <li>
                                                 <a href="/Mdm/WorkingPositions" title="Working Positions" data-filter-tags="Working Positions">
                                                     <i class="fa fa-archive"></i>
@@ -816,41 +857,41 @@
                                                 </a>
                                             </li>
                                             @*<li>
-                                                <a href="/Mdm/Outlets" title="Outlets" data-filter-tags="Outlets">
-                                                    <i class="fa fa-hdd-o"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Outlets</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="/Mdm/OutletAttributes" title="Outlet Attributes" data-filter-tags="Outlet Attributes">
-                                                    <i class="fa fa-file-text-o"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Outlet Attributes</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="/Mdm/OutletImages" title="Outlet Images" data-filter-tags="Outlet Images">
-                                                    <i class="fa fa-picture-o"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Outlet Images</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="/Mdm/BPBanks" title="Business Partner Banks" data-filter-tags="Business Partner Banks">
-                                                    <i class="fa fa-university"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Business Partner Banks</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="/Mdm/BPContacts" title="Business Partner Contacts" data-filter-tags="Business Partner Contacts">
-                                                    <i class="fa fa-phone-square"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Business Partner Contacts</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="/Mdm/BPAttachments" title="Business Partner Attachments" data-filter-tags="Business Partner Attachments">
-                                                    <i class="fa fa-paperclip"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Business Partner Attachments</span>
-                                                </a>
-                                            </li>*@
+                                                    <a href="/Mdm/Outlets" title="Outlets" data-filter-tags="Outlets">
+                                                        <i class="fa fa-hdd-o"></i>
+                                                        <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Outlets</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/Mdm/OutletAttributes" title="Outlet Attributes" data-filter-tags="Outlet Attributes">
+                                                        <i class="fa fa-file-text-o"></i>
+                                                        <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Outlet Attributes</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/Mdm/OutletImages" title="Outlet Images" data-filter-tags="Outlet Images">
+                                                        <i class="fa fa-picture-o"></i>
+                                                        <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Outlet Images</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/Mdm/BPBanks" title="Business Partner Banks" data-filter-tags="Business Partner Banks">
+                                                        <i class="fa fa-university"></i>
+                                                        <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Business Partner Banks</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/Mdm/BPContacts" title="Business Partner Contacts" data-filter-tags="Business Partner Contacts">
+                                                        <i class="fa fa-phone-square"></i>
+                                                        <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Business Partner Contacts</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/Mdm/BPAttachments" title="Business Partner Attachments" data-filter-tags="Business Partner Attachments">
+                                                        <i class="fa fa-paperclip"></i>
+                                                        <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Business Partner Attachments</span>
+                                                    </a>
+                                                </li>*@
                                             <li>
                                                 <a href="/Mdm/CustomerGroups" title="Customer Groups" data-filter-tags="Customer Groups">
                                                     <i class="fa fa-users"></i>
@@ -1755,8 +1796,8 @@
                                 <a href="#" data-toggle="dropdown" title="drlantern@gotbootstrap.com" class="header-icon d-flex align-items-center justify-content-center ml-2">
                                     <img src="/dmstheme/img/demo/avatars/avatar-admin.png" class="profile-image rounded-circle" alt="Administrator">
                                     <!-- you can also add username next to the avatar with the codes below:
-                                <span class="ml-1 mr-1 text-truncate text-truncate-header hidden-xs-down">Me</span>
-                                <i class="ni ni-chevron-down hidden-xs-down"></i> -->
+                                    <span class="ml-1 mr-1 text-truncate text-truncate-header hidden-xs-down">Me</span>
+                                    <i class="ni ni-chevron-down hidden-xs-down"></i> -->
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-animated dropdown-lg">
                                     <div class="dropdown-header bg-trans-gradient d-flex flex-row py-4 rounded-top">
@@ -1818,8 +1859,8 @@
                     <main id="js-page-content" role="main" class="page-content">
                         @RenderSection("breadcrumb", required: false)
                         @*  <div class="subheader">
-                        @RenderSection("subheaderTitle", required: false)
-                        </div>*@
+                            @RenderSection("subheaderTitle", required: false)
+                            </div>*@
                         <div class="row">
                             <div id="AbpContentToolbar">
                                 <div class="text-end mb-2">
@@ -1839,8 +1880,8 @@
                         <div>
                             <ul class="list-table m-0">
                                 @*  <li><a href="intel_introduction.html" class="text-secondary fw-700">About</a></li>
-                                <li class="pl-3"><a href="info_app_licensing.html" class="text-secondary fw-700">License</a></li>
-                                <li class="pl-3"><a href="info_app_docs.html" class="text-secondary fw-700">Documentation</a></li>*@
+                                    <li class="pl-3"><a href="info_app_licensing.html" class="text-secondary fw-700">License</a></li>
+                                    <li class="pl-3"><a href="info_app_docs.html" class="text-secondary fw-700">Documentation</a></li>*@
                                 <li class="pl-3 fs-xl"><a href="" class="text-secondary" target="_blank"><i class="fal fa-question-circle" aria-hidden="true"></i></a></li>
                             </ul>
                         </div>
@@ -2416,8 +2457,8 @@
                                         Theme colors <small>(overlays base css)</small>
                                     </h5>
                                     @*<div class="fs-xs text-muted p-2 alert alert-warning mt-3 mb-0">
-                                        <i class="fal fa-exclamation-triangle text-warning mr-2"></i>Due to network latency and CPU utilization, you may experience a brief flickering effect on page load which may show the intial applied theme for a split second. Setting the prefered style/theme in the header will prevent this from happening.
-                                    </div>*@
+                                            <i class="fal fa-exclamation-triangle text-warning mr-2"></i>Due to network latency and CPU utilization, you may experience a brief flickering effect on page load which may show the intial applied theme for a split second. Setting the prefered style/theme in the header will prevent this from happening.
+                                        </div>*@
                                 </div>
                             </div>
                             <div class="expanded theme-colors pl-5 pr-3">
@@ -2463,8 +2504,7 @@
 
         <script src="~/dmstheme/js/vendors.bundle.js"></script>
         <script src="~/dmstheme/js/app.bundle.js"></script>
-        <script type="text/javascript">
-            'use strict';
+        <script type="text/javascript">'use strict';
             var classHolder = document.getElementsByTagName("BODY")[0],
                 themeSettings = (localStorage.getItem('themeSettings')) ? JSON.parse(localStorage.getItem('themeSettings')) :
                     {},
@@ -2495,21 +2535,17 @@
             }
             var resetSettings = function () {
                 localStorage.setItem("themeSettings", "");
-            }
-        </script>
-        <script type="text/javascript">
-            /* Activate smart panels */
+            }</script>
+        <script type="text/javascript">/* Activate smart panels */
             $('#js-page-content').smartPanel();
-             if($('ol.breadcrumb.page-breadcrumb').length > 0)
-                {
-                    if($('#panel-1 > div.panel-hdr > h2').length > 0
-                    && $('#panel-1 > div.panel-hdr > h2')[0].childNodes.length > 2)
-                    {
-                        $('#panel-1 > div.panel-hdr > h2')[0].childNodes[2].remove();
-                        $('#panel-1 > div.panel-hdr > h2').append($('ol.breadcrumb.page-breadcrumb')[0].outerHTML); 
-                    } 
+            if ($('ol.breadcrumb.page-breadcrumb').length > 0) {
+                if ($('#panel-1 > div.panel-hdr > h2').length > 0
+                    && $('#panel-1 > div.panel-hdr > h2')[0].childNodes.length > 2) {
+                    $('#panel-1 > div.panel-hdr > h2')[0].childNodes[2].remove();
+                    $('#panel-1 > div.panel-hdr > h2').append($('ol.breadcrumb.page-breadcrumb')[0].outerHTML);
                 }
-            $(document).ready(function () { 
+            }
+            $(document).ready(function () {
                 $('#js-nav-menu li').removeClass('active');
                 $('#js-nav-menu li').removeClass('open');
                 var items = $('#js-nav-menu a');
@@ -2524,25 +2560,24 @@
                             .addClass('active open');
                         $(node).parent()
                             .parent()
-                            .parent() 
-                            .parent() 
-                            .parent() 
+                            .parent()
+                            .parent()
+                            .parent()
                             .addClass('active open');
 
                         return;
                     }
-                } 
-               
-            });
-        </script>
+                }
+
+            });</script>
         <script src="~/pages/shared/_Layout.js"></script>
 
         @*
-         <script src="/libs/abp/utils/abp-utils.umd.min.js"></script>
-        <script src="/libs/abp/core/abp.js"></script>
-         <script src="/libs/abp/jquery/abp.jquery.js"></script>
-         <script src="/libs/luxon/luxon.min.js"></script>
-         <script src="/libs/abp/luxon/abp.luxon.js"></script> *@
+             <script src="/libs/abp/utils/abp-utils.umd.min.js"></script>
+            <script src="/libs/abp/core/abp.js"></script>
+             <script src="/libs/abp/jquery/abp.jquery.js"></script>
+             <script src="/libs/luxon/luxon.min.js"></script>
+             <script src="/libs/abp/luxon/abp.luxon.js"></script> *@
 
 
         <script src="/js/devextreme/dx.all.js"></script>
@@ -2553,7 +2588,7 @@
             <script src="~/pages/shared/dxconvert.js"></script>
         }
         @RenderSection("scripts", false)
-
+        <script src="~/Abp/ApplicationLocalizationScript?cultureName=@System.Globalization.CultureInfo.CurrentCulture.Name"></script>
         @await Component.InvokeLayoutHookAsync(LayoutHooks.PageContent.Last, StandardLayouts.Empty)
     </div>
 
