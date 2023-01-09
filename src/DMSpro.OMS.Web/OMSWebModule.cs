@@ -12,8 +12,8 @@ using DMSpro.OMS.AdministrationService.Web;
 using DMSpro.OMS.IdentityService;
 using DMSpro.OMS.IdentityService.Web;
 using DMSpro.OMS.Localization;
-using DMSpro.OMS.ProductService;
-using DMSpro.OMS.ProductService.Web;
+// using DMSpro.OMS.ProductService;
+// using DMSpro.OMS.ProductService.Web;
 using DMSpro.OMS.SurveyService;
 using DMSpro.OMS.SurveyService.Web;
 using DMSpro.OMS.OrderService;
@@ -77,8 +77,8 @@ namespace DMSpro.OMS.Web;
     typeof(AbpAccountPublicHttpApiClientModule),
     typeof(SaasServiceWebModule),
     typeof(SaasServiceHttpApiClientModule),
-    typeof(ProductServiceWebModule),
-    typeof(ProductServiceHttpApiClientModule),
+    // typeof(ProductServiceWebModule),
+    // typeof(ProductServiceHttpApiClientModule),
     typeof(SurveyServiceWebModule),
     typeof(SurveyServiceHttpApiClientModule),
     typeof(OrderServiceWebModule),
