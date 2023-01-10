@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\packages\Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic\Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic.csproj" />
-    <ProjectReference Include="..\..\..\..\shared\DMSpro.OMS.Shared.Hosting.AspNetCore\DMSpro.OMS.Shared.Hosting.AspNetCore.csproj" />
+    <!--<ProjectReference Include="..\..\..\..\shared\DMSpro.OMS.Shared.Hosting.AspNetCore\DMSpro.OMS.Shared.Hosting.AspNetCore.csproj" />
     
     <ProjectReference Include="..\..\..\..\shared\DMSpro.OMS.Shared.Localization\DMSpro.OMS.Shared.Localization.csproj" />
     
@@ -57,7 +57,7 @@
     <ProjectReference Include="..\..\..\..\services\identity\src\DMSpro.OMS.IdentityService.HttpApi.Client\DMSpro.OMS.IdentityService.HttpApi.Client.csproj" />
     <ProjectReference Include="..\..\..\..\services\identity\src\DMSpro.OMS.IdentityService.Web\DMSpro.OMS.IdentityService.Web.csproj" />
     <ProjectReference Include="..\..\..\..\services\saas\src\DMSpro.OMS.SaasService.HttpApi.Client\DMSpro.OMS.SaasService.HttpApi.Client.csproj" />
-    <ProjectReference Include="..\..\..\..\services\saas\src\DMSpro.OMS.SaasService.Web\DMSpro.OMS.SaasService.Web.csproj" />
+    <ProjectReference Include="..\..\..\..\services\saas\src\DMSpro.OMS.SaasService.Web\DMSpro.OMS.SaasService.Web.csproj" />-->
   </ItemGroup>
 
   <!-- Product -->

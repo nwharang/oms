@@ -1,4 +1,5 @@
-﻿@using Volo.Abp.AspNetCore.Mvc.UI.Components.LayoutHook
+﻿@using Microsoft.AspNetCore.Mvc.Localization;
+@using Volo.Abp.AspNetCore.Mvc.UI.Components.LayoutHook
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic.Bundling
 @using Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic.Themes.Basic.Components.PageAlerts
@@ -7,8 +8,9 @@
 @using Volo.Abp.AspNetCore.Mvc.UI.Widgets.Components.WidgetStyles
 @using Volo.Abp.Localization
 @using Volo.Abp.Ui.Branding
- 
-@using Volo.Abp.Users 
+@using DMSpro.OMS.MdmService.Localization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@using Volo.Abp.Users
 @inject IBrandingProvider BrandingProvider
 @inject IPageLayout PageLayout
 @{
@@ -34,7 +36,7 @@
 
 <html lang="@System.Globalization.CultureInfo.CurrentCulture.Name" dir="@rtl">
 <head>
-    @await Component.InvokeLayoutHookAsync(LayoutHooks.Head.First, StandardLayouts.Empty)
+    @await Component.InvokeLayoutHookAsync(LayoutHooks.Head.First, StandardLayouts.Application)
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -49,7 +51,7 @@
 
     @await Component.InvokeAsync(typeof(WidgetStylesViewComponent))
     
-    <!-- base css --> 
+    <!-- base css -->
     <link rel="stylesheet" media="screen, print" href="/dmstheme/css/vendors.bundle.css">
     <link rel="stylesheet" media="screen, print" href="/dmstheme/css/app.bundle.css">
     <!-- Place favicon.ico in the root directory -->
@@ -61,15 +63,49 @@
 
     <link rel="stylesheet" href="/libs/@@fortawesome/fontawesome-free/css/all.css">
     <link rel="stylesheet" href="/libs/@@fortawesome/fontawesome-free/css/v4-shims.css">
-    <link rel="stylesheet" href="/css/devextreme/dx.light.css" /> 
-    
-     <link rel="stylesheet" href="/Pages/Shared/_Layout.css" /> 
-    @RenderSection("styles", required: false) 
+    <link rel="stylesheet" href="/css/devextreme/dx.light.css" />
+
+    <link rel="stylesheet" href="/Pages/Shared/_Layout.css" />
+    @RenderSection("styles", required: false)
     @await Component.InvokeLayoutHookAsync(LayoutHooks.Head.Last, StandardLayouts.Empty)
 </head>
 <body class="abp-empty-layout @rtl">
-    @await Component.InvokeLayoutHookAsync(LayoutHooks.Body.First, StandardLayouts.Empty)
-     
+    <script type="text/javascript">
+        'use strict';
+        var classHolder = document.getElementsByTagName("BODY")[0],
+            themeSettings = (localStorage.getItem('themeSettings')) ? JSON.parse(localStorage.getItem('themeSettings')) :
+                {},
+            themeURL = themeSettings.themeURL || '',
+            themeOptions = themeSettings.themeOptions || '';
+        if (themeSettings.themeOptions) {
+            classHolder.className = themeSettings.themeOptions;
+            console.log("%c✔ Theme settings loaded", "color: #148f32");
+        }
+        else {
+            console.log("Heads up! Theme settings is empty or does not exist, loading default settings...");
+        }
+        if (themeSettings.themeURL && !document.getElementById('mytheme')) {
+            var cssfile = document.createElement('link');
+            cssfile.id = 'mytheme';
+            cssfile.rel = 'stylesheet';
+            cssfile.href = themeURL;
+            document.getElementsByTagName('head')[0].appendChild(cssfile);
+        }
+        var saveSettings = function () {
+            themeSettings.themeOptions = String(classHolder.className).split(/[^\w-]+/).filter(function (item) {
+                return /^(nav|header|mod|display)-/i.test(item);
+            }).join(' ');
+            if (document.getElementById('mytheme')) {
+                themeSettings.themeURL = document.getElementById('mytheme').getAttribute("href");
+            };
+            localStorage.setItem('themeSettings', JSON.stringify(themeSettings));
+        }
+        var resetSettings = function () {
+            localStorage.setItem("themeSettings", "");
+        }
+    </script>
+    @await Component.InvokeLayoutHookAsync(LayoutHooks.Body.First, StandardLayouts.Application)
+
     <div>
         @(await Component.InvokeAsync<PageAlertsViewComponent>())
         @await Component.InvokeLayoutHookAsync(LayoutHooks.PageContent.First, StandardLayouts.Empty)
@@ -337,10 +373,10 @@
                                                 </a>
                                             </li>
                                             @*<li>
-                                                <a href="/Mdm/Streets" title="Street" data-filter-tags="font icons fontawesome regular">
-                                                    <i class="fa fa-road"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">Street - Pending</span>
-                                                </a>
+                                            <a href="/Mdm/Streets" title="Street" data-filter-tags="font icons fontawesome regular">
+                                            <i class="fa fa-road"></i>
+                                            <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">Street - Pending</span>
+                                            </a>
                                             </li>*@
                                         </ul>
                                     </li>
@@ -357,7 +393,7 @@
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_nextgen_icons_general">Company Profile</span>
                                                 </a>
                                             </li>
-                                            @*<li>
+                                            <li>
                                                 <a href="/Mdm/DimensionMeasurements" title="Dimension Measurements" data-filter-tags="mdm company dimension measurements">
                                                     <i class="fa fa-tachometer"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_nextgen_icons_base">Dimension Measurements</span>
@@ -368,7 +404,7 @@
                                                     <i class="fa fa-balance-scale"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_nextgen_icons_base">Weight Measurements</span>
                                                 </a>
-                                            </li>*@
+                                            </li>
                                             <li>
                                                 <a href="/Mdm/VATs" title="VATs" data-filter-tags="mdm company vats">
                                                     <i class="fa fa-file-alt"></i>
@@ -381,19 +417,13 @@
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_nextgen_icons_base">Sales Channels</span>
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a href="/Mdm/CompanyAssignments" title="Users Assignment" data-filter-tags="mdm company users assignment">
-                                                    <i class="fa fa-users"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_nextgen_icons_base">Users Assignment</span>
-                                                </a>
-                                            </li>
                                         </ul>
                                     </li>
                                     @*Product*@
                                     <li>
-                                        <a href="javascript:void(0);" title="Item" data-filter-tags="mdm product">
+                                        <a href="javascript:void(0);" title="Product" data-filter-tags="mdm product">
                                             <i class="fa fa-product-hunt"></i>
-                                            <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons">Item</span>
+                                            <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons">Product</span>
                                         </a>
                                         <ul>
                                             <li>
@@ -409,15 +439,15 @@
                                                 </a>
                                             </li>
                                             @*<li>
-                                                <a href="/Mdm/UOMGroupDetails" title="UOM Group Details" data-filter-tags="UOM Group Details">
-                                                    <i class="fa fa-info"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">UOM Group Details</span>
-                                                </a>
+                                            <a href="/Mdm/UOMGroupDetails" title="UOM Group Details" data-filter-tags="UOM Group Details">
+                                            <i class="fa fa-info"></i>
+                                            <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">UOM Group Details</span>
+                                            </a>
                                             </li>*@
                                             <li>
                                                 <a href="/Mdm/ProductAttributes" title="Product Attributes" data-filter-tags="mdm product attributes">
                                                     <i class="fa fa-indent"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Attributes</span>
+                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Product Attributes</span>
                                                 </a>
                                             </li>
                                             <li>
@@ -427,10 +457,10 @@
                                                 </a>
                                             </li>
                                             @*<li>
-                                                <a href="/Mdm/ProductHierarchies" title="Product Hierarchies" data-filter-tags="Product Hierarchies">
-                                                    <i class="fa fa-sitemap"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Product Hierarchies</span>
-                                                </a>
+                                            <a href="/Mdm/ProductHierarchies" title="Product Hierarchies" data-filter-tags="Product Hierarchies">
+                                            <i class="fa fa-sitemap"></i>
+                                            <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Product Hierarchies</span>
+                                            </a>
                                             </li>*@
                                             <li>
                                                 <a href="/Mdm/ItemMasters" title="Item Masters" data-filter-tags="mdm product item masters">
@@ -438,25 +468,25 @@
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Masters</span>
                                                 </a>
                                             </li>
-                                            @*<li>
+                                            <li>
                                                 <a href="/Mdm/ItemImages" title="Item Images" data-filter-tags="mdm product item images">
                                                     <i class="fa fa-file-image-o"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Images</span>
                                                 </a>
-                                            </li>*@
-                                            @*<li>
+                                            </li>
+                                            <li>
                                                 <a href="/Mdm/ItemAttachments" title="Item Attachments" data-filter-tags="mdm product item attachments">
                                                     <i class="fa fa-paperclip"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Attachments</span>
                                                 </a>
-                                            </li>*@
+                                            </li>
                                             <li>
                                                 <a href="/Mdm/ItemGroups" title="Item Groups" data-filter-tags="mdm product item groups">
                                                     <i class="fa fa-object-group"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Groups</span>
                                                 </a>
                                             </li>
-                                            @*<li>
+                                            <li>
                                                 <a href="/Mdm/ItemGroupAttrs" title="Item Group Attributes" data-filter-tags="mdm product item group attributes">
                                                     <i class="fa fa-clone"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Group Attributes</span>
@@ -467,43 +497,43 @@
                                                     <i class="fa fa-list-alt"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Group Lists</span>
                                                 </a>
-                                            </li>*@
+                                            </li>
                                             <li>
                                                 <a href="/Mdm/PriceLists" title="Price Lists" data-filter-tags="mdm product price lists">
                                                     <i class="fa fa-money"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Price Lists</span>
                                                 </a>
                                             </li>
-                                            @*<li>
+                                            <li>
                                                 <a href="/Mdm/PriceListDetails" title="Price List Details" data-filter-tags="mdm product price list details">
                                                     <i class="fa fa-list"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Price List Details</span>
                                                 </a>
-                                            </li>*@
+                                            </li>
                                             <li>
                                                 <a href="/Mdm/PriceUpdates" title="Price Update" data-filter-tags="mdm product price update">
                                                     <i class="fa fa-pencil-square-o"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Price Update</span>
                                                 </a>
                                             </li>
-                                            @*<li>
+                                            <li>
                                                 <a href="/Mdm/PriceUpdateDetails" title="Price Update Details" data-filter-tags="mdm product price update details">
                                                     <i class="fa fa-info-circle"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Price Update Details</span>
                                                 </a>
-                                            </li>*@
+                                            </li>
                                             <li>
                                                 <a href="/Mdm/PricelistAssignments" title="Price List Assignments" data-filter-tags="mdm product price list assignments">
                                                     <i class="fa fa-table"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Price List Assignments</span>
                                                 </a>
                                             </li>
-                                            @*<li>
+                                            <li>
                                                 <a href="/Mdm/PricelistAssignmentDetails" title="Price List Assignment Details" data-filter-tags="mdm product price list assignment details">
                                                     <i class="fa fa-asterisk"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Price List Assignment Details</span>
                                                 </a>
-                                            </li>*@
+                                            </li>
                                         </ul>
                                     </li>
                                     @*Sales Organization*@
@@ -513,12 +543,12 @@
                                             <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons">Sales Organization</span>
                                         </a>
                                         <ul>
-                                             <li>
+                                            <li>
                                                 <a href="/Mdm/EmployeeTypes" title="Employee Types" data-filter-tags="mdm sales organization employee types">
                                                     <i class="fa fa-users"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_showcase">Employee Types</span>
                                                 </a>
-                                            </li> 
+                                            </li>
                                             <li>
                                                 <a href="/Mdm/WorkingPositions" title="Working Positions" data-filter-tags="mdm sales organization working positions">
                                                     <i class="fa fa-archive"></i>
@@ -532,9 +562,9 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/SalesOrganization" title="Sales Organization" data-filter-tags="Sales Organization">
+                                                <a href="/Mdm/SalesOrgs" title="Sales Organization Masters" data-filter-tags="mdm sales organization sales organization masters">
                                                     <i class="fa fa-check-square"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Sales Organization</span>
+                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Sales Organization Masters</span>
                                                 </a>
                                             </li>
                                             <li class="d-none">
@@ -595,7 +625,7 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/CusAttributeValues" title="Customer Attribute Values" data-filter-tags="mdm customer attribute values">
+                                                <a href="/Mdm/CusAttributesValues" title="Customer Attribute Values" data-filter-tags="mdm customer attribute values">
                                                     <i class="fa fa-check-square"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Customer Attribute Values</span>
                                                 </a>
@@ -607,17 +637,17 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/Vendors" title="Vendor" data-filter-tags="mdm customer vendor">
+                                                <a href="/Mdm/Vendor" title="Vendor" data-filter-tags="mdm customer vendor">
                                                     <i class="fa fa-user-secret"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_showcase">Vendor</span>
                                                 </a>
                                             </li>
-                                            @*<li>
-                                                <a href="/Mdm/BusinessPartners" title="Business Partners" data-filter-tags="Business Partners">
+                                            <li>
+                                                <a href="/Mdm/BusinessPartners" title="Business Partners" data-filter-tags="mdm customer business partners">
                                                     <i class="fa fa-handshake-o"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Business Partners</span>
                                                 </a>
-                                            </li>*@
+                                            </li>
                                             <li>
                                                 <a href="/Mdm/CustomerAssignments" title="Customer Assignments" data-filter-tags="mdm customer assignments">
                                                     <i class="fa fa-tasks"></i>
@@ -625,40 +655,40 @@
                                                 </a>
                                             </li>
                                             @*<li>
-                                                <a href="/Mdm/Outlets" title="Outlets" data-filter-tags="Outlets">
-                                                    <i class="fa fa-hdd-o"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Outlets</span>
-                                                </a>
+                                            <a href="/Mdm/Outlets" title="Outlets" data-filter-tags="Outlets">
+                                            <i class="fa fa-hdd-o"></i>
+                                            <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Outlets</span>
+                                            </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/OutletAttributes" title="Outlet Attributes" data-filter-tags="Outlet Attributes">
-                                                    <i class="fa fa-file-text-o"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Outlet Attributes</span>
-                                                </a>
+                                            <a href="/Mdm/OutletAttributes" title="Outlet Attributes" data-filter-tags="Outlet Attributes">
+                                            <i class="fa fa-file-text-o"></i>
+                                            <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Outlet Attributes</span>
+                                            </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/OutletImages" title="Outlet Images" data-filter-tags="Outlet Images">
-                                                    <i class="fa fa-picture-o"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Outlet Images</span>
-                                                </a>
+                                            <a href="/Mdm/OutletImages" title="Outlet Images" data-filter-tags="Outlet Images">
+                                            <i class="fa fa-picture-o"></i>
+                                            <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Outlet Images</span>
+                                            </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/BPBanks" title="Business Partner Banks" data-filter-tags="Business Partner Banks">
-                                                    <i class="fa fa-university"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Business Partner Banks</span>
-                                                </a>
+                                            <a href="/Mdm/BPBanks" title="Business Partner Banks" data-filter-tags="Business Partner Banks">
+                                            <i class="fa fa-university"></i>
+                                            <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Business Partner Banks</span>
+                                            </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/BPContacts" title="Business Partner Contacts" data-filter-tags="Business Partner Contacts">
-                                                    <i class="fa fa-phone-square"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Business Partner Contacts</span>
-                                                </a>
+                                            <a href="/Mdm/BPContacts" title="Business Partner Contacts" data-filter-tags="Business Partner Contacts">
+                                            <i class="fa fa-phone-square"></i>
+                                            <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Business Partner Contacts</span>
+                                            </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/BPAttachments" title="Business Partner Attachments" data-filter-tags="Business Partner Attachments">
-                                                    <i class="fa fa-paperclip"></i>
-                                                    <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Business Partner Attachments</span>
-                                                </a>
+                                            <a href="/Mdm/BPAttachments" title="Business Partner Attachments" data-filter-tags="Business Partner Attachments">
+                                            <i class="fa fa-paperclip"></i>
+                                            <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Business Partner Attachments</span>
+                                            </a>
                                             </li>*@
                                             <li>
                                                 <a href="/Mdm/CustomerGroups" title="Customer Groups" data-filter-tags="mdm customer groups">
@@ -1024,12 +1054,38 @@
                                     <i class="fal fa-search"></i>
                                 </a>
                             </div>
+                            <div>
+                                <button class="btn btn-primary btn-sm waves-effect waves-themed btn-select-company" data-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-sitemap"></i><span id="selected-company"></span>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-animated w-auto h-auto">
+                                    <div class="custom-scroll h-100" style="padding: 14px;">
+                                        <table class="table table-sm m-0 companies">
+                                            <thead class="bg-primary-500">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>@L["EntityFieldName:MDMService:CompanyProfile:Code"].Value</th>
+                                                    <th>@L["EntityFieldName:MDMService:CompanyProfile:Name"].Value</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @*  <a style="" href="#" class="header-icon" data-toggle="modal" data-target=".js-modal-messenger">
+
+                            </a>*@
+
                             <!-- app settings -->
                             <div class="hidden-md-down">
                                 <a href="#" class="header-icon" data-toggle="modal" data-target=".js-modal-settings">
                                     <i class="fal fa-cog"></i>
                                 </a>
                             </div>
+
                             <!-- app shortcuts -->
                             <div style="display:none">
                                 <a href="#" class="header-icon" data-toggle="dropdown" title="My Apps">
@@ -1564,8 +1620,8 @@
                                 <a href="#" data-toggle="dropdown" title="drlantern@gotbootstrap.com" class="header-icon d-flex align-items-center justify-content-center ml-2">
                                     <img src="/dmstheme/img/demo/avatars/avatar-admin.png" class="profile-image rounded-circle" alt="Administrator">
                                     <!-- you can also add username next to the avatar with the codes below:
-                                <span class="ml-1 mr-1 text-truncate text-truncate-header hidden-xs-down">Me</span>
-                                <i class="ni ni-chevron-down hidden-xs-down"></i> -->
+                                    <span class="ml-1 mr-1 text-truncate text-truncate-header hidden-xs-down">Me</span>
+                                    <i class="ni ni-chevron-down hidden-xs-down"></i> -->
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-animated dropdown-lg">
                                     <div class="dropdown-header bg-trans-gradient d-flex flex-row py-4 rounded-top">
@@ -1647,9 +1703,7 @@
                         </div>
                         <div>
                             <ul class="list-table m-0">
-                                @*  <li><a href="intel_introduction.html" class="text-secondary fw-700">About</a></li>
-                                <li class="pl-3"><a href="info_app_licensing.html" class="text-secondary fw-700">License</a></li>
-                                <li class="pl-3"><a href="info_app_docs.html" class="text-secondary fw-700">Documentation</a></li>*@
+                               
                                 <li class="pl-3 fs-xl"><a href="" class="text-secondary" target="_blank"><i class="fal fa-question-circle" aria-hidden="true"></i></a></li>
                             </ul>
                         </div>
@@ -1663,7 +1717,7 @@
                                 <div class="modal-body">
                                     <ul class="app-list w-auto h-auto p-0 text-left">
                                         <li>
-                                            <a href="intel_introduction.html" class="app-list-item text-white border-0 m-0">
+                                            <a href="/" class="app-list-item text-white border-0 m-0">
                                                 <div class="icon-stack">
                                                     <i class="base base-7 icon-stack-3x opacity-100 color-primary-500 "></i>
                                                     <i class="base base-7 icon-stack-2x opacity-100 color-primary-300 "></i>
@@ -1675,7 +1729,7 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="page_inbox_general.html" class="app-list-item text-white border-0 m-0">
+                                            <a href="#" class="app-list-item text-white border-0 m-0">
                                                 <div class="icon-stack">
                                                     <i class="base base-7 icon-stack-3x opacity-100 color-success-500 "></i>
                                                     <i class="base base-7 icon-stack-2x opacity-100 color-success-300 "></i>
@@ -1687,7 +1741,7 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="intel_introduction.html" class="app-list-item text-white border-0 m-0">
+                                            <a href="#" class="app-list-item text-white border-0 m-0">
                                                 <div class="icon-stack">
                                                     <i class="base base-7 icon-stack-2x opacity-100 color-primary-300 "></i>
                                                     <i class="fal fa-plus icon-stack-1x opacity-100 color-white"></i>
@@ -2225,7 +2279,7 @@
                                         Theme colors <small>(overlays base css)</small>
                                     </h5>
                                     @*<div class="fs-xs text-muted p-2 alert alert-warning mt-3 mb-0">
-                                        <i class="fal fa-exclamation-triangle text-warning mr-2"></i>Due to network latency and CPU utilization, you may experience a brief flickering effect on page load which may show the intial applied theme for a split second. Setting the prefered style/theme in the header will prevent this from happening.
+                                    <i class="fal fa-exclamation-triangle text-warning mr-2"></i>Due to network latency and CPU utilization, you may experience a brief flickering effect on page load which may show the intial applied theme for a split second. Setting the prefered style/theme in the header will prevent this from happening.
                                     </div>*@
                                 </div>
                             </div>
@@ -2272,53 +2326,18 @@
 
         <script src="/dmstheme/js/vendors.bundle.js"></script>
         <script src="/dmstheme/js/app.bundle.js"></script>
-        <script type="text/javascript">
-            'use strict';
-            var classHolder = document.getElementsByTagName("BODY")[0],
-                themeSettings = (localStorage.getItem('themeSettings')) ? JSON.parse(localStorage.getItem('themeSettings')) :
-                    {},
-                themeURL = themeSettings.themeURL || '',
-                themeOptions = themeSettings.themeOptions || '';
-            if (themeSettings.themeOptions) {
-                classHolder.className = themeSettings.themeOptions;
-                console.log("%c✔ Theme settings loaded", "color: #148f32");
-            }
-            else {
-                console.log("Heads up! Theme settings is empty or does not exist, loading default settings...");
-            }
-            if (themeSettings.themeURL && !document.getElementById('mytheme')) {
-                var cssfile = document.createElement('link');
-                cssfile.id = 'mytheme';
-                cssfile.rel = 'stylesheet';
-                cssfile.href = themeURL;
-                document.getElementsByTagName('head')[0].appendChild(cssfile);
-            }
-            var saveSettings = function () {
-                themeSettings.themeOptions = String(classHolder.className).split(/[^\w-]+/).filter(function (item) {
-                    return /^(nav|header|mod|display)-/i.test(item);
-                }).join(' ');
-                if (document.getElementById('mytheme')) {
-                    themeSettings.themeURL = document.getElementById('mytheme').getAttribute("href");
-                };
-                localStorage.setItem('themeSettings', JSON.stringify(themeSettings));
-            }
-            var resetSettings = function () {
-                localStorage.setItem("themeSettings", "");
-            }
-        </script>
+
         <script type="text/javascript">
             /* Activate smart panels */
             $('#js-page-content').smartPanel();
-             if($('ol.breadcrumb.page-breadcrumb').length > 0)
-                {
-                    if($('#panel-1 > div.panel-hdr > h2').length > 0
-                    && $('#panel-1 > div.panel-hdr > h2')[0].childNodes.length > 2)
-                    {
-                        $('#panel-1 > div.panel-hdr > h2')[0].childNodes[2].remove();
-                        $('#panel-1 > div.panel-hdr > h2').append($('ol.breadcrumb.page-breadcrumb')[0].outerHTML); 
-                    } 
+            if ($('ol.breadcrumb.page-breadcrumb').length > 0) {
+                if ($('#panel-1 > div.panel-hdr > h2').length > 0
+                    && $('#panel-1 > div.panel-hdr > h2')[0].childNodes.length > 2) {
+                    $('#panel-1 > div.panel-hdr > h2')[0].childNodes[2].remove();
+                    $('#panel-1 > div.panel-hdr > h2').append($('ol.breadcrumb.page-breadcrumb')[0].outerHTML);
                 }
-            $(document).ready(function () { 
+            }
+            $(document).ready(function () {
                 $('#js-nav-menu li').removeClass('active');
                 $('#js-nav-menu li').removeClass('open');
                 var items = $('#js-nav-menu a');
@@ -2333,25 +2352,25 @@
                             .addClass('active open');
                         $(node).parent()
                             .parent()
-                            .parent() 
-                            .parent() 
-                            .parent() 
+                            .parent()
+                            .parent()
+                            .parent()
                             .addClass('active open');
 
                         return;
                     }
-                } 
-               
+                }
+
             });
         </script>
         <script src="/pages/shared/_Layout.js"></script>
 
         @*
-         <script src="/libs/abp/utils/abp-utils.umd.min.js"></script>
+        <script src="/libs/abp/utils/abp-utils.umd.min.js"></script>
         <script src="/libs/abp/core/abp.js"></script>
-         <script src="/libs/abp/jquery/abp.jquery.js"></script>
-         <script src="/libs/luxon/luxon.min.js"></script>
-         <script src="/libs/abp/luxon/abp.luxon.js"></script> *@
+        <script src="/libs/abp/jquery/abp.jquery.js"></script>
+        <script src="/libs/luxon/luxon.min.js"></script>
+        <script src="/libs/abp/luxon/abp.luxon.js"></script> *@
 
 
         <script src="/js/devextreme/dx.all.js"></script>
@@ -2363,12 +2382,12 @@
         }
         @RenderSection("scripts", false)
 
-        @await Component.InvokeLayoutHookAsync(LayoutHooks.PageContent.Last, StandardLayouts.Empty)
+        @await Component.InvokeLayoutHookAsync(LayoutHooks.PageContent.Last, StandardLayouts.Application)
     </div>
 
 
     @await Component.InvokeAsync(typeof(WidgetScriptsViewComponent))
 
-    @await Component.InvokeLayoutHookAsync(LayoutHooks.Body.Last, StandardLayouts.Empty)
+    @await Component.InvokeLayoutHookAsync(LayoutHooks.Body.Last, StandardLayouts.Application)
 </body>
 </html>

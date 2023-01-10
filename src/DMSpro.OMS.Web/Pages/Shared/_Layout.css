@@ -217,3 +217,37 @@ div.panel a.btn.btn-panel.hover-effect-dot.js-panel-close {
 #AbpContentToolbar button[name=CreateClaimType] {
     margin-top: 10px;
 }
+
+.btn-select-company {
+    -webkit-box-shadow: 0 2px 6px 0 rgb(33 152 243 / 50%);
+    box-shadow: 0 2px 6px 0 rgb(33 152 243 / 50%);
+    height: 32px;
+    color: #fff;
+    background-color: #2198F3;
+    border-color: #2198F3;
+    padding-left: 15px;
+    padding-right: 15px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+    .btn-select-company:hover {
+        color: #fff;
+        background-color: #0c85e2;
+        border-color: #0c7ed5;
+    }
+    .btn-select-company > i.fa.fa-sitemap{
+        margin-right:4px;
+    }
+table.companies th:nth-child(1) {
+    min-width:30px;
+}
+table.companies th:nth-child(2) {
+    min-width: 60px;
+}
+table.companies th:nth-child(3) {
+    min-width: 180px;
+}
+table.companies > tbody > tr{
+    cursor:pointer;
+}
