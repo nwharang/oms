@@ -14,22 +14,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.Holidays
 {
     public class IndexModel : AbpPageModel
     {
-        public int? YearFilterMin { get; set; }
-
-        public int? YearFilterMax { get; set; }
-        public string DescriptionFilter { get; set; }
-
-        private readonly IHolidaysAppService _holidaysAppService;
-
-        public IndexModel(IHolidaysAppService holidaysAppService)
-        {
-            _holidaysAppService = holidaysAppService;
-        }
-
-        public async Task OnGetAsync()
-        {
-
-            await Task.CompletedTask;
-        }
+        
     }
 }

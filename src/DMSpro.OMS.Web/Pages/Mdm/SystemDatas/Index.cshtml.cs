@@ -14,21 +14,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.SystemDatas
 {
     public class IndexModel : AbpPageModel
     {
-        public string CodeFilter { get; set; }
-        public string ValueCodeFilter { get; set; }
-        public string ValueNameFilter { get; set; }
-
-        private readonly ISystemDatasAppService _systemDatasAppService;
-
-        public IndexModel(ISystemDatasAppService systemDatasAppService)
-        {
-            _systemDatasAppService = systemDatasAppService;
-        }
-
-        public async Task OnGetAsync()
-        {
-
-            await Task.CompletedTask;
-        }
+        
     }
 }

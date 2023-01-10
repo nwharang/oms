@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using DMSpro.OMS.MdmService.Permissions
-@using DMSpro.OMS.MdmService.Web.Pages.ItemMasters
+@using DMSpro.OMS.MdmService.Web.Pages.ItemAttributeValues
 @using DMSpro.OMS.MdmService.Web.Menus
 @using Microsoft.AspNetCore.Mvc.Localization
 @using DMSpro.OMS.MdmService.Localization
@@ -11,20 +11,21 @@
 @model IndexModel
 @inject IPageLayout PageLayout
 @{
-    PageLayout.Content.Title = L["ItemMasters"].Value;
-    PageLayout.Content.MenuItemName = MdmServiceMenus.Items;
+    PageLayout.Content.Title = L["Page.Title.ItemAttributeValue"].Value;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.ItemAttributeValues;
 }
 
 @section scripts
     {
-    <abp-script src="/Pages/Mdm/ItemMasters/index.js" />
+    <abp-script src="/Pages/Mdm/ItemAttributeValues/index.js" />
 }
 
-@section breadcrumb {
+@section breadcrumb
+    {
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
         <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:Product"].Value</li>
-        <li class="breadcrumb-item active">@L["Menu:MdmService:ItemMasters"].Value</li>
+        <li class="breadcrumb-item active">@L["Menu:MdmService:ItemAttributeValue"].Value</li>
     </ol>
 }
 
@@ -32,7 +33,7 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fal fal fa-window"></i> @L["Menu:MdmService:ItemMasters"].Value
+                <i class="subheader-icon fal fal fa-window"></i> @L["Menu:MdmService:ItemdAttributeValue"].Value
             </h2>
         </div>
         <div class="panel-container show">
@@ -41,23 +42,24 @@
                     <abp-card-body>
                         <abp-row>
                             <div style="padding-left:12px" class="buttons-header-grid">
-                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.GeoMasters.Create))
+                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.ItemAttributeValues.Create))
                                 {
-                                    <button id="NewItemMasterButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                        <i class="fa fa-plus"></i> <span>@L["Button.New.ItemMaster"].Value</span>
+                                    <button id="NewProductAttrValueButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                        <i class="fa fa-plus"></i> <span>@L["Button.New.ItemAttributeValue"].Value</span>
                                     </button>
                                 }
                                 <button id="ExportToExcelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
                                     <i class="fa fa-download"></i> <span>@L["ExportToExcel"].Value</span>
                                 </button>
-                                <button id="ImportFromExcelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                    <i class="fa fa-upload"></i> <span>@L["ImportFromExcel"].Value</span>
+                                <button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                    <i class="fa fa-upload"></i> <span>Import from Excel</span>
                                 </button>
                                 <div class="dx-datagrid-search-panel dx-show-invalid-badge dx-textbox dx-texteditor dx-editor-outlined dx-searchbox dx-show-clear-button dx-texteditor-empty dx-widget dx-state-hover" style="width: 250px;">
                                     <div class="dx-texteditor-container">
                                         <div class="dx-texteditor-input-container">
                                             <div class="dx-icon dx-icon-search"></div>
                                             <input autocomplete="off" aria-label="Search in the data grid" class="dx-texteditor-input" type="text" spellcheck="false" tabindex="0" role="textbox">
+
                                         </div>
                                         <div class="dx-texteditor-buttons-container">
                                             <span class="dx-clear-button-area"><span class="dx-icon dx-icon-clear"></span></span>
@@ -67,8 +69,8 @@
                             </div>
                         </abp-row>
                         <div class="dx-viewport">
-                            <div id="dataTreeContainer"></div>
-                            <div id="dataGridItemMasters"></div>
+                            <div id="loadPanel"></div>
+                            <div id="treeProdAttributeValue"></div>
                         </div>
                     </abp-card-body>
                 </abp-card>

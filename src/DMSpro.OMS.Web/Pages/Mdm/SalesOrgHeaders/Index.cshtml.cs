@@ -14,30 +14,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.SalesOrgHeaders
 {
     public class IndexModel : AbpPageModel
     {
-        public string CodeFilter { get; set; }
-        public string NameFilter { get; set; }
-        [SelectItems(nameof(ActiveBoolFilterItems))]
-        public string ActiveFilter { get; set; }
-
-        public List<SelectListItem> ActiveBoolFilterItems { get; set; } =
-            new List<SelectListItem>
-            {
-                new SelectListItem("", ""),
-                new SelectListItem("Yes", "true"),
-                new SelectListItem("No", "false"),
-            };
-
-        private readonly ISalesOrgHeadersAppService _salesOrgHeadersAppService;
-
-        public IndexModel(ISalesOrgHeadersAppService salesOrgHeadersAppService)
-        {
-            _salesOrgHeadersAppService = salesOrgHeadersAppService;
-        }
-
-        public async Task OnGetAsync()
-        {
-
-            await Task.CompletedTask;
-        }
+        
     }
 }

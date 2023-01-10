@@ -14,22 +14,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.VATs
 {
     public class IndexModel : AbpPageModel
     {
-        public string NameFilter { get; set; }
-        public uint? RateFilterMin { get; set; }
-
-        public uint? RateFilterMax { get; set; }
-
-        private readonly IVATsAppService _vATsAppService;
-
-        public IndexModel(IVATsAppService vATsAppService)
-        {
-            _vATsAppService = vATsAppService;
-        }
-
-        public async Task OnGetAsync()
-        {
-
-            await Task.CompletedTask;
-        }
+        
     }
 }

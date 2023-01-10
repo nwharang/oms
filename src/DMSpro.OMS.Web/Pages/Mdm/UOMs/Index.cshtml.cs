@@ -14,20 +14,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.UOMs
 {
     public class IndexModel : AbpPageModel
     {
-        public string CodeFilter { get; set; }
-        public string NameFilter { get; set; }
-
-        private readonly IUOMsAppService _uOMsAppService;
-
-        public IndexModel(IUOMsAppService uOMsAppService)
-        {
-            _uOMsAppService = uOMsAppService;
-        }
-
-        public async Task OnGetAsync()
-        {
-
-            await Task.CompletedTask;
-        }
+        
     }
 }

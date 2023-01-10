@@ -1,4 +1,4 @@
-using DMSpro.OMS.MdmService.ItemMasters;
+// using DMSpro.OMS.MdmService.ItemMasters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,23 +15,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.ItemGroups
 {
     public class IndexModel : AbpPageModel
     {
-        public string CodeFilter { get; set; }
-        public string NameFilter { get; set; }
-        public string DescriptionFilter { get; set; }
-        public GroupType? TypeFilter { get; set; }
-        public Status? StatusFilter { get; set; }
-
-        private readonly IItemGroupsAppService _itemGroupsAppService;
-
-        public IndexModel(IItemGroupsAppService itemGroupsAppService)
-        {
-            _itemGroupsAppService = itemGroupsAppService;
-        }
-
-        public async Task OnGetAsync()
-        {
-
-            await Task.CompletedTask;
-        }
+        
     }
 }

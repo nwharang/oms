@@ -14,23 +14,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.DimensionMeasurements
 {
     public class IndexModel : AbpPageModel
     {
-        public string CodeFilter { get; set; }
-        public string NameFilter { get; set; }
-        public uint? ValueFilterMin { get; set; }
-
-        public uint? ValueFilterMax { get; set; }
-
-        private readonly IDimensionMeasurementsAppService _dimensionMeasurementsAppService;
-
-        public IndexModel(IDimensionMeasurementsAppService dimensionMeasurementsAppService)
-        {
-            _dimensionMeasurementsAppService = dimensionMeasurementsAppService;
-        }
-
-        public async Task OnGetAsync()
-        {
-
-            await Task.CompletedTask;
-        }
+        
     }
 }

@@ -14,23 +14,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.WeightMeasurements
 {
     public class IndexModel : AbpPageModel
     {
-        public string CodeFilter { get; set; }
-        public string NameFilter { get; set; }
-        public uint? ValueFilterMin { get; set; }
-
-        public uint? ValueFilterMax { get; set; }
-
-        private readonly IWeightMeasurementsAppService _weightMeasurementsAppService;
-
-        public IndexModel(IWeightMeasurementsAppService weightMeasurementsAppService)
-        {
-            _weightMeasurementsAppService = weightMeasurementsAppService;
-        }
-
-        public async Task OnGetAsync()
-        {
-
-            await Task.CompletedTask;
-        }
+        
     }
 }

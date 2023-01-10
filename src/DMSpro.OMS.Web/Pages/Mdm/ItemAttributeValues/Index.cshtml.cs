@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.AspNetCore.Mvc.UI.RazorPages;
 using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Form;
-using DMSpro.OMS.MdmService.EmployeeProfiles;
+
 using DMSpro.OMS.MdmService.Shared;
 
-namespace DMSpro.OMS.MdmService.Web.Pages.EmployeeProfiles
+namespace DMSpro.OMS.MdmService.Web.Pages.ItemAttributeValues
 {
     public class IndexModel : AbpPageModel
     {
