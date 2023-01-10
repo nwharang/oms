@@ -4,6 +4,7 @@
     // load mdmService
     var productAttrService = window.dMSpro.oMS.mdmService.controllers.productAttributes.productAttribute;
 
+    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
     // custom store
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
@@ -11,22 +12,11 @@
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            const args2 = { 'loadOptions': args };
             productAttrService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -58,79 +48,6 @@
         }
     });
 
-    //const data = [
-    //    {
-    //        ID: 1,
-    //        AttrNo: 0,
-    //        AttrName: 'Category',
-    //        HierarchyLevel: 0,
-    //        IsActive: true,
-    //    },
-    //    {
-    //        ID: 2,
-    //        AttrNo: 1,
-    //        AttrName: 'Attribute 1',
-    //        HierarchyLevel: 1,
-    //        IsActive: true,
-    //    },
-    //    {
-    //        ID: 3,
-    //        AttrNo: 2,
-    //        AttrName: 'Attribute 2',
-    //        HierarchyLevel: 2,
-    //        IsActive: true,
-    //    },
-    //    {
-    //        ID: 4,
-    //        AttrNo: 3,
-    //        AttrName: 'Attribute 3',
-    //        HierarchyLevel: null,
-    //        IsActive: false,
-    //    },
-    //    {
-    //        ID: 5,
-    //        AttrNo: 4,
-    //        AttrName: 'Attribute 4',
-    //        HierarchyLevel: null,
-    //        IsActive: true,
-    //    },
-    //    {
-    //        ID: 6,
-    //        AttrNo: 5,
-    //        AttrName: 'Attribute 5',
-    //        HierarchyLevel: null,
-    //        IsActive: false,
-    //    },
-    //    {
-    //        ID: 7,
-    //        AttrNo: 6,
-    //        AttrName: 'Attribute 6',
-    //        HierarchyLevel: null,
-    //        IsActive: true,
-    //    },
-    //    {
-    //        ID: 8,
-    //        AttrNo: 7,
-    //        AttrName: 'Attribute 7',
-    //        HierarchyLevel: null,
-    //        IsActive: true,
-    //    },
-    //    {
-    //        ID: 9,
-    //        AttrNo: 8,
-    //        AttrName: 'Attribute 8',
-    //        HierarchyLevel: null,
-    //        IsActive: true,
-    //    },
-    //    {
-    //        ID: 10,
-    //        AttrNo: 9,
-    //        AttrName: 'Attribute 9',
-    //        HierarchyLevel: null,
-    //        IsActive: true,
-    //    },
-    //];
-
     const dataGrid = $('#gridProdAttribute').dxDataGrid({
         dataSource: customStore,
         keyExpr: 'id',
@@ -156,13 +73,13 @@
             enabled: true,
             pageSize: 10
         },
-        //pager: {
-        //    visible: true,
-        //    showPageSizeSelector: true,
-        //    allowedPageSizes: [10, 20, 50, 100],
-        //    showInfo: true,
-        //    showNavigationButtons: true
-        //},
+        pager: {
+            visible: true,
+            showPageSizeSelector: true,
+            allowedPageSizes: [10, 20, 50, 100],
+            showInfo: true,
+            showNavigationButtons: true
+        },
         editing: {
             mode: 'row',
             allowAdding: true,
@@ -219,16 +136,34 @@
             {
                 dataField: 'active',
                 caption: l("EntityFieldName:MDMService:ProductAttribute:Active"),
+                alignment: 'center',
+                dataType: 'boolean',
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                        .appendTo(container);
+                }
             },
             {
                 dataField: 'isProductCategory',
-                caption: l("EntityFieldName:MDMService:ProductAttribute:IsProductCategory")
+                caption: l("EntityFieldName:MDMService:ProductAttribute:IsProductCategory"),
+                alignment: 'center',
+                dataType: 'boolean',
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                        .appendTo(container);
+                }
             }
         ]
     }).dxDataGrid('instance');
 
     $("#NewProductAttributeButton").click(function () {
         dataGrid.addRow();
+    });
+
+    $("input#Search").on("input", function () {
+        dataGrid.searchByText($(this).val());
     });
 
     $("#ExportToExcelButton").click(function (e) {
@@ -245,4 +180,8 @@
             }
         )
     });
+
+    function isNotEmpty(value) {
+        return value !== undefined && value !== null && value !== '';
+    }
 });

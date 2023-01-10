@@ -11,7 +11,7 @@
 @model IndexModel
 @inject IPageLayout PageLayout
 @{
-    PageLayout.Content.Title = L["Page.Title.ProdAttributeValue"].Value;
+    PageLayout.Content.Title = L["Item Attribute Value"].Value;
     PageLayout.Content.MenuItemName = MdmServiceMenus.ProdAttributeValues;
 }
 
@@ -24,8 +24,8 @@
     {
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
-        <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:Product"].Value</li>
-        <li class="breadcrumb-item active">@L["Menu:MdmService:ProdAttributeValue"].Value</li>
+        <li class="breadcrumb-item">@L["Item"].Value</li>
+        <li class="breadcrumb-item active">@L["Item Attribute Value"].Value</li>
     </ol>
 }
 
@@ -33,7 +33,7 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fal fal fa-window"></i> @L["Menu:MdmService:ProdAttributeValue"].Value
+                <i class="subheader-icon fal fal fa-window"></i> @L["Item Attribute Value"].Value
             </h2>
         </div>
         <div class="panel-container show">
@@ -45,7 +45,7 @@
                                 @if (await Authorization.IsGrantedAsync(MdmServicePermissions.ProdAttributeValues.Create))
                                 {
                                     <button id="NewProductAttrValueButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                        <i class="fa fa-plus"></i> <span>@L["Button.New.ProdAttributeValue"].Value</span>
+                                        <i class="fa fa-plus"></i> <span>@L["New Item Attribute Value"].Value</span>
                                     </button>
                                 }
                                 <button id="ExportToExcelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
@@ -58,7 +58,7 @@
                                     <div class="dx-texteditor-container">
                                         <div class="dx-texteditor-input-container">
                                             <div class="dx-icon dx-icon-search"></div>
-                                            <input autocomplete="off" aria-label="Search in the data grid" class="dx-texteditor-input" type="text" spellcheck="false" tabindex="0" role="textbox">
+                                            <input id="Search" autocomplete="off" aria-label="Search in the data grid" class="dx-texteditor-input" type="text" spellcheck="false" tabindex="0" role="textbox">
 
                                         </div>
                                         <div class="dx-texteditor-buttons-container">
