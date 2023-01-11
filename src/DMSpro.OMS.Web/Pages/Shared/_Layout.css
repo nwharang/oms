@@ -239,15 +239,28 @@ div.panel a.btn.btn-panel.hover-effect-dot.js-panel-close {
     .btn-select-company > i.fa.fa-sitemap{
         margin-right:4px;
     }
+table.companies{
+   
+}
 table.companies th:nth-child(1) {
-    min-width:30px;
+    min-width: 30px;
 }
 table.companies th:nth-child(2) {
     min-width: 60px;
 }
 table.companies th:nth-child(3) {
-    min-width: 180px;
+    min-width: 200px;
+    width:100%;
 }
 table.companies > tbody > tr{
     cursor:pointer;
+}
+.wraper-select-company > .dropdown-menu-animated {
+    -webkit-transform: unset !important;
+    transform: unset !important;
+    -webkit-transition: unset;
+    transition: unset;
+    opacity: unset;
+    display: unset;
+    max-width: 320px;
 }
