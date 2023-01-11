@@ -1,6 +1,149 @@
-$(function () {
+﻿$(function () {
     var l = abp.localization.getResource("MdmService");
     var itemMasterService = window.dMSpro.oMS.mdmService.controllers.itemMasters.itemMaster;
+    var itemTypeService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
+
+    // get item type list
+    var itemTypeList = [];
+    var urlItemTypeLookup = abp.appPath + 'api/mdm-service/item-masters/system-data-lookup' +
+        abp.utils.buildQueryString([
+            { name: 'maxResultCount', value: 1000 }
+        ]);
+    $.ajax({
+        url: `${urlItemTypeLookup}`,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            itemTypeList = data.items;
+        }
+    });
+    var getItemTypes = function () {
+        return itemTypeList;
+    }
+
+    // get UOM group lookup
+    var UOMGroups = [];
+    var urlUOMGroupLookup = abp.appPath + 'api/mdm-service/item-masters/u-oMGroup-lookup' +
+        abp.utils.buildQueryString([
+            { name: 'maxResultCount', value: 1000 }
+        ]);
+    $.ajax({
+        url: `${urlUOMGroupLookup}`,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            UOMGroups = data.items;
+        }
+    });
+    var getUOMGroups = function () {
+        return UOMGroups;
+    }
+
+    // get UOMs lookup
+    var UOMs = [];
+    var urlUOMsLookup = abp.appPath + 'api/mdm-service/item-masters/u-oM-lookup' +
+        abp.utils.buildQueryString([
+            { name: 'maxResultCount', value: 1000 }
+        ]);
+    $.ajax({
+        url: `${urlUOMsLookup}`,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            UOMs = data.items;
+        }
+    });
+    var getUOMs = function () {
+        return UOMs;
+    }
+
+    // get VATs
+    var VATs = [];
+    var urlVATsLookup = abp.appPath + 'api/mdm-service/item-masters/v-aT-lookup' +
+        abp.utils.buildQueryString([
+            { name: 'maxResultCount', value: 1000 }
+        ]);
+    $.ajax({
+        url: `${urlVATsLookup}`,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            VATs = data.items;
+        }
+    });
+    var getVATs = function () {
+        return VATs;
+    }
+
+    // get Product Attribute
+    var ProductAttrs = [];
+    var urlProductAttrsLookup = abp.appPath + 'api/mdm-service/item-masters/prod-attribute-value-lookup' +
+        abp.utils.buildQueryString([
+            { name: 'maxResultCount', value: 1000 }
+        ]);
+    $.ajax({
+        url: `${urlProductAttrsLookup}`,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            ProductAttrs = data.items;
+        }
+    });
+    var getProductAttr = function () {
+        return ProductAttrs;
+    }
+
+    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+
+    //const items = {
+    //    ID: 1,
+    //    Code: 'IT0001',
+    //    Name: 'Trà Thảo Mộc Dr Thanh',
+    //    ShortName: 'Dr Thanh',
+    //    ERPCode: 'ERP0001',
+    //    ItemType: 'Items',
+    //    UOMGroup: 'Items',
+    //    Barcode: '452SDAF2121DF',
+    //    IsPurchaseItem: true,
+    //    IsSalesItem: true,
+    //    IsInventoryItem: true,
+    //    ManageItemBy: 'LOT',
+    //    ExpiredType: 'Day',
+    //    ExpiredValue: '30',
+    //    IssueMethod: 'FIFO',
+    //    ManageItemBy: 'None',
+    //    VAT: '5%',
+    //    IsActive: true,
+    //    InventoryUnit: 'CHAI',
+    //    PurUnit: 'THUNG',
+    //    SalesUnit: 'CHAI',
+    //    Attr0: 'Attr0',
+    //    Attr1: 'Attr1',
+    //    Attr2: 'Attr2',
+    //    Attr3: 'Attr3',
+    //    Attr4: 'Attr4',
+    //    Attr5: 'Attr5',
+    //    Attr6: 'Attr6',
+    //    Attr7: 'Attr7',
+    //    Attr8: 'Attr8',
+    //    Attr9: 'Attr9',
+    //    Inactive: false,
+    //    Images: [
+    //        {
+    //            imageAlt: "Maria",
+    //            imageSrc: "https://cf.shopee.vn/file/d20fd2da8ca9a0b0d6bf6d1740f09462"
+    //        },
+    //        {
+    //            imageAlt: "Maria",
+    //            imageSrc: "https://cf.shopee.vn/file/d20fd2da8ca9a0b0d6bf6d1740f09462"
+    //        }
+    //    ],
+    //    Attachments: ['Attachment 1', 'Attachment 2'],
+    //};
+
+    const manageItem = ['NONE', 'LOT', 'SERIAL'];
+    const expiredType = ['Day', 'Week', 'Month', 'Year'];
+    const issueMethod = ['FEFO', 'Serial'];
 
     var customStore = new DevExpress.data.CustomStore({
         key: 'id',
@@ -8,22 +151,12 @@ $(function () {
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            const args2 = { "loadOptions": args };
+
             itemMasterService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -55,7 +188,43 @@ $(function () {
         }
     });
 
-    var gridUOMs = $('#dataGridItemMasters').dxDataGrid({
+    var customItemType = new DevExpress.data.CustomStore({
+        key: 'id',
+        loadMode: "raw",
+        load(loadOptions) {
+            if (loadOptions.filter == undefined)
+                loadOptions.filter = ['code', '=', 'MD02']
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            itemTypeService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            itemMasterService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
+
+    var gridItemMasters = $('#dataGridItemMasters').dxDataGrid({
         dataSource: customStore,
         keyExpr: 'id',
         remoteOperations: true,
@@ -65,7 +234,7 @@ $(function () {
         allowColumnReordering: false,
         rowAlternationEnabled: true,
         columnAutoWidth: true,
-        columnHidingEnabled: true,
+        //columnHidingEnabled: true,
         errorRowEnabled: false,
         filterRow: {
             visible: true
@@ -89,30 +258,197 @@ $(function () {
         },
         editing: {
             mode: 'popup',
-            allowAdding: true,
-            allowUpdating: true,
-            allowDeleting: true,
+            allowAdding: abp.auth.isGranted('MdmService.ItemMasters.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.ItemMasters.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.ItemMasters.Delete'),
             useIcons: true,
             popup: {
                 title: l("Page.Title.ItemMasters"),
                 showTitle: true,
-                width: 700,
-                height: 345,
+                width: '95%',
+                height: '100%'
             },
             texts: {
                 editRow: l("Edit"),
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
+            },
+            form: {
+                //formData: items,
+                colCount: 10,
+                items: [
+                    {
+                        itemType: 'group',
+                        cssClass: 'first-group',
+                        colCount: 2,
+                        colSpan: 8,
+                        items: [
+                            {
+                                itemType: 'group',
+                                caption: 'General',
+                                colSpan: 4,
+                                items: [
+                                    {
+                                        dataField: 'code'
+                                    },
+                                    {
+                                        dataField: 'name'
+                                    },
+                                    {
+                                        dataField: 'shortName'
+                                    },
+                                    {
+                                        dataField: 'itemTypeId'
+                                    },
+                                    {
+                                        dataField: 'barcode'
+                                    },
+                                    {
+                                        dataField: 'erpCode',
+                                        colSpan: 2,
+                                    }
+                                ]
+                            },
+                            {
+                                itemType: 'group',
+                                caption: 'System Information',
+                                colSpan: 4,
+                                colCount: 2,
+                                items: [
+                                    {
+                                        dataField: 'uomGroupId',
+                                        colSpan: 2
+                                    },
+                                    {
+                                        itemType: 'group',
+                                        items: [
+                                            {
+                                                dataField: 'inventoriable'
+                                            },
+                                            {
+                                                dataField: 'purchasble'
+                                            },
+                                            {
+                                                dataField: 'saleable'
+                                            },
+                                            {
+                                                dataField: 'manageType'
+                                            },
+                                            {
+                                                dataField: 'expiredType'
+                                            },
+                                            {
+                                                dataField: 'expiredValue'
+                                            },
+                                            {
+                                                dataField: 'issueMethod'
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        itemType: 'group',
+                                        items: [
+                                            {
+                                                dataField: 'inventoryUnitId'
+                                            },
+                                            {
+                                                dataField: 'purUnitId'
+                                            },
+                                            {
+                                                dataField: 'salesUnit'
+                                            },
+                                            {
+                                                dataField: 'vatId'
+                                            },
+                                            {
+                                                dataField: 'active'
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                        ]
+                    },
+                    {
+                        itemType: 'group',
+                        cssClass: 'second-group',
+                        caption: 'DMS Attribute',
+                        colSpan: 2,
+                        items: [
+                            {
+                                dataField: 'attr0Id'
+                            },
+                            {
+                                dataField: 'attr1Id'
+                            },
+                            {
+                                dataField: 'attr2Id'
+                            },
+                            {
+                                dataField: 'attr3Id'
+                            },
+                            {
+                                dataField: 'attr4Id'
+                            },
+                            {
+                                dataField: 'attr5Id'
+                            },
+                            {
+                                dataField: 'attr6Id'
+                            },
+                            {
+                                dataField: 'attr7Id'
+                            },
+                            {
+                                dataField: 'attr8Id'
+                            },
+                            {
+                                dataField: 'attr9Id'
+                            }
+                        ]
+                    }
+                    //{
+                    //    itemType: 'group',
+                    //    colSpan: 8,
+                    //    items: [{
+                    //        itemType: 'tabbed',
+                    //        tabPanelOptions: {
+                    //            deferRendering: false,
+                    //        },
+                    //        tabs: [
+                    //            {
+                    //                title: 'Images',
+                    //                icon: "isnotblank",
+                    //                badge: "new",
+                    //                template: function (itemData, itemIndex, element) {
+                    //                    const galleryDiv = $("<div style='padding:10px'>")
+                    //                    galleryDiv.dxGallery({
+                    //                        dataSource: items.Images,
+                    //                        height: 'auto',
+                    //                        selectedItem: items.Images[1],
+                    //                        slideshowDelay: 1500,
+                    //                        loop: true
+                    //                    });
+                    //                    galleryDiv.appendTo(element);
+                    //                }
+                    //            },
+                    //            {
+                    //                title: 'Attachments',
+                    //                items: ['Attachments']
+                    //            }
+                    //        ]
+                    //    }]
+                    //    }
+                ]
             }
         },
-        //onRowInserting: function (e) {
-        //    debugger
-        //    if (e.data && e.data.code == null) {
-        //        e.data.code = e.data.Code;
-        //    }
-        //},
+        onRowInserting: function (e) {
+            if (e.data && e.data.id == 0) {
+                e.data.id = null;
+            }
+        },
         onRowUpdating: function (e) {
-            var objectRequire = ['code', 'name', 'itemTypeId', 'barcode', 'purchasble', 'saleable', 'inventoriable', 'vatId', 'uomGroupId', 'inventoryUnitId', 'purUnitId', 'salesUnit', 'basePrice'];
+            var objectRequire = ['code', 'name', 'barcode', 'inventoriable', 'purchasble', 'saleable', 'manageType', 'inventoryUnitId', 'purUnitId', 'salesUnit', 'vatId', 'active'];
             for (var property in e.oldData) {
                 if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                     e.newData[property] = e.oldData[property];
@@ -134,14 +470,20 @@ $(function () {
                 buttons: ['edit', 'delete'],
             },
             {
+                dataField: 'id',
+                visible: false
+            },
+            {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:ItemMaster:Code"),
-                dataType: 'string'
+                dataType: 'string',
+                validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'name',
                 caption: l("EntityFieldName:MDMService:ItemMaster:Name"),
-                dataType: 'string'
+                dataType: 'string',
+                validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'shortName',
@@ -151,466 +493,286 @@ $(function () {
             {
                 dataField: 'itemTypeId',
                 caption: l("EntityFieldName:MDMService:ItemMaster:ItemTypeName"),
-                dataType: 'string'
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: customItemType,
+                    valueExpr: 'id',
+                    displayExpr: 'valueName'
+                }
             },
             {
                 dataField: 'barcode',
                 caption: l("EntityFieldName:MDMService:ItemMaster:Barcode"),
-                dataType: 'string'
+                dataType: 'string',
+                validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'erpCode',
                 caption: l("EntityFieldName:MDMService:ItemMaster:ERPCode"),
                 dataType: 'string'
+            },
+            {
+                dataField: 'uomGroupId',
+                caption: l('EntityFieldName:MDMService:ItemMaster:UOMGroupCode'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getUOMGroups,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                visible: false
+            },
+            {
+                dataField: 'inventoriable',
+                caption: l('EntityFieldName:MDMService:ItemMaster:IsInventoryItem'),
+                editorType: 'dxCheckBox',
+                //validationRules: [{ type: "required" }],
+                visible: false
+            },
+            {
+                dataField: 'purchasble',
+                caption: l('EntityFieldName:MDMService:ItemMaster:IsPurchaseItem'),
+                editorType: 'dxCheckBox',
+                //validationRules: [{ type: "required" }],
+                visible: false
+            },
+            {
+                dataField: 'saleable',
+                caption: l('EntityFieldName:MDMService:ItemMaster:IsSalesItem'),
+                editorType: 'dxCheckBox',
+                //validationRules: [{ type: "required" }],
+                visible: false
+            },
+            {
+                dataField: 'manageType',
+                caption: l('EntityFieldName:MDMService:ItemMaster:ManageItemBy'),
+                editorType: 'dxSelectBox',
+                editorOptions: {
+                    items: manageItem,
+                    searchEnabled: true
+                },
+                validationRules: [{ type: "required" }],
+                visible: false
+            },
+            {
+                dataField: 'expiredType',
+                caption: l('EntityFieldName:MDMService:ItemMaster:ExpiredType'),
+                editorType: 'dxSelectBox',
+                editorOptions: {
+                    items: expiredType,
+                    searchEnabled: true
+                },
+                visible: false
+            },
+            {
+                dataField: 'expiredValue',
+                caption: l('EntityFieldName:MDMService:ItemMaster:ExpiredValue'),
+                dataType: 'number',
+                visible: false
+            },
+            {
+                dataField: 'issueMethod',
+                caption: l('EntityFieldName:MDMService:ItemMaster:IssueMethod'),
+                editorType: 'dxSelectBox',
+                editorOptions: {
+                    items: issueMethod,
+                    searchEnabled: true
+                },
+                visible: false
+            },
+            {
+                dataField: 'inventoryUnitId',
+                caption: l('EntityFieldName:MDMService:ItemMaster:InventoryUnitName'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getUOMs,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                validationRules: [{ type: "required" }],
+                visible: false
+            },
+            {
+                dataField: 'purUnitId',
+                caption: l('EntityFieldName:MDMService:ItemMaster:PurUnitName'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getUOMs,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                validationRules: [{ type: "required" }],
+                visible: false
+            },
+            {
+                dataField: 'salesUnit',
+                caption: l('EntityFieldName:MDMService:ItemMaster:SalesUnitName'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getUOMs,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                validationRules: [{ type: "required" }],
+                visible: false
+            },
+            {
+                dataField: 'vatId',
+                caption: l('EntityFieldName:MDMService:ItemMaster:VATName'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getVATs,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                validationRules: [{ type: "required" }],
+                visible: false
+            },
+            {
+                dataField: 'active',
+                caption: l('EntityFieldName:MDMService:ItemMaster:Active'),
+                editorType: 'dxCheckBox',
+                //validationRules: [{ type: "required" }],
+                visible: false
+            },
+            {
+                dataField: 'attr0Id',
+                caption: l('EntityFieldName:MDMService:ItemMaster:Attr0Name'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getProductAttr,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                visible: false
+            },
+            {
+                dataField: 'attr1Id',
+                caption: l('EntityFieldName:MDMService:ItemMaster:Attr1Name'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getProductAttr,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                visible: false
+            },
+            {
+                dataField: 'attr2Id',
+                caption: l('EntityFieldName:MDMService:ItemMaster:Attr2Name'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getProductAttr,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                visible: false
+            },
+            {
+                dataField: 'attr3Id',
+                caption: l('EntityFieldName:MDMService:ItemMaster:Attr3Name'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getProductAttr,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                visible: false
+            },
+            {
+                dataField: 'attr4Id',
+                caption: l('EntityFieldName:MDMService:ItemMaster:Attr4Name'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getProductAttr,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                visible: false
+            },
+            {
+                dataField: 'attr5Id',
+                caption: l('EntityFieldName:MDMService:ItemMaster:Attr5Name'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getProductAttr,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                visible: false
+            },
+            {
+                dataField: 'attr6Id',
+                caption: l('EntityFieldName:MDMService:ItemMaster:Attr6Name'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getProductAttr,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                visible: false
+            },
+            {
+                dataField: 'attr7Id',
+                caption: l('EntityFieldName:MDMService:ItemMaster:Attr7Name'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getProductAttr,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                visible: false
+            },
+            {
+                dataField: 'attr8Id',
+                caption: l('EntityFieldName:MDMService:ItemMaster:Attr8Name'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getProductAttr,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                visible: false
+            },
+            {
+                dataField: 'attr9Id',
+                caption: l('EntityFieldName:MDMService:ItemMaster:Attr9Name'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getProductAttr,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName'
+                },
+                visible: false
             }
         ]
     }).dxDataGrid('instance');
 
+    $("#NewItemMasterButton").click(function (e) {
+        gridItemMasters.addRow();
+    });
 
-    //        var lastNpIdId = '';
-    //        var lastNpDisplayNameId = '';
+    $("input#Search").on("input", function () {
+        gridItemMasters.searchByText($(this).val());
+    });
 
-    //        var _lookupModal = new abp.ModalManager({
-    //            viewUrl: abp.appPath + "Shared/LookupModal",
-    //            scriptUrl: "/Pages/Shared/lookupModal.js",
-    //            modalClass: "navigationPropertyLookup"
-    //        });
+    $("#ExportToExcelButton").click(function (e) {
+        e.preventDefault();
 
-    //        $('.lookupCleanButton').on('click', '', function () {
-    //            $(this).parent().find('input').val('');
-    //        });
+        itemMasterService.getDownloadToken().then(
+            function (result) {
+                var url = abp.appPath + 'api/mdm-service/item-masters/as-excel-file' +
+                    abp.utils.buildQueryString([
+                        { name: 'downloadToken', value: result.token }
+                    ]);
 
-    //        _lookupModal.onClose(function () {
-    //            var modal = $(_lookupModal.getModal());
-    //            $('#' + lastNpIdId).val(modal.find('#CurrentLookupId').val());
-    //            $('#' + lastNpDisplayNameId).val(modal.find('#CurrentLookupDisplayName').val());
-    //        });
+                var downloadWindow = window.open(url, '_blank');
+                downloadWindow.focus();
+            }
+        )
+    });
 
-    //    var createModal = new abp.ModalManager({
-    //        viewUrl: abp.appPath + "ItemMasters/CreateModal",
-    //        scriptUrl: "/Pages/ItemMasters/createModal.js",
-    //        modalClass: "itemMasterCreate"
-    //    });
-
-    //	var editModal = new abp.ModalManager({
-    //        viewUrl: abp.appPath + "ItemMasters/EditModal",
-    //        scriptUrl: "/Pages/ItemMasters/editModal.js",
-    //        modalClass: "itemMasterEdit"
-    //    });
-
-    //	var getFilter = function() {
-    //        return {
-    //            filterText: $("#FilterText").val(),
-    //            code: $("#CodeFilter").val(),
-    //			name: $("#NameFilter").val(),
-    //			shortName: $("#ShortNameFilter").val(),
-    //			erpCode: $("#ERPCodeFilter").val(),
-    //			barcode: $("#BarcodeFilter").val(),
-    //            purchasble: (function () {
-    //                var value = $("#PurchasbleFilter").val();
-    //                if (value === undefined || value === null || value === '') {
-    //                    return '';
-    //                }
-    //                return value === 'true';
-    //            })(),
-    //            saleable: (function () {
-    //                var value = $("#SaleableFilter").val();
-    //                if (value === undefined || value === null || value === '') {
-    //                    return '';
-    //                }
-    //                return value === 'true';
-    //            })(),
-    //            inventoriable: (function () {
-    //                var value = $("#InventoriableFilter").val();
-    //                if (value === undefined || value === null || value === '') {
-    //                    return '';
-    //                }
-    //                return value === 'true';
-    //            })(),
-    //            active: (function () {
-    //                var value = $("#ActiveFilter").val();
-    //                if (value === undefined || value === null || value === '') {
-    //                    return '';
-    //                }
-    //                return value === 'true';
-    //            })(),
-    //			manageType: $("#ManageTypeFilter").val(),
-    //			expiredType: $("#ExpiredTypeFilter").val(),
-    //			expiredValueMin: $("#ExpiredValueFilterMin").val(),
-    //			expiredValueMax: $("#ExpiredValueFilterMax").val(),
-    //			issueMethod: $("#IssueMethodFilter").val(),
-    //            canUpdate: (function () {
-    //                var value = $("#CanUpdateFilter").val();
-    //                if (value === undefined || value === null || value === '') {
-    //                    return '';
-    //                }
-    //                return value === 'true';
-    //            })(),
-    //			basePriceMin: $("#BasePriceFilterMin").val(),
-    //			basePriceMax: $("#BasePriceFilterMax").val(),
-    //			itemTypeId: $("#ItemTypeIdFilter").val(),			vATId: $("#VATIdFilter").val(),			uOMGroupId: $("#UOMGroupIdFilter").val(),			inventoryUnitId: $("#InventoryUnitIdFilter").val(),			purUnitId: $("#PurUnitIdFilter").val(),			salesUnit: $("#SalesUnitFilter").val(),			attr0Id: $("#Attr0IdFilter").val(),			attr1Id: $("#Attr1IdFilter").val(),			attr2Id: $("#Attr2IdFilter").val(),			attr3Id: $("#Attr3IdFilter").val(),			attr4Id: $("#Attr4IdFilter").val(),			attr5Id: $("#Attr5IdFilter").val(),			attr6Id: $("#Attr6IdFilter").val(),			attr7Id: $("#Attr7IdFilter").val(),			attr8Id: $("#Attr8IdFilter").val(),			attr9Id: $("#Attr9IdFilter").val(),			attr10Id: $("#Attr10IdFilter").val(),			attr11Id: $("#Attr11IdFilter").val(),			attr12Id: $("#Attr12IdFilter").val(),			attr13Id: $("#Attr13IdFilter").val(),			attr14Id: $("#Attr14IdFilter").val(),			attr15Id: $("#Attr15IdFilter").val(),			attr16Id: $("#Attr16IdFilter").val(),			attr17Id: $("#Attr17IdFilter").val(),			attr18Id: $("#Attr18IdFilter").val(),			attr19Id: $("#Attr19IdFilter").val()
-    //        };
-    //    };
-
-    //    var dataTable = $("#ItemMastersTable").DataTable(abp.libs.datatables.normalizeConfiguration({
-    //        processing: true,
-    //        serverSide: true,
-    //        paging: true,
-    //        searching: false,
-    //        scrollX: true,
-    //        autoWidth: true,
-    //        scrollCollapse: true,
-    //        order: [[1, "asc"]],
-    //        ajax: abp.libs.datatables.createAjax(itemMasterService.getList, getFilter),
-    //        columnDefs: [
-    //            {
-    //                rowAction: {
-    //                    items:
-    //                        [
-    //                            {
-    //                                text: l("Edit"),
-    //                                visible: abp.auth.isGranted('MdmService.ItemMasters.Edit'),
-    //                                action: function (data) {
-    //                                    editModal.open({
-    //                                     id: data.record.itemMaster.id
-    //                                     });
-    //                                }
-    //                            },
-    //                            {
-    //                                text: l("Delete"),
-    //                                visible: abp.auth.isGranted('MdmService.ItemMasters.Delete'),
-    //                                confirmMessage: function () {
-    //                                    return l("DeleteConfirmationMessage");
-    //                                },
-    //                                action: function (data) {
-    //                                    itemMasterService.delete(data.record.itemMaster.id)
-    //                                        .then(function () {
-    //                                            abp.notify.info(l("SuccessfullyDeleted"));
-    //                                            dataTable.ajax.reload();
-    //                                        });
-    //                                }
-    //                            }
-    //                        ]
-    //                }
-    //            },
-    //			{ data: "itemMaster.code" },
-    //			{ data: "itemMaster.name" },
-    //			{ data: "itemMaster.shortName" },
-    //			{ data: "itemMaster.erpCode" },
-    //			{ data: "itemMaster.barcode" },
-    //            {
-    //                data: "itemMaster.purchasble",
-    //                render: function (purchasble) {
-    //                    return purchasble ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
-    //                }
-    //            },
-    //            {
-    //                data: "itemMaster.saleable",
-    //                render: function (saleable) {
-    //                    return saleable ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
-    //                }
-    //            },
-    //            {
-    //                data: "itemMaster.inventoriable",
-    //                render: function (inventoriable) {
-    //                    return inventoriable ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
-    //                }
-    //            },
-    //            {
-    //                data: "itemMaster.active",
-    //                render: function (active) {
-    //                    return active ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
-    //                }
-    //            },
-    //            {
-    //                data: "itemMaster.manageType",
-    //                render: function (manageType) {
-    //                    if (manageType === undefined ||
-    //                        manageType === null) {
-    //                        return "";
-    //                    }
-
-    //                    var localizationKey = "EntityFieldValue:MDMService:ItemMaster:ManageItemBy:" + manageType;
-    //                    var localized = l(localizationKey);
-
-    //                    if (localized === localizationKey) {
-    //                        abp.log.warn("No localization found for " + localizationKey);
-    //                        return "";
-    //                    }
-
-    //                    return localized;
-    //                }
-    //            },
-    //            {
-    //                data: "itemMaster.expiredType",
-    //                render: function (expiredType) {
-    //                    if (expiredType === undefined ||
-    //                        expiredType === null) {
-    //                        return "";
-    //                    }
-
-    //                    var localizationKey = "EntityFieldValue:MDMService:ItemMaster:ExpiredType:" + expiredType;
-    //                    var localized = l(localizationKey);
-
-    //                    if (localized === localizationKey) {
-    //                        abp.log.warn("No localization found for " + localizationKey);
-    //                        return "";
-    //                    }
-
-    //                    return localized;
-    //                }
-    //            },
-    //			{ data: "itemMaster.expiredValue" },
-    //            {
-    //                data: "itemMaster.issueMethod",
-    //                render: function (issueMethod) {
-    //                    if (issueMethod === undefined ||
-    //                        issueMethod === null) {
-    //                        return "";
-    //                    }
-
-    //                    var localizationKey = "EntityFieldValue:MDMService:ItemMaster:IssueMethod:" + issueMethod;
-    //                    var localized = l(localizationKey);
-
-    //                    if (localized === localizationKey) {
-    //                        abp.log.warn("No localization found for " + localizationKey);
-    //                        return "";
-    //                    }
-
-    //                    return localized;
-    //                }
-    //            },
-    //            {
-    //                data: "itemMaster.canUpdate",
-    //                render: function (canUpdate) {
-    //                    return canUpdate ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
-    //                }
-    //            },
-    //			{ data: "itemMaster.basePrice" },
-    //            {
-    //                data: "systemData.valueCode",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "vat.code",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "uomGroup.code",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "uom.code",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "uoM1.code",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "uoM2.code",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue1.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue2.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue3.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue4.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue5.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue6.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue7.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue8.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue9.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue10.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue11.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue12.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue13.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue14.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue15.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue16.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue17.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue18.attrValName",
-    //                defaultContent : ""
-    //            },
-    //            {
-    //                data: "prodAttributeValue19.attrValName",
-    //                defaultContent : ""
-    //            }
-    //        ]
-    //    }));
-
-    //    createModal.onResult(function () {
-    //        dataTable.ajax.reload();
-    //    });
-
-    //    editModal.onResult(function () {
-    //        dataTable.ajax.reload();
-    //    });
-
-    //    $("#NewItemMasterButton").click(function (e) {
-    //        e.preventDefault();
-    //        createModal.open();
-    //    });
-
-    //	$("#SearchForm").submit(function (e) {
-    //        e.preventDefault();
-    //        dataTable.ajax.reload();
-    //    });
-
-    //    $("#ExportToExcelButton").click(function (e) {
-    //        e.preventDefault();
-
-    //        itemMasterService.getDownloadToken().then(
-    //            function(result){
-    //                    var input = getFilter();
-    //                    var url =  abp.appPath + 'api/mdm-service/item-masters/as-excel-file' + 
-    //                        abp.utils.buildQueryString([
-    //                            { name: 'downloadToken', value: result.token },
-    //                            { name: 'filterText', value: input.filterText }, 
-    //                            { name: 'code', value: input.code }, 
-    //                            { name: 'name', value: input.name }, 
-    //                            { name: 'shortName', value: input.shortName }, 
-    //                            { name: 'erpCode', value: input.erpCode }, 
-    //                            { name: 'barcode', value: input.barcode }, 
-    //                            { name: 'purchasble', value: input.purchasble }, 
-    //                            { name: 'saleable', value: input.saleable }, 
-    //                            { name: 'inventoriable', value: input.inventoriable }, 
-    //                            { name: 'active', value: input.active }, 
-    //                            { name: 'manageType', value: input.manageType }, 
-    //                            { name: 'expiredType', value: input.expiredType },
-    //                            { name: 'expiredValueMin', value: input.expiredValueMin },
-    //                            { name: 'expiredValueMax', value: input.expiredValueMax }, 
-    //                            { name: 'issueMethod', value: input.issueMethod }, 
-    //                            { name: 'canUpdate', value: input.canUpdate },
-    //                            { name: 'basePriceMin', value: input.basePriceMin },
-    //                            { name: 'basePriceMax', value: input.basePriceMax }, 
-    //                            { name: 'itemTypeId', value: input.itemTypeId }
-    //, 
-    //                            { name: 'vATId', value: input.vATId }
-    //, 
-    //                            { name: 'uOMGroupId', value: input.uOMGroupId }
-    //, 
-    //                            { name: 'inventoryUnitId', value: input.inventoryUnitId }
-    //, 
-    //                            { name: 'purUnitId', value: input.purUnitId }
-    //, 
-    //                            { name: 'salesUnit', value: input.salesUnit }
-    //, 
-    //                            { name: 'attr0Id', value: input.attr0Id }
-    //, 
-    //                            { name: 'attr1Id', value: input.attr1Id }
-    //, 
-    //                            { name: 'attr2Id', value: input.attr2Id }
-    //, 
-    //                            { name: 'attr3Id', value: input.attr3Id }
-    //, 
-    //                            { name: 'attr4Id', value: input.attr4Id }
-    //, 
-    //                            { name: 'attr5Id', value: input.attr5Id }
-    //, 
-    //                            { name: 'attr6Id', value: input.attr6Id }
-    //, 
-    //                            { name: 'attr7Id', value: input.attr7Id }
-    //, 
-    //                            { name: 'attr8Id', value: input.attr8Id }
-    //, 
-    //                            { name: 'attr9Id', value: input.attr9Id }
-    //, 
-    //                            { name: 'attr10Id', value: input.attr10Id }
-    //, 
-    //                            { name: 'attr11Id', value: input.attr11Id }
-    //, 
-    //                            { name: 'attr12Id', value: input.attr12Id }
-    //, 
-    //                            { name: 'attr13Id', value: input.attr13Id }
-    //, 
-    //                            { name: 'attr14Id', value: input.attr14Id }
-    //, 
-    //                            { name: 'attr15Id', value: input.attr15Id }
-    //, 
-    //                            { name: 'attr16Id', value: input.attr16Id }
-    //, 
-    //                            { name: 'attr17Id', value: input.attr17Id }
-    //, 
-    //                            { name: 'attr18Id', value: input.attr18Id }
-    //, 
-    //                            { name: 'attr19Id', value: input.attr19Id }
-    //                            ]);
-
-    //                    var downloadWindow = window.open(url, '_blank');
-    //                    downloadWindow.focus();
-    //            }
-    //        )
-    //    });
-
-    //    $('#AdvancedFilterSectionToggler').on('click', function (e) {
-    //        $('#AdvancedFilterSection').toggle();
-    //    });
-
-    //    $('#AdvancedFilterSection').on('keypress', function (e) {
-    //        if (e.which === 13) {
-    //            dataTable.ajax.reload();
-    //        }
-    //    });
-
-    //    $('#AdvancedFilterSection select').change(function() {
-    //        dataTable.ajax.reload();
-    //    });
-
-
+    function isNotEmpty(value) {
+        return value !== undefined && value !== null && value !== '';
+    }
 });

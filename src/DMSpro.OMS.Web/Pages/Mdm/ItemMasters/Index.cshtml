@@ -41,7 +41,7 @@
                     <abp-card-body>
                         <abp-row>
                             <div style="padding-left:12px" class="buttons-header-grid">
-                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.GeoMasters.Create))
+                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.ItemMasters.Create))
                                 {
                                     <button id="NewItemMasterButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
                                         <i class="fa fa-plus"></i> <span>@L["Button.New.ItemMaster"].Value</span>
@@ -57,7 +57,7 @@
                                     <div class="dx-texteditor-container">
                                         <div class="dx-texteditor-input-container">
                                             <div class="dx-icon dx-icon-search"></div>
-                                            <input autocomplete="off" aria-label="Search in the data grid" class="dx-texteditor-input" type="text" spellcheck="false" tabindex="0" role="textbox">
+                                            <input id="Search" autocomplete="off" aria-label="Search in the data grid" class="dx-texteditor-input" type="text" spellcheck="false" tabindex="0" role="textbox">
                                         </div>
                                         <div class="dx-texteditor-buttons-container">
                                             <span class="dx-clear-button-area"><span class="dx-icon dx-icon-clear"></span></span>
@@ -67,7 +67,6 @@
                             </div>
                         </abp-row>
                         <div class="dx-viewport">
-                            <div id="dataTreeContainer"></div>
                             <div id="dataGridItemMasters"></div>
                         </div>
                     </abp-card-body>
@@ -76,3 +75,9 @@
         </div>
     </div>
 </div>
+
+<style>
+    .dx-tabpanel-container {
+        padding-bottom: 20px !important;
+    }
+</style>

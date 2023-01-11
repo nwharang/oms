@@ -97,11 +97,11 @@
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             },
-            //popup: {
-            //    title: l("Page.Title.CustomerProfiles"),
-            //    showTitle: true,
-            //    height: 900
-            //},
+            popup: {
+                title: l("Page.Title.CustomerProfiles"),
+                showTitle: true,
+                height: 760
+            },
             form: {
                 colCount: 1,
                 items: [{
@@ -120,7 +120,7 @@
                         tabs: [{
                             title: 'IMAGE',
                             template: function (itemData, itemIndex, element) {
-                                const formDiv = $("<div style='padding:15px'>")
+                                const formDiv = $("<div style='padding:15px; min-height: 320px;'>")
                                 formDiv.dxForm({
                                     formData: {
                                         isActive: true,
@@ -128,10 +128,12 @@
                                         url: "https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_960_720.jpg",
                                         createDate: new Date()
                                     },
-                                    colCount: 2,
+                                    colCount: 3,
                                     items: [
                                         {
                                             itemType: "group",
+                                            colSpan: 2,
+                                            colCount: 1,
                                             items: [{
                                                 dataField: "url",
                                                 caption: "",
@@ -145,6 +147,7 @@
                                         },
                                         {
                                             itemType: "group",
+                                            colSpan: 1,
                                             items: ["isActive", "isAvatar", "createDate"]
                                         }]
                                 });
@@ -152,93 +155,110 @@
                             }
                         }, {
                             title: 'ADDRESS',
-                            colCount: 2,
-                            colSpan: 2,
-                            items: [
-                                {
-                                    itemType: "group",
-                                    items: [{
-                                        dataField: "GeoMaster0Id",
-                                        label: { text: "Country" },
-                                        editorType: "dxSelectBox",
-                                        editorOptions: {
-                                            dataSource: geoMaster,
-                                            displayExpr: "name",
-                                            valueExpr: "code",
-                                        }
-                                    }, {
-                                        dataField: "GeoMaster1Id",
-                                        label: { text: "Area" },
-                                        editorType: "dxSelectBox",
-                                        editorOptions: {
-                                            dataSource: geoMaster,
-                                            displayExpr: "name",
-                                            valueExpr: "code",
-                                        }
-                                    }, {
-                                        dataField: "GeoMaster2Id",
-                                        label: { text: "Province" },
-                                        editorType: "dxSelectBox",
-                                        editorOptions: {
-                                            dataSource: geoMaster,
-                                            displayExpr: "name",
-                                            valueExpr: "code",
-                                        }
-                                    }, {
-                                        dataField: "GeoMaster3Id",
-                                        label: {
-                                            text: "District"
-                                        },
-                                        editorType: "dxSelectBox",
-                                        editorOptions: {
-                                            dataSource: geoMaster,
-                                            displayExpr: "name",
-                                            valueExpr: "code",
-                                        }
-                                    }, {
-                                        dataField: "GeoMaster4Id",
-                                        label: {
-                                            text: "Ward"
-                                        },
-                                        editorType: "dxSelectBox",
-                                        editorOptions: {
-                                            dataSource: geoMaster,
-                                            displayExpr: "name",
-                                            valueExpr: "code",
-                                        }
-                                    }, "street", "address", "latitude", "longitude"]
-                                },
-                                {
-                                    itemType: "group",
-                                    items: [{
-                                        template: function (data, itemElement) {
-                                            const mapsDiv = $("<div style='padding:15px'>")
-                                            mapsDiv.dxMap({
-                                                center: { lat: cusAddress.latitude, lng: cusAddress.longitude },
-                                                controls: true,
-                                                zoom: 14,
-                                                height: 380,
-                                                width: '100%',
-                                                provider: 'google',
-                                                apiKey: {
-                                                    // Specify your API keys for each map provider:
-                                                    // bing: "YOUR_BING_MAPS_API_KEY",
-                                                    // google: "YOUR_GOOGLE_MAPS_API_KEY",
-                                                    // googleStatic: "YOUR_GOOGLE_STATIC_MAPS_API_KEY"
+                            template: function (itemData, itemIndex, element) {
+                                const formDiv = $("<div style='padding:15px; min-height: 320px;'>")
+                                formDiv.dxForm({
+                                    formData: {
+                                        GeoMaster0Id: 'VN',
+                                        GeoMaster1Id: 'MT',
+                                        GeoMaster2Id: 'QN',
+                                        GeoMaster3Id: 'DB',
+                                        GeoMaster4Id: 'DNT',
+                                        street: '897 Trần Thủ Độ',
+                                        address: '897',
+                                        latitude: '',
+                                        longitude: ''
+                                    },
+                                    colCount: 2,
+                                    items: [
+                                        {
+                                            itemType: "group",
+                                            items: [{
+                                                dataField: "GeoMaster0Id",
+                                                label: { text: "Country" },
+                                                editorType: "dxSelectBox",
+                                                editorOptions: {
+                                                    dataSource: geoMaster,
+                                                    displayExpr: "name",
+                                                    valueExpr: "code",
+                                                }
+                                            }, {
+                                                dataField: "GeoMaster1Id",
+                                                label: { text: "Area" },
+                                                editorType: "dxSelectBox",
+                                                editorOptions: {
+                                                    dataSource: geoMaster,
+                                                    displayExpr: "name",
+                                                    valueExpr: "code",
+                                                }
+                                            }, {
+                                                dataField: "GeoMaster2Id",
+                                                label: { text: "Province" },
+                                                editorType: "dxSelectBox",
+                                                editorOptions: {
+                                                    dataSource: geoMaster,
+                                                    displayExpr: "name",
+                                                    valueExpr: "code",
+                                                }
+                                            }, {
+                                                dataField: "GeoMaster3Id",
+                                                label: {
+                                                    text: "District"
                                                 },
-                                            });
-                                            mapsDiv.appendTo(itemElement);
-                                        }
-                                    }]
-                                }],
+                                                editorType: "dxSelectBox",
+                                                editorOptions: {
+                                                    dataSource: geoMaster,
+                                                    displayExpr: "name",
+                                                    valueExpr: "code",
+                                                }
+                                            }, {
+                                                dataField: "GeoMaster4Id",
+                                                label: {
+                                                    text: "Ward"
+                                                },
+                                                editorType: "dxSelectBox",
+                                                editorOptions: {
+                                                    dataSource: geoMaster,
+                                                    displayExpr: "name",
+                                                    valueExpr: "code",
+                                                }
+                                            }, "street", "address", "latitude", "longitude"]
+                                        },
+                                        {
+                                            itemType: "group",
+                                            items: [{
+                                                template: function (data, itemElement) {
+                                                    const mapsDiv = $("<div style='padding:15px; min-height: 320px;'>")
+                                                    mapsDiv.dxMap({
+                                                        center: { lat: cusAddress.latitude, lng: cusAddress.longitude },
+                                                        controls: true,
+                                                        zoom: 14,
+                                                        height: 380,
+                                                        width: '100%',
+                                                        provider: 'google',
+                                                        apiKey: {
+                                                            // Specify your API keys for each map provider:
+                                                            // bing: "YOUR_BING_MAPS_API_KEY",
+                                                            // google: "YOUR_GOOGLE_MAPS_API_KEY",
+                                                            // googleStatic: "YOUR_GOOGLE_STATIC_MAPS_API_KEY"
+                                                        },
+                                                    });
+                                                    mapsDiv.appendTo(itemElement);
+                                                }
+                                            }]
+                                        }],
+                                });
+                                formDiv.appendTo(element);
+                            },
                         }, {
                             title: 'ATTRIBUTE',
                             colCount: 2,
+                            cssClass: 'cusTab',
                             items: ["attribute00", "attribute01", "attribute02", "attribute03", "attribute04", "attribute05", "attribute06", "attribute07", "attribute08", "attribute09"]
                         }, {
                             title: 'CONTACT',
                             template: function (itemData, itemIndex, element) {
-                                const formDiv = $("<div style='padding:15px'>")
+                                const formDiv = $("<div style='padding:15px; min-height: 320px;'>")
                                 formDiv.dxForm({
                                     formData: cusContact,
                                     colCount: 5,
@@ -281,7 +301,7 @@
                         }, {
                             title: 'ATTACHMENT',
                             template: function (itemData, itemIndex, element) {
-                                const gridDiv = $("<div style='padding:15px'>")
+                                const gridDiv = $("<div style='padding:15px; min-height: 320px;'>")
                                 gridDiv.dxDataGrid({
                                     dataSource: cusAssigments,
                                     keyExpr: "id",
@@ -356,12 +376,7 @@
             },
         },
         onRowUpdating: function (e) {
-            var objectRequire = ["attrNo", "attrName", "active", "hierarchyLevel"];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            e.newData = Object.assign({}, e.oldData, e.newData);
         },
         remoteOperations: true,
         showBorders: true,
@@ -885,11 +900,15 @@
     var geoMaster = [
         {
             code: "VN",
-            name: "Viet Nam"
+            name: "Việt Nam"
+        },
+        {
+            code: "MT",
+            name: "Miền Trung"
         },
         {
             code: "QN",
-            name: "Quang Nam"
+            name: "Quảng Nam"
         },
         {
             code: "DB",

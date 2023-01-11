@@ -59,7 +59,6 @@
             });
             companyService.getListDevextremes(args)
                 .done(result => {
-                    console.log('data ne: ', result);
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -246,12 +245,13 @@
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ["code", "name", "street", "address"];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            //var objectRequire = ["code", "name", "street", "address"];
+            //for (var property in e.oldData) {
+            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+            //        e.newData[property] = e.oldData[property];
+            //    }
+            //}
+            e.newData = Object.assign({}, e.oldData, e.newData);
         },
         onRowInserting: function (e) {
             // for create first data - if parentId = 0, update parentId = null
@@ -282,7 +282,7 @@
             },
             {
                 dataField: "geoLevel0Id",
-                caption: l1("CompanyProfile.geoLevel0Id"),
+                caption: l1("GeoLevel0Name"),
                 width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel0Id = value;
@@ -301,7 +301,7 @@
             },
             {
                 dataField: "geoLevel1Id",
-                caption: l1("CompanyProfile.geoLevel1Id"),
+                caption: l1("GeoLevel1Name"),
                 width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel1Id = value;
@@ -322,7 +322,7 @@
             },
             {
                 dataField: "geoLevel2Id",
-                caption: l1("CompanyProfile.geoLevel2Id"),
+                caption: l1("GeoLevel2Name"),
                 width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel2Id = value;
@@ -342,7 +342,7 @@
             },
             {
                 dataField: "geoLevel3Id",
-                caption: l1("CompanyProfile.geoLevel3Id"),
+                caption: l1("GeoLevel3Name"),
                 width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel3Id = value;
@@ -361,7 +361,7 @@
             },
             {
                 dataField: "geoLevel4Id",
-                caption: l1("CompanyProfile.geoLevel4Id"),
+                caption: l1("GeoLevel4Name"),
                 width: 110,
                 lookup: {
                     dataSource(options) {

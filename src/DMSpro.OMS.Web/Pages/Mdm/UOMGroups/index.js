@@ -6,6 +6,8 @@ $(function () {
     var uomGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail;
     var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 
+    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+
     // custom store
     var groupStore = new DevExpress.data.CustomStore({
         key: "id",
@@ -13,22 +15,11 @@ $(function () {
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            const args2 = { 'loadOptions': args };
             uomGroupService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -66,22 +57,11 @@ $(function () {
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            const args2 = { 'loadOptions': args };
             uomGroupDetailService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -112,49 +92,24 @@ $(function () {
         }
     });
 
-    var uomStore = new DevExpress.data.CustomStore({
-        key: "id",
-        loadMode: 'raw',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            const args2 = { 'loadOptions': args };
-            uomService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            uomService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                })
-            return d.promise();
+    // get UOMs lookup
+    var uoms = [];
+    var urlUOMsLookup = abp.appPath + 'api/mdm-service/u-oMGroup-details/u-oM-lookup' +
+        abp.utils.buildQueryString([
+            { name: 'maxResultCount', value: 1000 }
+        ]);
+    $.ajax({
+        url: `${urlUOMsLookup}`,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            console.log('data call geoList ajax: ', data);
+            uoms = data.items;
         }
     });
+    var getUOMs = function () {
+        return uoms;
+    }
 
     const dataGrid = $('#gridUOMGroups').dxDataGrid({
         dataSource: groupStore,
@@ -307,14 +262,11 @@ $(function () {
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:AltUomCode"),
                                 dataField: "altUOMId",
-                                lookup:
-                                {
-                                    dataSource:
-                                    {
-                                        store: uomStore,
-                                    },
+                                editorType: 'dxSelectBox',
+                                lookup: {
+                                    dataSource: getUOMs,
                                     valueExpr: 'id',
-                                    displayExpr: 'code',
+                                    displayExpr: 'displayName'
                                 }
                             },
                             {
@@ -324,19 +276,24 @@ $(function () {
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:BaseUomCode"),
                                 dataField: "baseUOMId",
-                                lookup:
-                                {
-                                    dataSource:
-                                    {
-                                        store: uomStore,
-                                    },
+                                editorType: 'dxSelectBox',
+                                lookup: {
+                                    dataSource: getUOMs,
                                     valueExpr: 'id',
-                                    displayExpr: 'code',
+                                    displayExpr: 'displayName'
                                 }
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:Active"),
-                                dataField: "active"
+                                dataField: "active",
+                                width: 110,
+                                alignment: 'center',
+                                dataType: 'boolean',
+                                cellTemplate(container, options) {
+                                    $('<div>')
+                                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                                        .appendTo(container);
+                                }
                             }
                         ]
                     }).appendTo(container);
@@ -346,6 +303,10 @@ $(function () {
 
     $("#NewUOMGroup").click(function () {
         dataGrid.addRow();
+    });
+
+    $("input#Search").on("input", function () {
+        dataGrid.searchByText($(this).val());
     });
 
     $("#ExportToExcelButton").click(function (e) {

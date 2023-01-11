@@ -4,6 +4,7 @@
     // load mdmService
     var uOMsService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 
+    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
     // custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
@@ -11,22 +12,11 @@
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            const args2 = { 'loadOptions': args };
             uOMsService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -147,6 +137,10 @@
         gridUOMs.addRow();
     });
 
+    $("input#Search").on("input", function () {
+        gridUOMs.searchByText($(this).val());
+    });
+
     $("#ExportToExcelButton").click(function (e) {
         e.preventDefault();
 
@@ -161,4 +155,8 @@
             }
         )
     });
+
+    function isNotEmpty(value) {
+        return value !== undefined && value !== null && value !== '';
+    }
 });

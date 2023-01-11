@@ -3,8 +3,8 @@ $(function () {
     var l = abp.localization.getResource("MdmService");
     // load mdmService
     var productAttrValueService = window.dMSpro.oMS.mdmService.controllers.prodAttributeValues.prodAttributeValue;
-    var productAttrService = window.dMSpro.oMS.mdmService.controllers.productAttributes.productAttribute;
 
+    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
     //Custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
@@ -12,22 +12,11 @@ $(function () {
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            const args2 = { 'loadOptions': args };
             productAttrValueService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -59,108 +48,44 @@ $(function () {
         }
     });
 
-    var lookupStore = new DevExpress.data.CustomStore({
-        key: "id",
-        loadMode: 'raw',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            const args2 = { 'loadOptions': args };
-            productAttrService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            productAttrValueService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                })
-            return d.promise();
+    // get product attribute
+    var productAttr = [];
+    var urlProductAttrLookup = abp.appPath + 'api/mdm-service/prod-attribute-values/product-attribute-lookup' +
+        abp.utils.buildQueryString([
+            { name: 'maxResultCount', value: 1000 }
+        ]);
+    $.ajax({
+        url: `${urlProductAttrLookup}`,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            console.log('data call geoList ajax: ', data);
+            productAttr = data.items;
         }
     });
+    var getProductAttr = function () {
+        return productAttr;
+    }
 
-    //const data = [
-    //    {
-    //        ID: 1,
-    //        Name: 'FMCG',
-    //        AttrNo: 1,
+    // get Product Attr Value
+    var productAttrValue = [];
+    var urlProductAttrValLookup = abp.appPath + 'api/mdm-service/prod-attribute-values/prod-attribute-value-lookup' +
+        abp.utils.buildQueryString([
+            { name: 'maxResultCount', value: 1000 }
+        ]);
+    $.ajax({
+        url: `${urlProductAttrValLookup}`,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            console.log('data call geoList ajax: ', data);
+            productAttrValue = data.items;
+        }
+    });
+    var getProductAttrValue = function () {
+        return productAttrValue;
+    }
 
-    //        Inactive: true,
-    //    },
-    //    {
-    //        ID: 2,
-    //        Name: 'FnB',
-    //        AttrNo: 1,
-
-    //        Inactive: true,
-    //    },
-    //    {
-    //        ID: 3,
-    //        Name: 'Food',
-    //        AttrNo: 2,
-
-    //        Inactive: true,
-    //    },
-    //    {
-    //        ID: 4,
-    //        Name: 'Beverage',
-    //        AttrNo: 2,
-
-    //        Inactive: true,
-    //    },
-    //];
-
-    //const AttrNo = [
-    //    {
-    //        ID: 1,
-    //        Name: 'Category',
-    //    },
-    //    {
-    //        ID: 2,
-    //        Name: 'Sub-Category',
-    //    },
-    //    {
-    //        ID: 3,
-    //        Name: 'Attribute 2',
-    //    },
-    //    {
-    //        ID: 4,
-    //        Name: 'Attribute 3',
-    //    },
-    //    {
-    //        ID: 5,
-    //        Name: 'Attribute 4',
-    //    },
-    //    {
-    //        ID: 6,
-    //        Name: 'Attribute 6',
-    //    },
-
-    //];
 
     const dataTreeContainer = $('#treeProdAttributeValue').dxTreeList({
         dataSource: customStore,
@@ -255,28 +180,21 @@ $(function () {
             {
                 dataField: 'prodAttributeId',
                 caption: l("EntityFieldName:MDMService:ProdAttributeValue:ProdAttributeId"),
-                lookup:
-                {
-                    dataSource:
-                    {
-                        store: lookupStore,
-                    },
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getProductAttr,
                     valueExpr: 'id',
-                    displayExpr: 'attrName',
+                    displayExpr: 'displayName'
                 }
             },
             {
                 caption: l("EntityFieldName:MDMService:ProdAttributeValue:ParentProdAttributeValueId"),
                 dataField: 'parentProdAttributeValueId',
+                editorType: 'dxSelectBox',
                 lookup: {
-                    dataSource(options) {
-                        return {
-                            store: customStore,
-                            filter: options.data ? ["!", ["attrValName", "=", options.data.name]] : null,
-                        };
-                    },
-                    displayExpr: 'attrValName',
+                    dataSource: getProductAttrValue,
                     valueExpr: 'id',
+                    displayExpr: 'displayName'
                 }
             }
         ]
@@ -284,6 +202,10 @@ $(function () {
 
     $("#NewProductAttrValueButton").click(function () {
         dataTreeContainer.addRow();
+    });
+
+    $("input#Search").on("input", function () {
+        dataTreeContainer.searchByText($(this).val());
     });
 
     $("#ExportToExcelButton").click(function (e) {
@@ -301,4 +223,8 @@ $(function () {
             }
         )
     });
+
+    function isNotEmpty(value) {
+        return value !== undefined && value !== null && value !== '';
+    }
 });
