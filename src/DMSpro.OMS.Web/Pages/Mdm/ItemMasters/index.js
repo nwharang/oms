@@ -495,9 +495,9 @@
                 caption: l("EntityFieldName:MDMService:ItemMaster:ItemTypeName"),
                 editorType: 'dxSelectBox',
                 lookup: {
-                    dataSource: customItemType,
+                    dataSource: getItemTypes,
                     valueExpr: 'id',
-                    displayExpr: 'valueName'
+                    displayExpr: 'displayName'
                 }
             },
             {
