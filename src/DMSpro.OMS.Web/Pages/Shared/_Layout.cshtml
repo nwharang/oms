@@ -32,6 +32,7 @@
 @inject ITenantResolveResultAccessor TenantResolveResultAccessor
 @inject IOptions<AbpMultiTenancyOptions> MultiTenancyOptions
 @inject ICurrentTenant CurrentTenant
+@inject ICurrentUser CurrentUser
 @using DMSpro.OMS.MdmService.Localization
 @inject IHtmlLocalizer<MdmServiceResource> L
 
@@ -1658,8 +1659,8 @@
                                                 <img src="/dmstheme/img/demo/avatars/avatar-admin.png" class="rounded-circle profile-image" alt="Administrator">
                                             </span>
                                             <div class="info-card-text">
-                                                <div class="fs-lg text-truncate text-truncate-lg">Administrator</div>
-                                                <span class="text-truncate text-truncate-md opacity-80">admin@joytiny.net</span>
+                                                <div class="fs-lg text-truncate text-truncate-lg">@(CurrentUser.UserName)</div>
+                                                <span class="text-truncate text-truncate-md opacity-80">@(CurrentUser.Email)</span>
                                             </div>
                                         </div>
                                     </div>
