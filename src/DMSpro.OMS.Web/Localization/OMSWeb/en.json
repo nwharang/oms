@@ -9,6 +9,19 @@
     "NoData": "No data to display",
     "Button.Save": "Save",
     "Button.Close": "Close",
-    "Button.Cancel": "Cancel"
+    "Button.Cancel": "Cancel",
+    "SalesOrgHierarchies.Context.Edit": "Edit",
+    "SalesOrgHierarchies.Context.AddSub": "Add sub org hierarchy",
+    "SalesOrgHierarchies.Context.Delete": "Delete",
+    "GeoLevel0Name": "Country",
+    "GeoLevel1Name": "Area",
+    "GeoLevel2Name": "Province",
+    "GeoLevel3Name": "District",
+    "GeoLevel4Name": "Ward",
+    "PriceListName": "Price List Name",
+    "CustomerAttribute.Code": "Attribute Code",
+    "CustomerAttribute.Name": "Attribute Name",
+    "CustomerAttribute.Active": "Active",
+    "CustomerAttribute.HierarchyLevel": "Hierarchy Level"
   }
 }

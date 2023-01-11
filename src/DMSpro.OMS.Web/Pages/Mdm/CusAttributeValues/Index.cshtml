@@ -25,9 +25,9 @@
 @section breadcrumb
     {
     <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="javascript:void(0);">MDM</a></li>
-        <li class="breadcrumb-item">Product</li>
-        <li class="breadcrumb-item active">@L["Page.Title.ProductHierarcies"].Value</li>
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
+        <li class="breadcrumb-item">@L["Menu:MdmService:Customer"].Value</li>
+        <li class="breadcrumb-item active">@L["Page.Title.CusAttributeValues"].Value</li>
     </ol>
 
     }
@@ -35,7 +35,7 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fal fa-credit-card-front"></i> Product <span class="fw-300">Hierarchies</span>
+                <i class="subheader-icon fal fa-credit-card-front"></i> @L["Page.Title.CusAttributeValues"].Value</span>
             </h2>
         </div>
         <div class="panel-container show">
@@ -44,7 +44,7 @@
                     <abp-card-body>
                         <abp-row>
                             <div style="padding-left:12px" class="buttons-header-grid">
-                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.CusAttributeValues.Create))
+                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.CustomerAttributes.Create))
                                 {
                                     <button id="btnNewCusAttributeValue" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
                                         <i class="fa fa-plus"></i> <span>@L["Button.New.CusAttributeValue"].Value</span>
@@ -78,22 +78,3 @@
         </div>
     </div>
 </div>
-
-@*<abp-card>
-    <abp-card-body>
-        <abp-row>
-            <div style="padding-left:12px">
-                <abp-button id="ExportToExcelButton" text="@L["ExportToExcel"].Value" icon="download" size="Small" button-type="Primary" />
-                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.ProductHierarchies.Create))
-                {
-                    <abp-button id="NewProductHierarchyButton" text="@L["Button.New.ProductHierarchy"].Value" icon="plus" size="Small" button-type="Primary" />
-                }
-            </div>
-        </abp-row>
-
-        <div class="dx-viewport">
-            <div id="treeListProductHierarchies"></div>
-        </div>
-
-    </abp-card-body>
-</abp-card>*@

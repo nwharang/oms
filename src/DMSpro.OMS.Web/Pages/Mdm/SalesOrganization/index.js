@@ -1,16 +1,13 @@
 $(function () {
     var l = abp.localization.getResource("MdmService");
+    var l1 = abp.localization.getResource("OMSWeb");
     var salesOrgHeaderService = window.dMSpro.oMS.mdmService.controllers.salesOrgHeaders.salesOrgHeader;
     var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
     var salesOrgEmpAssignmentService = window.dMSpro.oMS.mdmService.controllers.salesOrgEmpAssignments.salesOrgEmpAssignment;
     var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
 
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-    const menuItems = [
-        { id: '1', text: 'Edit' },
-        { id: '2', text: 'Add sub Org Hierarchy' },
-        { id: '3', text: 'Delete' }
-    ];
+    const menuItems = [{ id: '1', text: l1('SalesOrgHierarchies.Context.Edit') }, { id: '2', text: l1('SalesOrgHierarchies.Context.AddSub') }, { id: '3', text: l1('SalesOrgHierarchies.Context.Delete') }];
 
     var stateMode = "home"; //value: home || add || edit; default: home
     var salesOrgHeaderIdFilter = null;
@@ -187,7 +184,7 @@ $(function () {
                 type: 'normal',
                 stylingMode: 'text',
                 onClick() {
-                    salesOrgHeaderCode.option({ minSearchLength:0, opened: true });
+                    salesOrgHeaderCode.option({ minSearchLength: 0, opened: true });
                 },
             },
         }],
@@ -200,8 +197,10 @@ $(function () {
 
                         //load data for Sales Org Hierarchy
                         salesOrgHeaderIdFilter = result.id;
-                        dataTreeContainer.refresh();
-                        dataTreeContainer.option({ focusedRowIndex: 0 })
+                        dataTreeContainer.refresh().done(() => {
+                            //re-focused the first row
+                            dataTreeContainer.option({ focusedRowKey: null, focusedRowIndex: 0 });
+                        });
 
                         //clear data for Sales Org Employee Assignment
                         salesOrgHierarchyIdFilter = null;
@@ -212,25 +211,14 @@ $(function () {
 
                         //set button name - Active
                         if (result.active) {
-                            $("#btnActive").html(l('EntityFieldValue:MDMService:SalesOrgHeader:Active:False'));
+                            $("#btnSalesOrgHeaderActive").html(l('EntityFieldValue:MDMService:SalesOrgHeader:Active:True'));
                         } else {
-                            $("#btnActive").html(l('EntityFieldValue:MDMService:SalesOrgHeader:Active:True'));
+                            $("#btnSalesOrgHeaderActive").html(l('EntityFieldValue:MDMService:SalesOrgHeader:Active:False'));
                         }
                     });
             } else {
                 //change state to home
-                CheckState('home');
-
-                //clear data for Sales Org Hierarchy
-                salesOrgHeaderIdFilter = null;
-                dataTreeContainer.refresh();
-
-                //clear data for Sales Org Employee Assignment
-                salesOrgHierarchyIdFilter = null;
-                dataGridContainer.refresh();
-
-                //clear textbox value - Name
-                salesOrgHeaderName.reset();
+                //CheckState('home');
             }
         },
     }).dxAutocomplete("instance");
@@ -317,11 +305,12 @@ $(function () {
             salesOrgHierarchyIdFilter = dataTreeContainer.option("focusedRowKey");
             dataGridContainer.refresh();
         },
-        onSaved() {
-            UpdateDetailButton();
+        onSaved(e) {
+            e.component.option({ focusedRowKey: null });
+            UpdateButton();
         },
         onContentReady() {
-            UpdateDetailButton();
+            UpdateButton();
         },
         toolbar: {
             items: [
@@ -496,7 +485,6 @@ $(function () {
     $("#NewSalesOrgButton").click(function (e) {
         e.preventDefault();
         CheckState('add');
-        UpdateDetailButton();
     });
 
     $("#SaveButton").click(function (e) {
@@ -521,11 +509,18 @@ $(function () {
             salesOrgHeaderService.create(orgHeaderValue, { contentType: "application/json" })
                 .done(result => {
                     abp.message.success(l('Congratulations'));
+                    salesOrgHeaderIdFilter = result.id;
+                    salesOrgHeaderCode.getDataSource().reload();
+                    UpdateButton();
                     CheckState('edit');
                 })
-                .fail(() => { LoadingButton("SaveButton", false); });
-        } else if (stateMode == "edit") {
-            console.log('edit');
+                .fail(() => { });
+        } else if (stateMode == "edit" && salesOrgHeaderIdFilter != null) {
+            salesOrgHeaderService.update(salesOrgHeaderIdFilter, orgHeaderValue, { contentType: "application/json" })
+                .done(result => {
+                    abp.message.success(l('Congratulations'));
+                    salesOrgHeaderCode.getDataSource().reload();
+                });
         }
     });
 
@@ -544,6 +539,32 @@ $(function () {
         dataGridContainer.addRow();
     });
 
+    $("#btnSalesOrgHeaderActive").click(function (e) {
+        e.preventDefault();
+
+        abp.message.confirm().then(function (confirmed) {
+            if (confirmed && salesOrgHeaderIdFilter != null) {
+                salesOrgHeaderService.get(salesOrgHeaderIdFilter)
+                    .done(data => {
+                        var orgHeaderValue = {
+                            code: data.code,
+                            name: data.name,
+                            active: !data.active
+                        };
+                        salesOrgHeaderService.update(salesOrgHeaderIdFilter, orgHeaderValue, { contentType: "application/json" })
+                            .done(result => {
+                                abp.message.success(l('Congratulations'));
+                                if (result.active) {
+                                    $("#btnSalesOrgHeaderActive").html(l('EntityFieldValue:MDMService:SalesOrgHeader:Active:True'));
+                                } else {
+                                    $("#btnSalesOrgHeaderActive").html(l('EntityFieldValue:MDMService:SalesOrgHeader:Active:False'));
+                                }
+                            });
+                    });
+            }
+        });
+    });
+
     /****function*****/
     function isNotEmpty(value) {
         return value !== undefined && value !== null && value !== '';
@@ -553,20 +574,16 @@ $(function () {
         stateMode = state;
         switch (stateMode) {
             case 'home': {
-                salesOrgHeaderCode.reset();
-                salesOrgHeaderCode.getButton("btnSearch").option("visible", true);
-                salesOrgHeaderCode.option('isValid', true);
-                salesOrgHeaderName.reset();
+                ResetControl();
+
                 $("#NewSalesOrgButton").prop('disabled', false);
                 $("#SaveButton, #CancelButton").prop('disabled', true);
                 //$("#NewSalesOrgHierarchyButton,#NewSalesOrgEmpAssignmentButton").prop('disabled', false);
                 break;
             }
             case 'add': {
-                salesOrgHeaderCode.reset();
-                salesOrgHeaderCode.getButton("btnSearch").option("visible", false);
-                salesOrgHeaderCode.option('isValid', true);
-                salesOrgHeaderName.reset();
+                ResetControl();
+
                 $("#NewSalesOrgButton").prop('disabled', true);
                 $("#SaveButton, #CancelButton").prop('disabled', false);
                 //$("#NewSalesOrgHierarchyButton,#NewSalesOrgEmpAssignmentButton").prop('disabled', true);
@@ -574,8 +591,7 @@ $(function () {
             }
             case 'edit': {
                 salesOrgHeaderCode.getButton("btnSearch").option("visible", true);
-                //$("#NewSalesOrgButton").prop('disabled', true);
-                $("#SaveButton, #CancelButton").prop('disabled', false);
+                $("#NewSalesOrgButton, #SaveButton, #CancelButton").prop('disabled', false);
                 break;
             }
             default:
@@ -583,9 +599,7 @@ $(function () {
         }
     }
 
-    function UpdateDetailButton() {
-        //disable NewSalesOrgHierarchyButton if Sales Org Header have data
-        //disable NewSalesOrgEmpAssignmentButton if Sales Org Hierarchy have't data
+    function UpdateButton() {
         if ($('#dataTreeContainer span[class="dx-treelist-nodata"]').length == 0) {
             $("#NewSalesOrgHierarchyButton").prop('disabled', true);
             $("#NewSalesOrgEmpAssignmentButton").prop('disabled', false);
@@ -593,5 +607,35 @@ $(function () {
             $("#NewSalesOrgHierarchyButton").prop('disabled', false);
             $("#NewSalesOrgEmpAssignmentButton").prop('disabled', true);
         }
+
+        if (salesOrgHeaderIdFilter == null) {
+            $("#NewSalesOrgHierarchyButton").prop('disabled', true);
+            $("#btnSalesOrgHeaderActive").prop('disabled', true);
+        } else {
+            $("#btnSalesOrgHeaderActive").prop('disabled', false);
+        }
+
+
+    }
+
+    function ResetControl() {
+        //clear data for Sales Org Hierarchy
+        salesOrgHeaderIdFilter = null;
+        dataTreeContainer.refresh();
+
+        //clear data for Sales Org Employee Assignment
+        salesOrgHierarchyIdFilter = null;
+        dataGridContainer.refresh();
+
+        //clear textbox value - Name
+        salesOrgHeaderName.reset();
+
+        salesOrgHeaderCode.reset();
+        salesOrgHeaderCode.getButton("btnSearch").option("visible", true);
+        salesOrgHeaderCode.option('isValid', true);
+        salesOrgHeaderName.reset();
+
+        //reset active button
+        $("#btnSalesOrgHeaderActive").html(l('EntityFieldValue:MDMService:SalesOrgHeader:Active:True')).prop('disabled', true);
     }
 });

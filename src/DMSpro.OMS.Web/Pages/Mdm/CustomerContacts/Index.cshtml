@@ -22,7 +22,7 @@
 
 @*@section content_toolbar {
     <abp-button id="ExportToExcelButton" text="@L["ExportToExcel"].Value" icon="download" size="Small" button-type="Primary" />
-    @if (await Authorization.IsGrantedAsync(MdmServicePermissions.Customers.Create))
+    @if (await Authorization.IsGrantedAsync(MdmServicePermissions.CustomerContacts.Create))
     {
         <abp-button id="NewCustomerContactButton" text="@L["NewCustomerContact"].Value" icon="plus" size="Small" button-type="Primary" />
     }

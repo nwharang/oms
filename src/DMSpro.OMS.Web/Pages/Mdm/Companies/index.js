@@ -1,65 +1,49 @@
 ﻿$(function () {
     var l = abp.localization.getResource("MdmService");
+    var l1 = abp.localization.getResource("OMSWeb");
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+    var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
 
-    var geoList = [];
-
-    var url = abp.appPath + 'api/mdm-service/companies/geo-master-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    $.ajax({
-        url: `${url}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            console.log('data call geoList ajax: ', data);
-            geoList = data.items;
-        }
-    })
-
-    var getGEOLevel = function (level) {
-        //return geoList.filter(x => x.level === level);
-        return geoList;
-    };
+    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
-    //var lookupDataSource = {
-    //    store: new DevExpress.data.CustomStore({
-    //        key: "id",
-    //        load: function (loadOptions) {
-    //            var d = $.Deferred();
-    //            companyService.geoMasterLookup({
-    //                sort: loadOptions.sort ? JSON.stringify(loadOptions.sort) : "",
-    //                // skip: loadOptions.skip,
-    //                // take: loadOptions.take,
-    //                // filter: loadOptions.filter ? JSON.stringify(loadOptions.filter) : "",
-    //                // searchExpr: loadOptions.searchExpr ? JSON.stringify(loadOptions.searchExpr) : "",
-    //                // searchOperation: loadOptions.searchOperation,
-    //                // searchValue: loadOptions.searchValue,
-    //                // group: loadOptions.group ? JSON.stringify(loadOptions.group) : ""
-    //            })
-    //                .done(result => {
-    //                    console.log('data lookup ne: ', result);
-    //                    d.resolve(result.items);
-    //                });
-    //            return d.promise();
-    //        },
-    //        byKey: function (key) {
-    //            if (key == 0) return null;
 
-    //            var d = new $.Deferred();
-    //            companyService.get(key)
-    //                .done(data => {
-    //                    d.resolve(data);
-    //                });
-    //            return d.promise();
-    //        }
-    //    }),
-    //    sort: "displayName"
-    //}
+    var geoMasterStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        loadMode: "raw",
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const argsGeo = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            geoMasterService.getListDevextremes(argsGeo)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            geoMasterService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
 
     //Custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
@@ -68,25 +52,13 @@
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            const args2 = { "loadOptions": args };
             companyService.getListDevextremes(args)
                 .done(result => {
-                    console.log('data ne: ', result);
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -165,27 +137,35 @@
                         cssClass: "pl-5",
                     },
                     {
-                        dataField: "street",
+                        dataField: "geoLevel4Id",
                         cssClass: "pr-5",
+                    },
+                    {
+                        dataField: "street",
+                        cssClass: "pl-5",
                     },
                     {
                         dataField: "address",
-                        cssClass: "pl-5",
+                        cssClass: "pr-5",
                     },
                     {
                         dataField: "phone",
-                        cssClass: "pr-5",
-                    },
-                    {
-                        dataField: "license",
                         cssClass: "pl-5",
                     },
                     {
-                        dataField: "taxCode",
+                        dataField: "license",
                         cssClass: "pr-5",
                     },
                     {
+                        dataField: "taxCode",
+                        cssClass: "pl-5",
+                    },
+                    {
                         dataField: "erpCode",
+                        cssClass: "pr-5",
+                    },
+                    {
+                        dataField: "parentId",
                         cssClass: "pl-5",
                     },
                     {
@@ -227,10 +207,6 @@
                     {
                         dataField: "contactPhone",
                         cssClass: "pl-5",
-                    },
-                    {
-                        dataField: "parentId",
-                        cssClass: "pr-5",
                     }
                 ]
             },
@@ -268,6 +244,15 @@
                 e.editorOptions.value = '';
             }
         },
+        onRowUpdating: function (e) {
+            //var objectRequire = ["code", "name", "street", "address"];
+            //for (var property in e.oldData) {
+            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+            //        e.newData[property] = e.oldData[property];
+            //    }
+            //}
+            e.newData = Object.assign({}, e.oldData, e.newData);
+        },
         onRowInserting: function (e) {
             // for create first data - if parentId = 0, update parentId = null
             if (e.data && e.data.parentId == 0) {
@@ -297,57 +282,96 @@
             },
             {
                 dataField: "geoLevel0Id",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel0Id"),
+                caption: l1("GeoLevel0Name"),
                 width: 110,
+                setCellValue(rowData, value) {
+                    rowData.geoLevel0Id = value;
+                    rowData.geoLevel1Id = null;
+                },
                 lookup: {
-                    dataSource: getGEOLevel(0),
+                    dataSource(options) {
+                        return {
+                            store: geoMasterStore,
+                            filter: options.data ? ['level', '=', 0] : null,
+                        };
+                    },
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "name"
                 }
             },
             {
                 dataField: "geoLevel1Id",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel1Id"),
+                caption: l1("GeoLevel1Name"),
                 width: 110,
+                setCellValue(rowData, value) {
+                    rowData.geoLevel1Id = value;
+                    rowData.geoLevel2Id = null;
+                    rowData.geoLevel3Id = null;
+                    rowData.geoLevel4Id = null;
+                },
                 lookup: {
                     dataSource(options) {
                         return {
-                            store: getGEOLevel(1),
-                            //filter: options.data ? ['geoLevel0Id', '=', options.data.parentId] : null,
+                            store: geoMasterStore,
+                            filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : null,
                         };
                     },
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'name',
                 },
             },
             {
                 dataField: "geoLevel2Id",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel2Id"),
+                caption: l1("GeoLevel2Name"),
                 width: 110,
+                setCellValue(rowData, value) {
+                    rowData.geoLevel2Id = value;
+                    rowData.geoLevel3Id = null;
+                    rowData.geoLevel4Id = null;
+                },
                 lookup: {
                     dataSource(options) {
                         return {
-                            store: getGEOLevel(2),
-                            //filter: options.data ? ['geoLevel1Id', '=', options.data.parentId] : null,
+                            store: geoMasterStore,
+                            filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : null,
                         };
                     },
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'name',
                 },
             },
             {
                 dataField: "geoLevel3Id",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel3Id"),
+                caption: l1("GeoLevel3Name"),
+                width: 110,
+                setCellValue(rowData, value) {
+                    rowData.geoLevel3Id = value;
+                    rowData.geoLevel4Id = null;
+                },
+                lookup: {
+                    dataSource(options) {
+                        return {
+                            store: geoMasterStore,
+                            filter: options.data ? ['parentId', '=', options.data.geoLevel2Id] : null,
+                        };
+                    },
+                    valueExpr: 'id',
+                    displayExpr: 'name',
+                }
+            },
+            {
+                dataField: "geoLevel4Id",
+                caption: l1("GeoLevel4Name"),
                 width: 110,
                 lookup: {
                     dataSource(options) {
                         return {
-                            store: getGEOLevel(3),
-                            //filter: options.data ? ['geoLevel2Id', '=', options.data.parentId] : null,
+                            store: geoMasterStore,
+                            filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : null,
                         };
                     },
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'name',
                 }
             },
             {

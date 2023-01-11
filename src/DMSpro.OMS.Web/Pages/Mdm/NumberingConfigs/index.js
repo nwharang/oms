@@ -1,8 +1,13 @@
 $(function () {
+    // language
     var l = abp.localization.getResource("MdmService");
+    // load mdmService
     var numberingConfigService = window.dMSpro.oMS.mdmService.controllers.numberingConfigs.numberingConfig;
-    var customStore = new DevExpress.data.CustomStore({
-        key: 'ID',
+    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+
+    // custom store
+    var numberingConfigStore = new DevExpress.data.CustomStore({
+        key: 'id',
         loadMode: "raw",
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -22,22 +27,18 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-
             numberingConfigService.getListDevextremes(args)
                 .done(result => {
-                    debugger
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
                         groupCount: result.groupCount,
                     });
                 });
-
             return deferred.promise();
         },
         byKey: function (key) {
             if (key == 0) return null;
-
             var d = new $.Deferred();
             numberingConfigService.get(key)
                 .done(data => {
@@ -56,33 +57,54 @@ $(function () {
         }
     });
 
-    const data = [
-        {
-            ID: 1,
-            TenantId: 1,
-            CompanyId: "*",
-            ObjectId: 'CUS',
-            StartNumber: 1,
-            Prefix: 'KH (=> KH001)',
-            Suffix: '',
-            Lenght: 5
+    var companyStore = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'raw',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            [
+                'skip',
+                'take',
+                'requireTotalCount',
+                'requireGroupCount',
+                'sort',
+                'filter',
+                'totalSummary',
+                'group',
+                'groupSummary',
+            ].forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            const args2 = { 'loadOptions': args };
+            companyService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
         },
-        {
-            ID: 2,
-            TenantId: 3,
-            CompanyId: "OMS",
-            ObjectId: 'EMP',
-            StartNumber: 6,
-            Prefix: 'EM (=> EM000006)',
-            Suffix: '',
-            Lenght: 8
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            companyService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
         }
-    ];
+    });
 
-    var gridNumberingConfigs = $('#gridNumberingConfigs').dxDataGrid({
-        dataSource: data,
-
-        //remoteOperations: true,
+    var gridgridNumberingConfigs = $('#gridNumberingConfigs').dxDataGrid({
+        dataSource: numberingConfigStore,
+        keyExpr: 'id',
+        remoteOperations: true,
         showBorders: true,
         autoExpandAll: true,
         focusedRowEnabled: true,
@@ -98,17 +120,17 @@ $(function () {
             visible: true
         },
         scrolling: {
-            mode: 'standard',
+            mode: 'standard'
         },
         paging: {
             enabled: true,
             pageSize: 10
         },
         pager: {
+            visible: true,
             showPageSizeSelector: true,
             allowedPageSizes: [10, 20, 50, 100],
             showInfo: true,
-            visible: true,
             showNavigationButtons: true
         },
         editing: {
@@ -123,100 +145,84 @@ $(function () {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        onInitNewRow(e) {
-            e.data.CompanyId = '*';
-        },
-        editing: {
-            mode: 'popup',
-            allowUpdating: true,
-            allowDeleting: true,
-            useIcons: true,
-            popup: {
-                title: l("Page.Title.NumberingConfigs"),
-                showTitle: true,
-                width: 700,
-                height: 350
-            },
-            texts: {
-                editRow: l("Edit"),
-                deleteRow: l("Delete"),
-                confirmDeleteMessage: l("DeleteConfirmationMessage")
+        //onRowInserting: function (e) {
+        //    debugger
+        //    if (e.data && e.data.code == null) {
+        //        e.data.code = e.data.Code;
+        //    }
+        //},
+        onRowUpdating: function (e) {
+            var objectRequire = ['startNumber', 'length'];
+            for (var property in e.oldData) {
+                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+                    e.newData[property] = e.oldData[property];
+                }
             }
+        },
+        toolbar: {
+            items: [
+                {
+                    name: "searchPanel",
+                    location: 'after'
+                }
+            ]
         },
         columns: [
             {
                 type: 'buttons',
-                caption: l("Actions"),
+                caption: l('Actions'),
                 buttons: ['edit', 'delete'],
             },
             {
-                dataField: 'ID',
-                caption: 'ID'
-            }, {
-                dataField: 'TenantID',
-                caption: 'TenantID'
+                dataField: 'companyId',
+                caption: l("EntityFieldName:MDMService:NumberingConfig:CompanyName"),
+                lookup: {
+                    dataSource:
+                    {
+                        store: companyStore,
+                    },
+                    valueExpr: 'id',
+                    displayExpr: 'name'
+                }
             },
             {
-                dataField: 'CompanyId',
-                caption: l("EntityFieldName:MDMService:NumberingConfig:CompanyId")
-            }, {
-                dataField: 'ObjectId',
-                caption: l("EntityFieldName:MDMService:NumberingConfig:ObjectId")
-            }, {
-                dataField: 'StartNumber',
-                caption: l("EntityFieldName:MDMService:NumberingConfig:Numbnr")
-            }, {
-                dataField: 'Prefix',
-                caption: l("EntityFieldName:MDMService:NumberingConfig:Prefix")
-            }, {
-                dataField: 'Suffix',
-                caption: l("EntityFieldName:MDMService:NumberingConfig:Suffix")
+                dataField: 'startNumber',
+                caption: l("EntityFieldName:MDMService:NumberingConfig:Numbnr"),
+                dataType: 'number'
             },
             {
-                dataField: 'Lenght',
-                caption: l("EntityFieldName:MDMService:NumberingConfig:Length")
+                dataField: 'prefix',
+                caption: l("EntityFieldName:MDMService:NumberingConfig:Prefix"),
+                dataType: 'string'
+            },
+            //{
+            //    dataField: 'suffix',
+            //    caption: l("EntityFieldName:MDMService:NumberingConfig:Suffix"),
+            //    dataType: 'string'
+            //},
+            {
+                dataField: 'length',
+                caption: l("EntityFieldName:MDMService:NumberingConfig:Length"),
+                dataType: 'number'
             }
-        ],
-        onEditingStart(e) {
-            logEvent('EditingStart');
-        },
-        onRowInserting(e) {
-            logEvent('RowInserting');
-        },
-        onRowInserted(e) {
-            logEvent('RowInserted');
-        },
-        onRowUpdating(e) {
-            logEvent('RowUpdating');
-        },
-        onRowUpdated(e) {
-            logEvent('RowUpdated');
-        },
-        onRowRemoving(e) {
-            logEvent('RowRemoving');
-        },
-        onRowRemoved(e) {
-            logEvent('RowRemoved');
-        },
-        onSaving(e) {
-            logEvent('Saving');
-        },
-        onSaved(e) {
-            logEvent('Saved');
-        },
-        onEditCanceling(e) {
-            logEvent('EditCanceling');
-        },
-        onEditCanceled(e) {
-            logEvent('EditCanceled');
-        },
-    }).dxDataGrid("instance");
+        ]
+    }).dxDataGrid('instance');
 
-    function logEvent(eventName) {
-        console.log(eventName);
-    }
+    $("#NewNumberingConfigButton").click(function () {
+        gridgridNumberingConfigs.addRow();
+    });
 
-    $('#NewNumberingConfigButton').click(function () {
-        gridNumberingConfigs.addRow();
+    $("#ExportToExcelButton").click(function (e) {
+        e.preventDefault();
+
+        numberingConfigService.getDownloadToken().then(
+            function (result) {
+                var url = abp.appPath + 'api/mdm-service/numbering-configs/as-excel-file' + abp.utils.buildQueryString([
+                    { name: 'downloadToken', value: result.token }
+                ]);
+                var downloadWindow = window.open(url, '_blank');
+                downloadWindow.focus();
+            }
+        )
     });
 });

@@ -1,6 +1,6 @@
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    var cusAttributesValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributesValues.cusAttributesValue;
+    var cusAttributesValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
@@ -45,6 +45,7 @@ $(function () {
 
             cusAttributesValueService.getListDevextremes(args)
                 .done(result => {
+                    console.log('data:', result)
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -72,9 +73,9 @@ $(function () {
         keyExpr: "id",
         editing: {
             mode: "row",
-            allowAdding: abp.auth.isGranted('MdmService.CusAttributeValues.Create'),
-            allowUpdating: abp.auth.isGranted('MdmService.CusAttributeValues.Edit'),
-            allowDeleting: abp.auth.isGranted('MdmService.CusAttributeValues.Delete'),
+            allowAdding: abp.auth.isGranted('MdmService.CustomerAttributes.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.CustomerAttributes.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.CustomerAttributes.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -95,6 +96,12 @@ $(function () {
                     //e.cellElement.find(".dx-link-edit").remove();
                     e.cellElement.find(".dx-link-edit").disable();
                 }
+            }
+        },
+        onRowInserting: function (e) {
+            // for create first data - if parentId = 0, update parentId = null
+            if (e.data && e.data.parentCusAttributeValueId == 0) {
+                e.data.parentCusAttributeValueId = null;
             }
         },
         remoteOperations: true,
@@ -139,7 +146,7 @@ $(function () {
                 validationRules: [{ type: "required" }]
             },
             {
-                dataField: 'cusAttributesID',
+                dataField: 'customerAttributeId',
                 caption: l("EntityFieldName:MDMService:CusAttributeValue:AttrNo"),
                 lookup: {
                     dataSource: cusAttributes,

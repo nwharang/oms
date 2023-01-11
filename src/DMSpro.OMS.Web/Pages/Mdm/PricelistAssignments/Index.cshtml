@@ -11,24 +11,75 @@
 @model IndexModel
 @inject IPageLayout PageLayout
 @{
-    PageLayout.Content.Title = L["PricelistAssignments"].Value;
+    PageLayout.Content.Title = L["Page.Title.PriceListAssignments"].Value;
     PageLayout.Content.MenuItemName = MdmServiceMenus.PriceListAssignments;
 }
 
 @section scripts
-{
+    {
     <abp-script src="/Pages/Mdm/PricelistAssignments/index.js" />
 }
 
-@*@section content_toolbar {
-    <abp-button id="ExportToExcelButton" text="@L["ExportToExcel"].Value" icon="download" size="Small" button-type="Primary" />
-    @if (await Authorization.IsGrantedAsync(MdmServicePermissions.PricelistAssignments.Create))
+@section breadcrumb
     {
-        <abp-button id="NewPricelistAssignmentButton" text="@L["NewPricelistAssignment"].Value" icon="plus" size="Small" button-type="Primary" />
-    }
-}*@
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
+        <li class="breadcrumb-item">@L["Item"].Value</li>
+        <li class="breadcrumb-item active">@L["Menu:MdmService:PriceListAssignments"].Value</li>
+    </ol>
+}
 
-<abp-card>
-    <abp-card-body>
-    </abp-card-body>
-</abp-card>
+<div class="col-lg-12">
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="ui-sortable-handle">
+                <i class="subheader-icon fal fal fa-window"></i> @L["Menu:MdmService:PriceListAssignments"].Value
+            </h2>
+        </div>
+        <div class="panel-container show">
+            <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
+                <abp-card>
+                    <abp-card-body>
+                        <abp-row>
+                            <div style="padding-left:12px" class="buttons-header-grid">
+                                @*@if (await Authorization.IsGrantedAsync(MdmServicePermissions.PriceListAssignments.Create))
+                                {
+                                <button id="New" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                <i class="fa fa-plus"></i> <span>@L["Button.New.UOMGroup"].Value</span>
+                                </button>
+                                }*@
+                                <button id="ExportToExcelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                    <i class="fa fa-download"></i> <span>@L["ExportToExcel"].Value</span>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                    <i class="fa fa-upload"></i> <span>Import from Excel</span>
+                                </button>
+                                <div class="dx-datagrid-search-panel dx-show-invalid-badge dx-textbox dx-texteditor dx-editor-outlined dx-searchbox dx-show-clear-button dx-texteditor-empty dx-widget dx-state-hover" style="width: 250px;">
+                                    <div class="dx-texteditor-container">
+                                        <div class="dx-texteditor-input-container">
+                                            <div class="dx-icon dx-icon-search"></div>
+                                            <input autocomplete="off" aria-label="Search in the data grid" class="dx-texteditor-input" type="text" spellcheck="false" tabindex="0" role="textbox">
+                                        </div>
+                                        <div class="dx-texteditor-buttons-container">
+                                            <span class="dx-clear-button-area"><span class="dx-icon dx-icon-clear"></span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </abp-row>
+                        <div class="dx-viewport">
+                            <div id="loadPanel"></div>
+                            <div id="gridPriceListAssignment"></div>
+                        </div>
+                    </abp-card-body>
+                </abp-card>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .dx-master-detail-cell > .dx-widget > .dx-datagrid > .dx-datagrid-header-panel > .dx-toolbar > .dx-toolbar-items-container {
+        display: flex !important;
+    }
+</style>

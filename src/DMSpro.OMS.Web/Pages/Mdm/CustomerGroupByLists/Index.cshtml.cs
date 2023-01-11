@@ -14,6 +14,33 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerGroupByLists
 {
     public class IndexModel : AbpPageModel
     {
-        
+        // public string CustomerGroupIdFilter { get; set; }
+        // public string BPIdFilter { get; set; }
+        // [SelectItems(nameof(ActiveBoolFilterItems))]
+        // public string ActiveFilter { get; set; }
+
+        // public List<SelectListItem> ActiveBoolFilterItems { get; set; } =
+        //     new List<SelectListItem>
+        //     {
+        //         new SelectListItem("", ""),
+        //         new SelectListItem("Yes", "true"),
+        //         new SelectListItem("No", "false"),
+        //     };
+        // public DateTime? EffDateFilterMin { get; set; }
+
+        // public DateTime? EffDateFilterMax { get; set; }
+
+        // private readonly ICustomerGroupByListsAppService _customerGroupByListsAppService;
+
+        // public IndexModel(ICustomerGroupByListsAppService customerGroupByListsAppService)
+        // {
+        //     _customerGroupByListsAppService = customerGroupByListsAppService;
+        // }
+
+        // public async Task OnGetAsync()
+        // {
+
+        //     await Task.CompletedTask;
+        // }
     }
 }

@@ -14,6 +14,22 @@ namespace DMSpro.OMS.MdmService.Web.Pages.CustomerGroupByAtts
 {
     public class IndexModel : AbpPageModel
     {
-        
+        // public string CustomerGroupIdFilter { get; set; }
+        // public string AttributeCodeFilter { get; set; }
+        // public string ValueCodeFilter { get; set; }
+        // public string ValueNameFilter { get; set; }
+
+        // private readonly ICustomerGroupByAttsAppService _customerGroupByAttsAppService;
+
+        // public IndexModel(ICustomerGroupByAttsAppService customerGroupByAttsAppService)
+        // {
+        //     _customerGroupByAttsAppService = customerGroupByAttsAppService;
+        // }
+
+        // public async Task OnGetAsync()
+        // {
+
+        //     await Task.CompletedTask;
+        // }
     }
 }

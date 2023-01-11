@@ -2,24 +2,7 @@ $(function () {
     var l = abp.localization.getResource("MdmService");
 	var customerGroupByGeoService = window.dMSpro.oMS.mdmService.controllers.customerGroupByGeos.customerGroupByGeo;
 	
-        var lastNpIdId = '';
-        var lastNpDisplayNameId = '';
-
-        var _lookupModal = new abp.ModalManager({
-            viewUrl: abp.appPath + "Shared/LookupModal",
-            scriptUrl: "/Pages/Shared/lookupModal.js",
-            modalClass: "navigationPropertyLookup"
-        });
-
-        $('.lookupCleanButton').on('click', '', function () {
-            $(this).parent().find('input').val('');
-        });
-
-        _lookupModal.onClose(function () {
-            var modal = $(_lookupModal.getModal());
-            $('#' + lastNpIdId).val(modal.find('#CurrentLookupId').val());
-            $('#' + lastNpDisplayNameId).val(modal.find('#CurrentLookupDisplayName').val());
-        });
+	
 	
     var createModal = new abp.ModalManager({
         viewUrl: abp.appPath + "CustomerGroupByGeos/CreateModal",
@@ -36,6 +19,10 @@ $(function () {
 	var getFilter = function() {
         return {
             filterText: $("#FilterText").val(),
+            customerGroupId: $("#CustomerGroupIdFilter").val(),
+			geoTypeMin: $("#GeoTypeFilterMin").val(),
+			geoTypeMax: $("#GeoTypeFilterMax").val(),
+			value: $("#ValueFilter").val(),
             active: (function () {
                 var value = $("#ActiveFilter").val();
                 if (value === undefined || value === null || value === '') {
@@ -43,9 +30,8 @@ $(function () {
                 }
                 return value === 'true';
             })(),
-			effectiveDateMin: $("#EffectiveDateFilterMin").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			effectiveDateMax: $("#EffectiveDateFilterMax").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			customerGroupId: $("#CustomerGroupIdFilter").val(),			geoMasterId: $("#GeoMasterIdFilter").val()
+			effDateMin: $("#EffDateFilterMin").data().datepicker.getFormattedDate('yyyy-mm-dd'),
+			effDateMax: $("#EffDateFilterMax").data().datepicker.getFormattedDate('yyyy-mm-dd')
         };
     };
 
@@ -69,7 +55,7 @@ $(function () {
                                 visible: abp.auth.isGranted('MdmService.CustomerGroupByGeos.Edit'),
                                 action: function (data) {
                                     editModal.open({
-                                     id: data.record.customerGroupByGeo.id
+                                     id: data.record.id
                                      });
                                 }
                             },
@@ -80,7 +66,7 @@ $(function () {
                                     return l("DeleteConfirmationMessage");
                                 },
                                 action: function (data) {
-                                    customerGroupByGeoService.delete(data.record.customerGroupByGeo.id)
+                                    customerGroupByGeoService.delete(data.record.id)
                                         .then(function () {
                                             abp.notify.info(l("SuccessfullyDeleted"));
                                             dataTable.ajax.reload();
@@ -90,30 +76,25 @@ $(function () {
                         ]
                 }
             },
-			{
-                data: "customerGroupByGeo.active",
+			{ data: "customerGroupId" },
+			{ data: "geoType" },
+			{ data: "value" },
+            {
+                data: "active",
                 render: function (active) {
                     return active ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
                 }
             },
             {
-                data: "customerGroupByGeo.effectiveDate",
-                render: function (effectiveDate) {
-                    if (!effectiveDate) {
+                data: "effDate",
+                render: function (effDate) {
+                    if (!effDate) {
                         return "";
                     }
                     
-					var date = Date.parse(effectiveDate);
+					var date = Date.parse(effDate);
                     return (new Date(date)).toLocaleDateString(abp.localization.currentCulture.name);
                 }
-            },
-            {
-                data: "customerGroup.code",
-                defaultContent : ""
-            },
-            {
-                data: "geoMaster.code",
-                defaultContent : ""
             }
         ]
     }));
@@ -146,12 +127,13 @@ $(function () {
                         abp.utils.buildQueryString([
                             { name: 'downloadToken', value: result.token },
                             { name: 'filterText', value: input.filterText }, 
+                            { name: 'customerGroupId', value: input.customerGroupId },
+                            { name: 'geoTypeMin', value: input.geoTypeMin },
+                            { name: 'geoTypeMax', value: input.geoTypeMax }, 
+                            { name: 'value', value: input.value }, 
                             { name: 'active', value: input.active },
-                            { name: 'effectiveDateMin', value: input.effectiveDateMin },
-                            { name: 'effectiveDateMax', value: input.effectiveDateMax }, 
-                            { name: 'customerGroupId', value: input.customerGroupId }
-, 
-                            { name: 'geoMasterId', value: input.geoMasterId }
+                            { name: 'effDateMin', value: input.effDateMin },
+                            { name: 'effDateMax', value: input.effDateMax }
                             ]);
                             
                     var downloadWindow = window.open(url, '_blank');

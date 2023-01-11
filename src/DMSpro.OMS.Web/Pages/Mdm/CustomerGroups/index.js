@@ -1,7 +1,197 @@
 ﻿$(function () {
     var l = abp.localization.getResource("MdmService");
 	var customerGroupService = window.dMSpro.oMS.mdmService.controllers.customerGroups.customerGroup;
-	
+
+    var isNotEmpty = function (value) {
+        return value !== undefined && value !== null && value !== '';
+    }
+    var GroupModes = [{
+        id: 1,
+        displayName: "By Attribute"
+    },
+    {
+        id: 2,
+        displayName: "By List"
+    },
+    {
+        id: 3,
+        displayName: "By Geo"
+        }];
+
+    //Custom store - for load, update, delete
+    var customStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        loadMode: "raw",
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            [
+                'skip',
+                'take',
+                'requireTotalCount',
+                'requireGroupCount',
+                'sort',
+                'filter',
+                'totalSummary',
+                'group',
+                'groupSummary',
+            ].forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            customerGroupService.getListDevextremes(args)
+                .done(result => {
+                    console.log('data ne: ', result);
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            customerGroupService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        },
+        insert(values) {
+            return customerGroupService.create(values, { contentType: "application/json" });
+        },
+        update(key, values) {
+            return customerGroupService.update(key, values, { contentType: "application/json" });
+        },
+        remove(key) {
+            return customerGroupService.delete(key);
+        }
+    });
+
+    var gridCusGroups = $('#dgCusGroups').dxDataGrid({
+        dataSource: customStore,
+        keyExpr: "id",
+        editing: {
+            mode: "row",
+            allowAdding: abp.auth.isGranted('MdmService.CustomerGroups.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.CustomerGroups.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.CustomerGroups.Delete'),
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            }
+        },
+        remoteOperations: true,
+        showBorders: true,
+        focusedRowEnabled: true,
+        allowColumnReordering: false,
+        rowAlternationEnabled: true,
+        columnAutoWidth: true,
+        //columnHidingEnabled: true,
+        errorRowEnabled: false,
+        filterRow: {
+            visible: false
+        },
+        searchPanel: {
+            visible: true
+        },
+        scrolling: {
+            mode: 'standard'
+        },
+        paging: {
+            enabled: true,
+            pageSize: 10
+        },
+        pager: {
+            visible: true,
+            showPageSizeSelector: true,
+            allowedPageSizes: [10, 20, 50, 100],
+            showInfo: true,
+            showNavigationButtons: true
+        },
+        onEditorPreparing(e) {
+        },
+        onRowInserting: function (e) {
+        },
+        columns: [
+            {
+                type: 'buttons',
+                caption: l("Actions"),
+                width: 90,
+                buttons: ['edit', 'delete'],
+            },
+            {
+                dataField: 'code',
+                caption: l("EntityFieldName:MDMService:CustomerGroup:Code"),
+                validationRules: [{ type: "required" }],
+                dataType: 'string',
+            },
+            {
+                dataField: 'name',
+                caption: l("EntityFieldName:MDMService:CustomerGroup:Name"),
+                validationRules: [{ type: "required" }],
+                dataType: 'string',
+            },
+            {
+                dataField: 'active',
+                caption: l("EntityFieldName:MDMService:CustomerGroup:Active"),
+                width: 70,
+                alignment: 'center',
+                dataType: 'boolean',
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                        .appendTo(container);
+                },
+            },
+            {
+                dataField: 'effDate',
+                caption: l("EntityFieldName:MDMService:CustomerGroup:EffectiveDate"),
+                dataType: 'date',
+            },
+            {
+                dataField: 'groupByMode',
+                caption: l("EntityFieldName:MDMService:CustomerGroup:GroupByMode"),
+                lookup: {
+                    dataSource: GroupModes,
+                    valueExpr: "id",
+                    displayExpr: "displayName"
+                }
+            }
+        ],
+    }).dxDataGrid("instance");
+
+    $("input#Search").on("input", function () {
+        gridCusGroups.searchByText($(this).val());
+    });
+
+    $("#btnNewCusGroup").click(function (e) {
+        gridCompanies.addRow();
+    });
+
+    $("#ExportToExcelButton").click(function (e) {
+        e.preventDefault();
+
+        customerGroupService.getDownloadToken().then(
+            function (result) {
+                var url = abp.appPath + 'api/mdm-service/customer-groups/as-excel-file' +
+                    abp.utils.buildQueryString([
+                        { name: 'downloadToken', value: result.token }
+                    ]);
+
+                var downloadWindow = window.open(url, '_blank');
+                downloadWindow.focus();
+            }
+        )
+    });
+
 
     var outletInfos = [{
         code: "KH001_S1",

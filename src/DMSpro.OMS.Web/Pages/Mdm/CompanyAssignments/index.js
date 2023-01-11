@@ -1,6 +1,6 @@
-$(function () {
+﻿$(function () {
     var l = abp.localization.getResource("MdmService");
-    var customerAssignmentService = window.dMSpro.oMS.mdmService.controllers.customerAssignments.customerAssignment;
+    //var customerAssignmentService = window.dMSpro.oMS.mdmService.controllers.customerAssignments.customerAssignment;
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
     var isNotEmpty = function (value) {
@@ -8,6 +8,52 @@ $(function () {
     }
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
+    var userTemps = [
+        {
+            id: 1,
+            displayName: "User 01"
+        },
+        {
+            id: 2,
+            displayName: "User 02"
+        },
+        {
+            id: 3,
+            displayName: "User 03"
+        }
+    ];
+    var companyTemps = [
+        {
+            id: 1,
+            displayName: "Company 01"
+        },
+        {
+            id: 2,
+            displayName: "Company 02"
+        },
+        {
+            id: 3,
+            displayName: "Company 03"
+        }
+    ];
+
+    var assignmentTemps = [
+        {
+            id: 1,
+            userId: 1,
+            companyId: 1
+        },
+        {
+            id: 2,
+            userId: 1,
+            companyId: 2
+        },
+        {
+            id: 3,
+            userId: 3,
+            companyId: 3
+        }
+    ];
 
     //var companyStore = new DevExpress.data.CustomStore({
     //    key: 'id',
@@ -89,15 +135,15 @@ $(function () {
         abp.utils.buildQueryString([
             { name: 'maxResultCount', value: 1000 }
         ]);
-    $.ajax({
-        url: `${urlCus}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            console.log('data call customersLookup ajax: ', data);
-            customersLookup = data.items;
-        }
-    });
+    //$.ajax({
+    //    url: `${urlCus}`,
+    //    dataType: 'json',
+    //    async: false,
+    //    success: function (data) {
+    //        console.log('data call customersLookup ajax: ', data);
+    //        customersLookup = data.items;
+    //    }
+    //});
     $.ajax({
         url: `${urlCompany}`,
         dataType: 'json',
@@ -108,45 +154,45 @@ $(function () {
         }
     });
 
-    //Custom store - for load, update, delete
-    var customStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
+    ////Custom store - for load, update, delete
+    //var customStore = new DevExpress.data.CustomStore({
+    //    key: 'id',
+    //    load(loadOptions) {
+    //        const deferred = $.Deferred();
+    //        const args = {};
+    //        requestOptions.forEach((i) => {
+    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+    //                args[i] = JSON.stringify(loadOptions[i]);
+    //            }
+    //        });
 
-            customerAssignmentService.getListDevextremes(args)
-                .done(result => {
-                    console.log('data:', result)
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
+    //        customerAssignmentService.getListDevextremes(args)
+    //            .done(result => {
+    //                console.log('data:', result)
+    //                deferred.resolve(result.data, {
+    //                    totalCount: result.totalCount,
+    //                    summary: result.summary,
+    //                    groupCount: result.groupCount,
+    //                });
+    //            });
 
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            return key == 0 ? customerAssignmentService.get(key) : null;
-        },
-        insert(values) {
-            return customerAssignmentService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return customerAssignmentService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return customerAssignmentService.delete(key);
-        }
-    });
-    var gridCusAssignments = $('#dgCusAssignments').dxDataGrid({
-        dataSource: customStore,
+    //        return deferred.promise();
+    //    },
+    //    byKey: function (key) {
+    //        return key == 0 ? customerAssignmentService.get(key) : null;
+    //    },
+    //    insert(values) {
+    //        return customerAssignmentService.create(values, { contentType: "application/json" });
+    //    },
+    //    update(key, values) {
+    //        return customerAssignmentService.update(key, values, { contentType: "application/json" });
+    //    },
+    //    remove(key) {
+    //        return customerAssignmentService.delete(key);
+    //    }
+    //});
+    var gridComAssignments = $('#dgComAssignments').dxDataGrid({
+        dataSource: assignmentTemps,
         keyExpr: "id",
         editing: {
             mode: "row",
@@ -196,30 +242,11 @@ $(function () {
                 buttons: ['edit', 'delete'],
             },
             {
-                dataField: 'companyId',
-                caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
+                dataField: 'userId',
+                caption: l("User Name"),
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource: companiesLookup,
-                    valueExpr: "id",
-                    displayExpr: "displayName"
-                }
-                //lookup: {
-                //    dataSource() {
-                //        return {
-                //            store: companyStore
-                //        };
-                //    },
-                //    displayExpr: 'name',
-                //    valueExpr: 'id',
-                //}
-            },
-            {
-                dataField: 'customerId',
-                caption: l("EntityFieldName:MDMService:CustomerAssignment:CustomerShortName"),
-                validationRules: [{ type: "required" }],
-                lookup: {
-                    dataSource: customersLookup,
+                    dataSource: userTemps,
                     valueExpr: "id",
                     displayExpr: "displayName"
                 }
@@ -234,44 +261,52 @@ $(function () {
                 //}
             },
             {
-                dataField: 'effectiveDate',
-                caption: l("EntityFieldName:MDMService:CustomerAssignment:EffectiveDate"),
-                dataType: 'date',
-                validationRules: [{ type: "required" }]
-            },
-            {
-                dataField: 'endDate',
-                caption: l("EntityFieldName:MDMService:CustomerAssignment:EndDate"),
-                dataType: 'date',
-            },
+                dataField: 'companyId',
+                caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
+                validationRules: [{ type: "required" }],
+                lookup: {
+                    dataSource: companyTemps,
+                    valueExpr: "id",
+                    displayExpr: "displayName"
+                }
+                //lookup: {
+                //    dataSource() {
+                //        return {
+                //            store: companyStore
+                //        };
+                //    },
+                //    displayExpr: 'name',
+                //    valueExpr: 'id',
+                //}
+            }
         ],
     }).dxDataGrid("instance");
 
     $("input#Search").on("input", function () {
-        gridCusAssignments.searchByText($(this).val());
+        gridComAssignments.searchByText($(this).val());
     });
 
-    $("#btnNewCusAssignment").click(function (e) {
-        gridCusAssignments.addRow();
+    $("#btnNewComAssignment").click(function (e) {
+        gridComAssignments.addRow();
     });
 
     $("#ExportToExcelButton").click(function (e) {
         e.preventDefault();
 
-        cusAttributesValueService.getDownloadToken().then(
-            function (result) {
-                var input = getFilter();
-                var url = abp.appPath + 'api/mdm-service/sales-channels/as-excel-file' +
-                    abp.utils.buildQueryString([
-                        { name: 'downloadToken', value: result.token },
-                        { name: 'filterText', value: input.filterText },
-                        { name: 'code', value: input.code },
-                        { name: 'name', value: input.name }
-                    ]);
+        //cusAttributesValueService.getDownloadToken().then(
+        //    function (result) {
+        //        var input = getFilter();
+        //        var url = abp.appPath + 'api/mdm-service/sales-channels/as-excel-file' +
+        //            abp.utils.buildQueryString([
+        //                { name: 'downloadToken', value: result.token },
+        //                { name: 'filterText', value: input.filterText },
+        //                { name: 'code', value: input.code },
+        //                { name: 'name', value: input.name }
+        //            ]);
 
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
+        //        var downloadWindow = window.open(url, '_blank');
+        //        downloadWindow.focus();
+        //    }
+        //)
     });
 });

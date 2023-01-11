@@ -1,5 +1,6 @@
 $(function () {
     var l = abp.localization.getResource("MdmService");
+    var l1 = abp.localization.getResource("OMSWeb");
     var customerAttributeService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
@@ -53,7 +54,6 @@ $(function () {
         }
     });
 	
-
     var gridCusAttribute = $('#dgCusAttributes').dxDataGrid({
         dataSource: customStore,
         keyExpr: "id",
@@ -76,6 +76,14 @@ $(function () {
                 var value = grid.cellValue(index, "active");
                 if (!value)
                     e.editorOptions.disabled = true;
+            }
+        },
+        onRowUpdating: function (e) {
+            var objectRequire = ["attrNo", "attrName", "active", "hierarchyLevel"];
+            for (var property in e.oldData) {
+                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+                    e.newData[property] = e.oldData[property];
+                }
             }
         },
         remoteOperations: true,
@@ -115,28 +123,29 @@ $(function () {
             },
             {
                 dataField: 'attrNo',
-                caption: l("EntityFieldName:MDMService:CustomerAttribute:Code"),
+                caption: l1("CustomerAttribute:Code"),
                 allowEditing: false,
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'attrName',
-                caption: l("EntityFieldName:MDMService:CustomerAttribute:Name"),
+                caption: l1("CustomerAttribute:Name"),
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'hierarchyLevel ',
-                caption: l("EntityFieldName:MDMService:CustomerAttribute:Level"),
+                caption: l1("CustomerAttribute.HierarchyLevel"),
                 dataType: 'string',
             },
             {
-                dataField: 'isActive',
-                caption: l("EntityFieldName:MDMService:CustomerAttribute:Active"),
-                allowEditing: false,
+                dataField: 'active',
+                caption: l1("CustomerAttribute.Active"),
+                //allowEditing: false,
                 width: 110,
                 alignment: 'center',
+                dataType: 'boolean',
                 cellTemplate(container, options) {
                     $('<div>')
                         .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
