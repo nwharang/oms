@@ -2,7 +2,7 @@
     // language
     var l = abp.localization.getResource("MdmService");
     // load mdmService
-    var productAttrService = window.dMSpro.oMS.mdmService.controllers.productAttributes.productAttribute;
+    var productAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
 
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
     // custom store
@@ -127,15 +127,15 @@
             //},
             {
                 dataField: 'attrName',
-                caption: l("EntityFieldName:MDMService:ProductAttribute:AttrName"),
+                caption: l("EntityFieldName:MDMService:ItemAttribute:AttrName"),
             },
             {
                 dataField: 'hierarchyLevel',
-                caption: l("EntityFieldName:MDMService:ProductAttribute:HierarchyLevel"),
+                caption: l("EntityFieldName:MDMService:ItemAttribute:HierarchyLevel"),
             },
             {
                 dataField: 'active',
-                caption: l("EntityFieldName:MDMService:ProductAttribute:Active"),
+                caption: l("EntityFieldName:MDMService:ItemAttribute:Active"),
                 alignment: 'center',
                 dataType: 'boolean',
                 cellTemplate(container, options) {
@@ -145,8 +145,8 @@
                 }
             },
             {
-                dataField: 'isProductCategory',
-                caption: l("EntityFieldName:MDMService:ProductAttribute:IsProductCategory"),
+                dataField: 'isSellingCategory',
+                caption: l("EntityFieldName:MDMService:ItemAttribute:IsSellingCategory"),
                 alignment: 'center',
                 dataType: 'boolean',
                 cellTemplate(container, options) {
@@ -171,7 +171,7 @@
 
         productAttrService.getDownloadToken().then(
             function (result) {
-                var url = abp.appPath + 'api/mdm-service/product-attributes/as-excel-file' + abp.utils.buildQueryString([
+                var url = abp.appPath + 'api/mdm-service/item-attributes/as-excel-file' + abp.utils.buildQueryString([
                     { name: 'downloadToken', value: result.token }
                 ]);
 

@@ -23,7 +23,7 @@
 @section breadcrumb {
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
-        <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:Product"].Value</li>
+        <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:Item"].Value</li>
         <li class="breadcrumb-item active">@L["Menu:MdmService:Items"].Value</li>
     </ol>
 }
@@ -44,7 +44,7 @@
                                 @if (await Authorization.IsGrantedAsync(MdmServicePermissions.Items.Create))
                                 {
                                     <button id="NewItemMasterButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                        <i class="fa fa-plus"></i> <span>@L["Button.New.ItemMaster"].Value</span>
+                                        <i class="fa fa-plus"></i> <span>@L["Button.New.Item"].Value</span>
                                     </button>
                                 }
                                 <button id="ExportToExcelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">

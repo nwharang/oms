@@ -1,6 +1,6 @@
 $(function () {
     var l = abp.localization.getResource("MdmService");
-	var itemGroupAttrService = window.dMSpro.oMS.mdmService.controllers.itemGroupAttrs.itemGroupAttr;
+	var itemGroupAttrService = window.dMSpro.oMS.mdmService.controllers.itemGroupAttributes.itemGroupAttribute;
 	
         var lastNpIdId = '';
         var lastNpDisplayNameId = '';
@@ -77,7 +77,7 @@ $(function () {
                         [
                             {
                                 text: l("Edit"),
-                                visible: abp.auth.isGranted('MdmService.ItemGroupAttrs.Edit'),
+                                visible: abp.auth.isGranted('MdmService.ItemGroupAttributes.Edit'),
                                 action: function (data) {
                                     editModal.open({
                                      id: data.record.itemGroupAttr.id
@@ -86,7 +86,7 @@ $(function () {
                             },
                             {
                                 text: l("Delete"),
-                                visible: abp.auth.isGranted('MdmService.ItemGroupAttrs.Delete'),
+                                visible: abp.auth.isGranted('MdmService.ItemGroupAttributes.Delete'),
                                 confirmMessage: function () {
                                     return l("DeleteConfirmationMessage");
                                 },
@@ -106,83 +106,83 @@ $(function () {
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue.attrValName",
+                data: "itemAttributeValue.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue1.attrValName",
+                data: "itemAttributeValue1.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue2.attrValName",
+                data: "itemAttributeValue2.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue3.attrValName",
+                data: "itemAttributeValue3.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue4.attrValName",
+                data: "itemAttributeValue4.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue5.attrValName",
+                data: "itemAttributeValue5.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue6.attrValName",
+                data: "itemAttributeValue6.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue7.attrValName",
+                data: "itemAttributeValue7.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue8.attrValName",
+                data: "itemAttributeValue8.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue9.attrValName",
+                data: "itemAttributeValue9.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue10.attrValName",
+                data: "itemAttributeValue10.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue11.attrValName",
+                data: "itemAttributeValue11.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue12.attrValName",
+                data: "itemAttributeValue12.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue13.attrValName",
+                data: "itemAttributeValue13.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue14.attrValName",
+                data: "itemAttributeValue14.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue15.attrValName",
+                data: "itemAttributeValue15.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue16.attrValName",
+                data: "itemAttributeValue16.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue17.attrValName",
+                data: "itemAttributeValue17.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue18.attrValName",
+                data: "itemAttributeValue18.attrValName",
                 defaultContent : ""
             },
             {
-                data: "prodAttributeValue19.attrValName",
+                data: "itemAttributeValue19.attrValName",
                 defaultContent : ""
             }
         ]
@@ -212,7 +212,7 @@ $(function () {
         itemGroupAttrService.getDownloadToken().then(
             function(result){
                     var input = getFilter();
-                    var url =  abp.appPath + 'api/mdm-service/item-group-attrs/as-excel-file' + 
+                    var url =  abp.appPath + 'api/mdm-service/item-group-attributes/as-excel-file' + 
                         abp.utils.buildQueryString([
                             { name: 'downloadToken', value: result.token },
                             { name: 'filterText', value: input.filterText }, 
