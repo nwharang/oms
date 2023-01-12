@@ -10,9 +10,12 @@
     "Button.Save": "Save",
     "Button.Close": "Close",
     "Button.Cancel": "Cancel",
+    "Active": "Active",
     "SalesOrgHierarchies.Context.Edit": "Edit",
     "SalesOrgHierarchies.Context.AddSub": "Add sub org hierarchy",
     "SalesOrgHierarchies.Context.Delete": "Delete",
+    "SellingZones.Tab.CompanyAssgin": "Company Assgin",
+    "SellingZones.Tab.CustomerAssgin": "Customer Assgin",
     "GeoLevel0Name": "Country",
     "GeoLevel1Name": "Area",
     "GeoLevel2Name": "Province",
@@ -22,6 +25,9 @@
     "CustomerAttribute.Code": "Attribute Code",
     "CustomerAttribute.Name": "Attribute Name",
     "CustomerAttribute.Active": "Active",
-    "CustomerAttribute.HierarchyLevel": "Hierarchy Level"
+    "CustomerAttribute.HierarchyLevel": "Hierarchy Level",
+    "CompanyInZone.Company": "Company",
+    "CustomerInZone.CustomerCode": "Customer Code",
+    "CustomerInZone.CustomerName": "Customer Name"
   }
 }
