@@ -3,8 +3,11 @@
     vertical-align: top;
 }
 
-#btnActions > i, #btnActions > span.dx-button-text {
+#btnDetailsActions > i, #btnDetailsActions > span.dx-button-text {
     vertical-align: middle;
+}
+#btnDetailsActions::after {
+    vertical-align: middle !important;
 }
 
 #MDMtabpanel > #tabpanel-container {
@@ -237,7 +240,7 @@ div.panel a.btn.btn-panel.hover-effect-dot.js-panel-close {
         border-color: #0c7ed5;
     }
     .btn-select-company > i.fa.fa-sitemap{
-        margin-right:4px;
+        margin-right:6px;
     }
 table.companies{
    
@@ -263,4 +266,7 @@ table.companies > tbody > tr{
     opacity: unset;
     display: unset;
     max-width: 320px;
+}
+.nav-menu li > ul li a > [class*='fa-'], .nav-menu li > ul li a > .ni{
+    margin-left:unset;
 }
