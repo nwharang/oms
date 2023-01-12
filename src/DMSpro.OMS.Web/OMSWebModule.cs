@@ -197,6 +197,7 @@ public class OMSWebModule : AbpModule
                 options.Scope.Add("InventoryService");
                 options.Scope.Add("SurveyService");
             });
+        context.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.FromHours(24));
 
         if (Convert.ToBoolean(configuration["AuthServer:IsOnK8s"]))
         {
@@ -325,6 +326,13 @@ public class OMSWebModule : AbpModule
         app.UseMultiTenancy();
         app.UseAbpSerilogEnrichers();
         app.UseAuthorization();
+        app.Use(async (httpContext,next) =>{
+            var user = httpContext.User;
+            Console.WriteLine("SAAAAAAAA");
+            Console.WriteLine(user);
+            await next(httpContext);
+        });
+        app.UseWebSockets();
         app.UseConfiguredEndpoints(endpoints =>
         {
             endpoints.MapMetrics();
