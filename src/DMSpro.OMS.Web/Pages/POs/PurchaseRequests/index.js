@@ -1,136 +1,44 @@
 ﻿
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    DevExpress.config({
-        editorStylingMode: 'underlined',
-    });
-
-    // DevExpress.setTemplateEngine('underscore');
-    $('#tabpanel-container').dxTabPanel({
-        height: 260,
-        items: [{
-            title: "Details",
-            icon: "detailslayout",
-            template: function () {
-                return $('#details-1')
-            }
-        }, {
-            title: "Promotional Information",
-            icon: "money",
-            template: function () {
-                return $('#details-2')
-            }
-        }]
-    }).dxTabPanel('instance');
-
-    $("#top-section").dxForm({
-        formData: {
-            // Docdate: currentDate(),
-            // PostingDate: currentDate()
+    $('#gridPurchaseRequests').dxDataGrid({
+        dataSource: [{
+            Vendor: "IDP",
+            DocNbr: "RP001",
+            CreatedUser: "Phượng Nguyễn",
+            DocDate: "02/03/2023",
+            RequestDate: "05/01/2023",
+            PostingDate: "07/01/2023",
+            Status: "Open",
+            Remark: "Giao sau 14h",
+            DocTotalAmt: 112456000,
+            DocTotalAmtAfterTax: 112456000
         },
-        labelMode: 'floating',
-        colCount: 4,
-        items: [
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'RPONbr',
-                        editorType: 'dxSelectBox',
-                        editorOptions: {
-                           // items: positions,
-                            searchEnabled: true,
-                            value: '',
-                        },
-                        validationRules: [{
-                            type: 'required',
-                            message: 'RPONbr is required',
-                        }],
-                        message:"xx",
-                        label: {
-                            template: function () {
-                                return (data) => $(`<div>ffff</div>`);
-                            },
-                        }
-                    },
-                    {
-                        dataField: 'Status',
-                        editorOptions: {
-                            readOnly: true,
-                        },
-                    }
-                ]
-            },
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'DocDate',
-                        editorType: 'dxDateBox',
-                    },
-                    {
-                        dataField: 'RequiredDate',
-                        editorType: 'dxDateBox'
-                    }, {
-                        dataField: 'PostingDate',
-                        editorType: 'dxDateBox'
-                    }]
-            },
-            {
-                itemType: "group",
-                items: ["Vendor", "LinkedNbr", "Warehouse"]
-            },
-            {
-                itemType: "group",
-                items: ["TotalLineAmtNoTax", "TotalTaxAmt", "TotalLineAmt"]
-            }
-        ]
-    });
-    
-    $("#bottom-remark").dxForm({
-        labelMode: 'floating',
-        colCount: 2,
-        items: [
-            {
-                itemType: "group",
-                items: [
-                    { 
-                        dataField: 'ReMark',
-                        colSpan: 2, 
-                        editorType: 'dxTextArea',
-                        editorOptions: {
-                            height: 90, 
-                        },
-                    }]
-            }
-        ]
-    });
-    const resizable = $('#resizable').dxResizable({
-        minHeight: 120,
-        height:235,
-       // area: '.wrapper-resizable',
-    }).dxResizable('instance');
-
-    $('#txtBarCode').dxTextBox({
-        value: '',
-        placeholder: "Type barcode...",
-        height: 32,
-        width: 200,
-        showClearButton: true,
-    });
-    //$("#cbBarCodes").dxAutocomplete({
-    //    dataSource: products,  
-    //    placeholder: 'Type barcode...',
-    //    showClearButton: true,
-    //    valueExpr: 'ID',
-    //    itemTemplate(data) {
-    //        return $(`<div>${data.Name} (${data.BarCode})</div>`);
-    //    },
-    //});
-
-    const dataGridContainer = $('#gridDetails').dxDataGrid({
-        dataSource: inventoryDatas,
-        keyExpr: "id",
+        {
+            Vendor: "IDP",
+            DocNbr: "RP002",
+            CreatedUser: "Minh Lien",
+            DocDate: "01/03/2023",
+            RequestDate: "02/01/2023",
+            PostingDate: "05/01/2023",
+            Status: "Approved",
+            Remark: "Ok, cho đi ngay",
+            DocTotalAmt: 66321000,
+            DocTotalAmtAfterTax: 66000000
+        },
+        {
+            Vendor: "IDP",
+            DocNbr: "RP003",
+            CreatedUser: "Nguyễn Hiệp",
+            DocDate: "01/03/2023",
+            RequestDate: "01/01/2023",
+            PostingDate: "10/01/2023",
+            Status: "Rejected",
+            Remark: "Không giao đi",
+            DocTotalAmt: 56789000,
+            DocTotalAmtAfterTax: 56111000
+        }],
+        // keyExpr: "id",
         stateStoring: {
             enabled: true,
             type: 'localStorage',
@@ -160,11 +68,8 @@ $(function () {
         },
         columnChooser: {
             enabled: true,
-            mode: "select" // or "select"
+            mode: "select"
         },
-        //columnFixing: {
-        //    enabled: true
-        //},
         pager: {
             visible: true,
             showPageSizeSelector: true,
@@ -173,7 +78,7 @@ $(function () {
             showNavigationButtons: true
         },
         toolbar: {
-            items: [ {
+            items: [{
                 location: 'before',
                 widget: 'dxButton',
                 options: {
@@ -183,37 +88,60 @@ $(function () {
                         dataGridContainer.addRow();
                     },
                 },
-            },{
+            },
+            {
                 location: 'before',
-                widget: 'dxTextBox',
-                options: { 
-                   // text: 'Add Row',
-                    placeholder: "Type barcode..."
+                template: '<div class="btn-group"><button id="btnActions" type="button" class="btn btn-light btn-sm dropdown-toggle"                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="dx-icon dx-icon-preferences"></i>                                        <span class="dx-button-text">Action</span>  </button> <div class="dropdown-menu fadeindown">                                        <button class="dropdown-item" type="button">Approved</button> <button class="dropdown-item" type="button">Rejected</button>                                    </div> </div>'
+            },
+            {
+                location: 'after',
+                widget: 'dxButton',
+                options: {
+                    icon: 'refresh',
+                    onClick() {
+                        dataGridContainer.refresh();
+                    },
                 },
             },
-                 {
-                    location: 'after',
-                     widget: 'dxButton', 
-                    options: {
-                        icon: 'refresh', 
-                        onClick() {
-                            dataGridContainer.refresh();
-                        },
-                    },
-                },
                 'columnChooserButton',
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'fa fa-upload',
-                        text:"Import From Excel",
-                        onClick() {
-                            //dataGridContainer.refresh();
-                        },
+                "exportButton",
+            {
+                location: 'after',
+                widget: 'dxButton',
+                options: {
+                    icon: 'fa fa-upload',
+                    text: "Import From Excel",
+                    onClick() {
+                        //todo
                     },
                 },
+            },
             ],
+        },
+        export: {
+            enabled: true,
+            // formats: ['excel','pdf'],
+            allowExportSelectedData: true,
+        }, groupPanel: {
+            visible: true,
+        },
+        selection: {
+            mode: 'multiple',
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('PurchaseRequests');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PurchaseRequests.xlsx');
+                });
+            });
+            e.cancel = true;
         },
         editing: {
             mode: "row",
@@ -278,99 +206,98 @@ $(function () {
                 width: 100,
                 type: 'buttons',
                 caption: l('Actions'),
-                buttons: ['edit', 'delete'],
-                //fixed: true,
-            },
-            {
-                width: 300,
-                caption: "Item Code",
-                dataField: "code",
-                calculateDisplayValue: function (rowData) {
-                    if (!rowData || !rowData.code) return "";
-
-                    var displayText = products.filter(function (item) { return item.ID == rowData.code })[0].Name;
-                    if (displayText)
-                        return displayText;
-                    return "";
-                },
-                lookup: {
-                    dataSource: {
-                        store: {
-                            type: "array",
-                            data: products,
-                            key: "ID"
+                buttons: [
+                    {
+                        text: "View Details",
+                        icon: "fieldchooser",
+                        hint: "View Details",
+                        onClick: function (e) {
+                            window.open('/Pos/PurchaseRequests/Details', '_blank');
                         }
                     },
-                    displayExpr: "Name",
-                    valueExpr: "ID"
+                    'edit', 'delete']
+            },
+            {
+                caption: "Vendor",
+                dataField: "Vendor",
+                cellTemplate: function (element, info) {
+                    element.append(`<a href="#">${info.text}</a>`);
                 },
-                //fixed: true,
+                alignment: "center",
+                cssClass: "increaseFontWeight"
             },
             {
-                width: 200,
-                caption: "Item Name",
-                dataField: "ItemName",
-                //  fixed: true,
+                caption: "DocNbr",
+                dataField: "DocNbr",
             },
             {
-
-                caption: "UOM",
-                dataField: "UOM"
+                caption: "Created User",
+                dataField: "CreatedUser",
             },
             {
-
-                caption: "Price",
-                dataField: "Price"
-            }, {
-
-                caption: "Qty",
-                dataField: "Qty"
-            }, {
-
-                caption: "BaseQty",
-                dataField: "BaseQty"
-            }, {
-
-                caption: "BaseUOM",
-                dataField: "BaseUOM"
+                caption: "DocDate",
+                dataField: "DocDate",
             },
             {
-
-                caption: "IsFree",
-                dataField: "IsFree",
-                dataType: "boolean",
-                calculateCellValue: function (rowData) {
-                    let _val;
-                    rowData.IsFree === "TRUE" ? _val = true : _val = false;
-                    return _val;
+                caption: "RequestDate",
+                dataField: "RequestDate",
+            },
+            {
+                caption: "Posting Date",
+                dataField: "PostingDate",
+                allowFiltering: false
+            },
+            {
+                caption: "Status",
+                dataField: "Status",
+            },
+            {
+                caption: "Remark",
+                dataField: "Remark",
+                allowFiltering: false
+            },
+            {
+                caption: "Doc Total Amt",
+                dataField: "DocTotalAmt",
+                customizeText: function (cellInfo) {
+                    return cellInfo.valueText + "đ";
                 },
-                setCellValue: function (newData, value, currentRowData) {
-                    value ? newData.IsFree = "TRUE" : newData.IsFree = "FALSE";
-                }
+                allowFiltering: false,
+                alignment: 'right',
+                format: ",##0.###",
+                summaryType: "sum",
             },
             {
-
-                caption: "Desc",
-                dataField: "Desc"
-            }, {
-
-                caption: "TaxCode",
-                dataField: "TaxCode"
-            }, {
-
-                caption: "TaxRate",
-                dataField: "TaxRate"
-            }, {
-
-                caption: "LineAmt",
-                dataField: "LineAmt"
-            }
+                caption: "Doc Total Amt After Tax",
+                dataField: "DocTotalAmtAfterTax",
+                customizeText: function (cellInfo) {
+                    return cellInfo.valueText + "đ";
+                },
+                allowFiltering: false,
+                format: ",##0.###",
+                summaryType: "sum",
+                alignment: 'right',
+            },
         ],
+        summary: {
+            totalItems: [{
+                column: 'DocTotalAmt',
+                summaryType: 'sum',
+                valueFormat: ",##0.###",
+                customizeText: function (data) {
+                    return data.valueText + "đ";
+                },
+            }, {
+                column: 'DocTotalAmtAfterTax',
+                summaryType: 'sum',
+                valueFormat: ",##0.###",
+                customizeText: function (data) {
+                    return data.valueText + "đ";
+                },
+            }],
+        },
     }).dxDataGrid("instance");
-
-   
 });
-
 var products = [{
     "ID": 1,
     "Name": "Item 1",
@@ -392,75 +319,3 @@ var products = [{
     "Name": "Item 35",
     "BarCode": "45-0060-Z"
 }];
-var inventoryDatas = [
-    {
-        id: 1,
-        code: 5,//product id
-        ItemName: "Sản phẩm 1",
-        UOM: "Thung",
-        Qty: 4,
-        IssueQty: 0,
-        Price: 100000,
-        LineAmtNoTax: 400000,
-        Discount: 0,
-        DiscountLineAmount: 0,
-        TaxRate: 10,
-        TaxLineAmount: 40000,
-        LineAmt: 440000,
-        BaseQty: 40,
-        BaseUOM: "Chai",
-        WareHourse: "Main",
-        WHLocation: "Main",
-        TaxCode: "VAT10",
-        TranType: "Selling",
-        Desc: "Quần áo",
-        IsFree: "TRUE",
-    },
-    {
-
-        id: 2,
-        code: 2,//product id
-        ItemName: "Sản phẩm 2",
-        UOM: "Thung",
-        Qty: 4,
-        IssueQty: 0,
-        Price: 100000,
-        LineAmtNoTax: 300000,
-        Discount: 20,
-        DiscountLineAmount: 60000,
-        TaxRate: 10,
-        TaxLineAmount: 24000,
-        LineAmt: 264000,
-        BaseQty: 40,
-        BaseUOM: "Chai",
-        WareHourse: "Main",
-        WHLocation: "Main",
-        TaxCode: "VAT10",
-        TranType: "Selling",
-        Desc: "Mỹ phẩm",
-        IsFree: "TRUE",
-    },
-    {
-        id: 3,
-        code: 4,//product id
-        ItemName: "Sản phẩm 3",
-        UOM: "Lon",
-        Qty: 10,
-        IssueQty: 0,
-        Price: 0,
-        LineAmtNoTax: 0,
-        Discount: 0,
-        DiscountLineAmount: 0,
-        TaxRate: 0,
-        TaxLineAmount: 0,
-        LineAmt: 0,
-        BaseQty: 10,
-        BaseUOM: "Chai",
-        WareHourse: "Main",
-        WHLocation: "Main",
-        TaxCode: "VAT10",
-        TranType: "Sampling",
-        Desc: "Bia",
-        IsFree: "FALSE",
-    }
-];

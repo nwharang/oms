@@ -8,23 +8,20 @@
 }
 
 @section styles {
-     <abp-style src="/Pages/POs/PurchaseRequests/index.css" />
+    <abp-style src="/Pages/POs/PurchaseRequests/Details.css" />
 }
 @section scripts {
-    <script src="/js/devextreme/exceljs.min.js"></script>   
-    <script src="/js/devextreme/filesaver.min.js"></script>
-    <abp-script src="/Pages/POs/PurchaseRequests/index.js" />
-
+    <abp-script src="/Pages/POs/PurchaseRequests/Details.js" />
 }
 
 @section breadcrumb {
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">PO</a></li>
-        <li class="breadcrumb-item active">Purchase Requests</li>
+        <li class="breadcrumb-item">Purchase Requests</li>
+        <li class="breadcrumb-item active">Details</li>
     </ol>
 }
 
-@*
 <div class="col-lg-12">
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
@@ -33,13 +30,13 @@
             </h2>
         </div>
         <div class="panel-container show">
-            <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
+            <div class="panel-content jqvmap-bg-ocean p-0" style="">
                 <abp-card>
                     <abp-card-body>
                         <abp-row>
                             <div style="padding-left:12px" class="buttons-header-grid">
                                 <div class="btn-group">
-                                    <button id="btnActions" type="button" class="btn btn-light btn-sm dropdown-toggle"
+                                    <button id="btnDetailsActions" type="button" class="btn btn-light btn-sm dropdown-toggle"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="dx-icon dx-icon-preferences"></i>
                                         <span class="dx-button-text">Action</span>
@@ -53,13 +50,11 @@
                             </div>
                         </abp-row>
                         <div class="dx-viewport">
-                            <div class="py-3" id="resizable">
-                                <div class="wrapper">
-                                    <div id="top-section"></div>
-                                    <div id="bottom-remark"></div>
-                                </div> 
+                            <div class="py-3" id="resizable"> 
+                                <div id="top-section"></div>
+                                <div id="bottom-remark"></div> 
                             </div>
-                            <div class=" py-2"> 
+                            <div class=" py-2">
                                 <div id="MDMtabpanel">
                                     <div id="tabpanel-container"> </div>
                                     <div class="options">
@@ -72,11 +67,12 @@
 
                                     </div>
                                 </div>
-                                <script id="details-1" type="text/html"> 
+                                <script id="details-1" type="text/html">
+
                                     <div id="gridDetails"></div>
                                 </script>
                                 <script id="details-2" type="text/html">
-                                     
+
                                 </script>
                             </div>
                         </div>
@@ -85,30 +81,4 @@
             </div>
         </div>
     </div>
-</div>
-
-*@
-
-<div class="col-lg-12">
-    <div id="panel-1" class="panel">
-        <div class="panel-hdr">
-            <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fa fa-file-alt"></i>
-            </h2>
-        </div>
-        <div class="panel-container show">
-            <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
-                <abp-card>
-                    <abp-card-body> 
-                        <div class="dx-viewport"> 
-                            <div class="py-2">
-                                <div id="gridPurchaseRequests"></div>
-                            </div>
-                        </div>
-                    </abp-card-body>
-                </abp-card>
-            </div>
-        </div>
-    </div>
-</div>
-
+</div> 
