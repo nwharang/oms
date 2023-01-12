@@ -1,4 +1,5 @@
 @page
+@using DMSpro.OMS.Localization;
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using DMSpro.OMS.MdmService.Permissions
@@ -6,6 +7,7 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @using DMSpro.OMS.MdmService.Localization
 @inject IHtmlLocalizer<MdmServiceResource> L
+@inject IHtmlLocalizer<OMSWebResource> L1
 @inject IAuthorizationService Authorization
 @inject IPageLayout PageLayout
 @{
@@ -37,22 +39,40 @@
             <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
                 <abp-card>
                     <abp-card-body>
-                        <abp-row>
-                            <div style="padding-left:12px" class="buttons-header-grid">
-                                <button id="NewSellingZoneButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                    <i class="fa fa-plus"></i> <span>@L["NewSellingZone"].Value</span>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                    <i class="fa fa-upload"></i> <span>@L["ImportFromExcel"].Value</span>
-                                </button>
-                            </div>
-                        </abp-row>
                         <div class="dx-viewport">
-                            <div id="form" class="d-flex justify-content-center py-3"></div>
-                            <div class="border-top d-flex justify-content-center py-3">
-                                <div class="px-2">
-                                    <div id="tabPanel"></div>
-                                    <div id="dataGridContainer"></div>
+                            <div class="row pb-2">
+                                <div class="form-group col-2">
+                                    <div id="salesOrgHierarchy"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li class="nav-item"><a id="tab1" class="nav-link active" data-toggle="tab" href="#tab_company" role="tab">@L1["SellingZones.Tab.CompanyAssgin"]</a></li>
+                                    <li class="nav-item"><a id="tab2" class="nav-link" data-toggle="tab" href="#tab_customer" role="tab">@L1["SellingZones.Tab.CustomerAssgin"]</a></li>
+                                </ul>
+                                <div class="tab-content py-2">
+                                    <div class="tab-pane fade show active" id="tab_company" role="tabpanel">
+                                        <div class="buttons-header-grid">
+                                            <button id="NewCompanyAssginButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" disabled>
+                                                <i class="fa fa-plus"></i> <span>@L["Button.New.CompanyInZone"].Value</span>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                                <i class="fa fa-upload"></i> <span>@L["ImportFromExcel"].Value</span>
+                                            </button>
+                                        </div>
+                                        <div id="companyAssgin"></div>
+                                    </div>
+                                    <div class="tab-pane fade" id="tab_customer" role="tabpanel">
+                                        <div class="buttons-header-grid pb-2">
+                                            <button id="NewCustomerButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" disabled>
+                                                <i class="fa fa-plus"></i> <span>@L["Button.New.CustomerInZone"].Value</span>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                                <i class="fa fa-upload"></i> <span>@L["ImportFromExcel"].Value</span>
+                                            </button>
+                                        </div>
+                                        <div id="customerAssgin"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
