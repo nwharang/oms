@@ -172,6 +172,7 @@ public class OMSWebModule : AbpModule
             .AddCookie("Cookies", options =>
             {
                 options.ExpireTimeSpan = TimeSpan.FromDays(365);
+                options.AccessDeniedPath = "/Account/AccessDenied2";
             })
             .AddAbpOpenIdConnect("oidc", options =>
             {
