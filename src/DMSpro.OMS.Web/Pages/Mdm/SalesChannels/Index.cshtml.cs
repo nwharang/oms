@@ -14,31 +14,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.SalesChannels
 {
     public class IndexModel : AbpPageModel
     {
-        public string CodeFilter { get; set; }
-        public string NameFilter { get; set; }
-        public string DescriptionFilter { get; set; }
-        [SelectItems(nameof(ActiveBoolFilterItems))]
-        public string ActiveFilter { get; set; }
-
-        public List<SelectListItem> ActiveBoolFilterItems { get; set; } =
-            new List<SelectListItem>
-            {
-                new SelectListItem("", ""),
-                new SelectListItem("Yes", "true"),
-                new SelectListItem("No", "false"),
-            };
-
-        private readonly ISalesChannelsAppService _salesChannelsAppService;
-
-        public IndexModel(ISalesChannelsAppService salesChannelsAppService)
-        {
-            _salesChannelsAppService = salesChannelsAppService;
-        }
-
-        public async Task OnGetAsync()
-        {
-
-            await Task.CompletedTask;
-        }
+        
     }
 }

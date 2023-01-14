@@ -14,20 +14,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.Currencies
 {
     public class IndexModel : AbpPageModel
     {
-        public string CodeFilter { get; set; }
-        public string NameFilter { get; set; }
-
-        private readonly ICurrenciesAppService _currenciesAppService;
-
-        public IndexModel(ICurrenciesAppService currenciesAppService)
-        {
-            _currenciesAppService = currenciesAppService;
-        }
-
-        public async Task OnGetAsync()
-        {
-
-            await Task.CompletedTask;
-        }
+        
     }
 }

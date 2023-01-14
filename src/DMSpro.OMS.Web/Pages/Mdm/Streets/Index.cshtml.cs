@@ -14,19 +14,6 @@ namespace DMSpro.OMS.MdmService.Web.Pages.Streets
 {
     public class IndexModel : AbpPageModel
     {
-        public string NameFilter { get; set; }
-
-        private readonly IStreetsAppService _streetsAppService;
-
-        public IndexModel(IStreetsAppService streetsAppService)
-        {
-            _streetsAppService = streetsAppService;
-        }
-
-        public async Task OnGetAsync()
-        {
-
-            await Task.CompletedTask;
-        }
+        
     }
 }

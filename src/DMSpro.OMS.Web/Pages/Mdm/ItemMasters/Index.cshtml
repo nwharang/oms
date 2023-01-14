@@ -12,7 +12,7 @@
 @inject IPageLayout PageLayout
 @{
     PageLayout.Content.Title = L["ItemMasters"].Value;
-    PageLayout.Content.MenuItemName = MdmServiceMenus.ItemMasters;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.Items;
 }
 
 @section scripts
@@ -23,8 +23,8 @@
 @section breadcrumb {
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
-        <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:Product"].Value</li>
-        <li class="breadcrumb-item active">@L["Menu:MdmService:ItemMasters"].Value</li>
+        <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:Item"].Value</li>
+        <li class="breadcrumb-item active">@L["Menu:MdmService:Items"].Value</li>
     </ol>
 }
 
@@ -32,7 +32,7 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fal fal fa-window"></i> @L["Menu:MdmService:ItemMasters"].Value
+                <i class="subheader-icon fal fal fa-window"></i> @L["Menu:MdmService:Items"].Value
             </h2>
         </div>
         <div class="panel-container show">
@@ -41,10 +41,10 @@
                     <abp-card-body>
                         <abp-row>
                             <div style="padding-left:12px" class="buttons-header-grid">
-                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.ItemMasters.Create))
+                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.Items.Create))
                                 {
                                     <button id="NewItemMasterButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                        <i class="fa fa-plus"></i> <span>@L["Button.New.ItemMaster"].Value</span>
+                                        <i class="fa fa-plus"></i> <span>@L["Button.New.Item"].Value</span>
                                     </button>
                                 }
                                 <button id="ExportToExcelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">

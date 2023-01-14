@@ -30,59 +30,5 @@
 
 <abp-card>
     <abp-card-body>
-		<abp-row class="mb-3">
-            <abp-column size-md="_12">
-                <form id="SearchForm" autocomplete="off">
-                    <div class="input-group">
-                        <input class="form-control page-search-filter-text" id="FilterText" placeholder="@L["Search"]"/>
-                        <abp-button button-type="Primary" type="submit" icon="search"/>
-                    </div>
-                </form>
-            </abp-column>
-            <abp-column size-md="_12" class="mt-3">
-                <a href="javascript:;" id="AdvancedFilterSectionToggler" class="text-decoration-none">@L["SeeAdvancedFilters"]</a>
-            </abp-column>
-        </abp-row>
-
-        <abp-row id="AdvancedFilterSection" style="display: none;">
-            <abp-column size="_3">
-                <abp-input asp-for="AltQtyFilterMin" label="@L["MinAltQty"].Value" />
-            </abp-column>
-            <abp-column size="_3">
-                <abp-input asp-for="AltQtyFilterMax" label="@L["MaxAltQty"].Value" />
-            </abp-column>
-            <abp-column size="_3">
-                <abp-input asp-for="BaseQtyFilterMin" label="@L["MinBaseQty"].Value" />
-            </abp-column>
-            <abp-column size="_3">
-                <abp-input asp-for="BaseQtyFilterMax" label="@L["MaxBaseQty"].Value" />
-            </abp-column>
-            <abp-column size="_3">
-                <abp-select asp-for="ActiveFilter" label="@L["Active"].Value" />
-            </abp-column>
-            <abp-column size="_3">
-                <abp-select asp-for="UOMGroupIdFilter" label="@L["UOMGroup"].Value" />
-            </abp-column>
-            <abp-column size="_3">
-                <abp-select asp-for="AltUOMIdFilter" label="@L["AltUOM"].Value" />
-            </abp-column>
-            <abp-column size="_3">
-                <abp-select asp-for="BaseUOMIdFilter" label="@L["BaseUOM"].Value" />
-            </abp-column>
-        </abp-row>
-
-        <abp-table striped-rows="true" id="UOMGroupDetailsTable">
-            <thead>
-				<tr>
-					<th>@L["Actions"]</th>
-					<th>@L["AltQty"]</th>
-					<th>@L["BaseQty"]</th>
-					<th>@L["Active"]</th>
-					<th>@L["UOMGroup"]</th>
-					<th>@L["AltUOM"]</th>
-					<th>@L["BaseUOM"]</th>
-				</tr>
-            </thead>
-        </abp-table>
     </abp-card-body>
 </abp-card>

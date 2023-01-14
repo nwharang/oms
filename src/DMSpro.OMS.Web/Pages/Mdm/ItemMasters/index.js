@@ -1,11 +1,11 @@
 ﻿$(function () {
     var l = abp.localization.getResource("MdmService");
-    var itemMasterService = window.dMSpro.oMS.mdmService.controllers.itemMasters.itemMaster;
+    var itemMasterService = window.dMSpro.oMS.mdmService.controllers.items.item;
     var itemTypeService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
 
     // get item type list
     var itemTypeList = [];
-    var urlItemTypeLookup = abp.appPath + 'api/mdm-service/item-masters/system-data-lookup' +
+    var urlItemTypeLookup = abp.appPath + 'api/mdm-service/items/system-data-lookup' +
         abp.utils.buildQueryString([
             { name: 'maxResultCount', value: 1000 }
         ]);
@@ -23,7 +23,7 @@
 
     // get UOM group lookup
     var UOMGroups = [];
-    var urlUOMGroupLookup = abp.appPath + 'api/mdm-service/item-masters/u-oMGroup-lookup' +
+    var urlUOMGroupLookup = abp.appPath + 'api/mdm-service/items/u-oMGroup-lookup' +
         abp.utils.buildQueryString([
             { name: 'maxResultCount', value: 1000 }
         ]);
@@ -41,7 +41,7 @@
 
     // get UOMs lookup
     var UOMs = [];
-    var urlUOMsLookup = abp.appPath + 'api/mdm-service/item-masters/u-oM-lookup' +
+    var urlUOMsLookup = abp.appPath + 'api/mdm-service/items/u-oM-lookup' +
         abp.utils.buildQueryString([
             { name: 'maxResultCount', value: 1000 }
         ]);
@@ -59,7 +59,7 @@
 
     // get VATs
     var VATs = [];
-    var urlVATsLookup = abp.appPath + 'api/mdm-service/item-masters/v-aT-lookup' +
+    var urlVATsLookup = abp.appPath + 'api/mdm-service/items/v-aT-lookup' +
         abp.utils.buildQueryString([
             { name: 'maxResultCount', value: 1000 }
         ]);
@@ -77,7 +77,7 @@
 
     // get Product Attribute
     var ProductAttrs = [];
-    var urlProductAttrsLookup = abp.appPath + 'api/mdm-service/item-masters/prod-attribute-value-lookup' +
+    var urlProductAttrsLookup = abp.appPath + 'api/mdm-service/items/item-attribute-value-lookup' +
         abp.utils.buildQueryString([
             { name: 'maxResultCount', value: 1000 }
         ]);
@@ -258,12 +258,12 @@
         },
         editing: {
             mode: 'popup',
-            allowAdding: abp.auth.isGranted('MdmService.ItemMasters.Create'),
-            allowUpdating: abp.auth.isGranted('MdmService.ItemMasters.Edit'),
-            allowDeleting: abp.auth.isGranted('MdmService.ItemMasters.Delete'),
+            allowAdding: abp.auth.isGranted('MdmService.Items.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.Items.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.Items.Delete'),
             useIcons: true,
             popup: {
-                title: l("Page.Title.ItemMasters"),
+                title: l("Page.Title.Items"),
                 showTitle: true,
                 width: '95%',
                 height: '100%'
@@ -475,24 +475,24 @@
             },
             {
                 dataField: 'code',
-                caption: l("EntityFieldName:MDMService:ItemMaster:Code"),
+                caption: l("EntityFieldName:MDMService:Item:Code"),
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'name',
-                caption: l("EntityFieldName:MDMService:ItemMaster:Name"),
+                caption: l("EntityFieldName:MDMService:Item:Name"),
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'shortName',
-                caption: l("EntityFieldName:MDMService:ItemMaster:ShortName"),
+                caption: l("EntityFieldName:MDMService:Item:ShortName"),
                 dataType: 'string'
             },
             {
                 dataField: 'itemTypeId',
-                caption: l("EntityFieldName:MDMService:ItemMaster:ItemTypeName"),
+                caption: l("EntityFieldName:MDMService:Item:ItemTypeName"),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getItemTypes,
@@ -502,18 +502,18 @@
             },
             {
                 dataField: 'barcode',
-                caption: l("EntityFieldName:MDMService:ItemMaster:Barcode"),
+                caption: l("EntityFieldName:MDMService:Item:Barcode"),
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'erpCode',
-                caption: l("EntityFieldName:MDMService:ItemMaster:ERPCode"),
+                caption: l("EntityFieldName:MDMService:Item:ERPCode"),
                 dataType: 'string'
             },
             {
                 dataField: 'uomGroupId',
-                caption: l('EntityFieldName:MDMService:ItemMaster:UOMGroupCode'),
+                caption: l('EntityFieldName:MDMService:Item:UOMGroupCode'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getUOMGroups,
@@ -524,28 +524,28 @@
             },
             {
                 dataField: 'inventoriable',
-                caption: l('EntityFieldName:MDMService:ItemMaster:IsInventoryItem'),
+                caption: l('EntityFieldName:MDMService:Item:IsInventoryItem'),
                 editorType: 'dxCheckBox',
                 //validationRules: [{ type: "required" }],
                 visible: false
             },
             {
                 dataField: 'purchasble',
-                caption: l('EntityFieldName:MDMService:ItemMaster:IsPurchaseItem'),
+                caption: l('EntityFieldName:MDMService:Item:IsPurchaseItem'),
                 editorType: 'dxCheckBox',
                 //validationRules: [{ type: "required" }],
                 visible: false
             },
             {
                 dataField: 'saleable',
-                caption: l('EntityFieldName:MDMService:ItemMaster:IsSalesItem'),
+                caption: l('EntityFieldName:MDMService:Item:IsSalesItem'),
                 editorType: 'dxCheckBox',
                 //validationRules: [{ type: "required" }],
                 visible: false
             },
             {
                 dataField: 'manageType',
-                caption: l('EntityFieldName:MDMService:ItemMaster:ManageItemBy'),
+                caption: l('EntityFieldName:MDMService:Item:ManageItemBy'),
                 editorType: 'dxSelectBox',
                 editorOptions: {
                     items: manageItem,
@@ -556,7 +556,7 @@
             },
             {
                 dataField: 'expiredType',
-                caption: l('EntityFieldName:MDMService:ItemMaster:ExpiredType'),
+                caption: l('EntityFieldName:MDMService:Item:ExpiredType'),
                 editorType: 'dxSelectBox',
                 editorOptions: {
                     items: expiredType,
@@ -566,13 +566,13 @@
             },
             {
                 dataField: 'expiredValue',
-                caption: l('EntityFieldName:MDMService:ItemMaster:ExpiredValue'),
+                caption: l('EntityFieldName:MDMService:Item:ExpiredValue'),
                 dataType: 'number',
                 visible: false
             },
             {
                 dataField: 'issueMethod',
-                caption: l('EntityFieldName:MDMService:ItemMaster:IssueMethod'),
+                caption: l('EntityFieldName:MDMService:Item:IssueMethod'),
                 editorType: 'dxSelectBox',
                 editorOptions: {
                     items: issueMethod,
@@ -582,7 +582,7 @@
             },
             {
                 dataField: 'inventoryUnitId',
-                caption: l('EntityFieldName:MDMService:ItemMaster:InventoryUnitName'),
+                caption: l('EntityFieldName:MDMService:Item:InventoryUnitName'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getUOMs,
@@ -594,7 +594,7 @@
             },
             {
                 dataField: 'purUnitId',
-                caption: l('EntityFieldName:MDMService:ItemMaster:PurUnitName'),
+                caption: l('EntityFieldName:MDMService:Item:PurUnitName'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getUOMs,
@@ -606,7 +606,7 @@
             },
             {
                 dataField: 'salesUnit',
-                caption: l('EntityFieldName:MDMService:ItemMaster:SalesUnitName'),
+                caption: l('EntityFieldName:MDMService:Item:SalesUnitName'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getUOMs,
@@ -618,7 +618,7 @@
             },
             {
                 dataField: 'vatId',
-                caption: l('EntityFieldName:MDMService:ItemMaster:VATName'),
+                caption: l('EntityFieldName:MDMService:Item:VATName'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getVATs,
@@ -630,14 +630,14 @@
             },
             {
                 dataField: 'active',
-                caption: l('EntityFieldName:MDMService:ItemMaster:Active'),
+                caption: l('EntityFieldName:MDMService:Item:Active'),
                 editorType: 'dxCheckBox',
                 //validationRules: [{ type: "required" }],
                 visible: false
             },
             {
                 dataField: 'attr0Id',
-                caption: l('EntityFieldName:MDMService:ItemMaster:Attr0Name'),
+                caption: l('EntityFieldName:MDMService:Item:Attr0Name'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getProductAttr,
@@ -648,7 +648,7 @@
             },
             {
                 dataField: 'attr1Id',
-                caption: l('EntityFieldName:MDMService:ItemMaster:Attr1Name'),
+                caption: l('EntityFieldName:MDMService:Item:Attr1Name'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getProductAttr,
@@ -659,7 +659,7 @@
             },
             {
                 dataField: 'attr2Id',
-                caption: l('EntityFieldName:MDMService:ItemMaster:Attr2Name'),
+                caption: l('EntityFieldName:MDMService:Item:Attr2Name'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getProductAttr,
@@ -670,7 +670,7 @@
             },
             {
                 dataField: 'attr3Id',
-                caption: l('EntityFieldName:MDMService:ItemMaster:Attr3Name'),
+                caption: l('EntityFieldName:MDMService:Item:Attr3Name'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getProductAttr,
@@ -681,7 +681,7 @@
             },
             {
                 dataField: 'attr4Id',
-                caption: l('EntityFieldName:MDMService:ItemMaster:Attr4Name'),
+                caption: l('EntityFieldName:MDMService:Item:Attr4Name'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getProductAttr,
@@ -692,7 +692,7 @@
             },
             {
                 dataField: 'attr5Id',
-                caption: l('EntityFieldName:MDMService:ItemMaster:Attr5Name'),
+                caption: l('EntityFieldName:MDMService:Item:Attr5Name'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getProductAttr,
@@ -703,7 +703,7 @@
             },
             {
                 dataField: 'attr6Id',
-                caption: l('EntityFieldName:MDMService:ItemMaster:Attr6Name'),
+                caption: l('EntityFieldName:MDMService:Item:Attr6Name'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getProductAttr,
@@ -714,7 +714,7 @@
             },
             {
                 dataField: 'attr7Id',
-                caption: l('EntityFieldName:MDMService:ItemMaster:Attr7Name'),
+                caption: l('EntityFieldName:MDMService:Item:Attr7Name'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getProductAttr,
@@ -725,7 +725,7 @@
             },
             {
                 dataField: 'attr8Id',
-                caption: l('EntityFieldName:MDMService:ItemMaster:Attr8Name'),
+                caption: l('EntityFieldName:MDMService:Item:Attr8Name'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getProductAttr,
@@ -736,7 +736,7 @@
             },
             {
                 dataField: 'attr9Id',
-                caption: l('EntityFieldName:MDMService:ItemMaster:Attr9Name'),
+                caption: l('EntityFieldName:MDMService:Item:Attr9Name'),
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getProductAttr,

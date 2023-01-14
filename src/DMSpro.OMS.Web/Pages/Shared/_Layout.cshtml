@@ -1,3 +1,4 @@
+﻿@using Volo.Abp.Ui.LayoutHooks
 ﻿@using Microsoft.AspNetCore.Mvc.Localization;
 @using Volo.Abp.AspNetCore.Mvc.UI.Components.LayoutHook
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
@@ -8,13 +9,39 @@
 @using Volo.Abp.AspNetCore.Mvc.UI.Widgets.Components.WidgetStyles
 @using Volo.Abp.Localization
 @using Volo.Abp.Ui.Branding
+
+@using Volo.Abp.Users
+@*ThuyLC *@
+@using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Options
+
+@using Volo.Abp.Localization
+@using Volo.Abp.AspNetCore.Mvc.UI.Components.LayoutHook
+
+
+
+@using Volo.Abp.AspNetCore.Mvc.AntiForgery
+@using Volo.Abp.AspNetCore.Mvc.UI.MultiTenancy.Localization
+@using Volo.Abp.AspNetCore.MultiTenancy
+@using Volo.Abp.MultiTenancy
+
+@inject IAbpAntiForgeryManager AbpAntiForgeryManager
+@inject IBrandingProvider BrandingProvider
+
+@inject IStringLocalizer<AbpUiMultiTenancyResource> MultiTenancyStringLocalizer
+@inject ITenantResolveResultAccessor TenantResolveResultAccessor
+@inject IOptions<AbpMultiTenancyOptions> MultiTenancyOptions
+@inject ICurrentTenant CurrentTenant
+@inject ICurrentUser CurrentUser
 @using DMSpro.OMS.MdmService.Localization
 @inject IHtmlLocalizer<MdmServiceResource> L
-@using Volo.Abp.Users
-@inject IBrandingProvider BrandingProvider
+
 @inject IPageLayout PageLayout
 @{
     Layout = null;
+    AbpAntiForgeryManager.SetCookie();
+    var langDir = CultureHelper.IsRtl ? "rtl" : string.Empty;
+
     var containerClass = ViewBag.FluidLayout == true ? "container-fluid" : "container"; //TODO: Better and type-safe options
 
     var pageTitle = ViewBag.Title == null ? BrandingProvider.AppName : ViewBag.Title; //TODO: Discard to get from Title
@@ -311,7 +338,7 @@
                                 </ul>
                             </li>
                             @*Product service*@
-                            <li>
+                            @* <li>
                                 <a href="#" title="Product Service" data-filter-tags="product service">
                                     <i class=" fal fa-cog"></i>
                                     <span class="nav-link-text" >Product Service</span>
@@ -324,7 +351,7 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </li>
+                            </li> *@
                             @*MDM*@
                             <li class="">
                                 <a href="#" title="MDM" data-filter-tags="mdm">
@@ -445,13 +472,13 @@
                                             </a>
                                             </li>*@
                                             <li>
-                                                <a href="/Mdm/ProductAttributes" title="Item Attributes" data-filter-tags="mdm item attributes">
+                                                <a href="/Mdm/ItemAttributes" title="Item Attributes" data-filter-tags="mdm item attributes">
                                                     <i class="fa fa-indent"></i>
-                                                    <span class="nav-link-text" >Product Attributes</span>
+                                                    <span class="nav-link-text" >Item Attributes</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="/Mdm/ProdAttributeValues" title="Item Attribute Values" data-filter-tags="mdm item attribute values">
+                                                <a href="/Mdm/ItemAttributeValues" title="Item Attribute Values" data-filter-tags="mdm item attribute values">
                                                     <i class="fa fa-check"></i>
                                                     <span class="nav-link-text" data-i18n="nav.font_icons_stack_icons_generate_stack">Item Attribute Values</span>
                                                 </a>
@@ -1632,8 +1659,8 @@
                                                 <img src="/dmstheme/img/demo/avatars/avatar-admin.png" class="rounded-circle profile-image" alt="Administrator">
                                             </span>
                                             <div class="info-card-text">
-                                                <div class="fs-lg text-truncate text-truncate-lg">Administrator</div>
-                                                <span class="text-truncate text-truncate-md opacity-80">admin@joytiny.net</span>
+                                                <div class="fs-lg text-truncate text-truncate-lg">@(CurrentUser.UserName)</div>
+                                                <span class="text-truncate text-truncate-md opacity-80">@(CurrentUser.Email)</span>
                                             </div>
                                         </div>
                                     </div>
@@ -1685,8 +1712,8 @@
                     <main id="js-page-content" role="main" class="page-content">
                         @RenderSection("breadcrumb", required: false)
                         @*  <div class="subheader">
-                        @RenderSection("subheaderTitle", required: false)
-                        </div>*@
+                            @RenderSection("subheaderTitle", required: false)
+                            </div>*@
                         <div class="row">
                             <div id="AbpContentToolbar">
                                 <div class="text-end mb-2">
@@ -2387,6 +2414,7 @@
         @await Component.InvokeLayoutHookAsync(LayoutHooks.PageContent.Last, StandardLayouts.Application)
     </div>
 
+    <script src="~/Abp/ApplicationLocalizationScript?cultureName=@System.Globalization.CultureInfo.CurrentCulture.Name"></script>
 
     @await Component.InvokeAsync(typeof(WidgetScriptsViewComponent))
 

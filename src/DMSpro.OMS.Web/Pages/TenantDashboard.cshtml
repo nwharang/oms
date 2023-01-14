@@ -23,21 +23,10 @@
         <form method="get" id="DashboardFilterForm">
             <abp-row h-align="Center">
                 <div class="input-daterange input-group input-group-sm" id="datepicker">
-                    <div class="input-group-prepend me-1">
-                        <label class="input-group-text">@L["StartDate"].Value</label>
-                        <input type="text"
-                               class="form-control"
-                               name="StartDate"
-                               value="@DateTime.Now.AddMonths(-1).Date.ToString(CultureInfo.CurrentUICulture.DateTimeFormat.ShortDatePattern)" />
-                    </div>
-
-                    <div class="input-group-prepend me-1">
-                        <label class="input-group-text">@L["EndDate"].Value</label>
-                        <input type="text"
-                               class="form-control"
-                               name="EndDate"
-                               value="@DateTime.Now.Date.ToString(CultureInfo.CurrentUICulture.DateTimeFormat.ShortDatePattern)" />
-                    </div>
+                    <span class="input-group-text">@L["Date"].Value</span>
+                    <input type="text"
+                            class="form-control date-range-picker"
+                            name="When"/>
                     <abp-button button-type="Primary" icon="refresh" size="Medium" type="Submit" text="@L["Refresh"].Value" />
                 </div>
             </abp-row>

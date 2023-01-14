@@ -12,8 +12,8 @@ using DMSpro.OMS.AdministrationService.Web;
 using DMSpro.OMS.IdentityService;
 using DMSpro.OMS.IdentityService.Web;
 using DMSpro.OMS.Localization;
-using DMSpro.OMS.ProductService;
-using DMSpro.OMS.ProductService.Web;
+// using DMSpro.OMS.ProductService;
+// using DMSpro.OMS.ProductService.Web;
 using DMSpro.OMS.SurveyService;
 using DMSpro.OMS.SurveyService.Web;
 using DMSpro.OMS.OrderService;
@@ -30,6 +30,7 @@ using DMSpro.OMS.Shared.Hosting.AspNetCore;
 using DMSpro.OMS.Web.Navigation;
 using Polly;
 using Prometheus;
+using Serilog;
 using StackExchange.Redis;
 using Volo.Abp;
 using Volo.Abp.Account;
@@ -63,6 +64,7 @@ using Volo.Forms.Web;
 using Volo.Abp.Localization;
 using Volo.Abp.Validation;
 using Volo.Abp.Validation.Localization;
+using Microsoft.AspNetCore.Identity;
 namespace DMSpro.OMS.Web;
 
 [DependsOn(
@@ -76,8 +78,8 @@ namespace DMSpro.OMS.Web;
     typeof(AbpAccountPublicHttpApiClientModule),
     typeof(SaasServiceWebModule),
     typeof(SaasServiceHttpApiClientModule),
-    typeof(ProductServiceWebModule),
-    typeof(ProductServiceHttpApiClientModule),
+    // typeof(ProductServiceWebModule),
+    // typeof(ProductServiceHttpApiClientModule),
     typeof(SurveyServiceWebModule),
     typeof(SurveyServiceHttpApiClientModule),
     typeof(OrderServiceWebModule),
@@ -171,6 +173,7 @@ public class OMSWebModule : AbpModule
             .AddCookie("Cookies", options =>
             {
                 options.ExpireTimeSpan = TimeSpan.FromDays(365);
+                options.AccessDeniedPath = "/Account/AccessDenied2";
             })
             .AddAbpOpenIdConnect("oidc", options =>
             {
@@ -196,6 +199,7 @@ public class OMSWebModule : AbpModule
                 options.Scope.Add("InventoryService");
                 options.Scope.Add("SurveyService");
             });
+        context.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.FromHours(24));
 
         if (Convert.ToBoolean(configuration["AuthServer:IsOnK8s"]))
         {
@@ -222,7 +226,7 @@ public class OMSWebModule : AbpModule
                 {
                     // Intercept the redirection for signout so the browser navigates to the right URL in your host
                     ctx.ProtocolMessage.IssuerAddress = configuration["AuthServer:Authority"].EnsureEndsWith('/') +
-                                                        "connect/endsession";
+                                                        "connect/logout";
 
                     if (previousOnRedirectToIdentityProviderForSignOut != null)
                     {
@@ -279,7 +283,7 @@ public class OMSWebModule : AbpModule
                 .Add<OMSWebResource>("en")
                 .AddBaseTypes(typeof(AbpValidationResource))
                 .AddVirtualJson("/Localization/OMSWeb");
-            options.DefaultResourceType = typeof(OMSWebResource);
+            //options.DefaultResourceType = typeof(OMSWebResource);
             });
             
         }
@@ -319,11 +323,18 @@ public class OMSWebModule : AbpModule
         app.UseAbpSecurityHeaders();
         app.UseStaticFiles();
         app.UseRouting();
-        app.UseHttpMetrics();
+        // app.UseHttpMetrics();
         app.UseAuthentication();
         app.UseMultiTenancy();
         app.UseAbpSerilogEnrichers();
         app.UseAuthorization();
+        app.Use(async (httpContext,next) =>{
+            var user = httpContext.User;
+            Console.WriteLine("SAAAAAAAA");
+            Console.WriteLine(user);
+            await next(httpContext);
+        });
+        app.UseWebSockets();
         app.UseConfiguredEndpoints(endpoints =>
         {
             endpoints.MapMetrics();
