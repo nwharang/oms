@@ -167,7 +167,7 @@ $(function () {
 
     /****control*****/
 
-    //Search Sales Org Header
+    //Autocomplete - Search Sales Org Header
     const salesOrgHeaderCode = $('#salesOrgHeaderCode').dxAutocomplete({
         dataSource: salesOrgHeaderStore,
         valueExpr: "code",
@@ -229,7 +229,7 @@ $(function () {
         labelMode: "floating"
     }).dxTextBox('instance');
 
-    //Tree Sales Org Hierarchy
+    //TreeList - Sales Org Hierarchy
     const dataTreeContainer = $('#dataTreeContainer').dxTreeList({
         dataSource: salesOrgHierarchyStore,
         keyExpr: 'id',
@@ -337,7 +337,7 @@ $(function () {
     }).dxTreeList("instance");
 
 
-    //Grid Sales Org Employee Assignment
+    //DataGrid - Sales Org Employee Assignment
     const dataGridContainer = $('#dataGridContainer').dxDataGrid({
         dataSource: salesOrgEmpAssignmentStore,
         remoteOperations: true,
@@ -455,7 +455,7 @@ $(function () {
     }).dxDataGrid("instance");
 
 
-    //Menu context
+    //ContextMenu - for TreeList - Sales Org Hierarchy
     $('#contextMenu').dxContextMenu({
         dataSource: menuItems,
         target: '#dataTreeContainer .dx-row.dx-data-row',

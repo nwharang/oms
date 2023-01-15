@@ -6,9 +6,11 @@ $(function () {
     var customerInZoneService = window.dMSpro.oMS.mdmService.controllers.customerInZones.customerInZone;
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
+
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
     var salesOrgHierarchyId = null;
+
     /****custom store*****/
     var salesOrgHierarchyStore = new DevExpress.data.CustomStore({
         key: 'id',
@@ -225,6 +227,7 @@ $(function () {
         }
     }).dxSelectBox("instance");
 
+    //DataGrid - Company Assgin
     var companyAssginContainer = $('#companyAssgin').dxDataGrid({
         dataSource: companyInZoneStore,
         remoteOperations: true,
@@ -382,6 +385,7 @@ $(function () {
         ]
     }).dxDataGrid("instance");
 
+    //DataGrid - Customer Assgin
     var customerAssginContainer = $('#customerAssgin').dxDataGrid({
         dataSource: customerInZoneStore,
         remoteOperations: true,

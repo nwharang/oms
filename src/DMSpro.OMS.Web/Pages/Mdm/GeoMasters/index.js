@@ -1,25 +1,17 @@
 ﻿$(function () {
     var l = abp.localization.getResource("MdmService");
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
+    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
-    //Custom store - for load, update, delete
-    var customStore = new DevExpress.data.CustomStore({
+    /****custom store*****/
+    var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
         loadMode: "raw",
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
@@ -57,9 +49,10 @@
         }
     });
 
-    //load list geomaster to view
+    /****control*****/
+    //TreeList - GeoMaster
     const dataTreeContainer = $('#dataTreeContainer').dxTreeList({
-        dataSource: customStore,
+        dataSource: geoMasterStore,
         keyExpr: 'id',
         parentIdExpr: "parentId",
         remoteOperations: true,
@@ -161,7 +154,7 @@
                 lookup: {
                     dataSource(options) {
                         return {
-                            store: customStore,
+                            store: geoMasterStore,
                             filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
                         };
                     },
@@ -178,10 +171,12 @@
         ]
     }).dxTreeList("instance");
 
+    /****event*****/
     $("input#Search").on("input", function () {
         dataTreeContainer.searchByText($(this).val());
     });
 
+    /****button*****/
     $("#NewGeoMasterButton").click(function () {
         dataTreeContainer.addRow();
     });
@@ -202,6 +197,7 @@
         )
     });
 
+    /****function*****/
     function isNotEmpty(value) {
         return value !== undefined && value !== null && value !== '';
     }

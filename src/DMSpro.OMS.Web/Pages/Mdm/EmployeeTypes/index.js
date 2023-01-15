@@ -4,8 +4,8 @@ $(function () {
 
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
-    //Custom store - for load, update, delete
-    var customStore = new DevExpress.data.CustomStore({
+    /****custom store*****/
+    var systemDataStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
             if (loadOptions.filter == undefined)
@@ -30,7 +30,14 @@ $(function () {
             return deferred.promise();
         },
         byKey: function (key) {
-            return key == 0 ? systemDataService.get(key) : null;
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            systemDataService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
         },
         insert(values) {
             return systemDataService.create(values, { contentType: "application/json" });
@@ -43,8 +50,10 @@ $(function () {
         }
     });
 
+    /****control*****/
+    //DataGrid - System Data
     const dataGridContainer = $('#dataGridContainer').dxDataGrid({
-        dataSource: customStore,
+        dataSource: systemDataStore,
         remoteOperations: true,
         showBorders: true,
         focusedRowEnabled: true,
@@ -131,12 +140,13 @@ $(function () {
         ]
     }).dxDataGrid("instance");
 
+    /****event*****/
     $("input#Search").on("input", function () {
-        //dataGridContainer.searchByText($(this).val());
         var searchStr = $(this).val();
         dataGridContainer.filter([['code', '=', 'MD03'], 'and', [['valueCode', 'contains', searchStr], 'or', ['valueName', 'contains', searchStr]]]);
     });
 
+    /****button*****/
     $("#NewEmployeeTypeButton").click(function () {
         dataGridContainer.addRow();
     });
@@ -158,6 +168,7 @@ $(function () {
         )
     });
 
+    /****function*****/
     function isNotEmpty(value) {
         return value !== undefined && value !== null && value !== '';
     }

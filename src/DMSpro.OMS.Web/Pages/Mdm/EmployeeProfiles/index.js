@@ -6,8 +6,8 @@ $(function () {
 
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
-    //Custom store - for load, update, delete
-    var customStore = new DevExpress.data.CustomStore({
+    /****custom store*****/
+    var employeeProfileStore = new DevExpress.data.CustomStore({
         key: 'id',
         loadMode: "raw",
         load(loadOptions) {
@@ -113,8 +113,10 @@ $(function () {
         }
     });
 
+    /****control*****/
+    //DataGrid - Employee Profile
     const dataGridContainer = $('#dataGridContainer').dxDataGrid({
-        dataSource: customStore,
+        dataSource: employeeProfileStore,
         remoteOperations: true,
         showBorders: true,
         focusedRowEnabled: true,
@@ -395,247 +397,13 @@ $(function () {
         ]
     }).dxDataGrid("instance");
 
+    /****button*****/
     $("#NewEmployeeProfileButton").click(function () {
         dataGridContainer.addRow();
     });
 
+    /****function*****/
     function isNotEmpty(value) {
         return value !== undefined && value !== null && value !== '';
     }
 });
-
-
-//$(function () {
-//    var l = abp.localization.getResource("MdmService");
-
-//	var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
-
-//        var lastNpIdId = '';
-//        var lastNpDisplayNameId = '';
-
-//        var _lookupModal = new abp.ModalManager({
-//            viewUrl: abp.appPath + "Shared/LookupModal",
-//            scriptUrl: "/Pages/Shared/lookupModal.js",
-//            modalClass: "navigationPropertyLookup"
-//        });
-
-//        $('.lookupCleanButton').on('click', '', function () {
-//            $(this).parent().find('input').val('');
-//        });
-
-//        _lookupModal.onClose(function () {
-//            var modal = $(_lookupModal.getModal());
-//            $('#' + lastNpIdId).val(modal.find('#CurrentLookupId').val());
-//            $('#' + lastNpDisplayNameId).val(modal.find('#CurrentLookupDisplayName').val());
-//        });
-
-//    var createModal = new abp.ModalManager({
-//        viewUrl: abp.appPath + "EmployeeProfiles/CreateModal",
-//        scriptUrl: "/Pages/EmployeeProfiles/createModal.js",
-//        modalClass: "employeeProfileCreate"
-//    });
-
-//	var editModal = new abp.ModalManager({
-//        viewUrl: abp.appPath + "EmployeeProfiles/EditModal",
-//        scriptUrl: "/Pages/EmployeeProfiles/editModal.js",
-//        modalClass: "employeeProfileEdit"
-//    });
-
-//	var getFilter = function() {
-//        return {
-//            filterText: $("#FilterText").val(),
-//            code: $("#CodeFilter").val(),
-//			erpCode: $("#ERPCodeFilter").val(),
-//			firstName: $("#FirstNameFilter").val(),
-//			lastName: $("#LastNameFilter").val(),
-//			dateOfBirthMin: $("#DateOfBirthFilterMin").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-//			dateOfBirthMax: $("#DateOfBirthFilterMax").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-//			idCardNumber: $("#IdCardNumberFilter").val(),
-//			email: $("#EmailFilter").val(),
-//			phone: $("#PhoneFilter").val(),
-//			address: $("#AddressFilter").val(),
-//            active: (function () {
-//                var value = $("#ActiveFilter").val();
-//                if (value === undefined || value === null || value === '') {
-//                    return '';
-//                }
-//                return value === 'true';
-//            })(),
-//			effectiveDateMin: $("#EffectiveDateFilterMin").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-//			effectiveDateMax: $("#EffectiveDateFilterMax").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-//			endDateMin: $("#EndDateFilterMin").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-//			endDateMax: $("#EndDateFilterMax").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-//			identityUserId: $("#IdentityUserIdFilter").val(),
-//			workingPositionId: $("#WorkingPositionIdFilter").val(),			employeeTypeId: $("#EmployeeTypeIdFilter").val()
-//        };
-//    };
-
-//    var dataTable = $("#EmployeeProfilesTable").DataTable(abp.libs.datatables.normalizeConfiguration({
-//        processing: true,
-//        serverSide: true,
-//        paging: true,
-//        searching: false,
-//        scrollX: true,
-//        autoWidth: true,
-//        scrollCollapse: true,
-//        order: [[1, "asc"]],
-//        ajax: abp.libs.datatables.createAjax(employeeProfileService.getList, getFilter),
-//        columnDefs: [
-//            {
-//                rowAction: {
-//                    items:
-//                        [
-//                            {
-//                                text: l("Edit"),
-//                                visible: abp.auth.isGranted('MdmService.EmployeeProfiles.Edit'),
-//                                action: function (data) {
-//                                    editModal.open({
-//                                     id: data.record.employeeProfile.id
-//                                     });
-//                                }
-//                            },
-//                            {
-//                                text: l("Delete"),
-//                                visible: abp.auth.isGranted('MdmService.EmployeeProfiles.Delete'),
-//                                confirmMessage: function () {
-//                                    return l("DeleteConfirmationMessage");
-//                                },
-//                                action: function (data) {
-//                                    employeeProfileService.delete(data.record.employeeProfile.id)
-//                                        .then(function () {
-//                                            abp.notify.info(l("SuccessfullyDeleted"));
-//                                            dataTable.ajax.reload();
-//                                        });
-//                                }
-//                            }
-//                        ]
-//                }
-//            },
-//			{ data: "employeeProfile.code" },
-//			{ data: "employeeProfile.erpCode" },
-//			{ data: "employeeProfile.firstName" },
-//			{ data: "employeeProfile.lastName" },
-//            {
-//                data: "employeeProfile.dateOfBirth",
-//                render: function (dateOfBirth) {
-//                    if (!dateOfBirth) {
-//                        return "";
-//                    }
-
-//					var date = Date.parse(dateOfBirth);
-//                    return (new Date(date)).toLocaleDateString(abp.localization.currentCulture.name);
-//                }
-//            },
-//			{ data: "employeeProfile.idCardNumber" },
-//			{ data: "employeeProfile.email" },
-//			{ data: "employeeProfile.phone" },
-//			{ data: "employeeProfile.address" },
-//            {
-//                data: "employeeProfile.active",
-//                render: function (active) {
-//                    return active ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
-//                }
-//            },
-//            {
-//                data: "employeeProfile.effectiveDate",
-//                render: function (effectiveDate) {
-//                    if (!effectiveDate) {
-//                        return "";
-//                    }
-
-//					var date = Date.parse(effectiveDate);
-//                    return (new Date(date)).toLocaleDateString(abp.localization.currentCulture.name);
-//                }
-//            },
-//            {
-//                data: "employeeProfile.endDate",
-//                render: function (endDate) {
-//                    if (!endDate) {
-//                        return "";
-//                    }
-
-//					var date = Date.parse(endDate);
-//                    return (new Date(date)).toLocaleDateString(abp.localization.currentCulture.name);
-//                }
-//            },
-//			{ data: "employeeProfile.identityUserId" },
-//            {
-//                data: "workingPosition.code",
-//                defaultContent : ""
-//            },
-//            {
-//                data: "systemData.valueCode",
-//                defaultContent : ""
-//            }
-//        ]
-//    }));
-
-//    createModal.onResult(function () {
-//        dataTable.ajax.reload();
-//    });
-
-//    editModal.onResult(function () {
-//        dataTable.ajax.reload();
-//    });
-
-//    $("#NewEmployeeProfileButton").click(function (e) {
-//        e.preventDefault();
-//        createModal.open();
-//    });
-
-//	$("#SearchForm").submit(function (e) {
-//        e.preventDefault();
-//        dataTable.ajax.reload();
-//    });
-
-//    $("#ExportToExcelButton").click(function (e) {
-//        e.preventDefault();
-
-//        employeeProfileService.getDownloadToken().then(
-//            function(result){
-//                    var input = getFilter();
-//                    var url =  abp.appPath + 'api/mdm-service/employee-profiles/as-excel-file' +
-//                        abp.utils.buildQueryString([
-//                            { name: 'downloadToken', value: result.token },
-//                            { name: 'filterText', value: input.filterText },
-//                            { name: 'code', value: input.code },
-//                            { name: 'erpCode', value: input.erpCode },
-//                            { name: 'firstName', value: input.firstName },
-//                            { name: 'lastName', value: input.lastName },
-//                            { name: 'dateOfBirthMin', value: input.dateOfBirthMin },
-//                            { name: 'dateOfBirthMax', value: input.dateOfBirthMax },
-//                            { name: 'idCardNumber', value: input.idCardNumber },
-//                            { name: 'email', value: input.email },
-//                            { name: 'phone', value: input.phone },
-//                            { name: 'address', value: input.address },
-//                            { name: 'active', value: input.active },
-//                            { name: 'effectiveDateMin', value: input.effectiveDateMin },
-//                            { name: 'effectiveDateMax', value: input.effectiveDateMax },
-//                            { name: 'endDateMin', value: input.endDateMin },
-//                            { name: 'endDateMax', value: input.endDateMax },
-//                            { name: 'identityUserId', value: input.identityUserId },
-//                            { name: 'workingPositionId', value: input.workingPositionId }
-//,
-//                            { name: 'employeeTypeId', value: input.employeeTypeId }
-//                            ]);
-
-//                    var downloadWindow = window.open(url, '_blank');
-//                    downloadWindow.focus();
-//            }
-//        )
-//    });
-
-//    $('#AdvancedFilterSectionToggler').on('click', function (e) {
-//        $('#AdvancedFilterSection').toggle();
-//    });
-
-//    $('#AdvancedFilterSection').on('keypress', function (e) {
-//        if (e.which === 13) {
-//            dataTable.ajax.reload();
-//        }
-//    });
-
-//    $('#AdvancedFilterSection select').change(function() {
-//        dataTable.ajax.reload();
-//    });
-//});
