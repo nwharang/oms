@@ -160,6 +160,9 @@ $(function () {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
+        onRowUpdating: function (e) {
+            e.newData = Object.assign({}, e.oldData, e.newData);
+        },
         remoteOperations: true,
         showBorders: true,
         focusedRowEnabled: true,

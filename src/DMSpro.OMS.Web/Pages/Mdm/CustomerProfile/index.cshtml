@@ -10,7 +10,7 @@
 @inject IAuthorizationService Authorization
 @inject IPageLayout PageLayout
 @{
-    PageLayout.Content.Title = L["CustomerProfiles"].Value;
+    PageLayout.Content.Title = L["Page.Title.Customers"].Value;
     PageLayout.Content.MenuItemName = MdmServiceMenus.CustomerProfiles;
 }
 
@@ -32,7 +32,7 @@
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
         <li class="breadcrumb-item">@L["Menu:MdmService:Customer"].Value</li>
-        <li class="breadcrumb-item active">@L["Page.Title.CustomerProfiles"].Value</li>
+        <li class="breadcrumb-item active">@L["Page.Title.Customers"].Value</li>
     </ol>
 
     }
@@ -40,7 +40,7 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fal fa-credit-card-front"></i> @L["Page.Title.CustomerProfiles"].Value
+                    <i class="subheader-icon fal fa-credit-card-front"></i> @L["Page.Title.Customers"].Value
             </h2>
         </div>
         <div class="panel-container show">

@@ -30,6 +30,7 @@ $(function () {
 
             customerAttributeService.getListDevextremes(args)
                 .done(result => {
+                    console.log('data res:', result.data)
                     dataCusAttributes = result.data;
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -60,7 +61,7 @@ $(function () {
         editing: {
             mode: "row",
             allowAdding: false,
-            allowUpdating: abp.auth.isGranted('MdmService.GeoMasters.Edit'),
+            allowUpdating: abp.auth.isGranted('MdmService.CustomerAttributes.Edit'),
             allowDeleting: false,
             useIcons: true,
             texts: {
@@ -70,7 +71,7 @@ $(function () {
             }
         },
         onEditorPreparing(e) {
-            if (e.dataField == "customerAttributeTree") {
+            if (e.dataField == "hierarchyLevel") {
                 var grid = e.component;
                 var index = e.row.rowIndex;
                 var value = grid.cellValue(index, "active");
@@ -79,12 +80,7 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ["attrNo", "attrName", "active", "hierarchyLevel"];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            e.newData = Object.assign({}, e.oldData, e.newData);
         },
         remoteOperations: true,
         showBorders: true,
@@ -123,21 +119,21 @@ $(function () {
             },
             {
                 dataField: 'attrNo',
-                caption: l1("CustomerAttribute:Code"),
+                caption: l1("CustomerAttribute.Code"),
                 allowEditing: false,
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'attrName',
-                caption: l1("CustomerAttribute:Name"),
+                caption: l1("CustomerAttribute.Name"),
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
             {
-                dataField: 'hierarchyLevel ',
+                dataField: 'hierarchyLevel',
                 caption: l1("CustomerAttribute.HierarchyLevel"),
-                dataType: 'string',
+                dataType: 'number',
             },
             {
                 dataField: 'active',

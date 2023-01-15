@@ -8,6 +8,21 @@
     }
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
+    var urlCompanyAssignment = abp.appPath + 'api/mdm-service/company-identity-user-assignments' +
+        abp.utils.buildQueryString([
+            { name: 'maxResultCount', value: 1000 }
+        ]);
+
+    $.ajax({
+        url: `${urlCompanyAssignment}`,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            console.log('data call companyassignment ajax: ', data);
+        }
+    });
+
+
     var userTemps = [
         {
             id: 1,
@@ -205,6 +220,9 @@
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
+        },
+        onRowUpdating: function (e) {
+            e.newData = Object.assign({}, e.oldData, e.newData);
         },
         remoteOperations: true,
         showBorders: true,

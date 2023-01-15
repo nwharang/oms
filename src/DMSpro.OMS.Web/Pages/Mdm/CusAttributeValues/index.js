@@ -84,9 +84,6 @@ $(function () {
             }
         },
         onEditorPreparing(e) {
-            if (e.dataField == "customerAttributeTree") {
-                
-            }
             if (e.rowType === "data" && e.column.command == "edit") {
                 var grid = e.component;
                 var index = e.row.rowIndex;

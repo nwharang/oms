@@ -26,6 +26,9 @@
     "CustomerAttribute.Name": "Attribute Name",
     "CustomerAttribute.Active": "Active",
     "CustomerAttribute.HierarchyLevel": "Hierarchy Level",
+    "Button.New.CustomerAttachment": "New Customer Attachment",
+    "Button.New.CustomerContact": "New Customer Contact"
+    "CustomerAttribute.HierarchyLevel": "Hierarchy Level",
     "CompanyInZone.Company": "Company",
     "CustomerInZone.CustomerCode": "Customer Code",
     "CustomerInZone.CustomerName": "Customer Name"

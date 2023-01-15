@@ -120,6 +120,9 @@
         },
         onRowInserting: function (e) {
         },
+        onRowUpdating: function (e) {
+            e.newData = Object.assign({}, e.oldData, e.newData);
+        },
         columns: [
             {
                 type: 'buttons',
