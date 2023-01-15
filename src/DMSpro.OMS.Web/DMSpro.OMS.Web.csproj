@@ -35,7 +35,7 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\..\packages\Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic\Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic.csproj" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic" Version="7.0.0" />
     <!--<ProjectReference Include="..\..\..\..\shared\DMSpro.OMS.Shared.Hosting.AspNetCore\DMSpro.OMS.Shared.Hosting.AspNetCore.csproj" />
     
     <ProjectReference Include="..\..\..\..\shared\DMSpro.OMS.Shared.Localization\DMSpro.OMS.Shared.Localization.csproj" />
