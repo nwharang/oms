@@ -133,6 +133,7 @@
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
+            args.filter = JSON.stringify(['customerId', '=', cusProfile.id])
 
             cusAttachService.getListDevextremes(args)
                 .done(result => {
@@ -170,6 +171,7 @@
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
+            args.filter = JSON.stringify(['customerId', '=', cusProfile.id])
 
             cusContactService.getListDevextremes(args)
                 .done(result => {
@@ -609,45 +611,45 @@
             },
             {
                 dataField: 'phone1',
-                caption: l("phone1"),
+                caption: l("Phone1"),
                 dataType: 'string',
             },
             {
                 dataField: 'phone2',
-                caption: l("phone2"),
+                caption: l("Phone2"),
                 dataType: 'string',
             },
             {
                 dataField: 'erpCode',
-                caption: l("erpCode"),
+                caption: l("ERPCode"),
                 dataType: 'string',
                 visible: false
             },
             {
                 dataField: 'license',
-                caption: l("license"),
+                caption: l("License"),
                 dataType: 'string',
             },
             {
                 dataField: 'taxCode',
-                caption: l("taxCode"),
+                caption: l("TaxCode"),
                 dataType: 'string',
             },
             {
                 dataField: 'vatName',
-                caption: l("vatName"),
+                caption: l("VatName"),
                 dataType: 'string',
                 visible: false
             },
             {
                 dataField: 'vatAddress',
-                caption: l("vatAddress"),
+                caption: l("VatAddress"),
                 dataType: 'string',
                 visible: false
             },
             {
                 dataField: 'sfaCustomerCode',
-                caption: l("sfaCustomerCode"),
+                caption: l("SfaCustomerCode"),
                 dataType: 'string',
             },
             {
@@ -665,34 +667,34 @@
             },
             {
                 dataField: 'effectiveDate',
-                caption: l("effectiveDate"),
+                caption: l("EffectiveDate"),
                 dataType: 'date',
             },
             {
                 dataField: 'endDate',
-                caption: l("endDate"),
+                caption: l("EndDate"),
                 dataType: 'date',
             },
             {
                 dataField: 'creationTime',
-                caption: l("creationTime"),
+                caption: l("CreationTime"),
                 dataType: 'date',
                 visible: false
             },
             {
                 dataField: 'isCompany',
-                caption: l("isCompany"),
+                caption: l("IsCompany"),
                 dataType: 'boolean',
             },
             {
                 dataField: 'creditLimit',
-                caption: l("creditLimit"),
+                caption: l("CreditLimit"),
                 dataType: 'number',
                 visible: false
             },
             {
                 dataField: 'paymentTermId',
-                caption: l("paymentTermId"),
+                caption: l("PaymentTerm"),
                 dataType: 'string',
                 visible: false,
                 lookup: {
@@ -703,19 +705,19 @@
             },
             {
                 dataField: 'linkedCompanyId',
-                caption: l("linkedCompanyId"),
+                caption: l("LinkedCompany"),
                 dataType: 'string',
                 visible: false
             },
             {
                 dataField: 'warehouseId',
-                caption: l("warehouseId"),
+                caption: l("Warehouse"),
                 dataType: 'string',
                 visible: false
             },
             {
                 dataField: 'priceListId',
-                caption: l("priceListId"),
+                caption: l("PriceList"),
                 dataType: 'string',
                 visible: false,
                 lookup: {
@@ -801,31 +803,31 @@
             },
             {
                 dataField: 'street',
-                caption: l("street"),
+                caption: l("Street"),
                 dataType: 'string',
                 visible: false
             },
             {
                 dataField: 'address',
-                caption: l("address"),
+                caption: l("Address"),
                 dataType: 'string',
                 visible: false
             },
             {
                 dataField: 'latitude',
-                caption: l("latitude"),
+                caption: l("Latitude"),
                 dataType: 'string',
                 visible: false
             },
             {
                 dataField: 'longitude',
-                caption: l("longitude"),
+                caption: l("Longitude"),
                 dataType: 'string',
                 visible: false
             },
             {
                 dataField: "attribute0Id",
-                caption: l1("attribute0Id"),
+                caption: l1("Attribute0Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -835,7 +837,7 @@
             },
             {
                 dataField: "attribute1Id",
-                caption: l1("attribute1Id"),
+                caption: l1("Attribute1Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -845,7 +847,7 @@
             },
             {
                 dataField: "attribute2Id",
-                caption: l1("attribute2Id"),
+                caption: l1("Attribute2Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -855,7 +857,7 @@
             },
             {
                 dataField: "attribute3Id",
-                caption: l1("attribute3Id"),
+                caption: l1("Attribute3Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -865,7 +867,7 @@
             },
             {
                 dataField: "attribute4Id",
-                caption: l1("attribute4Id"),
+                caption: l1("Attribute4Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -875,7 +877,7 @@
             },
             {
                 dataField: "attribute5Id",
-                caption: l1("attribute5Id"),
+                caption: l1("Attribute5Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -885,7 +887,7 @@
             },
             {
                 dataField: "attribute6Id",
-                caption: l1("attribute6Id"),
+                caption: l1("Attribute6Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -895,7 +897,7 @@
             },
             {
                 dataField: "attribute7Id",
-                caption: l1("attribute7Id"),
+                caption: l1("Attribute7Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -905,7 +907,7 @@
             },
             {
                 dataField: "attribute8Id",
-                caption: l1("attribute8Id"),
+                caption: l1("Attribute8Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -915,7 +917,7 @@
             },
             {
                 dataField: "attribute9Id",
-                caption: l1("attribute9Id"),
+                caption: l1("Attribute9Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -925,7 +927,7 @@
             },
             {
                 dataField: "attribute10Id",
-                caption: l1("attribute10Id"),
+                caption: l1("Attribute10Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -935,7 +937,7 @@
             },
             {
                 dataField: "attribute11Id",
-                caption: l1("attribute11Id"),
+                caption: l1("Attribute11Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -945,7 +947,7 @@
             },
             {
                 dataField: "attribute12Id",
-                caption: l1("attribute12Id"),
+                caption: l1("Attribute12Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -955,7 +957,7 @@
             },
             {
                 dataField: "attribute13Id",
-                caption: l1("attribute13Id"),
+                caption: l1("Attribute13Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -965,7 +967,7 @@
             },
             {
                 dataField: "attribute14Id",
-                caption: l1("attribute14Id"),
+                caption: l1("Attribute14Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -975,7 +977,7 @@
             },
             {
                 dataField: "attribute15Id",
-                caption: l1("attribute15Id"),
+                caption: l1("Attribute15Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -985,7 +987,7 @@
             },
             {
                 dataField: "attribute16Id",
-                caption: l1("attribute16Id"),
+                caption: l1("Attribute16Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -995,7 +997,7 @@
             },
             {
                 dataField: "attribute17Id",
-                caption: l1("attribute17Id"),
+                caption: l1("Attribute17Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -1005,7 +1007,7 @@
             },
             {
                 dataField: "attribute18Id",
-                caption: l1("attribute18Id"),
+                caption: l1("Attribute18Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -1015,7 +1017,7 @@
             },
             {
                 dataField: "attribute19Id",
-                caption: l1("attribute19Id"),
+                caption: l1("Attribute19Name"),
                 visible: false,
                 lookup: {
                     dataSource: cusAttrLookup,
@@ -1026,20 +1028,16 @@
         ],
     }).dxDataGrid("instance");
 
-    var cusContact = {
-        firstName: "Tran",
-        lastName: "Bo",
-        gender: "Nam",
-        dateOfBirth: new Date(),
-        email: "abc@gmail.com",
-        phone: "",
-        address: "",
-        identityNumber: "",
-        bankName: "",
-        accountName: "",
-        accountNumber: ""
-    }
-
+    var genderStore = [
+        {
+            id: 1,
+            displayName: l1("Male")
+        },
+        {
+            id: 0,
+            displayName: l1("Female")
+        }
+    ]
     $("#btnNewCustomerProfile").click(function (e) {
         gridCustomers.addRow();
     });
