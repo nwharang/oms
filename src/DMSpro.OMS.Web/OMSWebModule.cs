@@ -64,7 +64,9 @@ using Volo.Forms.Web;
 using Volo.Abp.Localization;
 using Volo.Abp.Validation;
 using Volo.Abp.Validation.Localization;
+using Volo.Abp.Account.Public.Web;
 using Microsoft.AspNetCore.Identity;
+
 namespace DMSpro.OMS.Web;
 
 [DependsOn(
@@ -74,6 +76,7 @@ namespace DMSpro.OMS.Web;
     typeof(AbpAspNetCoreAuthenticationOpenIdConnectModule),
     typeof(AbpHttpClientWebModule),
     typeof(AbpHttpClientIdentityModelWebModule),
+    //typeof(AbpAccountPublicWebModule),
     typeof(AbpAspNetCoreMvcUiLeptonXThemeModule),
     typeof(AbpAccountPublicHttpApiClientModule),
     typeof(SaasServiceWebModule),
@@ -172,8 +175,14 @@ public class OMSWebModule : AbpModule
             })
             .AddCookie("Cookies", options =>
             {
-                options.ExpireTimeSpan = TimeSpan.FromDays(365);
+                
+                options.ExpireTimeSpan = TimeSpan.FromHours(1);
                 options.AccessDeniedPath = "/Account/AccessDenied2";
+                options.ForwardChallenge = "oidc";
+                options.SlidingExpiration = true;
+                //options.ForwardAuthenticate
+
+                //options.SessionStore
             })
             .AddAbpOpenIdConnect("oidc", options =>
             {
@@ -198,6 +207,9 @@ public class OMSWebModule : AbpModule
                 options.Scope.Add("MdmService");
                 options.Scope.Add("InventoryService");
                 options.Scope.Add("SurveyService");
+                options.AccessDeniedPath = "/Account/AccessDenied2";
+                //options.UseTokenLifetime = true;
+                //options.AutomaticRefreshInterval = 1000;
             });
         context.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.FromHours(24));
 
@@ -312,7 +324,7 @@ public class OMSWebModule : AbpModule
         }
         if (env.IsDevelopment())
         {
-            app.UseErrorPage();
+            //app.UseErrorPage();
         }
 
         app.UseForwardedHeaders(new ForwardedHeadersOptions {
