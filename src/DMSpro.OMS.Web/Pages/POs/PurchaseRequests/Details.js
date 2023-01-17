@@ -1,9 +1,10 @@
-﻿
+﻿var l = abp.localization.getResource("MdmService");
+var model = JSON.parse(sessionStorage.getItem("model"));
+console.log(model);
+document.title = `PO - ${model.DocNbr} | OMS`;
+
 $(function () {
-    var l = abp.localization.getResource("MdmService");
-    var model = JSON.parse(sessionStorage.getItem("model"));
-    console.log(model);
-    document.title = `PO - ${model.DocNbr} | OMS`;
+     
     DevExpress.config({
         editorStylingMode: 'underlined',
     });
