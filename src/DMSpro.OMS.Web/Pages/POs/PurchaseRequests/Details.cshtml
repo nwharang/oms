@@ -10,7 +10,9 @@
 @section styles {
     <abp-style src="/Pages/POs/PurchaseRequests/Details.css" />
 }
-@section scripts {
+@section scripts { 
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/POs/PurchaseRequests/Details.js" />
 }
 
@@ -36,10 +38,10 @@
                         <abp-row>
                             <div style="padding-left:12px" class="buttons-header-grid">
                                 <div class="btn-group">
-                                    <button id="btnDetailsActions" type="button" class="btn btn-light btn-sm dropdown-toggle"
+                                    <button id="btnActions" type="button" class="btn btn-light btn-sm dropdown-toggle"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="dx-icon dx-icon-preferences"></i>
-                                        <span class="dx-button-text">Action</span>
+                                        <i class="fa fa-gear"></i>
+                                        <span class="">Action</span>
                                     </button>
                                     <div class="dropdown-menu fadeindown">
                                         <button class="dropdown-item" type="button">Save</button>
@@ -66,14 +68,7 @@
                                         </div>
 
                                     </div>
-                                </div>
-                                <script id="details-1" type="text/html">
-
-                                    <div id="gridDetails"></div>
-                                </script>
-                                <script id="details-2" type="text/html">
-
-                                </script>
+                                </div> 
                             </div>
                         </div>
                     </abp-card-body>

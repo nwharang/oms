@@ -1,7 +1,33 @@
-﻿
+﻿var popupVenderInformation;
+function showDetails() {
+    popupVenderInformation.show();
+}
+
+var products = [{
+    "ID": 1,
+    "Name": "Item 1",
+    "BarCode": "ABC-abc-1234"
+}, {
+    "ID": 2,
+    "Name": "Item 2",
+    "BarCode": "A-0010-Z"
+}, {
+    "ID": 3,
+    "Name": "Item 3",
+    "BarCode": "A-0050-Z"
+}, {
+    "ID": 4,
+    "Name": "Item 4",
+    "BarCode": "A-0060-Z"
+}, {
+    "ID": 5,
+    "Name": "Item 35",
+    "BarCode": "45-0060-Z"
+}];
+
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    $('#gridPurchaseRequests').dxDataGrid({
+    var gridPurchaseRequests = $('#gridPurchaseRequests').dxDataGrid({
         dataSource: [{
             Vendor: "IDP",
             DocNbr: "RP001",
@@ -78,44 +104,37 @@ $(function () {
             showNavigationButtons: true
         },
         toolbar: {
-            items: [{
-                location: 'before',
-                widget: 'dxButton',
-                options: {
-                    icon: 'fa fa-plus',
-                    text: 'Add Row',
+            items: [
+                {
+                    location: 'before',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>New Purchase Request</span></button>',
                     onClick() {
-                        dataGridContainer.addRow();
+                        gridPurchaseRequests.addRow();
                     },
                 },
-            },
-            {
-                location: 'before',
-                template: '<div class="btn-group"><button id="btnActions" type="button" class="btn btn-light btn-sm dropdown-toggle"                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="dx-icon dx-icon-preferences"></i>                                        <span class="dx-button-text">Action</span>  </button> <div class="dropdown-menu fadeindown">                                        <button class="dropdown-item" type="button">Approved</button> <button class="dropdown-item" type="button">Rejected</button>                                    </div> </div>'
-            },
-            {
-                location: 'after',
-                widget: 'dxButton',
-                options: {
-                    icon: 'refresh',
-                    onClick() {
-                        dataGridContainer.refresh();
+                {
+                    location: 'before',
+                    template: '<div><button type="button" class="btn btn-light btn-sm dropdown-toggle waves-effect waves-themed" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="fa fa-gear"></i> <span class="">Action</span>  </button><div class="dropdown-menu fadeindown"> <button class="dropdown-item" type="button">Confirmed</button> <button class="dropdown-item" type="button">Rejected</button></div></div>'
+                },
+                {
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'refresh',
+                        onClick() {
+                            gridPurchaseRequests.refresh();
+                        },
                     },
                 },
-            },
                 'columnChooserButton',
                 "exportButton",
-            {
-                location: 'after',
-                widget: 'dxButton',
-                options: {
-                    icon: 'fa fa-upload',
-                    text: "Import From Excel",
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-upload"></i> <span>Import from Excel</span> </button>',
                     onClick() {
                         //todo
                     },
                 },
-            },
             ],
         },
         export: {
@@ -212,7 +231,8 @@ $(function () {
                         icon: "fieldchooser",
                         hint: "View Details",
                         onClick: function (e) {
-                            window.open('/Pos/PurchaseRequests/Details', '_blank');
+                            var w = window.open('/Pos/PurchaseRequests/Details', '_blank');
+                            w.sessionStorage.setItem("model", JSON.stringify(e.row.data));
                         }
                     },
                     'edit', 'delete']
@@ -221,7 +241,7 @@ $(function () {
                 caption: "Vendor",
                 dataField: "Vendor",
                 cellTemplate: function (element, info) {
-                    element.append(`<a href="#">${info.text}</a>`);
+                    element.append(`<a href="javascript:showDetails()">${info.text}</a>`);
                 },
                 alignment: "center",
                 cssClass: "increaseFontWeight"
@@ -297,25 +317,21 @@ $(function () {
             }],
         },
     }).dxDataGrid("instance");
+
+    popupVenderInformation = $("#popupVenderInformation").dxPopup({
+        width: 600,
+        height: 400,
+        showTitle: true,
+        container: '.page-content',
+        title: 'Information',
+        visible: false,
+        dragEnabled: false,
+        hideOnOutsideClick: true,
+        showCloseButton: true,
+        position: {
+            at: 'center',
+            my: 'center',
+            collision: 'fit',
+        },
+    }).dxPopup('instance');
 });
-var products = [{
-    "ID": 1,
-    "Name": "Item 1",
-    "BarCode": "ABC-abc-1234"
-}, {
-    "ID": 2,
-    "Name": "Item 2",
-    "BarCode": "A-0010-Z"
-}, {
-    "ID": 3,
-    "Name": "Item 3",
-    "BarCode": "A-0050-Z"
-}, {
-    "ID": 4,
-    "Name": "Item 4",
-    "BarCode": "A-0060-Z"
-}, {
-    "ID": 5,
-    "Name": "Item 35",
-    "BarCode": "45-0060-Z"
-}];

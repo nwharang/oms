@@ -95,10 +95,10 @@ div.panel-container.show > div.panel-content.jqvmap-bg-ocean.p-0 > div {
     box-shadow: none !important;
 }
 
-.buttons-header-grid .btn {
+/*.buttons-header-grid .btn {
     border-radius: 0 !important;
 }
-
+*/
 .dx-datagrid .dx-header-filter-empty {
     color: rgb(255 255 255);
 }
@@ -269,4 +269,8 @@ table.companies > tbody > tr{
 }
 .nav-menu li > ul li a > [class*='fa-'], .nav-menu li > ul li a > .ni{
     margin-left:unset;
+}
+
+div.dx-datagrid div.dx-toolbar-items-container button.btn, #btnActions {
+    border-radius: 0px;
 }

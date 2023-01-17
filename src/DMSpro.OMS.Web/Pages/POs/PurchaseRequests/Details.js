@@ -1,24 +1,22 @@
 ﻿
 $(function () {
     var l = abp.localization.getResource("MdmService");
+    var model = JSON.parse(sessionStorage.getItem("model"));
+    console.log(model);
+    document.title = `PO - ${model.DocNbr} | OMS`;
     DevExpress.config({
         editorStylingMode: 'underlined',
     });
 
-    $('#tabpanel-container').dxTabPanel({
-        //height: 260,
+    $('#tabpanel-container').dxTabPanel({ 
         items: [{
             title: "Details",
             icon: "detailslayout",
-            template: function () {
-                return $('#details-1')
-            }
+            template: initDetailsTab()
         }, {
             title: "Promotional Information",
             icon: "money",
-            template: function () {
-                return $('#details-2')
-            }
+            template: initPromotionalTab()
         }]
     }).dxTabPanel('instance');
 
@@ -104,8 +102,7 @@ $(function () {
             }
         ]
     });
-
-
+     
     $('#txtBarCode').dxTextBox({
         value: '',
         placeholder: "Type barcode...",
@@ -113,251 +110,517 @@ $(function () {
         width: 200,
         showClearButton: true,
     });
-    $('#gridDetails').dxDataGrid({
-        dataSource: inventoryDatas,
-        keyExpr: "id",
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'storage',
-        },
-        showBorders: true,
-        columnAutoWidth: true,
-        scrolling: {
-            columnRenderingMode: 'virtual',
-        },
-        searchPanel: {
-            visible: true
-        },
-        allowColumnResizing: true,
-        allowColumnReordering: true,
-        paging: {
-            enabled: true,
-            pageSize: 10
-        },
-        rowAlternationEnabled: true,
-        filterRow: {
-            visible: true,
-            applyFilter: 'auto',
-        },
-        headerFilter: {
-            visible: false,
-        },
-        columnChooser: {
-            enabled: true,
-            mode: "select" // or "select"
-        },
-        //columnFixing: {
-        //    enabled: true
-        //},
-        pager: {
-            visible: true,
-            showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
-            showInfo: true,
-            showNavigationButtons: true
-        },
-        toolbar: {
-            items: [{
-                location: 'before',
-                widget: 'dxButton',
-                options: {
-                    icon: 'fa fa-plus',
-                    text: 'Add Row',
-                    onClick() {
-                        dataGridContainer.addRow();
-                    },
-                },
-            }, {
-                location: 'before',
-                widget: 'dxTextBox',
-                options: {
-                    // text: 'Add Row',
-                    placeholder: "Type barcode..."
-                },
-            },
-            {
-                location: 'after',
-                widget: 'dxButton',
-                options: {
-                    icon: 'refresh',
-                    onClick() {
-                        dataGridContainer.refresh();
-                    },
-                },
-            },
-                'columnChooserButton',
-            {
-                location: 'after',
-                widget: 'dxButton',
-                options: {
-                    icon: 'fa fa-upload',
-                    text: "Import From Excel",
-                    onClick() {
-                        //dataGridContainer.refresh();
-                    },
-                },
-            },
-            ],
-        },
-        editing: {
-            mode: "row",
-            //allowAdding: abp.auth.isGranted('MdmService.u-oMs.Create'),
-            //allowUpdating: abp.auth.isGranted('MdmService.u-oMs.Edit'),
-            //allowDeleting: abp.auth.isGranted('MdmService.u-oMs.Delete'),
-            allowAdding: true,
-            allowUpdating: true,
-            allowDeleting: true,
-            useIcons: true,
-            texts: {
-                editRow: l("Edit"),
-                deleteRow: l("Delete"),
-                confirmDeleteMessage: l("DeleteConfirmationMessage")
-            }
-        },
-        onEditorPreparing: function (e) {
-            if (e.dataField == "code" && e.parentType == "dataRow") {
-                e.editorName = "dxDropDownBox";
-                e.editorOptions.dropDownOptions = {
-                    //height: 500
-                };
-                e.editorOptions.contentTemplate = function (args, container) {
-                    var value = args.component.option("value"),
-                        $dataGrid = $("<div>").dxDataGrid({
-                            width: '100%',
-                            dataSource: args.component.option("dataSource"),
-                            keyExpr: "ID",
-                            columns: [{
-                                caption: "Item Code",
-                                dataField: "Name"
-                            }, "BarCode"],
-                            hoverStateEnabled: true,
-                            paging: { enabled: true, pageSize: 10 },
-                            filterRow: { visible: true },
-                            scrolling: { mode: "infinite" },
-                            height: '90%',
-                            showRowLines: true,
-                            showBorders: true,
-                            selection: { mode: "single" },
-                            selectedRowKeys: value,
-                            onSelectionChanged: function (selectedItems) {
-                                var keys = selectedItems.selectedRowKeys;
-                                args.component.option("value", keys);
-                            }
-                        });
-
-                    var dataGrid = $dataGrid.dxDataGrid("instance");
-
-                    args.component.on("valueChanged", function (args) {
-                        var value = args.value;
-
-                        dataGrid.selectRows(value, false);
-                    });
-                    container.append($dataGrid);
-                    return container;
-                };
-            }
-        },
-        columns: [
-            {
-                width: 100,
-                type: 'buttons',
-                caption: l('Actions'),
-                buttons: ['edit', 'delete'],
-                //fixed: true,
-            },
-            {
-                width: 300,
-                caption: "Item Code",
-                dataField: "code",
-                calculateDisplayValue: function (rowData) {
-                    if (!rowData || !rowData.code) return "";
-
-                    var displayText = products.filter(function (item) { return item.ID == rowData.code })[0].Name;
-                    if (displayText)
-                        return displayText;
-                    return "";
-                },
-                lookup: {
-                    dataSource: {
-                        store: {
-                            type: "array",
-                            data: products,
-                            key: "ID"
-                        }
-                    },
-                    displayExpr: "Name",
-                    valueExpr: "ID"
-                },
-                //fixed: true,
-            },
-            {
-                width: 200,
-                caption: "Item Name",
-                dataField: "ItemName",
-                //  fixed: true,
-            },
-            {
-
-                caption: "UOM",
-                dataField: "UOM"
-            },
-            {
-
-                caption: "Price",
-                dataField: "Price"
-            }, {
-
-                caption: "Qty",
-                dataField: "Qty"
-            }, {
-
-                caption: "BaseQty",
-                dataField: "BaseQty"
-            }, {
-
-                caption: "BaseUOM",
-                dataField: "BaseUOM"
-            },
-            {
-
-                caption: "IsFree",
-                dataField: "IsFree",
-                dataType: "boolean",
-                calculateCellValue: function (rowData) {
-                    let _val;
-                    rowData.IsFree === "TRUE" ? _val = true : _val = false;
-                    return _val;
-                },
-                setCellValue: function (newData, value, currentRowData) {
-                    value ? newData.IsFree = "TRUE" : newData.IsFree = "FALSE";
-                }
-            },
-            {
-
-                caption: "Desc",
-                dataField: "Desc"
-            }, {
-
-                caption: "TaxCode",
-                dataField: "TaxCode"
-            }, {
-
-                caption: "TaxRate",
-                dataField: "TaxRate"
-            }, {
-
-                caption: "LineAmt",
-                dataField: "LineAmt"
-            }
-        ],
-    }).dxDataGrid("instance");
+     
+     
     $('#resizable').dxResizable({
         minHeight: 120, 
         handles: "bottom"
     }).dxResizable('instance');
 });
-var products = [{
+function initDetailsTab() {
+    return function () {
+        return $('<div id="gridDetails">')
+            .dxDataGrid({
+                dataSource: inventoryDatas,
+                // keyExpr: "id",
+                stateStoring: {
+                    enabled: true,
+                    type: 'localStorage',
+                    storageKey: 'storage',
+                },
+                showBorders: true,
+                columnAutoWidth: true,
+                scrolling: {
+                    columnRenderingMode: 'virtual',
+                },
+                searchPanel: {
+                    visible: true
+                },
+                allowColumnResizing: true,
+                allowColumnReordering: true,
+                paging: {
+                    enabled: true,
+                    pageSize: 10
+                },
+                rowAlternationEnabled: true,
+                filterRow: {
+                    visible: true,
+                    applyFilter: 'auto',
+                },
+                headerFilter: {
+                    visible: false,
+                },
+                columnChooser: {
+                    enabled: true,
+                    mode: "select" // or "select"
+                },
+                //columnFixing: {
+                //    enabled: true
+                //},
+                pager: {
+                    visible: true,
+                    showPageSizeSelector: true,
+                    allowedPageSizes: [10, 20, 50, 100],
+                    showInfo: true,
+                    showNavigationButtons: true
+                },
+                toolbar: {
+                    items: [{
+                        location: 'before',
+                        widget: 'dxButton',
+                        options: {
+                            icon: 'fa fa-plus',
+                            text: 'Add Row',
+                            onClick() {
+                                gridDetails.addRow();
+                            },
+                        },
+                    }, {
+                        location: 'before',
+                        widget: 'dxTextBox',
+                        options: {
+                            // text: 'Add Row',
+                            placeholder: "Type barcode..."
+                        },
+                    },
+                    {
+                        location: 'after',
+                        widget: 'dxButton',
+                        options: {
+                            icon: 'refresh',
+                            onClick() {
+                                gridDetails.refresh();
+                            },
+                        },
+                    },
+                        'columnChooserButton',
+                        'exportButton',
+                    {
+                        location: 'after',
+                        widget: 'dxButton',
+                        options: {
+                            icon: 'fa fa-upload',
+                            text: "Import From Excel",
+                            onClick() {
+                                //dataGridContainer.refresh();
+                            },
+                        },
+                    },
+                    ],
+                },
+                export: {
+                    enabled: true,
+                    // formats: ['excel','pdf'],
+                    allowExportSelectedData: true,
+                },
+                editing: {
+                    mode: "row",
+                    //allowAdding: abp.auth.isGranted('MdmService.u-oMs.Create'),
+                    //allowUpdating: abp.auth.isGranted('MdmService.u-oMs.Edit'),
+                    //allowDeleting: abp.auth.isGranted('MdmService.u-oMs.Delete'),
+                    allowAdding: true,
+                    allowUpdating: true,
+                    allowDeleting: true,
+                    useIcons: true,
+                    texts: {
+                        editRow: l("Edit"),
+                        deleteRow: l("Delete"),
+                        confirmDeleteMessage: l("DeleteConfirmationMessage")
+                    }
+                },
+                onEditorPreparing: function (e) {
+                    if (e.dataField == "code" && e.parentType == "dataRow") {
+                        e.editorName = "dxDropDownBox";
+                        e.editorOptions.dropDownOptions = {
+                            //height: 500
+                        };
+                        e.editorOptions.contentTemplate = function (args, container) {
+                            var value = args.component.option("value"),
+                                $dataGrid = $("<div>").dxDataGrid({
+                                    width: '100%',
+                                    dataSource: args.component.option("dataSource"),
+                                    keyExpr: "ID",
+                                    columns: [{
+                                        caption: "Item Code",
+                                        dataField: "Name"
+                                    }, "BarCode"],
+                                    hoverStateEnabled: true,
+                                    paging: { enabled: true, pageSize: 10 },
+                                    filterRow: { visible: true },
+                                    scrolling: { mode: "infinite" },
+                                    height: '90%',
+                                    showRowLines: true,
+                                    showBorders: true,
+                                    selection: { mode: "single" },
+                                    selectedRowKeys: value,
+                                    onSelectionChanged: function (selectedItems) {
+                                        var keys = selectedItems.selectedRowKeys;
+                                        args.component.option("value", keys);
+                                    }
+                                });
+
+                            var dataGrid = $dataGrid.dxDataGrid("instance");
+
+                            args.component.on("valueChanged", function (args) {
+                                var value = args.value;
+
+                                dataGrid.selectRows(value, false);
+                            });
+                            container.append($dataGrid);
+                            return container;
+                        };
+                    }
+                },
+                columns: [
+                    {
+                        width: 100,
+                        type: 'buttons',
+                        caption: l('Actions'),
+                        buttons: ['edit', 'delete'],
+                        //fixed: true,
+                    },
+                    {
+                        width: 300,
+                        caption: "Item Code",
+                        dataField: "code",
+                        calculateDisplayValue: function (rowData) {
+                            if (!rowData || !rowData.code) return "";
+
+                            var displayText = products.filter(function (item) { return item.ID == rowData.code })[0].Name;
+                            if (displayText)
+                                return displayText;
+                            return "";
+                        },
+                        lookup: {
+                            dataSource: {
+                                store: {
+                                    type: "array",
+                                    data: products,
+                                    key: "ID"
+                                }
+                            },
+                            displayExpr: "Name",
+                            valueExpr: "ID"
+                        },
+                        //fixed: true,
+                    },
+                    {
+                        width: 200,
+                        caption: "Item Name",
+                        dataField: "ItemName",
+                        //  fixed: true,
+                    },
+                    {
+
+                        caption: "UOM",
+                        dataField: "UOM"
+                    },
+                    {
+
+                        caption: "Price",
+                        dataField: "Price"
+                    }, {
+
+                        caption: "Qty",
+                        dataField: "Qty"
+                    }, {
+
+                        caption: "BaseQty",
+                        dataField: "BaseQty"
+                    }, {
+
+                        caption: "BaseUOM",
+                        dataField: "BaseUOM"
+                    },
+                    {
+
+                        caption: "IsFree",
+                        dataField: "IsFree",
+                        dataType: "boolean",
+                        calculateCellValue: function (rowData) {
+                            let _val;
+                            rowData.IsFree === "TRUE" ? _val = true : _val = false;
+                            return _val;
+                        },
+                        setCellValue: function (newData, value, currentRowData) {
+                            value ? newData.IsFree = "TRUE" : newData.IsFree = "FALSE";
+                        }
+                    },
+                    {
+
+                        caption: "Desc",
+                        dataField: "Desc"
+                    }, {
+
+                        caption: "TaxCode",
+                        dataField: "TaxCode"
+                    }, {
+
+                        caption: "TaxRate",
+                        dataField: "TaxRate"
+                    }, {
+
+                        caption: "LineAmt",
+                        dataField: "LineAmt"
+                    }
+                ],
+            })
+    }
+   
+}
+function initPromotionalTab() {
+    return function () {
+        return "";
+
+        return $('<div id="gridPromotional">')
+            .dxDataGrid({
+                dataSource: inventoryDatas,
+                // keyExpr: "id",
+                stateStoring: {
+                    enabled: true,
+                    type: 'localStorage',
+                    storageKey: 'storage',
+                },
+                showBorders: true,
+                columnAutoWidth: true,
+                scrolling: {
+                    columnRenderingMode: 'virtual',
+                },
+                searchPanel: {
+                    visible: true
+                },
+                allowColumnResizing: true,
+                allowColumnReordering: true,
+                paging: {
+                    enabled: true,
+                    pageSize: 10
+                },
+                rowAlternationEnabled: true,
+                filterRow: {
+                    visible: true,
+                    applyFilter: 'auto',
+                },
+                headerFilter: {
+                    visible: false,
+                },
+                columnChooser: {
+                    enabled: true,
+                    mode: "select" // or "select"
+                },
+                //columnFixing: {
+                //    enabled: true
+                //},
+                pager: {
+                    visible: true,
+                    showPageSizeSelector: true,
+                    allowedPageSizes: [10, 20, 50, 100],
+                    showInfo: true,
+                    showNavigationButtons: true
+                },
+                toolbar: {
+                    items: [{
+                        location: 'before',
+                        widget: 'dxButton',
+                        options: {
+                            icon: 'fa fa-plus',
+                            text: 'Add Row',
+                            onClick() {
+                                gridDetails.addRow();
+                            },
+                        },
+                    }, {
+                        location: 'before',
+                        widget: 'dxTextBox',
+                        options: {
+                            // text: 'Add Row',
+                            placeholder: "Type barcode..."
+                        },
+                    },
+                    {
+                        location: 'after',
+                        widget: 'dxButton',
+                        options: {
+                            icon: 'refresh',
+                            onClick() {
+                                gridDetails.refresh();
+                            },
+                        },
+                    },
+                        'columnChooserButton',
+                        'exportButton',
+                    {
+                        location: 'after',
+                        widget: 'dxButton',
+                        options: {
+                            icon: 'fa fa-upload',
+                            text: "Import From Excel",
+                            onClick() {
+                                //dataGridContainer.refresh();
+                            },
+                        },
+                    },
+                    ],
+                },
+                export: {
+                    enabled: true,
+                    // formats: ['excel','pdf'],
+                    allowExportSelectedData: true,
+                },
+                editing: {
+                    mode: "row",
+                    //allowAdding: abp.auth.isGranted('MdmService.u-oMs.Create'),
+                    //allowUpdating: abp.auth.isGranted('MdmService.u-oMs.Edit'),
+                    //allowDeleting: abp.auth.isGranted('MdmService.u-oMs.Delete'),
+                    allowAdding: true,
+                    allowUpdating: true,
+                    allowDeleting: true,
+                    useIcons: true,
+                    texts: {
+                        editRow: l("Edit"),
+                        deleteRow: l("Delete"),
+                        confirmDeleteMessage: l("DeleteConfirmationMessage")
+                    }
+                },
+                onEditorPreparing: function (e) {
+                    if (e.dataField == "code" && e.parentType == "dataRow") {
+                        e.editorName = "dxDropDownBox";
+                        e.editorOptions.dropDownOptions = {
+                            //height: 500
+                        };
+                        e.editorOptions.contentTemplate = function (args, container) {
+                            var value = args.component.option("value"),
+                                $dataGrid = $("<div>").dxDataGrid({
+                                    width: '100%',
+                                    dataSource: args.component.option("dataSource"),
+                                    keyExpr: "ID",
+                                    columns: [{
+                                        caption: "Item Code",
+                                        dataField: "Name"
+                                    }, "BarCode"],
+                                    hoverStateEnabled: true,
+                                    paging: { enabled: true, pageSize: 10 },
+                                    filterRow: { visible: true },
+                                    scrolling: { mode: "infinite" },
+                                    height: '90%',
+                                    showRowLines: true,
+                                    showBorders: true,
+                                    selection: { mode: "single" },
+                                    selectedRowKeys: value,
+                                    onSelectionChanged: function (selectedItems) {
+                                        var keys = selectedItems.selectedRowKeys;
+                                        args.component.option("value", keys);
+                                    }
+                                });
+
+                            var dataGrid = $dataGrid.dxDataGrid("instance");
+
+                            args.component.on("valueChanged", function (args) {
+                                var value = args.value;
+
+                                dataGrid.selectRows(value, false);
+                            });
+                            container.append($dataGrid);
+                            return container;
+                        };
+                    }
+                },
+                columns: [
+                    {
+                        width: 100,
+                        type: 'buttons',
+                        caption: l('Actions'),
+                        buttons: ['edit', 'delete'],
+                        //fixed: true,
+                    },
+                    {
+                        width: 300,
+                        caption: "Item Code",
+                        dataField: "code",
+                        calculateDisplayValue: function (rowData) {
+                            if (!rowData || !rowData.code) return "";
+
+                            var displayText = products.filter(function (item) { return item.ID == rowData.code })[0].Name;
+                            if (displayText)
+                                return displayText;
+                            return "";
+                        },
+                        lookup: {
+                            dataSource: {
+                                store: {
+                                    type: "array",
+                                    data: products,
+                                    key: "ID"
+                                }
+                            },
+                            displayExpr: "Name",
+                            valueExpr: "ID"
+                        },
+                        //fixed: true,
+                    },
+                    {
+                        width: 200,
+                        caption: "Item Name",
+                        dataField: "ItemName",
+                        //  fixed: true,
+                    },
+                    {
+
+                        caption: "UOM",
+                        dataField: "UOM"
+                    },
+                    {
+
+                        caption: "Price",
+                        dataField: "Price"
+                    }, {
+
+                        caption: "Qty",
+                        dataField: "Qty"
+                    }, {
+
+                        caption: "BaseQty",
+                        dataField: "BaseQty"
+                    }, {
+
+                        caption: "BaseUOM",
+                        dataField: "BaseUOM"
+                    },
+                    {
+
+                        caption: "IsFree",
+                        dataField: "IsFree",
+                        dataType: "boolean",
+                        calculateCellValue: function (rowData) {
+                            let _val;
+                            rowData.IsFree === "TRUE" ? _val = true : _val = false;
+                            return _val;
+                        },
+                        setCellValue: function (newData, value, currentRowData) {
+                            value ? newData.IsFree = "TRUE" : newData.IsFree = "FALSE";
+                        }
+                    },
+                    {
+
+                        caption: "Desc",
+                        dataField: "Desc"
+                    }, {
+
+                        caption: "TaxCode",
+                        dataField: "TaxCode"
+                    }, {
+
+                        caption: "TaxRate",
+                        dataField: "TaxRate"
+                    }, {
+
+                        caption: "LineAmt",
+                        dataField: "LineAmt"
+                    }
+                ],
+            })
+    } 
+}
+var products =  [{
     "ID": 1,
     "Name": "Item 1",
     "BarCode": "ABC-abc-1234"
