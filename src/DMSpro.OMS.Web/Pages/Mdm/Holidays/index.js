@@ -1,48 +1,11 @@
-﻿
+﻿var holidayDetail = window.dMSpro.oMS.mdmService.controllers.holidayDetails.holidayDetail;
+var l = abp.localization.getResource("MdmService");
+var l1 = abp.localization.getResource("OMS");
 $(() => {
-    var l = abp.localization.getResource("MdmService");
-    var holidayService = window.dMSpro.oMS.mdmService.controllers.holidays.holiday;
+   
+    var holidayService = window.dMSpro.oMS.mdmService.controllers.holidays.holiday; 
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-
-    var holidayStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: "raw",
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args  = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            holidayService.getListDevextremes(args)
-                .done(result => {
-                    debugger
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        insert(values) {
-            return holidayService.create(values, { contentType: "application/json" });
-        },
-        //byKey: function (key) {
-        //    if (key == 0) return null;
-
-        //    var d = new $.Deferred();
-        //    geoMasterService.get(key)
-        //        .done(data => {
-        //            d.resolve(data);
-        //        });
-        //    return d.promise();
-        //}
-    });
-
+     
     var gridHolidays = $('#gridHolidays').dxDataGrid({
         stateStoring: {
             enabled: true,
@@ -84,15 +47,12 @@ $(() => {
             items: [
                 {
                     location: 'before',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>New Holiday</span></button>',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>${l("Button.New.Holiday")}</span></button>`,
                     onClick() {
                         gridHolidays.addRow();
                     },
                 },
-                {
-                    location: 'before',
-                    template: '<div><button type="button" class="btn btn-light btn-sm dropdown-toggle waves-effect waves-themed" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="fa fa-gear"></i> <span class="">Action</span>  </button><div class="dropdown-menu fadeindown"> <button class="dropdown-item" type="button">Confirmed</button> <button class="dropdown-item" type="button">Rejected</button></div></div>'
-                },
+               
                 {
                     location: 'after',
                     widget: 'dxButton',
@@ -107,7 +67,7 @@ $(() => {
                 "exportButton",
                 {
                     location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-upload"></i> <span>Import from Excel</span> </button>',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-upload"></i> <span>${l("ImportFromExcel")}</span> </button>`,
                     onClick() {
                         //todo
                     },
@@ -118,7 +78,8 @@ $(() => {
             enabled: true,
             // formats: ['excel','pdf'],
             allowExportSelectedData: true,
-        }, groupPanel: {
+        },
+        groupPanel: {
             visible: true,
         },
         selection: {
@@ -154,23 +115,52 @@ $(() => {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        dataSource: holidayStore,
-        //    [{
-        //    Id: 1,
-        //    Year: 2022,
-        //    Descr: "Định nghĩa ngày nghỉ 2022"
-        //},
-        //{
-        //    Id: 2,
-        //    Year: 2023,
-        //    Descr: "Định nghĩa ngày nghỉ 2023"
-        //},
-        //{
-        //    Id: 3,
-        //    Year: 2024,
-        //    Descr: "Định nghĩa ngày nghỉ 2024"
-        //}],
-        keyExpr: 'Id', 
+        onRowUpdating: function (e) {
+            var objectRequire = ['year', 'description'];
+            for (var property in e.oldData) {
+                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+                    e.newData[property] = e.oldData[property];
+                }
+            }
+        },
+        dataSource: new DevExpress.data.CustomStore({
+            key: 'id',
+            loadMode: "raw",
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                const args = {};
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+
+                holidayService.getListDevextremes(args)
+                    .done(result => {
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount,
+                        });
+                    });
+
+                return deferred.promise();
+            },
+            insert(values) {
+                return holidayService.create(values, { contentType: "application/json" });
+            },
+            update(key, values) {
+                return holidayService.update(key, values, { contentType: "application/json" });
+            },
+            remove(key) {
+                return holidayService.delete(key);
+            },
+            errorHandler: function (error) {
+
+            }
+        }),
+       // keyExpr: 'Id', 
+        errorRowEnabled: false,
         columns: [
             {
                 width: 100,
@@ -180,83 +170,150 @@ $(() => {
                     'edit', 'delete']
             },
             {
-            dataField: 'year',
-            caption: 'Year',
-            width: 100
+                dataField: 'year',
+                caption: l("EntityFieldName:MDMService:Holiday:Year"),
+                width: 100,
+                validationRules: [{ type: "required" }],
             },
             {
                 dataField: 'description',
-                caption: 'Description',
+                caption: l("EntityFieldName:MDMService:Holiday:Description"),
+                validationRules: [{ type: "required" }],
             },
         ],
         masterDetail: {
             enabled: true,
-            template(container, options) {
-                const currentEmployeeData = options.data;
-
-                //$('<div>')
-                //    .addClass('master-detail-caption')
-                //    .text(`Details:`)
-                //    .appendTo(container);
-
-                $('<div>')
+            template(container, options) { 
+                $('<div class="grid-master-detail">')
                     .dxDataGrid({
+                        dataSource: new DevExpress.data.CustomStore({
+                            key: 'id',
+                            loadMode: "raw", 
+                            load(loadOptions) {
+                                const deferred = $.Deferred(); 
+                                var args = {};
+                                requestOptions.forEach((i) => {
+                                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                                        args[i] = JSON.stringify(loadOptions[i]);
+                                    }
+                                });
+
+                                holidayDetail.getListDevextremes(args)
+                                    .done(result => {
+                                        var data = result.data.filter(u => u.holidayId == options.key);
+                                        deferred.resolve(data, {
+                                            totalCount: result.totalCount,
+                                            summary: result.summary,
+                                            groupCount: result.groupCount,
+                                        });
+                                    });
+
+                                return deferred.promise();
+                            },
+                            insert(values) {
+                                return holidayDetail.create(values, { contentType: "application/json" });
+                            }, 
+                            update(key, values) {
+                                return holidayDetail.update(key, values, { contentType: "application/json" });
+                            },
+                            remove(key) {
+                                return holidayDetail.delete(key);
+                            }, 
+                        }),
+                        selection: {
+                            mode: 'single',
+                        },
                         columnAutoWidth: true,
                         showBorders: true,
-                        columns: [
+                        pager: {
+                            visible: true,
+                            showPageSizeSelector: true,
+                            allowedPageSizes: [10, 20, 50, 100],
+                            showInfo: true,
+                            showNavigationButtons: true
+                        },
+                        toolbar: {
+                            items: [
+                                {
+                                    location: 'before',
+                                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>${l("Button.New.HolidayDetail")}</span></button>`,
+                                    onClick(e) {
+                                        e.element.closest('div.grid-master-detail').data('dxDataGrid').addRow(); 
+                                    },
+                                }, 
+                                {
+                                    location: 'after',
+                                    widget: 'dxButton',
+                                    options: {
+                                        icon: 'refresh',
+                                        onClick(e) {
+                                            e.element.closest('div.grid-master-detail').data('dxDataGrid').refresh();
+                                        },
+                                    },
+                                },
+                                'columnChooserButton', 
+                            ],
+                        },
+                        editing: {
+                            mode: "row",
+                            //allowAdding: abp.auth.isGranted('MdmService.u-oMs.Create'),
+                            //allowUpdating: abp.auth.isGranted('MdmService.u-oMs.Edit'),
+                            //allowDeleting: abp.auth.isGranted('MdmService.u-oMs.Delete'),
+                            allowAdding: true,
+                            allowUpdating: true,
+                            allowDeleting: true,
+                            useIcons: true,
+                            texts: {
+                                editRow: l("Edit"),
+                                deleteRow: l("Delete"),
+                                confirmDeleteMessage: l("DeleteConfirmationMessage")
+                            }
+                        },
+                        onInitNewRow: function (e) {
+                            debugger
+                            e.data.holidayId = options.data.id; 
+                        },
+                        columns: [ 
                             {
-                                dataField: 'i',
-                                caption: '#', width: 50
+                                dataField: 'holidayId',
+                                visible: false, width: 120,
                             },
                             {
-                                dataField: 'StartDate',
-                                caption: 'Start Date',
-                                width: 120, type: "date", format: "dd/MM/yyyy", alignment: "right"
+                                width: 100,
+                                type: 'buttons',
+                                caption: l('Actions'),
+                                buttons: ['edit', 'delete']
+                            },  
+                            {
+                                dataField: 'startDate',
+                                caption: l("EntityFieldName:MDMService:HolidayDetail:StartDate"),
+                                width: 130, dataType: "date",
+                                format: "dd/MM/yyyy",
+                                alignment: "right"
                             },
                             {
-                                dataField: 'EndDate',
-                                caption: 'End Date',
-                                width: 120, type: "date", format: "dd/MM/yyyy", alignment: "right"
+                                dataField: 'endDate',
+                                caption: l("EntityFieldName:MDMService:HolidayDetail:EndDate"),
+                                width: 130,
+                                dataType: "date",
+                                format: "dd/MM/yyyy", 
+                                alignment: "right"
                             }, {
+                                allowEditing: false,
+                                dataType: "number",
                                 dataField: 'Days',
-                                caption: 'Days',
-                                width: 120, alignment: "center"
+                                caption: l1("EntityFieldName:MDMService:HolidayDetail:Days"),
+                                width: 120, alignment: "center",
+                                calculateCellValue: function (rowData) {
+                                    if (!rowData.startDate || !rowData.endDate)
+                                        return "";
+                                    return (((new Date(rowData.endDate)).getTime() - (new Date(rowData.startDate)).getTime()) / (1000 * 3600 * 24)) + 1;
+                                }
                             },
                             {
-                                dataField: 'Descr',
-                                caption: 'Description',
-                            }],
-                        dataSource: new DevExpress.data.DataSource({
-                            store: new DevExpress.data.ArrayStore({
-                                key: 'Id',
-                                data: [{
-                                    Days: 10,
-                                    i: 1,
-                                    Id: 1,
-                                    HolidayId: 1,
-                                    StartDate: new Date(),
-                                    EndDate: new Date(),
-                                    Descr: "Nghỉ tết nguyên đán 2022"
-                                },
-                                {
-                                    i: 2,
-                                    Id: 2,
-                                    HolidayId: 1,
-                                    StartDate: new Date(),
-                                    EndDate: new Date(),
-                                    Descr: "Nghỉ tết nguyên đán 2023"
-                                },
-                                {
-                                    i: 1,
-                                    Id: 3,
-                                    HolidayId: 2,
-                                    StartDate: new Date(),
-                                    EndDate: new Date(),
-                                    Descr: "Nghỉ tết nguyên đán 2024"
-                                }],
-                            }),
-                            filter: ['HolidayId', '=', options.key],
-                        }),
+                                dataField: 'description',
+                                caption: l("EntityFieldName:MDMService:HolidayDetail:Description"),
+                            }], 
                     }).appendTo(container);
             },
         },

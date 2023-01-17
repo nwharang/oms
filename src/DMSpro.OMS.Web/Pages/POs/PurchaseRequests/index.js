@@ -231,7 +231,7 @@ $(function () {
                         icon: "fieldchooser",
                         hint: "View Details",
                         onClick: function (e) {
-                            var w = window.open('/Pos/PurchaseRequests/Details', '_blank');
+                            var w = window.open('/POs/PurchaseRequests/Details', '_blank');
                             w.sessionStorage.setItem("model", JSON.stringify(e.row.data));
                         }
                     },
