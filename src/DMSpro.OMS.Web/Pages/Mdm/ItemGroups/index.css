@@ -1,0 +1,48 @@
+﻿div.dx-datagrid .dx-toolbar-items-container, div.dx-treelist-container div.dx-toolbar-items-container {
+    display: block !important;
+}
+
+div.dx-toolbar-items-container
+div.dx-button-content {
+    font-size: 12px;
+}
+
+    div.dx-toolbar-items-container
+    div.dx-button-content
+    i.dx-icon.fa {
+        font-size: 14px;
+    }
+
+div.dx-toolbar-items-container
+div.dx-button-has-text.dx-button-has-icon
+div.dx-button-content
+i.dx-icon.fa {
+    margin-right: 2px;
+}
+
+.dx-button-mode-contained {
+    border-radius: 0;
+}
+
+.dx-toolbar-text-auto-hide .dx-button .dx-button-content,
+div.dx-toolbar-after div.dx-button-content {
+    padding: 6px;
+}
+
+div.dx-toolbar-items-container
+div.dx-button-content {
+    font-size: 12px;
+}
+
+    div.dx-toolbar-items-container
+    div.dx-button-content
+    i.dx-icon.fa {
+        font-size: 14px;
+    }
+
+div.dx-toolbar-items-container
+div.dx-button-has-text.dx-button-has-icon
+div.dx-button-content
+i.dx-icon.fa {
+    margin-right: 2px;
+}

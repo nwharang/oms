@@ -141,7 +141,8 @@ $(function () {
             enabled: true,
             // formats: ['excel','pdf'],
             allowExportSelectedData: true,
-        }, groupPanel: {
+        },
+        groupPanel: {
             visible: true,
         },
         selection: {

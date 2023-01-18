@@ -1,170 +1,285 @@
 $(function () {
     var l = abp.localization.getResource("MdmService");
-	var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
-	
-	
-    var createModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "ItemGroups/CreateModal",
-        scriptUrl: "/Pages/ItemGroups/createModal.js",
-        modalClass: "itemGroupCreate"
-    });
+    var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
 
-	var editModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "ItemGroups/EditModal",
-        scriptUrl: "/Pages/ItemGroups/editModal.js",
-        modalClass: "itemGroupEdit"
-    });
+    const status = [
+        {
+            id: 'OPEN',
+            text: l('EntityFieldValue:MDMService:ItemGroup:Status:OPEN')
+        },
+        {
+            id: 'RELEASED',
+            text: l('EntityFieldValue:MDMService:ItemGroup:Status:RELEASED')
+        },
+        {
+            id: 'CANCELLED',
+            text: l('EntityFieldValue:MDMService:ItemGroup:Status:CANCELLED')
+        }
+    ];
 
-	var getFilter = function() {
-        return {
-            filterText: $("#FilterText").val(),
-            code: $("#CodeFilter").val(),
-			name: $("#NameFilter").val(),
-			description: $("#DescriptionFilter").val(),
-			type: $("#TypeFilter").val(),
-			status: $("#StatusFilter").val()
-        };
-    };
+    const types = [
+        {
+            id: 'ATTRIBUTE',
+            text: l('EntityFieldValue:MDMService:ItemGroup:Type:ATTRIBUTE')
+        },
+        {
+            id: 'LIST',
+            text: l('EntityFieldValue:MDMService:ItemGroup:Type:LIST')
+        }
+    ];
 
-    var dataTable = $("#ItemGroupsTable").DataTable(abp.libs.datatables.normalizeConfiguration({
-        processing: true,
-        serverSide: true,
-        paging: true,
-        searching: false,
-        scrollX: true,
-        autoWidth: true,
-        scrollCollapse: true,
-        order: [[1, "asc"]],
-        ajax: abp.libs.datatables.createAjax(itemGroupService.getList, getFilter),
-        columnDefs: [
-            {
-                rowAction: {
-                    items:
-                        [
-                            {
-                                text: l("Edit"),
-                                visible: abp.auth.isGranted('MdmService.ItemGroups.Edit'),
-                                action: function (data) {
-                                    editModal.open({
-                                     id: data.record.id
-                                     });
-                                }
-                            },
-                            {
-                                text: l("Delete"),
-                                visible: abp.auth.isGranted('MdmService.ItemGroups.Delete'),
-                                confirmMessage: function () {
-                                    return l("DeleteConfirmationMessage");
-                                },
-                                action: function (data) {
-                                    itemGroupService.delete(data.record.id)
-                                        .then(function () {
-                                            abp.notify.info(l("SuccessfullyDeleted"));
-                                            dataTable.ajax.reload();
-                                        });
-                                }
-                            }
-                        ]
+    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    // custom store
+    var groupStore = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'raw',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
                 }
-            },
-			{ data: "code" },
-			{ data: "name" },
-			{ data: "description" },
-            {
-                data: "type",
-                render: function (type) {
-                    if (type === undefined ||
-                        type === null) {
-                        return "";
-                    }
+            });
+            itemGroupService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
 
-                    var localizationKey = "EntityFieldValue:MDMService:ItemGroup:Type:" + type;
-                    var localized = l(localizationKey);
-
-                    if (localized === localizationKey) {
-                        abp.log.warn("No localization found for " + localizationKey);
-                        return "";
-                    }
-
-                    return localized;
-                }
-            },
-            {
-                data: "status",
-                render: function (status) {
-                    if (status === undefined ||
-                        status === null) {
-                        return "";
-                    }
-
-                    var localizationKey = "EntityFieldValue:MDMService:ItemGroup:Status:" + status;
-                    var localized = l(localizationKey);
-
-                    if (localized === localizationKey) {
-                        abp.log.warn("No localization found for " + localizationKey);
-                        return "";
-                    }
-
-                    return localized;
-                }
-            }
-        ]
-    }));
-
-    createModal.onResult(function () {
-        dataTable.ajax.reload();
-    });
-
-    editModal.onResult(function () {
-        dataTable.ajax.reload();
-    });
-
-    $("#NewItemGroupButton").click(function (e) {
-        e.preventDefault();
-        createModal.open();
-    });
-
-	$("#SearchForm").submit(function (e) {
-        e.preventDefault();
-        dataTable.ajax.reload();
-    });
-
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
-
-        itemGroupService.getDownloadToken().then(
-            function(result){
-                    var input = getFilter();
-                    var url =  abp.appPath + 'api/mdm-service/item-groups/as-excel-file' + 
-                        abp.utils.buildQueryString([
-                            { name: 'downloadToken', value: result.token },
-                            { name: 'filterText', value: input.filterText }, 
-                            { name: 'code', value: input.code }, 
-                            { name: 'name', value: input.name }, 
-                            { name: 'description', value: input.description }, 
-                            { name: 'type', value: input.type }, 
-                            { name: 'status', value: input.status }
-                            ]);
-                            
-                    var downloadWindow = window.open(url, '_blank');
-                    downloadWindow.focus();
-            }
-        )
-    });
-
-    $('#AdvancedFilterSectionToggler').on('click', function (e) {
-        $('#AdvancedFilterSection').toggle();
-    });
-
-    $('#AdvancedFilterSection').on('keypress', function (e) {
-        if (e.which === 13) {
-            dataTable.ajax.reload();
+            var d = new $.Deferred();
+            itemGroupService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
+        },
+        insert(values) {
+            return itemGroupService.create(values, { contentType: 'application/json' });
+        },
+        update(key, values) {
+            return itemGroupService.update(key, values, { contentType: 'application/json' });
+        },
+        remove(key) {
+            return itemGroupService.delete(key);
         }
     });
 
-    $('#AdvancedFilterSection select').change(function() {
-        dataTable.ajax.reload();
-    });
-    
-    
+    const dataGrid = $('#gridItemGroups').dxDataGrid({
+        dataSource: groupStore,
+        keyExpr: 'id',
+        remoteOperations: true,
+        showBorders: true,
+        autoExpandAll: true,
+        focusedRowEnabled: true,
+        allowColumnReordering: false,
+        rowAlternationEnabled: true,
+        columnAutoWidth: true,
+        columnHidingEnabled: true,
+        errorRowEnabled: false,
+        scrolling: {
+            //mode: 'standard',
+            columnRenderingMode: 'virtual'
+        },
+        filterRow: {
+            visible: true,
+            applyFilter: 'auto'
+        },
+        searchPanel: {
+            visible: true,
+            placeholder: 'Search...'
+        },
+        headerFilter: {
+            visible: false,
+        },
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        paging:
+        {
+            enabled: true,
+            pageSize: 10,
+        },
+        pager: {
+            visible: true,
+            showPageSizeSelector: true,
+            allowedPageSizes: [10, 20, 50, 100],
+            showInfo: true,
+            showNavigationButtons: true
+        },
+        groupPanel: {
+            visible: true,
+        },
+        toolbar: {
+            items: [
+                {
+                    location: 'before',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>New Purchase Request</span></button>',
+                    onClick() {
+                        //var w = window.open('/Mdm/ItemGroups/Details');
+                        //w.sessionStorage.setItem('modelId', 0);
+                        dataGrid.addRow();
+                    }
+                },
+                {
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'refresh',
+                        onClick() {
+                            dataGrid.refresh();
+                        },
+                    }
+                },
+                'columnChooserButton',
+                'exportButton',
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-upload"></i> <span>Import from Excel</span> </button>',
+                    onClick() {
+                        //todo
+                    },
+                },
+                'searchPanel'
+            ]
+        },
+        export: {
+            enabled: true
+        },
+        onExporting(e) {
+            //e.preventDefault();
+
+            itemGroupService.getDownloadToken().then(
+                function (result) {
+                    var url = abp.appPath + 'api/mdm-service/item-groups/as-excel-file' + abp.utils.buildQueryString([
+                        { name: 'downloadToken', value: result.token }
+                    ]);
+                    var downloadWindow = window.open(url, '_blank');
+                    downloadWindow.focus();
+                }
+            )
+        },
+        editing: {
+            mode: 'row',
+            allowAdding: true,
+            allowUpdating: true,
+            allowDeleting: true,
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            }
+        },
+        onRowInserting: function (e) {
+            e.data.status = 'OPEN';
+            if (e.data && e.data.id == 0) {
+                e.data.id = null;
+            }
+        },
+        onRowUpdating: function (e) {
+            var objectRequire = ['code', 'name', 'type', 'description', 'status'];
+            for (var property in e.oldData) {
+                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+                    e.newData[property] = e.oldData[property];
+                }
+            }
+        },
+        columns: [
+            {
+                width: 100,
+                type: 'buttons',
+                caption: l("Actions"),
+                buttons: [
+                    {
+                        text: "View Details",
+                        icon: "fieldchooser",
+                        hint: "View Details",
+                        onClick: function (e) {
+                            var w = window.open('/Mdm/ItemGroups/Details', '_blank');
+                            w.sessionStorage.setItem("itemGroup", JSON.stringify(e.row.data));
+                        }
+                    },
+                    'edit', 'delete']
+            },
+            {
+                caption: l("EntityFieldName:MDMService:ItemGroup:Code"),
+                dataField: "code",
+                validationRules: [{ type: "required" }]
+            },
+            {
+                caption: l("EntityFieldName:MDMService:ItemGroup:Name"),
+                dataField: "name",
+                validationRules: [{ type: "required" }]
+            },
+            {
+                caption: l("EntityFieldName:MDMService:ItemGroup:Description"),
+                dataField: "description"
+            },
+            {
+                caption: l("EntityFieldName:MDMService:ItemGroup:Type"),
+                dataField: "type",
+                validationRules: [{ type: "required" }],
+                lookup: {
+                    dataSource: types,
+                    displayExpr: 'text',
+                    valueExpr: 'id'
+                }
+            },
+            {
+                caption: l("EntityFieldName:MDMService:ItemGroup:Status"),
+                dataField: "status",
+                allowEditing: false,
+                lookup: {
+                    dataSource: status,
+                    displayExpr: 'text',
+                    valueExpr: 'id'
+                }
+            },
+            {
+                caption: l('EntityFieldName:MDMService:ItemAttachment:Active'),
+                dataField: 'active',
+                alignment: 'center',
+                dataType: 'boolean',
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                        .appendTo(container);
+                }
+            }
+        ]
+    }).dxDataGrid('instance');
+
+    //$("#NewItemGroup").click(function () {
+    //    //dataGrid.addRow();
+    //    var w = window.open('/Mdm/ItemGroups/Details');
+    //    w.sessionStorage.setItem('modelId', 0);
+    //});
+
+    //$("input#Search").on("input", function () {
+    //    dataGrid.searchByText($(this).val());
+    //});
+
+    //$("#ExportToExcelButton").click(function (e) {
+    //    e.preventDefault();
+
+    //    uomGroupService.getDownloadToken().then(
+    //        function (result) {
+    //            var url = abp.appPath + 'api/mdm-service/u-oMGroups/as-excel-file' + abp.utils.buildQueryString([
+    //                { name: 'downloadToken', value: result.token }
+    //            ]);
+
+    //            var downloadWindow = window.open(url, '_blank');
+    //            downloadWindow.focus();
+    //        }
+    //    )
+    //});
 });

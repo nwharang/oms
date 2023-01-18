@@ -2,7 +2,7 @@
     // language
     var l = abp.localization.getResource("MdmService");
     // load mdmService
-    var productAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
+    var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
 
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
     // custom store
@@ -17,7 +17,7 @@
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            productAttrService.getListDevextremes(args)
+            itemAttrService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -31,20 +31,20 @@
             if (key == 0) return null;
 
             var d = new $.Deferred();
-            productAttrService.get(key)
+            itemAttrService.get(key)
                 .done(data => {
                     d.resolve(data);
                 })
             return d.promise();
         },
         insert(values) {
-            return productAttrService.create(values, { contentType: 'application/json' });
+            return itemAttrService.create(values, { contentType: 'application/json' });
         },
         update(key, values) {
-            return productAttrService.update(key, values, { contentType: 'application/json' });
+            return itemAttrService.update(key, values, { contentType: 'application/json' });
         },
         remove(key) {
-            return productAttrService.delete(key);
+            return itemAttrService.delete(key);
         }
     });
 
@@ -169,7 +169,7 @@
     $("#ExportToExcelButton").click(function (e) {
         e.preventDefault();
 
-        productAttrService.getDownloadToken().then(
+        itemAttrService.getDownloadToken().then(
             function (result) {
                 var url = abp.appPath + 'api/mdm-service/item-attributes/as-excel-file' + abp.utils.buildQueryString([
                     { name: 'downloadToken', value: result.token }

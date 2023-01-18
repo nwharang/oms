@@ -103,7 +103,6 @@ $(function () {
         dataType: 'json',
         async: false,
         success: function (data) {
-            console.log('data call geoList ajax: ', data);
             uoms = data.items;
         }
     });
@@ -257,11 +256,13 @@ $(function () {
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:AltQty"),
-                                dataField: "altQty"
+                                dataField: "altQty",
+                                validationRules: [{ type: "required" }]
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:AltUomCode"),
                                 dataField: "altUOMId",
+                                validationRules: [{ type: "required" }],
                                 editorType: 'dxSelectBox',
                                 lookup: {
                                     dataSource: getUOMs,
@@ -271,11 +272,13 @@ $(function () {
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:BaseQty"),
-                                dataField: "baseQty"
+                                dataField: "baseQty",
+                                validationRules: [{ type: "required" }]
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:BaseUomCode"),
                                 dataField: "baseUOMId",
+                                validationRules: [{ type: "required" }],
                                 editorType: 'dxSelectBox',
                                 lookup: {
                                     dataSource: getUOMs,
@@ -286,6 +289,7 @@ $(function () {
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:Active"),
                                 dataField: "active",
+                                //validationRules: [{ type: "required" }],
                                 width: 110,
                                 alignment: 'center',
                                 dataType: 'boolean',

@@ -41,7 +41,7 @@
 
     // get UOMs lookup
     var UOMs = [];
-    var urlUOMsLookup = abp.appPath + 'api/mdm-service/items/u-oM-lookup' +
+    var urlUOMsLookup = abp.appPath + 'api/mdm-service/items/u-oMGroup-detail-lookup' +
         abp.utils.buildQueryString([
             { name: 'maxResultCount', value: 1000 }
         ]);
@@ -274,7 +274,6 @@
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             },
             form: {
-                //formData: items,
                 colCount: 10,
                 items: [
                     {

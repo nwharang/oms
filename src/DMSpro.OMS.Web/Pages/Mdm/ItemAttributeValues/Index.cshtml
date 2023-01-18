@@ -11,8 +11,6 @@
 @model IndexModel
 @inject IPageLayout PageLayout
 @{
-    @* PageLayout.Content.Title = L["Page.Title.ItemAttributeValue"].Value;
-    PageLayout.Content.MenuItemName = MdmServiceMenus.ItemAttributeValues; *@
     PageLayout.Content.Title = L["Item Attribute Value"].Value;
     PageLayout.Content.MenuItemName = MdmServiceMenus.ItemAttributeValues;
 }
@@ -26,8 +24,6 @@
     {
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
-        @* <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:Item"].Value</li>
-        <li class="breadcrumb-item active">@L["Menu:MdmService:ItemAttributeValue"].Value</li> *@
         <li class="breadcrumb-item">@L["Item"].Value</li>
         <li class="breadcrumb-item active">@L["Item Attribute Value"].Value</li>
     </ol>
@@ -37,7 +33,6 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                @* <i class="subheader-icon fal fal fa-window"></i> @L["Menu:MdmService:ItemdAttributeValue"].Value *@
                 <i class="subheader-icon fal fal fa-window"></i> @L["Item Attribute Value"].Value
             </h2>
         </div>
@@ -50,7 +45,6 @@
                                 @if (await Authorization.IsGrantedAsync(MdmServicePermissions.ItemAttributeValues.Create))
                                 {
                                     <button id="NewProductAttrValueButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                        @* <i class="fa fa-plus"></i> <span>@L["Button.New.ItemAttributeValue"].Value</span> *@
                                         <i class="fa fa-plus"></i> <span>@L["New Item Attribute Value"].Value</span>
                                     </button>
                                 }
