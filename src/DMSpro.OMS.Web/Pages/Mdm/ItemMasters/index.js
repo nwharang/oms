@@ -116,7 +116,7 @@
     //    IsActive: true,
     //    InventoryUnit: 'CHAI',
     //    PurUnit: 'THUNG',
-    //    SalesUnit: 'CHAI',
+    //    salesUOMId: 'CHAI',
     //    Attr0: 'Attr0',
     //    Attr1: 'Attr1',
     //    Attr2: 'Attr2',
@@ -348,13 +348,13 @@
                                         itemType: 'group',
                                         items: [
                                             {
-                                                dataField: 'inventoryUnitId'
+                                                dataField: 'inventoryUOMId'
                                             },
                                             {
-                                                dataField: 'purUnitId'
+                                                dataField: 'purUOMId'
                                             },
                                             {
-                                                dataField: 'salesUnit'
+                                                dataField: 'salesUOMId'
                                             },
                                             {
                                                 dataField: 'vatId'
@@ -447,7 +447,7 @@
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['code', 'name', 'barcode', 'inventoriable', 'purchasble', 'saleable', 'manageType', 'inventoryUnitId', 'purUnitId', 'salesUnit', 'vatId', 'active'];
+            var objectRequire = ['code', 'name', 'barcode', 'inventoriable', 'purchasble', 'saleable', 'manageType', 'inventoryUOMId', 'purUOMId', 'salesUOMId', 'vatId', 'active'];
             for (var property in e.oldData) {
                 if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                     e.newData[property] = e.oldData[property];
@@ -580,7 +580,7 @@
                 visible: false
             },
             {
-                dataField: 'inventoryUnitId',
+                dataField: 'inventoryUOMId',
                 caption: l('EntityFieldName:MDMService:Item:InventoryUnitName'),
                 editorType: 'dxSelectBox',
                 lookup: {
@@ -592,7 +592,7 @@
                 visible: false
             },
             {
-                dataField: 'purUnitId',
+                dataField: 'purUOMId',
                 caption: l('EntityFieldName:MDMService:Item:PurUnitName'),
                 editorType: 'dxSelectBox',
                 lookup: {
@@ -604,7 +604,7 @@
                 visible: false
             },
             {
-                dataField: 'salesUnit',
+                dataField: 'salesUOMId',
                 caption: l('EntityFieldName:MDMService:Item:SalesUnitName'),
                 editorType: 'dxSelectBox',
                 lookup: {
