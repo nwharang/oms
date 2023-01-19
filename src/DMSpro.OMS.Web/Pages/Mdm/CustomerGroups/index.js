@@ -6,15 +6,15 @@
         return value !== undefined && value !== null && value !== '';
     }
     var GroupModes = [{
-        id: 1,
+        id: "ATTRIBUTE",
         displayName: "By Attribute"
     },
     {
-        id: 2,
+        id: "LIST",
         displayName: "By List"
     },
     {
-        id: 3,
+        id: "GEO",
         displayName: "By Geo"
         }];
 
@@ -155,13 +155,13 @@
                 },
             },
             {
-                dataField: 'effDate',
+                dataField: 'effectiveDate',
                 caption: l("EntityFieldName:MDMService:CustomerGroup:EffectiveDate"),
                 dataType: 'date',
             },
             {
-                dataField: 'groupByMode',
-                caption: l("EntityFieldName:MDMService:CustomerGroup:GroupByMode"),
+                dataField: 'groupBy',
+                caption: l("EntityFieldName:MDMService:CustomerGroup:GroupBy"),
                 lookup: {
                     dataSource: GroupModes,
                     valueExpr: "id",
@@ -176,7 +176,7 @@
     });
 
     $("#btnNewCusGroup").click(function (e) {
-        gridCompanies.addRow();
+        gridCusGroups.addRow();
     });
 
     $("#ExportToExcelButton").click(function (e) {
