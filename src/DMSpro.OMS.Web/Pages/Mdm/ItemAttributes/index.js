@@ -92,12 +92,6 @@
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        //onRowInserting: function (e) {
-        //    debugger
-        //    if (e.data && e.data.code == null) {
-        //        e.data.code = e.data.Code;
-        //    }
-        //},
         onRowUpdating: function (e) {
             var objectRequire = ['attrNo', 'attrName', 'hierarchyLevel', 'active', 'isProductCategory'];
             for (var property in e.oldData) {
@@ -117,17 +111,23 @@
         columns: [
             {
                 type: 'buttons',
-                buttons: ['edit', 'delete'],
+                buttons: ['edit'],
                 caption: l('Actions'),
             },
-            //{
-            //    dataField: 'AttrNo',
-            //    caption: l("EntityFieldName:MDMService:ProductAttribute:AttrNo"),
-            //    allowEditing: false,
-            //},
+            {
+                dataField: 'attrNo',
+                caption: l("EntityFieldName:MDMService:ItemAttribute:AttrNo"),
+                allowEditing: false
+            },
             {
                 dataField: 'attrName',
                 caption: l("EntityFieldName:MDMService:ItemAttribute:AttrName"),
+                validationRules: [
+                    {
+                        type: "required",
+                        message: 'Attribute name is required'
+                    }
+                ]
             },
             {
                 dataField: 'hierarchyLevel',

@@ -15,6 +15,10 @@
     PageLayout.Content.MenuItemName = MdmServiceMenus.UOMs;
 }
 
+@*@section styles {
+    <abp-style src="/Pages/Mdm/UOMs/index.css" />
+}*@
+
 @section scripts
     {
     <abp-script src="/Pages/Mdm/UOMs/index.js" />
@@ -33,7 +37,7 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fal fal fa-window"></i> @L["Menu:MdmService:UOMs"].Value
+                <i class="subheader-icon fal fal fa-window"></i>
             </h2>
         </div>
         <div class="panel-container show">
@@ -69,7 +73,6 @@
                             </div>
                         </abp-row>
                         <div class="dx-viewport">
-                            <div id="loadPanel"></div>
                             <div id="gridUOMs"></div>
                         </div>
                     </abp-card-body>

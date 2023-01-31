@@ -92,23 +92,38 @@ $(function () {
         }
     });
 
-    // get UOMs lookup
-    var uoms = [];
-    var urlUOMsLookup = abp.appPath + 'api/mdm-service/u-oMGroup-details/u-oM-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    $.ajax({
-        url: `${urlUOMsLookup}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            uoms = data.items;
+    // get UOMs
+    var getUOMs = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'raw',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            uomService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+            var d = new $.Deferred();
+            uomService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
         }
     });
-    var getUOMs = function () {
-        return uoms;
-    }
 
     const dataGrid = $('#gridUOMGroups').dxDataGrid({
         dataSource: groupStore,
@@ -155,12 +170,6 @@ $(function () {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        onRowInserting: function (e) {
-            debugger
-            if (e.data && e.data.id == 0) {
-                e.data.id = null;
-            }
-        },
         onRowUpdating: function (e) {
             var objectRequire = ['code', 'name'];
             for (var property in e.oldData) {
@@ -178,12 +187,22 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:UOM:Code"),
                 dataField: "code",
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required",
+                        message: 'Code is required'
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:UOM:Name"),
                 dataField: "name",
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required",
+                        message: 'Name is required'
+                    }
+                ]
             }
         ],
         masterDetail: {
@@ -257,23 +276,47 @@ $(function () {
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:AltQty"),
                                 dataField: "altQty",
-                                validationRules: [{ type: "required" }]
+                                validationRules: [
+                                    {
+                                        type: "required",
+                                        message: 'Alt quantity is required'
+                                    }
+                                ]
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:AltUomCode"),
                                 dataField: "altUOMId",
-                                validationRules: [{ type: "required" }],
+                                validationRules: [
+                                    {
+                                        type: "required",
+                                        message: 'Alt UOM Code is required'
+                                    }
+                                ],
                                 editorType: 'dxSelectBox',
                                 lookup: {
                                     dataSource: getUOMs,
                                     valueExpr: 'id',
-                                    displayExpr: 'displayName'
+                                    displayExpr: 'code'
+                                }
+                            },
+                            {
+                                caption: '=',
+                                alignment: 'center',
+                                cellTemplate(container, options) {
+                                    $('<div>')
+                                        .append('<label>=</label>')
+                                        .appendTo(container);
                                 }
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:BaseQty"),
                                 dataField: "baseQty",
-                                validationRules: [{ type: "required" }]
+                                validationRules: [
+                                    {
+                                        type: "required",
+                                        message: 'Base quantity is required'
+                                    }
+                                ]
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:BaseUomCode"),
@@ -283,13 +326,12 @@ $(function () {
                                 lookup: {
                                     dataSource: getUOMs,
                                     valueExpr: 'id',
-                                    displayExpr: 'displayName'
+                                    displayExpr: 'code'
                                 }
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:Active"),
                                 dataField: "active",
-                                //validationRules: [{ type: "required" }],
                                 width: 110,
                                 alignment: 'center',
                                 dataType: 'boolean',

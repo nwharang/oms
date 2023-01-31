@@ -614,8 +614,6 @@ $(function () {
         } else {
             $("#btnSalesOrgHeaderActive").prop('disabled', false);
         }
-
-
     }
 
     function ResetControl() {
