@@ -271,6 +271,6 @@ table.companies > tbody > tr{
     margin-left:unset;
 }
 
-div.dx-datagrid div.dx-toolbar-items-container button.btn, #btnActions {
+/*div.dx-datagrid div.dx-toolbar-items-container button.btn, #btnActions {
     border-radius: 0px;
-}
+}*/
