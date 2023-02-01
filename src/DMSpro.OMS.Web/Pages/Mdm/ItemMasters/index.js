@@ -94,7 +94,7 @@
                 }
             });
 
-            uOMGroupDetailService.getListDevextremes(args)
+            uOMGroupDetailService.getListDevextremeswithNavigation(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -718,8 +718,8 @@
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getUOMGroupDetails,
-                    valueExpr: 'id',
-                    displayExpr: 'displayName'
+                    valueExpr: 'altUOM.id',
+                    displayExpr: 'altUOM.name'
                 },
                 validationRules: [{ type: "required" }],
                 visible: false
@@ -730,8 +730,8 @@
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getUOMGroupDetails,
-                    valueExpr: 'id',
-                    displayExpr: 'displayName'
+                    valueExpr: 'altUOM.id',
+                    displayExpr: 'altUOM.name'
                 },
                 validationRules: [{ type: "required" }],
                 visible: false
@@ -742,8 +742,8 @@
                 editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: getUOMGroupDetails,
-                    valueExpr: 'id',
-                    displayExpr: 'displayName'
+                    valueExpr: 'altUOM.id',
+                    displayExpr: 'altUOM.name'
                 },
                 validationRules: [{ type: "required" }],
                 visible: false
