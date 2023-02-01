@@ -59,7 +59,7 @@ $(() => {
                     options: {
                         icon: 'refresh',
                         onClick() {
-                            gridPurchaseRequests.refresh();
+                            gridHolidays.refresh();
                         },
                     },
                 },
@@ -269,8 +269,7 @@ $(() => {
                                 confirmDeleteMessage: l("DeleteConfirmationMessage")
                             }
                         },
-                        onInitNewRow: function (e) {
-                            debugger
+                        onInitNewRow: function (e) { 
                             e.data.holidayId = options.data.id; 
                         },
                         columns: [ 
