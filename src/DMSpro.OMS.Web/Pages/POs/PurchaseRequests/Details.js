@@ -4,12 +4,12 @@ console.log(model);
 document.title = `PO - ${model.DocNbr} | OMS`;
 
 $(function () {
-     
+
     DevExpress.config({
         editorStylingMode: 'underlined',
     });
 
-    $('#tabpanel-container').dxTabPanel({ 
+    $('#tabpanel-container').dxTabPanel({
         items: [{
             title: "Details",
             icon: "detailslayout",
@@ -103,7 +103,7 @@ $(function () {
             }
         ]
     });
-     
+
     $('#txtBarCode').dxTextBox({
         value: '',
         placeholder: "Type barcode...",
@@ -111,10 +111,10 @@ $(function () {
         width: 200,
         showClearButton: true,
     });
-     
-     
+
+
     $('#resizable').dxResizable({
-        minHeight: 120, 
+        minHeight: 120,
         handles: "bottom"
     }).dxResizable('instance');
 });
@@ -184,29 +184,16 @@ function initDetailsTab() {
                             placeholder: "Type barcode..."
                         },
                     },
+                    'columnChooserButton',
+                    'exportButton',
                     {
                         location: 'after',
-                        widget: 'dxButton',
-                        options: {
-                            icon: 'refresh',
-                            onClick() {
-                                gridDetails.refresh();
-                            },
+                        template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                        onClick() {
+                            //todo
                         },
                     },
-                        'columnChooserButton',
-                        'exportButton',
-                    {
-                        location: 'after',
-                        widget: 'dxButton',
-                        options: {
-                            icon: 'fa fa-upload',
-                            text: "Import From Excel",
-                            onClick() {
-                                //dataGridContainer.refresh();
-                            },
-                        },
-                    },
+                        "searchPanel"
                     ],
                 },
                 export: {
@@ -367,7 +354,7 @@ function initDetailsTab() {
                 ],
             })
     }
-   
+
 }
 function initPromotionalTab() {
     return function () {
@@ -619,9 +606,9 @@ function initPromotionalTab() {
                     }
                 ],
             })
-    } 
+    }
 }
-var products =  [{
+var products = [{
     "ID": 1,
     "Name": "Item 1",
     "BarCode": "ABC-abc-1234"

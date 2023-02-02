@@ -8,9 +8,7 @@ div.dx-datagrid .dx-toolbar-items-container, div.dx-treelist-container div.dx-to
 .dx-button-has-text .dx-button-content {
     padding: 6px 8px 6px;
 }
-.dx-button-mode-contained {
-    border-radius: 0;
-}
+
 .dx-toolbar .dx-button .dx-icon{
     margin-right:0;
 }
@@ -74,7 +72,4 @@ div.close-popup div[role=button] {
 }
 .increaseFontWeight > a {
     font-weight: 500;
-}
-div.dx-widget.dx-datagrid-export-button > div > div > div.dx-widget.dx-button{
-    border-radius:0;
 }
