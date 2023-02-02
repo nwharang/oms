@@ -11,9 +11,7 @@
 @model IndexModel
 @inject IPageLayout PageLayout
 @{
-    @* PageLayout.Content.Title = L["Page.Title.ItemAttributes"].Value;
-    PageLayout.Content.MenuItemName = MdmServiceMenus.ItemAttributes; *@
-    PageLayout.Content.Title = L["Item Attributes"].Value;
+    PageLayout.Content.Title = L["Page.Title.ItemAttributes"].Value;
     PageLayout.Content.MenuItemName = MdmServiceMenus.ItemAttributes;
 }
 
@@ -26,10 +24,8 @@
     {
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
-        @* <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:Item"].Value</li>
-        <li class="breadcrumb-item active">@L["Menu:MdmService:ItemAttributes"].Value</li> *@
         <li class="breadcrumb-item">@L["Item"].Value</li>
-        <li class="breadcrumb-item active">@L["Item Attributes"].Value</li>
+        <li class="breadcrumb-item active">@L["Menu:MdmService:ItemAttributes"].Value</li>
     </ol>
 }
 
@@ -37,8 +33,7 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                @* <i class="subheader-icon fal fal fa-window"></i> @L["Menu:MdmService:ItemAttributes"].Value *@
-                <i class="subheader-icon fal fal fa-window"></i> @L["Item Attributes"].Value
+                <i class="subheader-icon fal fal fa-window"></i> @L["Menu:MdmService:ItemAttributes"].Value
             </h2>
         </div>
         <div class="panel-container show">
@@ -47,12 +42,12 @@
                     <abp-card-body>
                         <abp-row>
                             <div style="padding-left:12px" class="buttons-header-grid">
-                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.ItemAttributes.Create))
+                                @*@if (await Authorization.IsGrantedAsync(MdmServicePermissions.ItemAttributes.Create))
                                 {
                                     <button id="NewProductAttributeButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
                                         <i class="fa fa-plus"></i> <span>@L["New Item Attributte"].Value</span>
                                     </button>
-                                }
+                                }*@
                                 <button id="ExportToExcelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
                                     <i class="fa fa-download"></i> <span>@L["ExportToExcel"].Value</span>
                                 </button>
@@ -74,7 +69,6 @@
                             </div>
                         </abp-row>
                         <div class="dx-viewport">
-                            <div id="loadPanel"></div>
                             <div id="gridProdAttribute"></div>
                         </div>
                     </abp-card-body>

@@ -15,6 +15,10 @@
     PageLayout.Content.MenuItemName = MdmServiceMenus.UOMGroups;
 }
 
+@section styles {
+    <abp-style src="/Pages/Mdm/UOMGroups/index.css" />
+}
+
 @section scripts
     {
     <abp-script src="/Pages/Mdm/UOMGroups/index.js" />
@@ -69,7 +73,6 @@
                             </div>
                         </abp-row>
                         <div class="dx-viewport">
-                            <div id="loadPanel"></div>
                             <div id="gridUOMGroups"></div>
                         </div>
                     </abp-card-body>
@@ -78,9 +81,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    .dx-master-detail-cell > .dx-widget > .dx-datagrid > .dx-datagrid-header-panel > .dx-toolbar > .dx-toolbar-items-container {
-        display: flex !important;
-    }
-</style>

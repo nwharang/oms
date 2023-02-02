@@ -11,7 +11,7 @@
 @model IndexModel
 @inject IPageLayout PageLayout
 @{
-    PageLayout.Content.Title = L["ItemMasters"].Value;
+    PageLayout.Content.Title = L["Page.Title.Items"].Value;
     PageLayout.Content.MenuItemName = MdmServiceMenus.Items;
 }
 
@@ -44,7 +44,7 @@
                                 @if (await Authorization.IsGrantedAsync(MdmServicePermissions.Items.Create))
                                 {
                                     <button id="NewItemMasterButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                        <i class="fa fa-plus"></i> <span>@L["Button.New.Item"].Value</span>
+                                        <i class="fa fa-plus"></i> <span>@L["Button.New.Items"].Value</span>
                                     </button>
                                 }
                                 <button id="ExportToExcelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">

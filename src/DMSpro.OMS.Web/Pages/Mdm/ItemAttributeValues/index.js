@@ -2,13 +2,14 @@ $(function () {
     // language
     var l = abp.localization.getResource("MdmService");
     // load mdmService
-    var productAttrValueService = window.dMSpro.oMS.mdmService.controllers.prodAttributeValues.prodAttributeValue;
+    var itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
+    var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
 
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
     //Custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'raw',
+        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -17,7 +18,7 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            productAttrValueService.getListDevextremes(args)
+            itemAttrValueService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -31,66 +32,60 @@ $(function () {
             if (key == 0) return null;
 
             var d = new $.Deferred();
-            productAttrValueService.get(key)
+            itemAttrValueService.get(key)
                 .done(data => {
                     d.resolve(data);
                 })
             return d.promise();
         },
         insert(values) {
-            return productAttrValueService.create(values, { contentType: 'application/json' });
+            return itemAttrValueService.create(values, { contentType: 'application/json' });
         },
         update(key, values) {
-            return productAttrValueService.update(key, values, { contentType: 'application/json' });
+            return itemAttrValueService.update(key, values, { contentType: 'application/json' });
         },
         remove(key) {
-            return productAttrValueService.delete(key);
+            return itemAttrValueService.delete(key);
         }
     });
 
-    // get product attribute
-    var productAttr = [];
-    var urlProductAttrLookup = abp.appPath + 'api/mdm-service/prod-attribute-values/product-attribute-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    $.ajax({
-        url: `${urlProductAttrLookup}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            console.log('data call geoList ajax: ', data);
-            productAttr = data.items;
+    // get item attribute
+    var getItemAttr = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'processed',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            itemAttrService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+            var d = new $.Deferred();
+            itemAttrService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
         }
     });
-    var getProductAttr = function () {
-        return productAttr;
-    }
-
-    // get Product Attr Value
-    var productAttrValue = [];
-    var urlProductAttrValLookup = abp.appPath + 'api/mdm-service/prod-attribute-values/prod-attribute-value-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    $.ajax({
-        url: `${urlProductAttrValLookup}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            console.log('data call geoList ajax: ', data);
-            productAttrValue = data.items;
-        }
-    });
-    var getProductAttrValue = function () {
-        return productAttrValue;
-    }
-
 
     const dataTreeContainer = $('#treeProdAttributeValue').dxTreeList({
         dataSource: customStore,
         keyExpr: 'id',
-        parentIdExpr: 'parentProdAttributeValueId',
+        parentIdExpr: 'parentId',
         remoteOperations: true,
         showBorders: true,
         autoExpandAll: true,
@@ -133,25 +128,25 @@ $(function () {
             }
         },
         onEditorPreparing(e) {
-            if (e.dataField === 'parentProdAttributeValueId' && e.editorOptions.value == 0) {
+            if (e.dataField === 'parentId' && e.editorOptions.value == 0) {
                 e.editorOptions.value = '';
             }
         },
         onInitNewRow(e) {
-            var row = e.component.getNodeByKey(e.data.parentProdAttributeValueId) ? e.component.getNodeByKey(e.data.parentProdAttributeValueId).data : null;
+            var row = e.component.getNodeByKey(e.data.parentId) ? e.component.getNodeByKey(e.data.parentId).data : null;
             if (row) {
                 e.data.level = row.level + 1;
-            } else if (e.data.parentProdAttributeValueId == 0) {
+            } else if (e.data.parentId == 0) {
                 e.data.level = 0;
             }
         },
         onRowInserting: function (e) {
-            if (e.data && e.data.parentProdAttributeValueId == 0) {
-                e.data.parentProdAttributeValueId = null;
+            if (e.data && e.data.parentId == 0) {
+                e.data.parentId = null;
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['id', 'attrValName', 'prodAttributeId', 'parentProdAttributeValueId'];
+            var objectRequire = ['id', 'attrValName', 'itemAttributeId', 'parentId'];
             for (var property in e.oldData) {
                 if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                     e.newData[property] = e.oldData[property];
@@ -175,26 +170,27 @@ $(function () {
             },
             {
                 dataField: 'attrValName',
-                caption: l("EntityFieldName:MDMService:ProdAttributeValue:AttrValName")
+                caption: l("EntityFieldName:MDMService:ItemAttributeValue:AttrValName")
             },
             {
-                dataField: 'prodAttributeId',
-                caption: l("EntityFieldName:MDMService:ProdAttributeValue:ProdAttributeId"),
+                dataField: 'itemAttributeId',
+                caption: l("EntityFieldName:MDMService:ItemAttributeValue:ItemAttributeName"),
                 editorType: 'dxSelectBox',
                 lookup: {
-                    dataSource: getProductAttr,
+                    dataSource: getItemAttr,
                     valueExpr: 'id',
-                    displayExpr: 'displayName'
+                    displayExpr: 'attrName'
                 }
             },
             {
                 caption: l("EntityFieldName:MDMService:ProdAttributeValue:ParentProdAttributeValueId"),
-                dataField: 'parentProdAttributeValueId',
+                dataField: 'parentId',
                 editorType: 'dxSelectBox',
+                visible: false,
                 lookup: {
-                    dataSource: getProductAttrValue,
+                    dataSource: customStore,
                     valueExpr: 'id',
-                    displayExpr: 'displayName'
+                    displayExpr: 'name'
                 }
             }
         ]
@@ -211,9 +207,9 @@ $(function () {
     $("#ExportToExcelButton").click(function (e) {
         e.preventDefault();
 
-        productAttrValueService.getDownloadToken().then(
+        itemAttrValueService.getDownloadToken().then(
             function (result) {
-                var url = abp.appPath + 'api/mdm-service/prod-attribute-values/as-excel-file' +
+                var url = abp.appPath + 'api/mdm-service/item-attribute-values/as-excel-file' +
                     abp.utils.buildQueryString([
                         { name: 'downloadToken', value: result.token }
                     ]);

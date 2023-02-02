@@ -8,7 +8,7 @@
     // custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'raw',
+        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -63,9 +63,6 @@
         filterRow: {
             visible: true
         },
-        searchPanel: {
-            visible: true
-        },
         scrolling: {
             mode: 'standard'
         },
@@ -92,12 +89,6 @@
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        //onRowInserting: function (e) {
-        //    debugger
-        //    if (e.data && e.data.code == null) {
-        //        e.data.code = e.data.Code;
-        //    }
-        //},
         onRowUpdating: function (e) {
             var objectRequire = ['code', 'name'];
             for (var property in e.oldData) {
@@ -106,14 +97,54 @@
                 }
             }
         },
-        toolbar: {
-            items: [
-                {
-                    name: "searchPanel",
-                    location: 'after'
-                }
-            ]
-        },
+        //toolbar: {
+        //    items: [
+        //        {
+        //            location: 'before',
+        //            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>' + l('Button.New.UOM') +'</span></button>',
+        //            onClick() {
+        //                gridUOMs.addRow();
+        //            }
+        //        },
+        //        {
+        //            location: 'after',
+        //            widget: 'dxButton',
+        //            options: {
+        //                icon: 'refresh',
+        //                onClick() {
+        //                    gridUOMs.refresh();
+        //                },
+        //            }
+        //        },
+        //        'columnChooserButton',
+        //        'exportButton',
+        //        {
+        //            location: 'after',
+        //            widget: 'dxButton',
+        //            options: {
+        //                icon: 'upload',
+        //                onclick() {
+        //                    //todo
+        //                }
+        //            }
+        //        },
+        //        'searchPanel'
+        //    ]
+        //},
+        //export: {
+        //    enabled: true
+        //},
+        //onExporting(e) {
+        //    uOMsService.getDownloadToken().then(
+        //        function (result) {
+        //            var url = abp.appPath + 'api/mdm-service/u-oMs/as-excel-file' + abp.utils.buildQueryString([
+        //                { name: 'downloadToken', value: result.token }
+        //            ]);
+        //            var downloadWindow = window.open(url, '_blank');
+        //            downloadWindow.focus();
+        //        }
+        //    )
+        //},
         columns: [
             {
                 type: 'buttons',
@@ -123,12 +154,24 @@
             {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:UOM:Code"),
-                dataType: 'string'
+                dataType: 'string',
+                validationRules: [
+                    {
+                        type: 'required',
+                        message: 'Code is required'
+                    }
+                ]
             },
             {
                 dataField: 'name',
                 caption: l("EntityFieldName:MDMService:UOM:Name"),
-                dataType: 'string'
+                dataType: 'string',
+                validationRules: [
+                    {
+                        type: 'required',
+                        message: 'Name is required'
+                    }
+                ]
             }
         ]
     }).dxDataGrid('instance');

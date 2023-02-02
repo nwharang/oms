@@ -11,17 +11,17 @@
 @model IndexModel
 @inject IPageLayout PageLayout
 @{
-    PageLayout.Content.Title = L["Page.Title.ItemGroups"].Value;
+    PageLayout.Content.Title = L["Item Group Detail"].Value;
     PageLayout.Content.MenuItemName = MdmServiceMenus.ItemGroups;
 }
 
 @section styles {
-    <abp-style src="/Pages/Mdm/ItemGroups/index.css" />
+    <abp-style src="/Pages/Mdm/ItemGroups/details.css" />
 }
 
 @section scripts
 {
-    <abp-script src="/Pages/Mdm/ItemGroups/index.js" />
+    <abp-script src="/Pages/Mdm/ItemGroups/details.js" />
 }
 
 @section breadcrumb
@@ -29,7 +29,7 @@
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
         <li class="breadcrumb-item">@L["Item"].Value</li>
-        <li class="breadcrumb-item active">@L["Menu:MdmService:ItemGroups"].Value</li>
+        <li class="breadcrumb-item active">Item Group Detail</li>
     </ol>
 }
 
@@ -45,8 +45,29 @@
                 <abp-card>
                     <abp-card-body>
                         <div class="dx-viewport">
+                            <div class="py-1" id="resizable">
+                                <div id="top-section"></div>
+                            </div>
                             <div class="py-2">
-                                <div id="gridItemGroups"></div>
+                                <div id="itemGroupTabpanel">
+                                    <div id="tabpanel-container"> </div>
+                                    <div class="options">
+                                        <div class="option">
+                                            <div id="animation-enabled"></div>
+                                        </div>
+                                        <div class="option">
+                                            <div id="animation-enabled"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="py-3" style="display: flex; float: right">
+                                <div style="padding-right:10px">
+                                    <div id="danger-contained"></div>
+                                </div>
+                                <div>
+                                    <div id="default-contained"></div>
+                                </div>
                             </div>
                         </div>
                     </abp-card-body>
@@ -55,9 +76,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    .dx-master-detail-cell > .dx-widget > .dx-datagrid > .dx-datagrid-header-panel > .dx-toolbar > .dx-toolbar-items-container {
-        display: flex !important;
-    }
-</style>
