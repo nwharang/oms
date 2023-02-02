@@ -420,5 +420,33 @@
     <Reference Include="Volo.Forms.Domain.Shared">
       <HintPath>..\..\..\commondll\Development\Services\survey\Volo.Forms.Domain.Shared.dll</HintPath>
     </Reference>
+
+    <Reference Include="DMSpro.OMS.FileManagementService.Application.Contracts">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\DMSpro.OMS.FileManagementService.Application.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="DMSpro.OMS.FileManagementService.Domain.Shared">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\DMSpro.OMS.FileManagementService.Domain.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="Volo.FileManagement.Application.Contracts">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\Volo.FileManagement.Application.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="Volo.FileManagement.Domain.Shared">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\Volo.FileManagement.Domain.Shared.dll</HintPath>
+    </Reference>
+
+
+    <Reference Include="DMSpro.OMS.FileManagementService.HttpApi.Client">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\DMSpro.OMS.FileManagementService.HttpApi.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="DMSpro.OMS.FileManagementService.Web">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\DMSpro.OMS.FileManagementService.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="Volo.FileManagement.HttpApi.Client">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\Volo.FileManagement.HttpApi.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Volo.FileManagement.Web">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\Volo.FileManagement.Web.dll</HintPath>
+    </Reference>
+
   </ItemGroup>
 </Project>
