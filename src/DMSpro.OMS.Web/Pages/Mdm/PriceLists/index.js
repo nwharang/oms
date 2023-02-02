@@ -9,7 +9,7 @@
     // custom store
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'raw',
+        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -213,4 +213,8 @@
             }
         )
     });
+
+    function isNotEmpty(value) {
+        return value !== undefined && value !== null && value !== '';
+    }
 });

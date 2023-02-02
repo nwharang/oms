@@ -11,7 +11,7 @@ $(function () {
     // custom store
     var priceListStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'raw',
+        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -53,7 +53,7 @@ $(function () {
 
     var pricelistAssignmentStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'raw',
+        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -94,21 +94,11 @@ $(function () {
 
     var customerGroupStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'raw',
+        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
@@ -329,4 +319,8 @@ $(function () {
             }
         )
     });
+
+    function isNotEmpty(value) {
+        return value !== undefined && value !== null && value !== '';
+    }
 });
