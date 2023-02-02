@@ -422,12 +422,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Update="Pages\Mdm\MCPHeaders\Index.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Update="Pages\Mdm\Routes\Index.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Update="Pages\Mdm\MCPHeaders\index.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Pages\Mdm\MCPHeaders\index.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Pages\Mdm\Routes\index.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

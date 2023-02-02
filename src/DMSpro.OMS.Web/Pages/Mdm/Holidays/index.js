@@ -125,7 +125,7 @@ $(() => {
         },
         dataSource: new DevExpress.data.CustomStore({
             key: 'id',
-            loadMode: "raw",
+            
             load(loadOptions) {
                 const deferred = $.Deferred();
                 const args = {};
@@ -188,7 +188,7 @@ $(() => {
                     .dxDataGrid({
                         dataSource: new DevExpress.data.CustomStore({
                             key: 'id',
-                            loadMode: "raw", 
+                            
                             load(loadOptions) {
                                 const deferred = $.Deferred(); 
                                 var args = {};

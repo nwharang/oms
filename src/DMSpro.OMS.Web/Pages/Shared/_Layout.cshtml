@@ -64,6 +64,8 @@
     var currentLanguage = languages.FindByCulture(
                     CultureInfo.CurrentCulture.Name,
                     CultureInfo.CurrentUICulture.Name);
+
+
     //var result = await AuthorizationService.AuthorizeAsync("/SystemDatas/Index", "MdmService.SystemData");
     //if (result.Succeeded == false)
     //{
@@ -99,6 +101,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/dmstheme/img/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/dmstheme/img/favicon/favicon-32x32.png">
     <link rel="mask-icon" href="/dmstheme/img/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="stylesheet" href="/dmstheme/css/hover-min.css"/>
     <link rel="stylesheet" media="screen, print" href="/dmstheme/css/miscellaneous/reactions/reactions.css">
     <link rel="stylesheet" media="screen, print" href="/dmstheme/css/miscellaneous/fullcalendar/fullcalendar.bundle.css">
 
@@ -778,9 +781,9 @@
                                                 </a>
                                             </li>*@
                                             <li>
-                                                <a href="/Mdm/MCPHeaders" title="MCP Headers" data-filter-tags="mdm route & mcp headers">
+                                                <a href="/Mdm/MCPHeaders" title="MCP" data-filter-tags="mdm route & mcp">
                                                     <i class="fa fa-calendar-minus-o"></i>
-                                                    <span class="nav-link-text">MCP Headers</span>
+                                                    <span class="nav-link-text">MCP</span>
                                                 </a>
                                             </li>
                                            @* <li>

@@ -1,185 +1,345 @@
+﻿var l = abp.localization.getResource("MdmService");
 $(function () {
-    var l = abp.localization.getResource("MdmService");
-	var mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
-	
-        var lastNpIdId = '';
-        var lastNpDisplayNameId = '';
 
-        var _lookupModal = new abp.ModalManager({
-            viewUrl: abp.appPath + "Shared/LookupModal",
-            scriptUrl: "/Pages/Shared/lookupModal.js",
-            modalClass: "navigationPropertyLookup"
-        });
-
-        $('.lookupCleanButton').on('click', '', function () {
-            $(this).parent().find('input').val('');
-        });
-
-        _lookupModal.onClose(function () {
-            var modal = $(_lookupModal.getModal());
-            $('#' + lastNpIdId).val(modal.find('#CurrentLookupId').val());
-            $('#' + lastNpDisplayNameId).val(modal.find('#CurrentLookupDisplayName').val());
-        });
-	
-    var createModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "MCPHeaders/CreateModal",
-        scriptUrl: "/Pages/MCPHeaders/createModal.js",
-        modalClass: "mCPHeaderCreate"
+    DevExpress.config({
+        editorStylingMode: 'underlined',
     });
 
-	var editModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "MCPHeaders/EditModal",
-        scriptUrl: "/Pages/MCPHeaders/editModal.js",
-        modalClass: "mCPHeaderEdit"
-    });
-
-	var getFilter = function() {
-        return {
-            filterText: $("#FilterText").val(),
-            code: $("#CodeFilter").val(),
-			name: $("#NameFilter").val(),
-			effectiveDateMin: $("#EffectiveDateFilterMin").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			effectiveDateMax: $("#EffectiveDateFilterMax").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			endDateMin: $("#EndDateFilterMin").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			endDateMax: $("#EndDateFilterMax").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			routeId: $("#RouteIdFilter").val(),			companyId: $("#CompanyIdFilter").val()
-        };
-    };
-
-    var dataTable = $("#MCPHeadersTable").DataTable(abp.libs.datatables.normalizeConfiguration({
-        processing: true,
-        serverSide: true,
-        paging: true,
-        searching: false,
-        scrollX: true,
-        autoWidth: true,
-        scrollCollapse: true,
-        order: [[1, "asc"]],
-        ajax: abp.libs.datatables.createAjax(mCPHeaderService.getList, getFilter),
-        columnDefs: [
+    $("#top-section").dxForm({
+        formData: {
+            // Docdate: currentDate(),
+            // PostingDate: currentDate()
+        },
+        labelMode: 'floating',
+        colCount: 4,
+        items: [
             {
-                rowAction: {
-                    items:
-                        [
-                            {
-                                text: l("Edit"),
-                                visible: abp.auth.isGranted('MdmService.MCPHeaders.Edit'),
-                                action: function (data) {
-                                    editModal.open({
-                                     id: data.record.mcpHeader.id
-                                     });
-                                }
-                            },
-                            {
-                                text: l("Delete"),
-                                visible: abp.auth.isGranted('MdmService.MCPHeaders.Delete'),
-                                confirmMessage: function () {
-                                    return l("DeleteConfirmationMessage");
-                                },
-                                action: function (data) {
-                                    mCPHeaderService.delete(data.record.mcpHeader.id)
-                                        .then(function () {
-                                            abp.notify.info(l("SuccessfullyDeleted"));
-                                            dataTable.ajax.reload();
-                                        });
-                                }
-                            }
-                        ]
-                }
-            },
-			{ data: "mcpHeader.code" },
-			{ data: "mcpHeader.name" },
-            {
-                data: "mcpHeader.effectiveDate",
-                render: function (effectiveDate) {
-                    if (!effectiveDate) {
-                        return "";
+                itemType: "group",
+                items: [
+                    {
+                        dataField: 'RefMCP',
+                    },
+                    {
+                        dataField: 'EffectiveDate',
+                        editorType: 'dxDateBox',
+                    }, {
+                        dataField: 'OutletQuantity',
                     }
-                    
-					var date = Date.parse(effectiveDate);
-                    return (new Date(date)).toLocaleDateString(abp.localization.currentCulture.name);
-                }
+                ]
             },
             {
-                data: "mcpHeader.endDate",
-                render: function (endDate) {
-                    if (!endDate) {
-                        return "";
-                    }
-                    
-					var date = Date.parse(endDate);
-                    return (new Date(date)).toLocaleDateString(abp.localization.currentCulture.name);
-                }
+                itemType: "group",
+                items: [
+                    {
+                        dataField: 'Description',
+                    },
+                    {
+                        dataField: 'Route',
+
+                    }, {
+                        dataField: 'Enddate',
+                        editorType: 'dxDateBox'
+                    }]
             },
             {
-                data: "salesOrgHierarchy.code",
-                defaultContent : ""
-            },
-            {
-                data: "company.code",
-                defaultContent : ""
+                itemType: "group",
+                items: [
+                    {
+                        dataField: 'EmployeeName',
+                    }]
             }
         ]
-    }));
-
-    createModal.onResult(function () {
-        dataTable.ajax.reload();
     });
 
-    editModal.onResult(function () {
-        dataTable.ajax.reload();
-    });
+    $('#resizable').dxResizable({
+        minHeight: 120,
+        handles: "bottom"
+    }).dxResizable('instance');
 
-    $("#NewMCPHeaderButton").click(function (e) {
-        e.preventDefault();
-        createModal.open();
-    });
+    var gridMCPHeaders = $('#gridMCPHeaders')
+        .dxDataGrid({
+            dataSource: dataSource,
+            stateStoring: {
+                enabled: true,
+                type: 'localStorage',
+                storageKey: 'storage',
+            },
+            showBorders: true,
+            columnAutoWidth: true,
+            scrolling: {
+                columnRenderingMode: 'virtual',
+            },
+            searchPanel: {
+                visible: true
+            },
+            allowColumnResizing: true,
+            allowColumnReordering: true,
+            paging: {
+                enabled: true,
+                pageSize: 10
+            },
+            rowAlternationEnabled: true,
+            filterRow: {
+                visible: true,
+                applyFilter: 'auto',
+            },
+            headerFilter: {
+                visible: false,
+            },
+            columnChooser: {
+                enabled: true,
+                mode: "select" // or "select"
+            },
+            //columnFixing: {
+            //    enabled: true
+            //},
+            pager: {
+                visible: true,
+                showPageSizeSelector: true,
+                allowedPageSizes: [10, 20, 50, 100],
+                showInfo: true,
+                showNavigationButtons: true
+            },
+            toolbar: {
+                items: [{
+                    location: 'before',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'fa fa-plus',
+                        text: 'Add Row',
+                        onClick() {
+                            gridMCPHeaders.addRow();
+                        },
+                    },
+                },
+                    'columnChooserButton',
+                    'exportButton',
+                {
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'fa fa-upload',
+                        onClick() {
+                            //dataGridContainer.refresh();
+                        },
+                    },
+                }, "searchPanel"
+                ],
+            },
+            export: {
+                enabled: true,
+                // formats: ['excel','pdf'],
+                allowExportSelectedData: true,
+            },
+            editing: {
+                mode: "row",
+                //allowAdding: abp.auth.isGranted('MdmService.u-oMs.Create'),
+                //allowUpdating: abp.auth.isGranted('MdmService.u-oMs.Edit'),
+                //allowDeleting: abp.auth.isGranted('MdmService.u-oMs.Delete'),
+                allowAdding: true,
+                allowUpdating: true,
+                allowDeleting: true,
+                useIcons: true,
+                texts: {
+                    editRow: l("Edit"),
+                    deleteRow: l("Delete"),
+                    confirmDeleteMessage: l("DeleteConfirmationMessage")
+                }
+            },
+            onEditorPreparing: function (e) {
+                if (e.dataField == "code" && e.parentType == "dataRow") {
+                    e.editorName = "dxDropDownBox";
+                    e.editorOptions.dropDownOptions = {
+                        //height: 500
+                    };
+                    e.editorOptions.contentTemplate = function (args, container) {
+                        var value = args.component.option("value"),
+                            $dataGrid = $("<div>").dxDataGrid({
+                                width: '100%',
+                                dataSource: args.component.option("dataSource"),
+                                keyExpr: "ID",
+                                columns: [{
+                                    caption: "Item Code",
+                                    dataField: "Name"
+                                }, "BarCode"],
+                                hoverStateEnabled: true,
+                                paging: { enabled: true, pageSize: 10 },
+                                filterRow: { visible: true },
+                                scrolling: { mode: "infinite" },
+                                height: '90%',
+                                showRowLines: true,
+                                showBorders: true,
+                                selection: { mode: "single" },
+                                selectedRowKeys: value,
+                                onSelectionChanged: function (selectedItems) {
+                                    var keys = selectedItems.selectedRowKeys;
+                                    args.component.option("value", keys);
+                                }
+                            });
 
-	$("#SearchForm").submit(function (e) {
-        e.preventDefault();
-        dataTable.ajax.reload();
-    });
+                        var dataGrid = $dataGrid.dxDataGrid("instance");
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
+                        args.component.on("valueChanged", function (args) {
+                            var value = args.value;
 
-        mCPHeaderService.getDownloadToken().then(
-            function(result){
-                    var input = getFilter();
-                    var url =  abp.appPath + 'api/mdm-service/m-cPHeaders/as-excel-file' + 
-                        abp.utils.buildQueryString([
-                            { name: 'downloadToken', value: result.token },
-                            { name: 'filterText', value: input.filterText }, 
-                            { name: 'code', value: input.code }, 
-                            { name: 'name', value: input.name },
-                            { name: 'effectiveDateMin', value: input.effectiveDateMin },
-                            { name: 'effectiveDateMax', value: input.effectiveDateMax },
-                            { name: 'endDateMin', value: input.endDateMin },
-                            { name: 'endDateMax', value: input.endDateMax }, 
-                            { name: 'routeId', value: input.routeId }
-, 
-                            { name: 'companyId', value: input.companyId }
-                            ]);
-                            
-                    var downloadWindow = window.open(url, '_blank');
-                    downloadWindow.focus();
-            }
-        )
-    });
+                            dataGrid.selectRows(value, false);
+                        });
+                        container.append($dataGrid);
+                        return container;
+                    };
+                }
+            },
+            columns: [
+                {
+                    width: 100,
+                    type: 'buttons',
+                    caption: l('Actions'),
+                    buttons: ['edit', 'delete'],
+                    //fixed: true,
+                },
+                {
+                    caption: "outlet Id",
+                    dataField: "outletId",
+                },
+                {
+                    caption: "outlet Name",
+                    dataField: "outletName",
+                },
+                {
+                    caption: "Address",
+                    dataField: "address"
+                },
+                {
+                    caption: "Effective Date",
+                    dataField: "effectiveDate"
+                }, {
 
-    $('#AdvancedFilterSectionToggler').on('click', function (e) {
-        $('#AdvancedFilterSection').toggle();
-    });
+                    caption: "EndDate",
+                    dataField: "endDate"
+                }, {
 
-    $('#AdvancedFilterSection').on('keypress', function (e) {
-        if (e.which === 13) {
-            dataTable.ajax.reload();
-        }
-    });
+                    caption: "Distance",
+                    dataField: "distance"
+                }, {
 
-    $('#AdvancedFilterSection select').change(function() {
-        dataTable.ajax.reload();
-    });
-    
-    
+                    caption: "Monday",
+                    dataField: "Monday",
+                    dataType: "boolean",
+                }
+                , {
+
+                    caption: "Tuesday",
+                    dataField: "Tuesday",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Wednesday",
+                    dataField: "Wednesday",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Thursday",
+                    dataField: "Thursday",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Friday",
+                    dataField: "Friday",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Saturday",
+                    dataField: "Saturday",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Sunday",
+                    dataField: "Sunday",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Week1",
+                    dataField: "Week1",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Week2",
+                    dataField: "Week2",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Week3",
+                    dataField: "Week3",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Week4",
+                    dataField: "Week4",
+                    dataType: "boolean",
+                }
+            ],
+        })
 });
+
+var dataSource = [
+    {
+        id: 1,
+        outletId: "C001",
+        outletName: "Cửa hàng A2",
+        address: "Quận 2, Hồ Chí Minh",
+        effectiveDate: "01/01/2023",
+        endDate: "02/11/2023",
+        distance: 100,
+        Monday: true,
+        Tuesday: true,
+        Wednesday: true,
+        Thursday: true,
+        Friday: true,
+        Saturday: true,
+        Sunday: true,
+        Week1: true,
+        Week2: true,
+        Week3: true,
+        Week4: true,
+    },
+    {
+        id: 2,
+        outletId: "C002",
+        outletName: "Cửa hàng A2",
+        address: "Quận 2, Hồ Chí Minh",
+        effectiveDate: "10/01/2023",
+        endDate: "12/11/2023",
+        distance: 100,
+        Monday: true,
+        Tuesday: true,
+        Wednesday: false,
+        Thursday: false,
+        Friday: true,
+        Saturday: true,
+        Sunday: true,
+        Week1: true,
+        Week2: false,
+        Week3: false,
+        Week4: true,
+    },
+    {
+        id: 3,
+        outletId: "C003",
+        outletName: "Cửa hàng A3",
+        address: "Quận 4, Hồ Chí Minh",
+        effectiveDate: "15/01/2023",
+        endDate: "15/11/2023",
+        distance: 400,
+        Monday: false,
+        Tuesday: false,
+        Wednesday: true,
+        Thursday: true,
+        Friday: false,
+        Saturday: false,
+        Sunday: false,
+        Week1: true,
+        Week2: false,
+        Week3: false,
+        Week4: false,
+    }
+];

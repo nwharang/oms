@@ -13,15 +13,15 @@
     function changeSelectedCompany(arg) { 
         $('#selected-company').text($(arg).find('td:nth-child(3)').text());
     }
-    var arr_companies = [];
-    window.dMSpro.oMS.mdmService.controllers.companies.company.getListDevextremes({})
+    //var arr_companies = [];
+    window.dMSpro.oMS.mdmService.controllers.companyIdentityUserAssignments.companyIdentityUserAssignment.getListCompanyByCurrentUser({})
         .done(result => {
             arr_companies = result.data;
             var index = 1;
             arr_companies.forEach(u => {
                 if (index == 1)
-                    $('#selected-company').text(u.name);
-                $('table.companies > tbody').append(`<tr><td>${index}</td><td>${u.code}</td><td>${u.name}</td></tr>`);
+                    $('#selected-company').text(u.company.name);
+                $('table.companies > tbody').append(`<tr data-id=${u.company.id}><td>${index}</td><td>${u.company.code}</td><td>${u.company.name}</td></tr>`);
                 index++;
             });
             $('table.companies > tbody > tr').click(function () {

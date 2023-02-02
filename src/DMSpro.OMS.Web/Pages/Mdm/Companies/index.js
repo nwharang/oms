@@ -12,13 +12,13 @@
 
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "raw",
+        //loadMode: "processed",
         load(loadOptions) {
             const deferred = $.Deferred();
             const argsGeo = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
+                    argsGeo[i] = JSON.stringify(loadOptions[i]);
                 }
             });
 
@@ -48,7 +48,7 @@
     //Custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "raw",
+       // loadMode: "processed",
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
