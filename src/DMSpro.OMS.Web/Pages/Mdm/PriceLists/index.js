@@ -20,6 +20,7 @@
             });
             priceListService.getListDevextremes(args)
                 .done(result => {
+                    priceList = result.data;
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -50,23 +51,38 @@
     });
 
     // get price list
-    var priceList = [];
-    var urlPriceListLookup = abp.appPath + 'api/mdm-service/price-lists/price-list-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    $.ajax({
-        url: `${urlPriceListLookup}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            console.log('data call geoList ajax: ', data);
-            priceList = data.items;
-        }
-    });
-    var getPriceList = function () {
-        return priceList;
-    }
+    //var getPriceList = new DevExpress.data.CustomStore({
+    //    key: "id",
+    //    loadMode: 'processed',
+    //    load(loadOptions) {
+    //        const deferred = $.Deferred();
+    //        const args = {};
+    //        requestOptions.forEach((i) => {
+    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+    //                args[i] = JSON.stringify(loadOptions[i]);
+    //            }
+    //        });
+    //        priceListService.getListDevextremes(args)
+    //            .done(result => {
+    //                deferred.resolve(result.data, {
+    //                    totalCount: result.totalCount,
+    //                    summary: result.summary,
+    //                    groupCount: result.groupCount
+    //                });
+    //            });
+    //        return deferred.promise();
+    //    },
+    //    byKey: function (key) {
+    //        if (key == 0) return null;
+
+    //        var d = new $.Deferred();
+    //        priceListService.get(key)
+    //            .done(data => {
+    //                d.resolve(data);
+    //            })
+    //        return d.promise();
+    //    }
+    //});
 
     const dataGrid = $('#gridPriceLists').dxDataGrid({
         dataSource: customStore,
@@ -132,7 +148,17 @@
             [
                 {
                     type: 'buttons',
-                    buttons: ['edit', 'delete'],
+                    buttons: [
+                        {
+                            text: 'View Details',
+                            icon: 'fieldchooser',
+                            hint: 'View Details',
+                            onclick: function (e) {
+                                var w = window.open('Mdm/PriceLists/Details', '_blank');
+                                w.sessionStorage.setItem('priceList', JSON.stringify(e.row.data));
+                            }
+                        },
+                        'edit'],
                     caption: l('Actions'),
                 },
                 {
@@ -161,9 +187,9 @@
                     dataField: "basePriceListId",
                     editorType: 'dxSelectBox',
                     lookup: {
-                        dataSource: getPriceList,
+                        dataSource: customStore,
                         valueExpr: 'id',
-                        displayExpr: 'displayName'
+                        displayExpr: 'code'
                     }
                 },
                 {

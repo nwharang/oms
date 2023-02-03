@@ -7,6 +7,7 @@
     var vATService = window.dMSpro.oMS.mdmService.controllers.vATs.vAT;
     var itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
     var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
+    var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
 
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
@@ -186,60 +187,40 @@
         }
     });
 
-    //itemAttrService.getListDevextremes({})
-    //    .done(result => {
-    //        var data = result.data;
-    //    });
+    // get price list
+    var getPriceList = new DevExpress.data.CustomStore({
+        key: 'id',
+        loadMode: "processed",
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
 
+            priceListService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
 
-    // get item Attribute
-
-
-    //const items = {
-    //    ID: 1,
-    //    Code: 'IT0001',
-    //    Name: 'Trà Thảo Mộc Dr Thanh',
-    //    ShortName: 'Dr Thanh',
-    //    ERPCode: 'ERP0001',
-    //    ItemType: 'Items',
-    //    UOMGroup: 'Items',
-    //    Barcode: '452SDAF2121DF',
-    //    IsPurchaseItem: true,
-    //    IsSalesItem: true,
-    //    IsInventoryItem: true,
-    //    ManageItemBy: 'LOT',
-    //    ExpiredType: 'Day',
-    //    ExpiredValue: '30',
-    //    IssueMethod: 'FIFO',
-    //    ManageItemBy: 'None',
-    //    VAT: '5%',
-    //    IsActive: true,
-    //    InventoryUnit: 'CHAI',
-    //    PurUnit: 'THUNG',
-    //    salesUOMId: 'CHAI',
-    //    Attr0: 'Attr0',
-    //    Attr1: 'Attr1',
-    //    Attr2: 'Attr2',
-    //    Attr3: 'Attr3',
-    //    Attr4: 'Attr4',
-    //    Attr5: 'Attr5',
-    //    Attr6: 'Attr6',
-    //    Attr7: 'Attr7',
-    //    Attr8: 'Attr8',
-    //    Attr9: 'Attr9',
-    //    Inactive: false,
-    //    Images: [
-    //        {
-    //            imageAlt: "Maria",
-    //            imageSrc: "https://cf.shopee.vn/file/d20fd2da8ca9a0b0d6bf6d1740f09462"
-    //        },
-    //        {
-    //            imageAlt: "Maria",
-    //            imageSrc: "https://cf.shopee.vn/file/d20fd2da8ca9a0b0d6bf6d1740f09462"
-    //        }
-    //    ],
-    //    Attachments: ['Attachment 1', 'Attachment 2'],
-    //};
+            var d = new $.Deferred();
+            priceListService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
 
     const manageItem = [
         {
@@ -317,6 +298,7 @@
             return d.promise();
         },
         insert(values) {
+            debugger
             return itemMasterService.create(values, { contentType: "application/json" });
         },
         update(key, values) {
@@ -360,20 +342,20 @@
         },
         editing: {
             mode: 'popup',
-            allowAdding: abp.auth.isGranted('MdmService.Items.Create'),
-            allowUpdating: abp.auth.isGranted('MdmService.Items.Edit'),
-            allowDeleting: abp.auth.isGranted('MdmService.Items.Delete'),
+            allowAdding: true,
+            allowUpdating: true,
+            allowDeleting: true,
             useIcons: true,
-            popup: {
-                title: l("Page.Title.Items"),
-                showTitle: true,
-                width: '95%',
-                height: '100%'
-            },
             texts: {
                 editRow: l("Edit"),
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
+            },
+            popup: {
+                title: l('Menu:MdmService:GroupMenu:ItemMaster'),
+                showTitle: true,
+                width: '95%',
+                height: '90%',
             },
             form: {
                 elementAttr: {
@@ -461,8 +443,9 @@
                                             },
                                             {
                                                 dataField: 'manageItemBy',
+                                                cssClass: 'fieldManageItemBy',
                                                 editorOptions: {
-                                                    onValueChanged: function (e) {
+                                                    onValueChanged: function (e) { 
                                                         if (e.value == 'LOT') {
                                                             $('div.fieldExpiredType > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
                                                             $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').removeClass('dx-state-disabled');
@@ -479,7 +462,6 @@
                                                             $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').addClass('dx-state-disabled');
                                                             $('div.fieldIssueMethod > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
                                                         }
-                                                        return e.value;
                                                     }
                                                 }
                                             },
@@ -514,6 +496,9 @@
                                             },
                                             {
                                                 dataField: 'vatId'
+                                            },
+                                            {
+                                                dataField: 'basePrice'
                                             },
                                             {
                                                 dataField: 'active'
@@ -626,7 +611,18 @@
             {
                 type: 'buttons',
                 caption: l('Actions'),
-                buttons: ['edit', 'delete'],
+                buttons: ['edit', 'delete']
+                //buttons: [
+                //    {
+                //        text: 'Edit',
+                //        icon: 'edit',
+                //        hint: 'Edit',
+                //        onclick: function (e) {
+                //            var w = window.open('/Mdm/ItemMasters/Details', '_blank');
+                //            w.sessionStorage.setItem('itemMaster', JSON.stringify(e.row.data));
+                //        }
+                //    },
+                //    'delete'],
             },
             {
                 dataField: 'id',
@@ -758,9 +754,6 @@
                     displayExpr: 'altUOMId',
                     disabled: true
                 },
-                onContentReady: function (e) {
-                    debugger
-                },
                 validationRules: [{ type: "required" }],
                 visible: false
             },
@@ -803,6 +796,18 @@
                 visible: false
             },
             {
+                dataField: 'basePrice',
+                caption: 'Base Price',
+                editorType: 'dxSelectBox',
+                editorOptions: {
+                    dataSource: getPriceList,
+                    valueExpr: 'id',
+                    displayExpr: 'code'
+                },
+                validationRules: [{ type: "required" }],
+                visible: false
+            },
+            {
                 dataField: 'active',
                 caption: l('EntityFieldName:MDMService:Item:Active'),
                 editorType: 'dxCheckBox',
@@ -812,248 +817,120 @@
                 dataField: 'attr0Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr0Name'),
                 editorType: 'dxSelectBox',
-                lookup: {
-                    dataSource: [
-                        {
-                            attrValName: "Nước ngọt",
-                            id: "eb4c4b72-a241-f928-b3c2-3a08db7a3a8d"
-                        },
-                        {
-                            attrValName: "Sữa",
-                            id: "eb4c4b72-a241-f928-b3c2-3a08db7a3a8d"
-                        }
-                    ],
-                    displayExpr: "attrValName",
-                    valueExpr: "id"
-                },
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr1Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr1Name'),
                 editorType: 'dxSelectBox',
-                lookup: {
-                    dataSource: [
-                        {
-                            attrValName: "Nước ngọt có gas",
-                            id: "eb4c4b72-a241-f928-b3c2-3a08db7a3a8d"
-                        },
-                        {
-                            attrValName: "Sữa tươi",
-                            id: "eb4c4b72-a241-f928-b3c2-3a08db7a3a8d"
-                        }
-                    ],
-                    displayExpr: "attrValName",
-                    valueExpr: "id"
-                },
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr2Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr2Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr3Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr3Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr4Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr4Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr5Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr5Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr6Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr6Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr7Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr7Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr8Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr8Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr9Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr9Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr10Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr10Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr11Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr11Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr12Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr12Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr13Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr13Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr14Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr14Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr15Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr15Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr16Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr16Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr17Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr17Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr18Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr18Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             },
             {
                 dataField: 'attr19Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr19Name'),
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getItemAttrValue,
-                //    valueExpr: 'id',
-                //    displayExpr: 'attrValName'
-                //},
                 visible: false
             }
         ]
@@ -1061,6 +938,8 @@
 
     $("#NewItemMasterButton").click(function (e) {
         gridItemMasters.addRow();
+        //var w = window.open('/Mdm/ItemMasters/Details');
+        //w.sessionStorage.setItem('itemMasters', null);
     });
 
     $("input#Search").on("input", function () {
