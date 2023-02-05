@@ -273,6 +273,15 @@
     <None Remove="DMSpro.OMS.SurveyService.Domain.Shared" />
     <None Remove="Volo.Forms.Application.Contracts" />
     <None Remove="Volo.Forms.Domain.Shared" />
+
+    <None Remove="DMSpro.OMS.FileManagementService.Application.Contracts" />
+    <None Remove="DMSpro.OMS.FileManagementService.Domain.Shared" />
+    <None Remove="DMSpro.OMS.FileManagementService.HttpApi.Client" />
+    <None Remove="DMSpro.OMS.FileManagementService.Web" />
+    <None Remove="Volo.FileManagement.Application.Contracts" />
+    <None Remove="Volo.FileManagement.Domain.Shared" />
+    <None Remove="Volo.FileManagement.HttpApi.Client" />
+    <None Remove="Volo.FileManagement.Web" />
   </ItemGroup>
 	
   <ItemGroup>
