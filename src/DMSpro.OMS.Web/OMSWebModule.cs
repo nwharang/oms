@@ -102,7 +102,7 @@ namespace DMSpro.OMS.Web;
     typeof(AdministrationServiceHttpApiClientModule),
     typeof(OMSSharedHostingAspNetCoreModule),
     typeof(OMSSharedLocalizationModule),
-    typeof(MdmServiceWebModule),
+    //typeof(MdmServiceWebModule),
     typeof(MdmServiceHttpApiClientModule),
     typeof(InventoryServiceWebModule),
 
