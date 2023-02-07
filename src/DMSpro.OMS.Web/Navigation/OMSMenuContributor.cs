@@ -135,8 +135,7 @@ public class OMSMenuContributor : IMenuContributor
 		var poMenu = AddModulePOMenuItem(context);
 		AddMenuItemPurchaseRequestHeaders(context, poMenu);
 		AddMenuItemPurchaseOrderHeaders(context, poMenu);
-		AddMenuItemPurchaseReceiptHeaders(context, poMenu);
-		AddMenuItemPurchaseReceiptDetails(context, poMenu);
+		AddMenuItemPurchaseReceiptHeaders(context, poMenu); 
 		AddMenuItemGoodsReturnRequestHeaders(context, poMenu);
 		AddMenuItemGoodsReturnHeaders(context, poMenu);
 
@@ -180,7 +179,7 @@ public class OMSMenuContributor : IMenuContributor
                 context.GetLocalizer<OrderServiceResource>()["Menu:SalesOrderHeaders"],
                 "/SO/SalesOrders",
                 icon: "fa fa-bars",
-                requiredPermissionName: OrderServicePermissions.SalesOrderHeaders.Default
+                requiredPermissionName: OrderServicePermissions.SalesOrders.Default
             )
         );
     }
@@ -206,7 +205,7 @@ public class OMSMenuContributor : IMenuContributor
                 context.GetLocalizer<OMSResource>()["Menu:POService:PurchaseRequest"],
                 "/POs/PurchaseRequests",
                 icon: "fa fa-th-list",
-                requiredPermissionName: OrderServicePermissions.PurchaseRequestHeaders.Default
+                requiredPermissionName: OrderServicePermissions.PurchaseRequests.Default
             )
         );
     }
@@ -232,20 +231,21 @@ public class OMSMenuContributor : IMenuContributor
                 context.GetLocalizer<OMSResource>()["Menu:POService:PurchaseOrder"],
                 "/Pos/PurchaseOrders",
                 icon: "fa fa-list-alt",
-                requiredPermissionName: OrderServicePermissions.PurchaseOrderHeaders.Default
+                requiredPermissionName: OrderServicePermissions.PurchaseOrders.Default
             )
         );
     }
 
     private static void AddMenuItemPurchaseOrderDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
     {
+		//same permission
         parentMenu.AddItem(
             new ApplicationMenuItem(
                 OrderServiceMenus.PurchaseOrderDetails,
                 context.GetLocalizer<OrderServiceResource>()["Menu:PurchaseOrderDetails"],
                 "/PurchaseOrderDetails",
                 icon: "fa fa-file-alt",
-                requiredPermissionName: OrderServicePermissions.PurchaseOrderDetails.Default
+                requiredPermissionName: OrderServicePermissions.PurchaseOrders.Default
             )
         );
     }
@@ -258,23 +258,23 @@ public class OMSMenuContributor : IMenuContributor
                 context.GetLocalizer<OMSResource>()["Menu:POService:PurchaseReceipt"],
                 "/POs/PurchaseReceipts",
                 icon: "fa fa-file-text-o",
-                requiredPermissionName: OrderServicePermissions.PurchaseReceiptHeaders.Default
+                requiredPermissionName: OrderServicePermissions.PurchaseReceipts.Default
             )
         );
     }
-
-    private static void AddMenuItemPurchaseReceiptDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-    {
-        parentMenu.AddItem(
-            new ApplicationMenuItem(
-                OrderServiceMenus.PurchaseReceiptDetails,
-                 context.GetLocalizer<OMSResource>()["Menu:POService:PurchaseReceiptConfirmation"],
-                "/POs/PurchaseReceiptConfirmations",
-                icon: "fa fa-check-square-o",
-                requiredPermissionName: OrderServicePermissions.PurchaseReceiptDetails.Default
-            )
-        );
-    }
+	//removed
+    //private static void AddMenuItemPurchaseReceiptDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    //{
+    //    parentMenu.AddItem(
+    //        new ApplicationMenuItem(
+    //            OrderServiceMenus.PurchaseReceiptDetails,
+    //             context.GetLocalizer<OMSResource>()["Menu:POService:PurchaseReceiptConfirmation"],
+    //            "/POs/PurchaseReceiptConfirmations",
+    //            icon: "fa fa-check-square-o",
+    //            requiredPermissionName: OrderServicePermissions.PurchaseReceiptConfirmations.Default
+    //        )
+    //    );
+    //}
 
     private static void AddMenuItemGoodsReturnRequestHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
     {
@@ -284,7 +284,7 @@ public class OMSMenuContributor : IMenuContributor
                   context.GetLocalizer<OMSResource>()["Menu:POService:GoodsReturnRequest"],
                 "/POs/GoodsReturnRequests",
                 icon: "fa fa-bars",
-                requiredPermissionName: OrderServicePermissions.GoodsReturnRequestHeaders.Default
+                requiredPermissionName: OrderServicePermissions.GoodsReturnRequests.Default
             )
         );
     }
@@ -310,7 +310,7 @@ public class OMSMenuContributor : IMenuContributor
                context.GetLocalizer<OMSResource>()["Menu:POService:GoodsReturn"],
                 "/POs/GoodsReturns",
                 icon: "fa fa-arrows-h",
-                requiredPermissionName: OrderServicePermissions.GoodsReturnHeaders.Default
+                requiredPermissionName: OrderServicePermissions.GoodsReturns.Default
             )
         );
     }
@@ -336,25 +336,25 @@ public class OMSMenuContributor : IMenuContributor
                 context.GetLocalizer<OrderServiceResource>()["Menu:SalesRequestHeaders"],
                 "/SalesRequestHeaders",
                 icon: "fa fa-file-alt",
-                requiredPermissionName: OrderServicePermissions.SalesRequestHeaders.Default
+                requiredPermissionName: OrderServicePermissions.SalesRequests.Default
             )
         );
     }
 
-    private static void AddMenuItemSalesRequestDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-    {
-        parentMenu.AddItem(
-            new ApplicationMenuItem(
-                OrderServiceMenus.SalesRequestDetails,
-                context.GetLocalizer<OrderServiceResource>()["Menu:SalesRequestDetails"],
-                "/SalesRequestDetails",
-                icon: "fa fa-file-alt",
-                requiredPermissionName: OrderServicePermissions.SalesRequestDetails.Default
-            )
-        );
-    }
+	//private static void AddMenuItemSalesRequestDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+	//{
+	//	parentMenu.AddItem(
+	//		new ApplicationMenuItem(
+	//			OrderServiceMenus.SalesRequestDetails,
+	//			context.GetLocalizer<OrderServiceResource>()["Menu:SalesRequestDetails"],
+	//			"/SalesRequestDetails",
+	//			icon: "fa fa-file-alt",
+	//			requiredPermissionName: OrderServicePermissions.SalesRequestDetails.Default
+	//		)
+	//	);
+	//}
 
-    private static void AddMenuItemDeliveryHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+	private static void AddMenuItemDeliveryHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
     {
         parentMenu.AddItem(
             new ApplicationMenuItem(
@@ -362,49 +362,49 @@ public class OMSMenuContributor : IMenuContributor
                 context.GetLocalizer<OrderServiceResource>()["Menu:DeliveryHeaders"],
                 "/SO/Delivery",
                 icon: "fa fa-truck",
-                requiredPermissionName: OrderServicePermissions.DeliveryHeaders.Default
+                requiredPermissionName: OrderServicePermissions.Deliveries.Default
             )
         );
     }
 
-    private static void AddMenuItemDeliveryDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-    {
-        parentMenu.AddItem(
-            new ApplicationMenuItem(
-                OrderServiceMenus.DeliveryDetails,
-                context.GetLocalizer<OrderServiceResource>()["Menu:DeliveryDetails"],
-                "/DeliveryDetails",
-                icon: "fa fa-file-alt",
-                requiredPermissionName: OrderServicePermissions.DeliveryDetails.Default
-            )
-        );
-    }
+    //private static void AddMenuItemDeliveryDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    //{
+    //    parentMenu.AddItem(
+    //        new ApplicationMenuItem(
+    //            OrderServiceMenus.DeliveryDetails,
+    //            context.GetLocalizer<OrderServiceResource>()["Menu:DeliveryDetails"],
+    //            "/DeliveryDetails",
+    //            icon: "fa fa-file-alt",
+    //            requiredPermissionName: OrderServicePermissions.DeliveryDetails.Default
+    //        )
+    //    );
+    //}
 
-	private static void AddMenuItemArHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-	{
-		parentMenu.AddItem(
-			new ApplicationMenuItem(
-				OrderServiceMenus.ArHeaders,
-				context.GetLocalizer<OrderServiceResource>()["Menu:ArHeaders"],
-				"/ArHeaders",
-				icon: "fa fa-file-alt",
-				requiredPermissionName: OrderServicePermissions.ArHeaders.Default
-			)
-		);
-	}
+	//private static void AddMenuItemArHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+	//{
+	//	parentMenu.AddItem(
+	//		new ApplicationMenuItem(
+	//			OrderServiceMenus.ArHeaders,
+	//			context.GetLocalizer<OrderServiceResource>()["Menu:ArHeaders"],
+	//			"/ArHeaders",
+	//			icon: "fa fa-file-alt",
+	//			requiredPermissionName: OrderServicePermissions.ArHeaders.Default
+	//		)
+	//	);
+	//}
 
-	private static void AddMenuItemArDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-	{
-		parentMenu.AddItem(
-			new ApplicationMenuItem(
-				OrderServiceMenus.ArDetails,
-				context.GetLocalizer<OrderServiceResource>()["Menu:ArDetails"],
-				"/ArDetails",
-				icon: "fa fa-file-alt",
-				requiredPermissionName: OrderServicePermissions.ArDetails.Default
-			)
-		);
-	}
+	//private static void AddMenuItemArDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+	//{
+	//	parentMenu.AddItem(
+	//		new ApplicationMenuItem(
+	//			OrderServiceMenus.ArDetails,
+	//			context.GetLocalizer<OrderServiceResource>()["Menu:ArDetails"],
+	//			"/ArDetails",
+	//			icon: "fa fa-file-alt",
+	//			requiredPermissionName: OrderServicePermissions.ArDetails.Default
+	//		)
+	//	);
+	//}
 
 	private static void AddMenuItemReturnOrderHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
     {
@@ -414,23 +414,23 @@ public class OMSMenuContributor : IMenuContributor
                 context.GetLocalizer<OrderServiceResource>()["Menu:ReturnOrderHeaders"],
                 "/SO/ReturnOrder",
                 icon: "fa fa-arrows-v",
-                requiredPermissionName: OrderServicePermissions.ReturnOrderHeaders.Default
+                requiredPermissionName: OrderServicePermissions.ReturnOrders.Default
             )
         );
     }
 
-    private static void AddMenuItemReturnOrderDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-    {
-        parentMenu.AddItem(
-            new ApplicationMenuItem(
-                OrderServiceMenus.ReturnOrderDetails,
-                context.GetLocalizer<OrderServiceResource>()["Menu:ReturnOrderDetails"],
-                "/ReturnOrderDetails",
-                icon: "fa fa-file-alt",
-                requiredPermissionName: OrderServicePermissions.ReturnOrderDetails.Default
-            )
-        );
-    }
+    //private static void AddMenuItemReturnOrderDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    //{
+    //    parentMenu.AddItem(
+    //        new ApplicationMenuItem(
+    //            OrderServiceMenus.ReturnOrderDetails,
+    //            context.GetLocalizer<OrderServiceResource>()["Menu:ReturnOrderDetails"],
+    //            "/ReturnOrderDetails",
+    //            icon: "fa fa-file-alt",
+    //            requiredPermissionName: OrderServicePermissions.ReturnOrderDetails.Default
+    //        )
+    //    );
+    //}
 
     private static void AddMenuItemArCreditMemoHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
     {
@@ -440,23 +440,23 @@ public class OMSMenuContributor : IMenuContributor
                 context.GetLocalizer<OrderServiceResource>()["Menu:ArCreditMemoHeaders"],
                 "/ArCreditMemoHeaders",
                 icon: "fa fa-file-alt",
-                requiredPermissionName: OrderServicePermissions.ArCreditMemoHeaders.Default
+                requiredPermissionName: OrderServicePermissions.ArCreditMemos.Default
             )
         );
     }
 
-    private static void AddMenuItemArCreditMemoDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-    {
-        parentMenu.AddItem(
-            new ApplicationMenuItem(
-                OrderServiceMenus.ArCreditMemoDetails,
-                context.GetLocalizer<OrderServiceResource>()["Menu:ArCreditMemoDetails"],
-                "/ArCreditMemoDetails",
-                icon: "fa fa-file-alt",
-                requiredPermissionName: OrderServicePermissions.ArCreditMemoDetails.Default
-            )
-        );
-    }
+    //private static void AddMenuItemArCreditMemoDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    //{
+    //    parentMenu.AddItem(
+    //        new ApplicationMenuItem(
+    //            OrderServiceMenus.ArCreditMemoDetails,
+    //            context.GetLocalizer<OrderServiceResource>()["Menu:ArCreditMemoDetails"],
+    //            "/ArCreditMemoDetails",
+    //            icon: "fa fa-file-alt",
+    //            requiredPermissionName: OrderServicePermissions.ArCreditMemoDetails.Default
+    //        )
+    //    );
+    //}
     
     private static void AddModuleSurveyMenuItem(MenuConfigurationContext context)
 	{
