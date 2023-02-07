@@ -798,12 +798,12 @@
             {
                 dataField: 'basePrice',
                 caption: 'Base Price',
-                editorType: 'dxSelectBox',
-                editorOptions: {
-                    dataSource: getPriceList,
-                    valueExpr: 'id',
-                    displayExpr: 'code'
-                },
+                //editorType: 'dxSelectBox',
+                //editorOptions: {
+                //    dataSource: getPriceList,
+                //    valueExpr: 'id',
+                //    displayExpr: 'code'
+                //},
                 validationRules: [{ type: "required" }],
                 visible: false
             },

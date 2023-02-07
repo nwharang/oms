@@ -8,6 +8,7 @@
     }
 
     $("#frmProcessDelivery").dxForm({
+        labelMode: 'floating',
         colCount: 2,
         formData: dataForm,
         items: [
