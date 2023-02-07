@@ -2,7 +2,11 @@
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using DMSpro.OMS.MdmService.Permissions
+<<<<<<< HEAD
 @using DMSpro.OMS.MdmService.Web.Pages.ItemMasters
+=======
+@using DMSpro.OMS.MdmService.Web.Pages.ItemGroups
+>>>>>>> feature/item-update
 @using DMSpro.OMS.MdmService.Web.Menus
 @using Microsoft.AspNetCore.Mvc.Localization
 @using DMSpro.OMS.MdmService.Localization
@@ -11,6 +15,7 @@
 @model IndexModel
 @inject IPageLayout PageLayout
 @{
+<<<<<<< HEAD
     PageLayout.Content.Title = L["Page.Title.Items"].Value;
     PageLayout.Content.MenuItemName = MdmServiceMenus.Items;
 }
@@ -25,6 +30,27 @@
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
         <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:Item"].Value</li>
         <li class="breadcrumb-item active">@L["Menu:MdmService:Items"].Value</li>
+=======
+    PageLayout.Content.Title = L["Item Detail"].Value;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.Items;
+}
+
+@section styles {
+    <abp-style src="/Pages/Mdm/ItemMasters/details.css" />
+}
+
+@section scripts
+{
+    <abp-script src="/Pages/Mdm/ItemMasters/details.js" />
+}
+
+@section breadcrumb
+    {
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
+        <li class="breadcrumb-item">@L["Item"].Value</li>
+        <li class="breadcrumb-item active">Item Master Detail</li>
+>>>>>>> feature/item-update
     </ol>
 }
 
@@ -32,13 +58,18 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
+<<<<<<< HEAD
                 <i class="subheader-icon fal fal fa-window"></i> @L["Menu:MdmService:Items"].Value
+=======
+                <i class="subheader-icon fal fal fa-window"></i>
+>>>>>>> feature/item-update
             </h2>
         </div>
         <div class="panel-container show">
             <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
                 <abp-card>
                     <abp-card-body>
+<<<<<<< HEAD
                         <abp-row>
                             <div style="padding-left:12px" class="buttons-header-grid">
                                 @if (await Authorization.IsGrantedAsync(MdmServicePermissions.Items.Create))
@@ -61,19 +92,38 @@
                                         </div>
                                         <div class="dx-texteditor-buttons-container">
                                             <span class="dx-clear-button-area"><span class="dx-icon dx-icon-clear"></span></span>
+=======
+                        <div class="dx-viewport">
+                            <div class="py-1" id="resizable">
+                                <div id="top-section"></div>
+                            </div>
+                            <div class="py-2">
+                                <div id="itemMasterTabpanel">
+                                    <div id="tabpanel-container"> </div>
+                                    <div class="options">
+                                        <div class="option">
+                                            <div id="animation-enabled"></div>
+                                        </div>
+                                        <div class="option">
+                                            <div id="animation-enabled"></div>
+>>>>>>> feature/item-update
                                         </div>
                                     </div>
                                 </div>
                             </div>
+<<<<<<< HEAD
                         </abp-row>
                         <div class="dx-viewport">
                             <div id="dataGridItemMasters"></div>
+=======
+>>>>>>> feature/item-update
                         </div>
                     </abp-card-body>
                 </abp-card>
             </div>
         </div>
     </div>
+<<<<<<< HEAD
 </div>
 
 <style>
@@ -81,3 +131,6 @@
         padding-bottom: 20px !important;
     }
 </style>
+=======
+</div>
+>>>>>>> feature/item-update

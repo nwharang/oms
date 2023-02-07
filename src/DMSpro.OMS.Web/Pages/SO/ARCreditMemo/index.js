@@ -94,6 +94,7 @@
             totalAmt: 420,
             docSource: "Đơn Manual",
         }, 
+        labelMode: 'floating',
         colCount: 2,
         items: [
             {
