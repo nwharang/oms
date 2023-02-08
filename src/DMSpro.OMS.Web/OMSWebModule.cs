@@ -16,6 +16,9 @@ using DMSpro.OMS.Localization;
 // using DMSpro.OMS.ProductService.Web;
 using DMSpro.OMS.SurveyService;
 using DMSpro.OMS.SurveyService.Web;
+using DMSpro.OMS.FileManagementService;
+using DMSpro.OMS.FileManagementService.Web;
+
 using DMSpro.OMS.OrderService;
 using DMSpro.OMS.OrderService.Web;
 
@@ -61,6 +64,9 @@ using Volo.Abp.Identity;
 
 using Volo.Forms;
 using Volo.Forms.Web;
+using Volo.FileManagement;
+using Volo.FileManagement.Web;
+
 using Volo.Abp.Localization;
 using Volo.Abp.Validation;
 using Volo.Abp.Validation.Localization;
@@ -83,6 +89,8 @@ namespace DMSpro.OMS.Web;
     typeof(SaasServiceHttpApiClientModule),
     // typeof(ProductServiceWebModule),
     // typeof(ProductServiceHttpApiClientModule),
+    typeof(FileManagementServiceWebModule),
+    typeof(FileManagementServiceHttpApiClientModule),
     typeof(SurveyServiceWebModule),
     typeof(SurveyServiceHttpApiClientModule),
     typeof(OrderServiceWebModule),
@@ -208,6 +216,7 @@ public class OMSWebModule : AbpModule
                 options.Scope.Add("InventoryService");
                 options.Scope.Add("SurveyService");
                 options.Scope.Add("OrderService");
+                options.Scope.Add("FileManagementService");
                 options.AccessDeniedPath = "/Account/AccessDenied2";
                 //options.UseTokenLifetime = true;
                 //options.AutomaticRefreshInterval = 1000;
