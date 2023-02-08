@@ -787,7 +787,7 @@ public class OMSMenuContributor : IMenuContributor
 	private static void AddMenuProductItems(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
 	{
 		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
-			   MdmServiceMenus.ItemMaster,
+			   MdmServiceMenus.Items,
 			   context.GetLocalizer<OMSResource>()["Menu:MdmService:Product"],
 			   null,
 			   icon: "fa fa-product-hunt"
@@ -1066,15 +1066,15 @@ public class OMSMenuContributor : IMenuContributor
 		//	).RequireFeatures(MdmFeatures.SalesOrgs)
 		//);
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.CompanyInZones,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CompanyInZone"],
-		//		"/Mdm/CompanyInZones",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.CompanyInZones.Default
-		//	).RequireFeatures(MdmFeatures.SellingZones)
-		//);
+		groupMenu.AddItem(
+			new ApplicationMenuItem(
+				MdmServiceMenus.CompanyInZones,
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:SellingZones"],
+                "/Mdm/SellingZones",
+				icon: "fa fa-map-marker",
+				requiredPermissionName: MdmServicePermissions.CompanyInZones.Default
+            ).RequireFeatures(MdmFeatures.SellingZones)
+		);
 
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
@@ -1082,7 +1082,7 @@ public class OMSMenuContributor : IMenuContributor
 		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CustomerInZone"],
 		//		"/Mdm/CustomerInZones",
 		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.CustomerInZones.Default
+		//		requiredPermissionName: 
 		//	).RequireFeatures(MdmFeatures.SellingZones)
 		//);
 
@@ -1095,7 +1095,6 @@ public class OMSMenuContributor : IMenuContributor
 		//		requiredPermissionName: MdmServicePermissions.EmployeeInZones.Default
 		//	).RequireFeatures(MdmFeatures.SellingZones)
 		//);
-
 	}
 
 	private static void AddMenuItemCustomers(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
