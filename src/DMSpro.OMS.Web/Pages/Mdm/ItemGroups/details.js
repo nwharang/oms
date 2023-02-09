@@ -1,43 +1,46 @@
 ﻿var l = abp.localization.getResource("MdmService");
+var l1 = abp.localization.getResource("OMS");
 const itemGroup = JSON.parse(sessionStorage.getItem('itemGroup'));
 document.title = `Item Group Detail - ${itemGroup.code} | OMS`;
 
 var itemGroupAttributeService = window.dMSpro.oMS.mdmService.controllers.itemGroupAttributes.itemGroupAttribute;
 var itemListService = window.dMSpro.oMS.mdmService.controllers.itemGroupLists.itemGroupList;
 var itemAttributeService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
+var itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
+var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
 
 const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-
-const status = [
-    {
-        id: 'OPEN',
-        text: l('EntityFieldValue:MDMService:ItemGroup:Status:OPEN')
-    },
-    {
-        id: 'RELEASED',
-        text: l('EntityFieldValue:MDMService:ItemGroup:Status:RELEASED')
-    },
-    {
-        id: 'CANCELLED',
-        text: l('EntityFieldValue:MDMService:ItemGroup:Status:CANCELLED')
-    }
-];
-
-const types = [
-    {
-        id: 'ATTRIBUTE',
-        text: l('EntityFieldValue:MDMService:ItemGroup:Type:ATTRIBUTE')
-    },
-    {
-        id: 'LIST',
-        text: l('EntityFieldValue:MDMService:ItemGroup:Type:LIST')
-    }
-];
 
 $(function () {
     DevExpress.config({
         editorStylingMode: 'underlined',
     });
+
+    var status = [
+        {
+            id: 'OPEN',
+            text: l1('EntityFieldValue:MDMService:ItemGroup:Status:OPEN')
+        },
+        {
+            id: 'RELEASED',
+            text: l1('EntityFieldValue:MDMService:ItemGroup:Status:RELEASED')
+        },
+        {
+            id: 'CANCELLED',
+            text: l1('EntityFieldValue:MDMService:ItemGroup:Status:CANCELLED')
+        }
+    ];
+
+    var types = [
+        {
+            id: 'ATTRIBUTE',
+            text: l1('EntityFieldValue:MDMService:ItemGroup:Type:ATTRIBUTE')
+        },
+        {
+            id: 'LIST',
+            text: l1('EntityFieldValue:MDMService:ItemGroup:Type:LIST')
+        }
+    ];
 
     $('#tabpanel-container').dxTabPanel({
         items: [{
@@ -105,17 +108,17 @@ $(function () {
                             valueExpr: 'id'
                         }
                     },
-                    {
-                        dataField: 'active',
-                        editorType: 'dxCheckBox',
-                        alignment: 'center',
-                        dataType: 'boolean',
-                        cellTemplate(container, options) {
-                            $('<div>')
-                                .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                                .appendTo(container);
-                        }
-                    }
+                    //{
+                    //    dataField: 'active',
+                    //    editorType: 'dxCheckBox',
+                    //    alignment: 'center',
+                    //    dataType: 'boolean',
+                    //    cellTemplate(container, options) {
+                    //        $('<div>')
+                    //            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                    //            .appendTo(container);
+                    //    }
+                    //}
                 ]
             }
         ]
@@ -151,8 +154,7 @@ function initItemAttributeTab() {
     return function () {
         return $('<div id="gridItemAttribute">')
             .dxDataGrid({
-                dataSource: groupAttributeStore,
-                keyExpr: 'id',
+                dataSource: getDataSourceAttrGrid(itemGroup.id),
                 remoteOperations: true,
                 showBorders: true,
                 //autoExpandAll: true,
@@ -160,8 +162,8 @@ function initItemAttributeTab() {
                 allowColumnReordering: false,
                 rowAlternationEnabled: true,
                 columnAutoWidth: true,
-                columnHidingEnabled: true,
-                errorRowEnabled: false,
+                //columnHidingEnabled: true,
+                //errorRowEnabled: false,
                 filterRow: {
                     visible: true
                 },
@@ -205,118 +207,19 @@ function initItemAttributeTab() {
                 toolbar: {
                     items: [
                         {
-                            name: "searchPanel",
-                            location: 'after'
-                        }
+                            location: 'before',
+                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>New Item Group Attribute</span></button>',
+                            onClick() {
+                                $('#gridItemAttribute').data('dxDataGrid').addRow();
+                            }
+                        },
+                        'searchPanel'
                     ]
                 },
-                columns: [
-                    //{
-                    //    type: 'buttons',
-                    //    caption: l('Actions'),
-                    //    buttons: ['edit', 'delete'],
-                    //},
-                    {
-                        dataField: 'attr0Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr0Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr1Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr1Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr2Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr2Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr3Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr3Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr4Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr4Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr5Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr5Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr6Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr6Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr7Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr7Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr8Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr8Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr9Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr9Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr10Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr10Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr11Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr11Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr12Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr12Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr13Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr13Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr14Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr14Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr15Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr15Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr16Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr16Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr17Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr17Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr18Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr18Name"),
-                        dataType: 'string'
-                    },
-                    {
-                        dataField: 'attr19Id',
-                        caption: l("EntityFieldName:MDMService:ItemGroupAttr:Attr19Name"),
-                        dataType: 'string'
-                    }
-                ]
+                onInitialized: function (e) {
+                    getItemAttributeColumns(e.component);
+                    //getItemToolbar(e.component);
+                }
             })
     }
 }
@@ -325,8 +228,7 @@ function initListItemTab() {
     return function () {
         return $('<div id="gridListItem">')
             .dxDataGrid({
-                dataSource: itemGroupListStore,
-                keyExpr: 'id',
+                dataSource: getDataSourceListGrid(itemGroup.id),
                 remoteOperations: true,
                 showBorders: true,
                 autoExpandAll: true,
@@ -334,8 +236,8 @@ function initListItemTab() {
                 allowColumnReordering: false,
                 rowAlternationEnabled: true,
                 columnAutoWidth: true,
-                columnHidingEnabled: true,
-                errorRowEnabled: false,
+                //columnHidingEnabled: true,
+                //errorRowEnabled: false,
                 filterRow: {
                     visible: true
                 },
@@ -369,7 +271,7 @@ function initListItemTab() {
                     }
                 },
                 onRowUpdating: function (e) {
-                    var objectRequire = ['itemGroupId', 'itemId', 'uomId', 'rate'];
+                    var objectRequire = ['itemGroupId', 'itemId', 'uomId', 'rate', 'price'];
                     for (var property in e.oldData) {
                         if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                             e.newData[property] = e.oldData[property];
@@ -379,26 +281,36 @@ function initListItemTab() {
                 toolbar: {
                     items: [
                         {
-                            name: "searchPanel",
-                            location: 'after'
-                        }
+                            location: 'before',
+                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>New Item Group List</span></button>',
+                            onClick() {
+                                $('#gridListItem').data('dxDataGrid').addRow();
+                            }
+                        },
+                        'searchPanel'
                     ]
                 },
                 columns: [
-                    //{
-                    //    type: 'buttons',
-                    //    caption: l('Actions'),
-                    //    buttons: ['edit', 'delete'],
-                    //},
+                    {
+                        type: 'buttons',
+                        caption: l('Actions'),
+                        buttons: ['edit', 'delete'],
+                    },
+                    {
+                        dataField: 'id',
+                        visible: false
+                    },
                     {
                         dataField: 'itemId',
                         caption: l("EntityFieldName:MDMService:ItemGroupList:Item"),
                         validationRules: [{ type: "required" }],
                         editorType: 'dxSelectBox',
                         lookup: {
-                            dataSource: getItems,
+                            dataSource: getItemList,
                             valueExpr: 'id',
-                            displayExpr: 'displayName'
+                            displayExpr: function (e) {
+                                return e.code + ' - ' + e.name
+                            }
                         }
                     },
                     {
@@ -416,11 +328,13 @@ function initListItemTab() {
                         dataField: 'rate',
                         caption: l("EntityFieldName:MDMService:ItemGroupList:Rate"),
                         validationRules: [{ type: "required" }],
-                        dataType: 'number'
+                        dataType: 'number',
+                        value: 1
                     },
                     {
                         dataField: 'price',
-                        caption: l("EntityFieldName:MDMService:ItemGroupList:Price")
+                        caption: l("EntityFieldName:MDMService:ItemGroupList:Price"),
+                        dataType: 'number'
                     }
                 ]
             })
@@ -429,7 +343,7 @@ function initListItemTab() {
 
 var groupAttributeStore = new DevExpress.data.CustomStore({
     key: "id",
-    loadMode: 'raw',
+    loadMode: 'processed',
     load(loadOptions) {
         const deferred = $.Deferred();
         const args = {};
@@ -459,6 +373,7 @@ var groupAttributeStore = new DevExpress.data.CustomStore({
         return d.promise();
     },
     insert(values) {
+        values.itemGroupId = itemGroup.id;
         return itemGroupAttributeService.create(values, { contentType: 'application/json' });
     },
     update(key, values) {
@@ -471,7 +386,7 @@ var groupAttributeStore = new DevExpress.data.CustomStore({
 
 var itemGroupListStore = new DevExpress.data.CustomStore({
     key: "id",
-    loadMode: 'raw',
+    loadMode: 'processed',
     load(loadOptions) {
         const deferred = $.Deferred();
         const args = {};
@@ -511,23 +426,45 @@ var itemGroupListStore = new DevExpress.data.CustomStore({
     }
 });
 
-// get items lookup
-var items = [];
-var urlItemsLookup = abp.appPath + 'api/mdm-service/item-group-lists/item-lookup' +
-    abp.utils.buildQueryString([
-        { name: 'maxResultCount', value: 1000 }
-    ]);
-$.ajax({
-    url: `${urlItemsLookup}`,
-    dataType: 'json',
-    async: false,
-    success: function (data) {
-        items = data.items;
+var getItemList = new DevExpress.data.CustomStore({
+    key: "id",
+    loadMode: 'processed',
+    load(loadOptions) {
+        const deferred = $.Deferred();
+        const args = {};
+        requestOptions.forEach((i) => {
+            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                args[i] = JSON.stringify(loadOptions[i]);
+            }
+        });
+        itemService.getListDevextremes(args)
+            .done(result => {
+                deferred.resolve(result.data, {
+                    totalCount: result.totalCount,
+                    summary: result.summary,
+                    groupCount: result.groupCount
+                });
+            });
+        return deferred.promise();
     }
 });
-var getItems = function () {
-    return items;
-}
+//// get items lookup
+//var items = [];
+//var urlItemsLookup = abp.appPath + 'api/mdm-service/item-group-lists/item-lookup' +
+//    abp.utils.buildQueryString([
+//        { name: 'maxResultCount', value: 1000 }
+//    ]);
+//$.ajax({
+//    url: `${urlItemsLookup}`,
+//    dataType: 'json',
+//    async: false,
+//    success: function (data) {
+//        items = data.items;
+//    }
+//});
+//var getItems = function () {
+//    return items;
+//}
 // get UOMs lookup
 var uOMs = [];
 var urlUOMsLookup = abp.appPath + 'api/mdm-service/item-group-lists/u-oM-lookup' +
@@ -544,4 +481,139 @@ $.ajax({
 });
 var getUOMs = function () {
     return uOMs;
+}
+
+var listAttrValue = [];
+function getItemAttributeColumns(dxGrid) {
+    itemAttrValueService.getListDevextremes({})
+        .done(r => {
+            listAttrValue = r.data
+            itemAttributeService.getListDevextremes({})
+                .done(result => {
+                    var u = result.data;
+                    var listAttrActive = u.filter(x => x.active == true);
+                    var columns = [
+                        {
+                            type: 'buttons',
+                            caption: l('Actions'),
+                            buttons: ['edit', 'delete']
+                        }
+                    ];
+                    for (let i = 0; i < listAttrActive.length; i++) {
+                        columns.push(generateAttrOptions(listAttrActive[i]))
+                    };
+                    dxGrid.option('columns', columns);
+                });
+        })
+}
+
+function generateAttrOptions(attr) {
+    return {
+        dataField: 'attr' + attr.attrNo + 'Id',
+        caption: l('EntityFieldName:MDMService:ItemGroupAttr:Attr' + attr.attrNo + 'Name'),
+        editorType: 'dxSelectBox',
+        lookup: {
+            dataSource: listAttrValue.filter(x => x.itemAttributeId == attr.id),
+            valueExpr: 'id',
+            displayExpr: 'attrValName'
+        }
+    }
+}
+
+function getDataSourceAttrGrid(itemGroupId) {
+    return new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'processed',
+        load(loadOptions) {
+            if (loadOptions.filter == undefined)
+                loadOptions.filter = ['itemGroupId', '=', itemGroupId]
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            itemGroupAttributeService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            itemGroupAttributeService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
+        },
+        insert(values) {
+            values.itemGroupId = itemGroup.id;
+            return itemGroupAttributeService.create(values, { contentType: 'application/json' });
+        },
+        update(key, values) {
+            return itemGroupAttributeService.update(key, values, { contentType: 'application/json' });
+        },
+        remove(key) {
+            return itemGroupAttributeService.delete(key);
+        }
+    });
+}
+
+function getDataSourceListGrid(itemGroupId) {
+    return new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'processed',
+        load(loadOptions) {
+            if (loadOptions.filter == undefined)
+                loadOptions.filter = ['itemGroupId', '=', itemGroupId]
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            itemListService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            itemListService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
+        },
+        insert(values) {
+            values.itemGroupId = itemGroup.id;
+            return itemListService.create(values, { contentType: 'application/json' });
+        },
+        update(key, values) {
+            return itemListService.update(key, values, { contentType: 'application/json' });
+        },
+        remove(key) {
+            return itemListService.delete(key);
+        }
+    });
+}
+
+function isNotEmpty(value) {
+    return value !== undefined && value !== null && value !== '';
 }
