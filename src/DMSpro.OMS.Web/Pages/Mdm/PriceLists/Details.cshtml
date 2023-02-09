@@ -11,17 +11,17 @@
 @model IndexModel
 @inject IPageLayout PageLayout
 @{
-    PageLayout.Content.Title = L["Item Detail"].Value;
-    PageLayout.Content.MenuItemName = MdmServiceMenus.Items;
+    PageLayout.Content.Title = L["Price List Detail"].Value;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.PriceLists;
 }
 
 @section styles {
-    <abp-style src="/Pages/Mdm/ItemMasters/details.css" />
+    <abp-style src="/Pages/Mdm/PriceLists/details.css" />
 }
 
 @section scripts
-    {
-    <abp-script src="/Pages/Mdm/ItemMasters/details.js" />
+{
+    <abp-script src="/Pages/Mdm/PriceLists/details.js" />
 }
 
 @section breadcrumb
@@ -29,7 +29,7 @@
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
         <li class="breadcrumb-item">@L["Item"].Value</li>
-        <li class="breadcrumb-item active">Item Master Detail</li>
+        <li class="breadcrumb-item active">Price List Detail</li>
     </ol>
 }
 
@@ -49,17 +49,7 @@
                                 <div id="top-section"></div>
                             </div>
                             <div class="py-2">
-                                <div id="itemMasterTabpanel">
-                                    <div id="tabpanel-container"> </div>
-                                    <div class="options">
-                                        <div class="option">
-                                            <div id="animation-enabled"></div>
-                                        </div>
-                                        <div class="option">
-                                            <div id="animation-enabled"></div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div id="gridPriceListDetails"></div>
                             </div>
                         </div>
                     </abp-card-body>

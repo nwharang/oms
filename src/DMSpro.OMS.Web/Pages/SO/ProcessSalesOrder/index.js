@@ -9,6 +9,7 @@
 
     $("#frmProcessSalesOrders").dxForm({
         colCount: 2,
+        labelMode: 'floating',
         formData: dataForm,
         items: [
             {
