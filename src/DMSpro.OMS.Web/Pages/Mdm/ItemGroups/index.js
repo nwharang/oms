@@ -122,7 +122,7 @@ $(function () {
             items: [
                 {
                     location: 'before',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>New Purchase Request</span></button>',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>New Item Group</span></button>',
                     onClick() {
                         //var w = window.open('/Mdm/ItemGroups/Details');
                         //w.sessionStorage.setItem('modelId', 0);
