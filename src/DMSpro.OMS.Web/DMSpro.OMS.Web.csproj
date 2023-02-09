@@ -31,11 +31,11 @@
         <PackageReference Include="Volo.Abp.Http.Client.Web" Version="7.0.0" />
         <PackageReference Include="Volo.Abp.Http.Client.IdentityModel.Web" Version="7.0.0" />
         <PackageReference Include="Volo.Abp.Account.Pro.Public.HttpApi.Client" Version="7.0.0" />
+        <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic" Version="7.0.0" />
     </ItemGroup>
 
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic" Version="7.0.0" />
     <!--<ProjectReference Include="..\..\..\..\shared\DMSpro.OMS.Shared.Hosting.AspNetCore\DMSpro.OMS.Shared.Hosting.AspNetCore.csproj" />
     
     <ProjectReference Include="..\..\..\..\shared\DMSpro.OMS.Shared.Localization\DMSpro.OMS.Shared.Localization.csproj" />
@@ -273,6 +273,15 @@
     <None Remove="DMSpro.OMS.SurveyService.Domain.Shared" />
     <None Remove="Volo.Forms.Application.Contracts" />
     <None Remove="Volo.Forms.Domain.Shared" />
+
+    <None Remove="DMSpro.OMS.FileManagementService.Application.Contracts" />
+    <None Remove="DMSpro.OMS.FileManagementService.Domain.Shared" />
+    <None Remove="DMSpro.OMS.FileManagementService.HttpApi.Client" />
+    <None Remove="DMSpro.OMS.FileManagementService.Web" />
+    <None Remove="Volo.FileManagement.Application.Contracts" />
+    <None Remove="Volo.FileManagement.Domain.Shared" />
+    <None Remove="Volo.FileManagement.HttpApi.Client" />
+    <None Remove="Volo.FileManagement.Web" />
   </ItemGroup>
 	
   <ItemGroup>
@@ -420,14 +429,52 @@
     <Reference Include="Volo.Forms.Domain.Shared">
       <HintPath>..\..\..\commondll\Development\Services\survey\Volo.Forms.Domain.Shared.dll</HintPath>
     </Reference>
+
+    <Reference Include="DMSpro.OMS.FileManagementService.Application.Contracts">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\DMSpro.OMS.FileManagementService.Application.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="DMSpro.OMS.FileManagementService.Domain.Shared">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\DMSpro.OMS.FileManagementService.Domain.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="Volo.FileManagement.Application.Contracts">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\Volo.FileManagement.Application.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="Volo.FileManagement.Domain.Shared">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\Volo.FileManagement.Domain.Shared.dll</HintPath>
+    </Reference>
+
+
+    <Reference Include="DMSpro.OMS.FileManagementService.HttpApi.Client">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\DMSpro.OMS.FileManagementService.HttpApi.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="DMSpro.OMS.FileManagementService.Web">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\DMSpro.OMS.FileManagementService.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="Volo.FileManagement.HttpApi.Client">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\Volo.FileManagement.HttpApi.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Volo.FileManagement.Web">
+      <HintPath>..\..\..\commondll\Development\Services\filemanagement\Volo.FileManagement.Web.dll</HintPath>
+    </Reference>
+
   </ItemGroup>
   <ItemGroup>
+    <Content Update="Pages\Mdm\MCPHeaders\Index.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Update="Pages\Mdm\Routes\Index.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Update="Pages\Mdm\MCPHeaders\index.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Pages\Mdm\MCPHeaders\index.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Pages\Mdm\Routes\index.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

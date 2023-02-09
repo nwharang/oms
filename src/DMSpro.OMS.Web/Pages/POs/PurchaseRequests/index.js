@@ -115,33 +115,25 @@ $(function () {
                 {
                     location: 'before',
                     template: '<div><button type="button" class="btn btn-light btn-sm dropdown-toggle waves-effect waves-themed" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="fa fa-gear"></i> <span class="">Action</span>  </button><div class="dropdown-menu fadeindown"> <button class="dropdown-item" type="button">Confirmed</button> <button class="dropdown-item" type="button">Rejected</button></div></div>'
-                },
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'refresh',
-                        onClick() {
-                            gridPurchaseRequests.refresh();
-                        },
-                    },
-                },
+                }, 
                 'columnChooserButton',
                 "exportButton",
                 {
                     location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-upload"></i> <span>Import from Excel</span> </button>',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}"> <i class="fa fa-upload"></i> <span></span> </button>`,
                     onClick() {
                         //todo
                     },
                 },
+                "searchPanel"
             ],
         },
         export: {
             enabled: true,
             // formats: ['excel','pdf'],
             allowExportSelectedData: true,
-        }, groupPanel: {
+        },
+        groupPanel: {
             visible: true,
         },
         selection: {

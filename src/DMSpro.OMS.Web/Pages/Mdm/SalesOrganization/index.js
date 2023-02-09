@@ -113,4 +113,72 @@ $(function () {
     function isNotEmpty(value) {
         return value !== undefined && value !== null && value !== '';
     }
+
+    // function CheckState(state) {
+    //     stateMode = state;
+    //     switch (stateMode) {
+    //         case 'home': {
+    //             ResetControl();
+
+    //             $("#NewSalesOrgButton").prop('disabled', false);
+    //             $("#SaveButton, #CancelButton").prop('disabled', true);
+    //             //$("#NewSalesOrgHierarchyButton,#NewSalesOrgEmpAssignmentButton").prop('disabled', false);
+    //             break;
+    //         }
+    //         case 'add': {
+    //             ResetControl();
+
+    //             $("#NewSalesOrgButton").prop('disabled', true);
+    //             $("#SaveButton, #CancelButton").prop('disabled', false);
+    //             //$("#NewSalesOrgHierarchyButton,#NewSalesOrgEmpAssignmentButton").prop('disabled', true);
+    //             break;
+    //         }
+    //         case 'edit': {
+    //             salesOrgHeaderCode.getButton("btnSearch").option("visible", true);
+    //             $("#NewSalesOrgButton, #SaveButton, #CancelButton").prop('disabled', false);
+    //             break;
+    //         }
+    //         default:
+    //             break;
+    //     }
+    // }
+
+    // function UpdateButton() {
+    //     if ($('#dataTreeContainer span[class="dx-treelist-nodata"]').length == 0) {
+    //         $("#NewSalesOrgHierarchyButton").prop('disabled', true);
+    //         $("#NewSalesOrgEmpAssignmentButton").prop('disabled', false);
+    //     } else {
+    //         $("#NewSalesOrgHierarchyButton").prop('disabled', false);
+    //         $("#NewSalesOrgEmpAssignmentButton").prop('disabled', true);
+    //     }
+
+    //     if (salesOrgHeaderIdFilter == null) {
+    //         $("#NewSalesOrgHierarchyButton").prop('disabled', true);
+    //         $("#btnSalesOrgHeaderActive").prop('disabled', true);
+    //     } else {
+    //         $("#btnSalesOrgHeaderActive").prop('disabled', false);
+    //     }
+    // }
+
+    // function ResetControl() {
+    //     //clear data for Sales Org Hierarchy
+    //     salesOrgHeaderIdFilter = null;
+    //     dataTreeContainer.refresh();
+
+    //     //clear data for Sales Org Employee Assignment
+    //     salesOrgHierarchyIdFilter = null;
+    //     dataGridContainer.refresh();
+
+    //     //clear textbox value - Name
+    //     salesOrgHeaderName.reset();
+
+    //     salesOrgHeaderCode.reset();
+    //     salesOrgHeaderCode.getButton("btnSearch").option("visible", true);
+    //     salesOrgHeaderCode.option('isValid', true);
+    //     salesOrgHeaderName.reset();
+
+    //     //reset active button
+    //     $("#btnSalesOrgHeaderActive").html(l('EntityFieldValue:MDMService:SalesOrgHeader:Active:True')).prop('disabled', true);
+    // }
+
 });
