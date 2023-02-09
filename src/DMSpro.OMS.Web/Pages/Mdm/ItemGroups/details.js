@@ -1,13 +1,19 @@
-﻿var l = abp.localization.getResource("MdmService");
-var l1 = abp.localization.getResource("OMS");
+﻿//var l = abp.localization.getResource("MdmService");
+var l = abp.localization.getResource("OMS");
 const itemGroup = JSON.parse(sessionStorage.getItem('itemGroup'));
-document.title = `Item Group Detail - ${itemGroup.code} | OMS`;
+if (itemGroup.id == 0) {
+    document.title = `New Item Group | OMS`;
+} else {
+    document.title = `Item Group - ${itemGroup.code} | OMS`;
+}
 
 var itemGroupAttributeService = window.dMSpro.oMS.mdmService.controllers.itemGroupAttributes.itemGroupAttribute;
 var itemListService = window.dMSpro.oMS.mdmService.controllers.itemGroupLists.itemGroupList;
 var itemAttributeService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
 var itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
 var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
+var uOMsService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
+var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
 
 const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
@@ -16,40 +22,68 @@ $(function () {
         editorStylingMode: 'underlined',
     });
 
+    if (itemGroup.status != 'OPEN') {
+        $('#btnReleased').attr("disabled", true);
+        $('#btnCancelled').attr("disabled", true);
+    }
+
     var status = [
         {
             id: 'OPEN',
-            text: l1('EntityFieldValue:MDMService:ItemGroup:Status:OPEN')
+            text: l('EntityFieldValue:MDMService:ItemGroup:Status:OPEN')
         },
         {
             id: 'RELEASED',
-            text: l1('EntityFieldValue:MDMService:ItemGroup:Status:RELEASED')
+            text: l('EntityFieldValue:MDMService:ItemGroup:Status:RELEASED')
         },
         {
             id: 'CANCELLED',
-            text: l1('EntityFieldValue:MDMService:ItemGroup:Status:CANCELLED')
+            text: l('EntityFieldValue:MDMService:ItemGroup:Status:CANCELLED')
         }
     ];
 
     var types = [
         {
             id: 'ATTRIBUTE',
-            text: l1('EntityFieldValue:MDMService:ItemGroup:Type:ATTRIBUTE')
+            text: l('EntityFieldValue:MDMService:ItemGroup:Type:ATTRIBUTE')
         },
         {
             id: 'LIST',
-            text: l1('EntityFieldValue:MDMService:ItemGroup:Type:LIST')
+            text: l('EntityFieldValue:MDMService:ItemGroup:Type:LIST')
         }
     ];
 
     $('#tabpanel-container').dxTabPanel({
-        items: [{
-            title: l('Menu:MdmService:ItemGroupAttrs'),
-            template: initItemAttributeTab()
-        }, {
-            title: l('Menu:MdmService:ItemGroupLists'),
-            template: initListItemTab()
-        }]
+        items: [
+            {
+                title: l('Menu:MdmService:ItemGroupAttrs'),
+                icon: "detailslayout",
+                template: initItemAttributeTab()
+            },
+            {
+                title: l('Menu:MdmService:ItemGroupLists'),
+                icon: "detailslayout",
+                template: initListItemTab()
+            }
+        ],
+        onInitialized: function (e) {
+            if (itemGroup.type == 'ATTRIBUTE') {
+                e.component.option('items[0].disabled', false);
+                e.component.option('items[1].disabled', true);
+                e.component.option('selectedIndex', 0);
+            }
+            else {
+                e.component.option('items[0].disabled', true);
+                e.component.option('items[1].disabled', false);
+                e.component.option('selectedIndex', 1);
+            }
+
+            if (itemGroup.id == 0) {
+                e.component.option('items[0].disabled', true);
+                e.component.option('items[1].disabled', true);
+                e.component.option('selectedIndex', 0);
+            }
+        }
     }).dxTabPanel('instance');
 
     $("#top-section").dxForm({
@@ -89,7 +123,21 @@ $(function () {
                             searchEnabled: true,
                             items: types,
                             displayExpr: 'text',
-                            valueExpr: 'id'
+                            valueExpr: 'id',
+                            onValueChanged: function (e) {
+                                var value = e.value;
+                                var dxTabPanel = $('#tabpanel-container').data('dxTabPanel');
+                                if (value == 'ATTRIBUTE') {
+                                    dxTabPanel.option('items[0].disabled', false);
+                                    dxTabPanel.option('items[1].disabled', true);
+                                    dxTabPanel.option('selectedIndex', 0);
+                                }
+                                else {
+                                    dxTabPanel.option('items[0].disabled', true);
+                                    dxTabPanel.option('items[1].disabled', false);
+                                    dxTabPanel.option('selectedIndex', 1);
+                                }
+                            }
                         },
                         validationRules: [
                             {
@@ -100,12 +148,13 @@ $(function () {
                     },
                     {
                         dataField: 'status',
-                        editorType: 'dxSelectBox',
+                        //editorType: 'dxSelectBox',
                         editorOptions: {
                             searchEnabled: true,
                             items: status,
                             displayExpr: 'text',
-                            valueExpr: 'id'
+                            valueExpr: 'id',
+                            readOnly: true
                         }
                     },
                     //{
@@ -121,7 +170,24 @@ $(function () {
                     //}
                 ]
             }
-        ]
+        ],
+        customizeItem: function (e) {
+            if (itemGroup.status != 'OPEN') {
+                if (e.dataField === 'code') {
+                    e.editorOptions = {
+                        readOnly: true
+                    }
+                }
+
+                if (e.dataField === 'type') {
+                    e.readOnly = true;
+                    e.disabled = true;
+                    //e.editorOptions = {
+                    //    disabled: true
+                    //}
+                }
+            }
+        }
     });
 
     $('#resizable').dxResizable({
@@ -208,7 +274,7 @@ function initItemAttributeTab() {
                     items: [
                         {
                             location: 'before',
-                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>New Item Group Attribute</span></button>',
+                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>' + l("Button.New.ItemGroupAttr") + '</span></button>',
                             onClick() {
                                 $('#gridItemAttribute').data('dxDataGrid').addRow();
                             }
@@ -218,7 +284,12 @@ function initItemAttributeTab() {
                 },
                 onInitialized: function (e) {
                     getItemAttributeColumns(e.component);
-                    //getItemToolbar(e.component);
+                },
+                onContentReady: function (e) {
+                    if (itemGroup.status != 'OPEN') {
+                        e.component.option('toolbar.items[0].visible', false);
+                        e.component.option('columns[0].visible', false);
+                    }
                 }
             })
     }
@@ -282,7 +353,7 @@ function initListItemTab() {
                     items: [
                         {
                             location: 'before',
-                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>New Item Group List</span></button>',
+                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>' + l("Button.New.ItemGroupList") + '</span></button>',
                             onClick() {
                                 $('#gridListItem').data('dxDataGrid').addRow();
                             }
@@ -294,7 +365,7 @@ function initListItemTab() {
                     {
                         type: 'buttons',
                         caption: l('Actions'),
-                        buttons: ['edit', 'delete'],
+                        buttons: ['edit', 'delete']
                     },
                     {
                         dataField: 'id',
@@ -321,7 +392,7 @@ function initListItemTab() {
                         lookup: {
                             dataSource: getUOMs,
                             valueExpr: 'id',
-                            displayExpr: 'displayName'
+                            displayExpr: 'code'
                         }
                     },
                     {
@@ -336,7 +407,13 @@ function initListItemTab() {
                         caption: l("EntityFieldName:MDMService:ItemGroupList:Price"),
                         dataType: 'number'
                     }
-                ]
+                ],
+                onContentReady: function (e) {
+                    if (itemGroup.status != 'OPEN') {
+                        e.component.option('toolbar.items[0].visible', false);
+                        e.component.option('columns[0].visible', false);
+                    }
+                }
             })
     }
 }
@@ -446,42 +523,51 @@ var getItemList = new DevExpress.data.CustomStore({
                 });
             });
         return deferred.promise();
+    },
+    byKey: function (key) {
+        if (key == 0) return null;
+
+        var d = new $.Deferred();
+        itemService.get(key)
+            .done(data => {
+                d.resolve(data);
+            })
+        return d.promise();
     }
 });
-//// get items lookup
-//var items = [];
-//var urlItemsLookup = abp.appPath + 'api/mdm-service/item-group-lists/item-lookup' +
-//    abp.utils.buildQueryString([
-//        { name: 'maxResultCount', value: 1000 }
-//    ]);
-//$.ajax({
-//    url: `${urlItemsLookup}`,
-//    dataType: 'json',
-//    async: false,
-//    success: function (data) {
-//        items = data.items;
-//    }
-//});
-//var getItems = function () {
-//    return items;
-//}
-// get UOMs lookup
-var uOMs = [];
-var urlUOMsLookup = abp.appPath + 'api/mdm-service/item-group-lists/u-oM-lookup' +
-    abp.utils.buildQueryString([
-        { name: 'maxResultCount', value: 1000 }
-    ]);
-$.ajax({
-    url: `${urlUOMsLookup}`,
-    dataType: 'json',
-    async: false,
-    success: function (data) {
-        uOMs = data.items;
+
+var getUOMs = new DevExpress.data.CustomStore({
+    key: "id",
+    loadMode: 'processed',
+    load(loadOptions) {
+        const deferred = $.Deferred();
+        const args = {};
+        requestOptions.forEach((i) => {
+            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                args[i] = JSON.stringify(loadOptions[i]);
+            }
+        });
+        uOMsService.getListDevextremes(args)
+            .done(result => {
+                deferred.resolve(result.data, {
+                    totalCount: result.totalCount,
+                    summary: result.summary,
+                    groupCount: result.groupCount
+                });
+            });
+        return deferred.promise();
+    },
+    byKey: function (key) {
+        if (key == 0) return null;
+
+        var d = new $.Deferred();
+        uOMsService.get(key)
+            .done(data => {
+                d.resolve(data);
+            })
+        return d.promise();
     }
 });
-var getUOMs = function () {
-    return uOMs;
-}
 
 var listAttrValue = [];
 function getItemAttributeColumns(dxGrid) {
@@ -612,6 +698,40 @@ function getDataSourceListGrid(itemGroupId) {
             return itemListService.delete(key);
         }
     });
+}
+
+function action(e) {
+    var typeButton = e.getAttribute('data-type');
+    var dataForm = $('#top-section').data('dxForm').option('formData');
+    var values = {
+        code: dataForm.code,
+        name: dataForm.name,
+        description: dataForm.description,
+        type: dataForm.type
+    }
+    var key = dataForm.id;
+    if (itemGroup.status == 'OPEN') {
+        if (typeButton == 'released') {
+            values.status = 'RELEASED';
+            dataForm.status = 'RELEASED';
+        }
+        if (typeButton == 'cancelled') {
+            values.status = 'CANCELLED';
+            dataForm.status = 'CANCELLED';
+        }
+        if (typeButton == 'save') {
+            values.status = dataForm.status;
+        }
+    }
+    else {
+        if (typeButton == 'save') {
+            values.status = dataForm.status;
+        }
+    }
+    itemGroupService.update(key, values, { contentType: 'application/json' });
+    sessionStorage.clear();
+    sessionStorage.setItem('itemGroup', JSON.stringify(dataForm));
+    location.reload();
 }
 
 function isNotEmpty(value) {
