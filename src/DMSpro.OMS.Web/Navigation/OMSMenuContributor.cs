@@ -144,10 +144,12 @@ public class OMSMenuContributor : IMenuContributor
 		AddMenuItemSalesRequestHeaders(context, soMenu);
 		AddMenuItemSalesOrderHeaders(context, soMenu);
 		AddMenuItemDeliveryHeaders(context, soMenu);
-		AddMenuItemReturnOrderHeaders(context, soMenu);
-		//      //survey
-		//      AddModuleSurveyMenuItem(context);
-	}
+        AddMenuItemArInvoiceHeaders(context, soMenu); 
+        AddMenuItemReturnOrderHeaders(context, soMenu);
+        AddMenuItemArCreditMemoHeaders(context, soMenu);
+        AddMenuItemProcessSalesOrderHeaders(context, soMenu);
+        AddMenuItemProcessDeliveryHeaders(context, soMenu);
+    }
     private static ApplicationMenuItem AddModulePOMenuItem(MenuConfigurationContext context)
     {
         var moduleMenu = new ApplicationMenuItem(
@@ -176,9 +178,21 @@ public class OMSMenuContributor : IMenuContributor
         parentMenu.AddItem(
             new ApplicationMenuItem(
                 OrderServiceMenus.SalesOrderHeaders,
-                context.GetLocalizer<OrderServiceResource>()["Menu:SalesOrderHeaders"],
+                context.GetLocalizer<OMSResource>()["Menu:SOService:SalesOrder"],
                 "/SO/SalesOrders",
                 icon: "fa fa-bars",
+                requiredPermissionName: OrderServicePermissions.SalesOrders.Edit
+            )
+        );
+    }
+    private static void AddMenuItemProcessSalesOrderHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    {
+        parentMenu.AddItem(
+            new ApplicationMenuItem(
+                OrderServiceMenus.SalesOrderHeaders,
+                context.GetLocalizer<OMSResource>()["Menu:SOService:ProcessSalesOrder"],
+                "/SO/SalesOrders",
+                icon: "fa fa-list-ol",
                 requiredPermissionName: OrderServicePermissions.SalesOrders.Default
             )
         );
@@ -333,9 +347,9 @@ public class OMSMenuContributor : IMenuContributor
         parentMenu.AddItem(
             new ApplicationMenuItem(
                 OrderServiceMenus.SalesRequestHeaders,
-                context.GetLocalizer<OrderServiceResource>()["Menu:SalesRequestHeaders"],
-                "/SalesRequestHeaders",
-                icon: "fa fa-file-alt",
+                context.GetLocalizer<OMSResource>()["Menu:SOService:SalesRequest"],
+                "/SO/SalesRequest",
+                icon: "fa fa-list-ul",
                 requiredPermissionName: OrderServicePermissions.SalesRequests.Default
             )
         );
@@ -359,14 +373,25 @@ public class OMSMenuContributor : IMenuContributor
         parentMenu.AddItem(
             new ApplicationMenuItem(
                 OrderServiceMenus.DeliveryHeaders,
-                context.GetLocalizer<OrderServiceResource>()["Menu:DeliveryHeaders"],
+                context.GetLocalizer<OMSResource>()["Menu:SOService:Delivery"],
                 "/SO/Delivery",
                 icon: "fa fa-truck",
+                requiredPermissionName: OrderServicePermissions.Deliveries.Edit
+            )
+        );
+    }
+    private static void AddMenuItemProcessDeliveryHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    {
+        parentMenu.AddItem(
+            new ApplicationMenuItem(
+                OrderServiceMenus.DeliveryHeaders,
+                context.GetLocalizer<OMSResource>()["Menu:SOService:ProcessDelivery"],
+                "/SO/Delivery",
+                icon: "fa fa-archive",
                 requiredPermissionName: OrderServicePermissions.Deliveries.Default
             )
         );
     }
-
     //private static void AddMenuItemDeliveryDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
     //{
     //    parentMenu.AddItem(
@@ -380,18 +405,18 @@ public class OMSMenuContributor : IMenuContributor
     //    );
     //}
 
-	//private static void AddMenuItemArHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-	//{
-	//	parentMenu.AddItem(
-	//		new ApplicationMenuItem(
-	//			OrderServiceMenus.ArHeaders,
-	//			context.GetLocalizer<OrderServiceResource>()["Menu:ArHeaders"],
-	//			"/ArHeaders",
-	//			icon: "fa fa-file-alt",
-	//			requiredPermissionName: OrderServicePermissions.ArHeaders.Default
-	//		)
-	//	);
-	//}
+    private static void AddMenuItemArInvoiceHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+	{
+		parentMenu.AddItem(
+			new ApplicationMenuItem(
+				OrderServiceMenus.ArHeaders,
+				context.GetLocalizer<OMSResource>()["Menu:SOService:ArInvoice"],
+                "/SO/ARInvoice",
+				icon: "fa fa-check-circle-o",
+				requiredPermissionName: OrderServicePermissions.ArInvoices.Default
+			)
+		);
+	}
 
 	//private static void AddMenuItemArDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
 	//{
@@ -404,14 +429,13 @@ public class OMSMenuContributor : IMenuContributor
 	//			requiredPermissionName: OrderServicePermissions.ArDetails.Default
 	//		)
 	//	);
-	//}
-
+	//} 
 	private static void AddMenuItemReturnOrderHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
     {
         parentMenu.AddItem(
             new ApplicationMenuItem(
                 OrderServiceMenus.ReturnOrderHeaders,
-                context.GetLocalizer<OrderServiceResource>()["Menu:ReturnOrderHeaders"],
+                context.GetLocalizer<OMSResource>()["Menu:SOService:ReturnOrder"],
                 "/SO/ReturnOrder",
                 icon: "fa fa-arrows-v",
                 requiredPermissionName: OrderServicePermissions.ReturnOrders.Default
@@ -437,9 +461,9 @@ public class OMSMenuContributor : IMenuContributor
         parentMenu.AddItem(
             new ApplicationMenuItem(
                 OrderServiceMenus.ArCreditMemoHeaders,
-                context.GetLocalizer<OrderServiceResource>()["Menu:ArCreditMemoHeaders"],
-                "/ArCreditMemoHeaders",
-                icon: "fa fa-file-alt",
+                context.GetLocalizer<OMSResource>()["Menu:SOService:ArCreditMemo"],
+                "/SO/ARCreditMemo",
+                icon: "fa fa-credit-card",
                 requiredPermissionName: OrderServicePermissions.ArCreditMemos.Default
             )
         );
@@ -468,143 +492,193 @@ public class OMSMenuContributor : IMenuContributor
 	{
 		var moduleMenu = new ApplicationMenuItem(
 			InventoryServicePermissions.GroupName,
-			context.GetLocalizer<MdmServiceResource>()["Permission:InventoryService"],
-			icon: "fal fal fa-window"
-		);//.RequireFeatures(InventoryService.Enable);
+			context.GetLocalizer<OMSResource>()["Menu:InventoryService:GroupMenu:Inventory"],
+			icon: "fa fa-bookmark"
+        );
 
 		context.Menu.Items.AddIfNotContains(moduleMenu);
 
-		//var myGroup = context.AddGroup(InventoryServicePermissions.GroupName, L("Permission:InventoryService"));
-		////context.Menu.AddItem(InventoryServicePermissions.GroupName, L("Permission:InventoryService"));
-		////Define your own permissions here. Example:
-		////myGroup.AddPermission(BookStorePermissions.MyPermission1, L("Permission:MyPermission1"));
+        moduleMenu.AddItem(new ApplicationMenuItem(
+                InventoryServiceMenus.Prefix,
+                context.GetLocalizer<OMSResource>()["Menu:InventoryService:Warehouses"],
+                "/Inventories/Warehouses",
+                icon: "fa fa-list-ul",
+				requiredPermissionName: InventoryServicePermissions.Warehouses.Default
+            ));
 
-		//var iNReceiptPermission = myGroup.AddPermission(InventoryServicePermissions.INReceipts.Default, L("Permission:INReceipts"));
-		//iNReceiptPermission.AddChild(InventoryServicePermissions.INReceipts.Create, L("Permission:Create"));
-		//iNReceiptPermission.AddChild(InventoryServicePermissions.INReceipts.Edit, L("Permission:Edit"));
-		//iNReceiptPermission.AddChild(InventoryServicePermissions.INReceipts.Delete, L("Permission:Delete"));
-		//iNReceiptPermission.AddChild(InventoryServicePermissions.INReceipts.Confirm, L("Permission:Confirm"));
-		//iNReceiptPermission.AddChild(InventoryServicePermissions.INReceipts.Cancel, L("Permission:Cancel"));
+        moduleMenu.AddItem(new ApplicationMenuItem(
+               InventoryServiceMenus.Prefix,
+               context.GetLocalizer<OMSResource>()["Menu:InventoryService:Inventories"],
+               "/Inventories/Inventories",
+               icon: "fa fa-file-alt",
+               requiredPermissionName: InventoryServicePermissions.Inventories.Default
+           ));
+        moduleMenu.AddItem(new ApplicationMenuItem(
+               InventoryServiceMenus.Prefix,
+               context.GetLocalizer<OMSResource>()["Menu:InventoryService:GoodsReceipt"],
+               "/Inventories/GoodsReceipt",
+               icon: "fa fa-thumbs-up",
+              requiredPermissionName: InventoryServicePermissions.INReceipts.Default
+           ));
+        moduleMenu.AddItem(new ApplicationMenuItem(
+               InventoryServiceMenus.Prefix,
+               context.GetLocalizer<OMSResource>()["Menu:InventoryService:GoodsIssue"],
+               "/Inventories/GoodsIssue",
+               icon: "fa fa-thumbs-o-up",
+               requiredPermissionName: InventoryServicePermissions.INIssues.Default
+           ));
+        moduleMenu.AddItem(new ApplicationMenuItem(
+               InventoryServiceMenus.Prefix,
+               context.GetLocalizer<OMSResource>()["Menu:InventoryService:InventoryTransfers"],
+               "/Inventories/InventoryTransfers",
+               icon: "fa fa-truck",
+               requiredPermissionName: InventoryServicePermissions.INTransfers.Default
+           ));
+        moduleMenu.AddItem(new ApplicationMenuItem(
+               InventoryServiceMenus.Prefix,
+               context.GetLocalizer<OMSResource>()["Menu:InventoryService:InventoryCounting"],
+               "/Inventories/InventoryCounting",
+               icon: "fa fa-list-ol",
+               requiredPermissionName: InventoryServicePermissions.INItemTrackings.Default
+           ));
+        moduleMenu.AddItem(new ApplicationMenuItem(
+               InventoryServiceMenus.Prefix,
+               context.GetLocalizer<OMSResource>()["Menu:InventoryService:InventoryAdjustment"],
+               "/Inventories/InventoryAdjustment",
+               icon: "fa fa-adjust"
+           //requiredPermissionName: InventoryServicePermissions.InventoryAdjustment.Default
+           ));
+        //var myGroup = context.AddGroup(InventoryServicePermissions.GroupName, L("Permission:InventoryService"));
+        //context.Menu.AddItem(InventoryServicePermissions.GroupName, L("Permission:InventoryService"));
+        //Define your own permissions here. Example:
+        //myGroup.AddPermission(BookStorePermissions.MyPermission1, L("Permission:MyPermission1"));
 
-		//var iNReceiptDetailPermission = myGroup.AddPermission(InventoryServicePermissions.INReceiptDetails.Default, L("Permission:INReceiptDetails"));
-		//iNReceiptDetailPermission.AddChild(InventoryServicePermissions.INReceiptDetails.Create, L("Permission:Create"));
-		//iNReceiptDetailPermission.AddChild(InventoryServicePermissions.INReceiptDetails.Edit, L("Permission:Edit"));
-		//iNReceiptDetailPermission.AddChild(InventoryServicePermissions.INReceiptDetails.Delete, L("Permission:Delete"));
+        //var iNReceiptPermission = myGroup.AddPermission(InventoryServicePermissions.INReceipts.Default, L("Permission:INReceipts"));
+        //iNReceiptPermission.AddChild(InventoryServicePermissions.INReceipts.Create, L("Permission:Create"));
+        //iNReceiptPermission.AddChild(InventoryServicePermissions.INReceipts.Edit, L("Permission:Edit"));
+        //iNReceiptPermission.AddChild(InventoryServicePermissions.INReceipts.Delete, L("Permission:Delete"));
+        //iNReceiptPermission.AddChild(InventoryServicePermissions.INReceipts.Confirm, L("Permission:Confirm"));
+        //iNReceiptPermission.AddChild(InventoryServicePermissions.INReceipts.Cancel, L("Permission:Cancel"));
 
-		//var iNReceiptDetailSplitPermission =
-		//	myGroup.AddPermission(InventoryServicePermissions.INReceiptDetailSplits.Default, L("Permission:INReceiptDetailSplits"));
-		//iNReceiptDetailSplitPermission.AddChild(InventoryServicePermissions.INReceiptDetailSplits.Create, L("Permission:Create"));
-		//iNReceiptDetailSplitPermission.AddChild(InventoryServicePermissions.INReceiptDetailSplits.Edit, L("Permission:Edit"));
-		//iNReceiptDetailSplitPermission.AddChild(InventoryServicePermissions.INReceiptDetailSplits.Delete, L("Permission:Delete"));
+        //var iNReceiptDetailPermission = myGroup.AddPermission(InventoryServicePermissions.INReceiptDetails.Default, L("Permission:INReceiptDetails"));
+        //iNReceiptDetailPermission.AddChild(InventoryServicePermissions.INReceiptDetails.Create, L("Permission:Create"));
+        //iNReceiptDetailPermission.AddChild(InventoryServicePermissions.INReceiptDetails.Edit, L("Permission:Edit"));
+        //iNReceiptDetailPermission.AddChild(InventoryServicePermissions.INReceiptDetails.Delete, L("Permission:Delete"));
 
-		//var iNReceiptEmeiListPermission =
-		//	myGroup.AddPermission(InventoryServicePermissions.INReceiptEmeiLists.Default, L("Permission:INReceiptEmeiLists"));
-		//iNReceiptEmeiListPermission.AddChild(InventoryServicePermissions.INReceiptEmeiLists.Create, L("Permission:Create"));
-		//iNReceiptEmeiListPermission.AddChild(InventoryServicePermissions.INReceiptEmeiLists.Edit, L("Permission:Edit"));
-		//iNReceiptEmeiListPermission.AddChild(InventoryServicePermissions.INReceiptEmeiLists.Delete, L("Permission:Delete"));
+        //var iNReceiptDetailSplitPermission =
+        //	myGroup.AddPermission(InventoryServicePermissions.INReceiptDetailSplits.Default, L("Permission:INReceiptDetailSplits"));
+        //iNReceiptDetailSplitPermission.AddChild(InventoryServicePermissions.INReceiptDetailSplits.Create, L("Permission:Create"));
+        //iNReceiptDetailSplitPermission.AddChild(InventoryServicePermissions.INReceiptDetailSplits.Edit, L("Permission:Edit"));
+        //iNReceiptDetailSplitPermission.AddChild(InventoryServicePermissions.INReceiptDetailSplits.Delete, L("Permission:Delete"));
 
-		//var iNIssuePermission = myGroup.AddPermission(InventoryServicePermissions.INIssues.Default, L("Permission:INIssues"));
-		//iNIssuePermission.AddChild(InventoryServicePermissions.INIssues.Create, L("Permission:Create"));
-		//iNIssuePermission.AddChild(InventoryServicePermissions.INIssues.Edit, L("Permission:Edit"));
-		//iNIssuePermission.AddChild(InventoryServicePermissions.INIssues.Delete, L("Permission:Delete"));
-		//iNIssuePermission.AddChild(InventoryServicePermissions.INIssues.Confirm, L("Permission:Confirm"));
-		//iNIssuePermission.AddChild(InventoryServicePermissions.INIssues.Cancel, L("Permission:Cancel"));
+        //var iNReceiptEmeiListPermission =
+        //	myGroup.AddPermission(InventoryServicePermissions.INReceiptEmeiLists.Default, L("Permission:INReceiptEmeiLists"));
+        //iNReceiptEmeiListPermission.AddChild(InventoryServicePermissions.INReceiptEmeiLists.Create, L("Permission:Create"));
+        //iNReceiptEmeiListPermission.AddChild(InventoryServicePermissions.INReceiptEmeiLists.Edit, L("Permission:Edit"));
+        //iNReceiptEmeiListPermission.AddChild(InventoryServicePermissions.INReceiptEmeiLists.Delete, L("Permission:Delete"));
 
-		//var iNIssueDetailPermission = myGroup.AddPermission(InventoryServicePermissions.INIssueDetails.Default, L("Permission:INIssueDetails"));
-		//iNIssueDetailPermission.AddChild(InventoryServicePermissions.INIssueDetails.Create, L("Permission:Create"));
-		//iNIssueDetailPermission.AddChild(InventoryServicePermissions.INIssueDetails.Edit, L("Permission:Edit"));
-		//iNIssueDetailPermission.AddChild(InventoryServicePermissions.INIssueDetails.Delete, L("Permission:Delete"));
+        //var iNIssuePermission = myGroup.AddPermission(InventoryServicePermissions.INIssues.Default, L("Permission:INIssues"));
+        //iNIssuePermission.AddChild(InventoryServicePermissions.INIssues.Create, L("Permission:Create"));
+        //iNIssuePermission.AddChild(InventoryServicePermissions.INIssues.Edit, L("Permission:Edit"));
+        //iNIssuePermission.AddChild(InventoryServicePermissions.INIssues.Delete, L("Permission:Delete"));
+        //iNIssuePermission.AddChild(InventoryServicePermissions.INIssues.Confirm, L("Permission:Confirm"));
+        //iNIssuePermission.AddChild(InventoryServicePermissions.INIssues.Cancel, L("Permission:Cancel"));
 
-		//var iNIssueDetailSplitPermission =
-		//	myGroup.AddPermission(InventoryServicePermissions.INIssueDetailSplits.Default, L("Permission:INIssueDetailSplits"));
-		//iNIssueDetailSplitPermission.AddChild(InventoryServicePermissions.INIssueDetailSplits.Create, L("Permission:Create"));
-		//iNIssueDetailSplitPermission.AddChild(InventoryServicePermissions.INIssueDetailSplits.Edit, L("Permission:Edit"));
-		//iNIssueDetailSplitPermission.AddChild(InventoryServicePermissions.INIssueDetailSplits.Delete, L("Permission:Delete"));
+        //var iNIssueDetailPermission = myGroup.AddPermission(InventoryServicePermissions.INIssueDetails.Default, L("Permission:INIssueDetails"));
+        //iNIssueDetailPermission.AddChild(InventoryServicePermissions.INIssueDetails.Create, L("Permission:Create"));
+        //iNIssueDetailPermission.AddChild(InventoryServicePermissions.INIssueDetails.Edit, L("Permission:Edit"));
+        //iNIssueDetailPermission.AddChild(InventoryServicePermissions.INIssueDetails.Delete, L("Permission:Delete"));
 
-		//var iNIssueDetailImeiPermission =
-		//	myGroup.AddPermission(InventoryServicePermissions.INIssueDetailImeis.Default, L("Permission:INIssueDetailImeis"));
-		//iNIssueDetailImeiPermission.AddChild(InventoryServicePermissions.INIssueDetailImeis.Create, L("Permission:Create"));
-		//iNIssueDetailImeiPermission.AddChild(InventoryServicePermissions.INIssueDetailImeis.Edit, L("Permission:Edit"));
-		//iNIssueDetailImeiPermission.AddChild(InventoryServicePermissions.INIssueDetailImeis.Delete, L("Permission:Delete"));
+        //var iNIssueDetailSplitPermission =
+        //	myGroup.AddPermission(InventoryServicePermissions.INIssueDetailSplits.Default, L("Permission:INIssueDetailSplits"));
+        //iNIssueDetailSplitPermission.AddChild(InventoryServicePermissions.INIssueDetailSplits.Create, L("Permission:Create"));
+        //iNIssueDetailSplitPermission.AddChild(InventoryServicePermissions.INIssueDetailSplits.Edit, L("Permission:Edit"));
+        //iNIssueDetailSplitPermission.AddChild(InventoryServicePermissions.INIssueDetailSplits.Delete, L("Permission:Delete"));
 
-		//var iNIssueDetailEmeiPermission =
-		//	myGroup.AddPermission(InventoryServicePermissions.INIssueDetailEmeis.Default, L("Permission:INIssueDetailEmeis"));
-		//iNIssueDetailEmeiPermission.AddChild(InventoryServicePermissions.INIssueDetailEmeis.Create, L("Permission:Create"));
-		//iNIssueDetailEmeiPermission.AddChild(InventoryServicePermissions.INIssueDetailEmeis.Edit, L("Permission:Edit"));
-		//iNIssueDetailEmeiPermission.AddChild(InventoryServicePermissions.INIssueDetailEmeis.Delete, L("Permission:Delete"));
+        //var iNIssueDetailImeiPermission =
+        //	myGroup.AddPermission(InventoryServicePermissions.INIssueDetailImeis.Default, L("Permission:INIssueDetailImeis"));
+        //iNIssueDetailImeiPermission.AddChild(InventoryServicePermissions.INIssueDetailImeis.Create, L("Permission:Create"));
+        //iNIssueDetailImeiPermission.AddChild(InventoryServicePermissions.INIssueDetailImeis.Edit, L("Permission:Edit"));
+        //iNIssueDetailImeiPermission.AddChild(InventoryServicePermissions.INIssueDetailImeis.Delete, L("Permission:Delete"));
 
-		//var iNReceiptDetailSerialPermission =
-		//	myGroup.AddPermission(InventoryServicePermissions.INReceiptDetailSerials.Default, L("Permission:INReceiptDetailSerials"));
-		//iNReceiptDetailSerialPermission.AddChild(InventoryServicePermissions.INReceiptDetailSerials.Create, L("Permission:Create"));
-		//iNReceiptDetailSerialPermission.AddChild(InventoryServicePermissions.INReceiptDetailSerials.Edit, L("Permission:Edit"));
-		//iNReceiptDetailSerialPermission.AddChild(InventoryServicePermissions.INReceiptDetailSerials.Delete, L("Permission:Delete"));
+        //var iNIssueDetailEmeiPermission =
+        //	myGroup.AddPermission(InventoryServicePermissions.INIssueDetailEmeis.Default, L("Permission:INIssueDetailEmeis"));
+        //iNIssueDetailEmeiPermission.AddChild(InventoryServicePermissions.INIssueDetailEmeis.Create, L("Permission:Create"));
+        //iNIssueDetailEmeiPermission.AddChild(InventoryServicePermissions.INIssueDetailEmeis.Edit, L("Permission:Edit"));
+        //iNIssueDetailEmeiPermission.AddChild(InventoryServicePermissions.INIssueDetailEmeis.Delete, L("Permission:Delete"));
 
-		//var iNIssueDetailSerialPermission =
-		//	myGroup.AddPermission(InventoryServicePermissions.INIssueDetailSerials.Default, L("Permission:INIssueDetailSerials"));
-		//iNIssueDetailSerialPermission.AddChild(InventoryServicePermissions.INIssueDetailSerials.Create, L("Permission:Create"));
-		//iNIssueDetailSerialPermission.AddChild(InventoryServicePermissions.INIssueDetailSerials.Edit, L("Permission:Edit"));
-		//iNIssueDetailSerialPermission.AddChild(InventoryServicePermissions.INIssueDetailSerials.Delete, L("Permission:Delete"));
+        //var iNReceiptDetailSerialPermission =
+        //	myGroup.AddPermission(InventoryServicePermissions.INReceiptDetailSerials.Default, L("Permission:INReceiptDetailSerials"));
+        //iNReceiptDetailSerialPermission.AddChild(InventoryServicePermissions.INReceiptDetailSerials.Create, L("Permission:Create"));
+        //iNReceiptDetailSerialPermission.AddChild(InventoryServicePermissions.INReceiptDetailSerials.Edit, L("Permission:Edit"));
+        //iNReceiptDetailSerialPermission.AddChild(InventoryServicePermissions.INReceiptDetailSerials.Delete, L("Permission:Delete"));
 
-		//var warehousePermission = myGroup.AddPermission(InventoryServicePermissions.Warehouses.Default, L("Permission:Warehouses"));
-		////warehousePermission.AddChild(InventoryServicePermissions.Warehouses.Create, L("Permission:Create"));
-		////warehousePermission.AddChild(InventoryServicePermissions.Warehouses.Edit, L("Permission:Edit"));
-		////warehousePermission.AddChild(InventoryServicePermissions.Warehouses.Delete, L("Permission:Delete"));
+        //var iNIssueDetailSerialPermission =
+        //	myGroup.AddPermission(InventoryServicePermissions.INIssueDetailSerials.Default, L("Permission:INIssueDetailSerials"));
+        //iNIssueDetailSerialPermission.AddChild(InventoryServicePermissions.INIssueDetailSerials.Create, L("Permission:Create"));
+        //iNIssueDetailSerialPermission.AddChild(InventoryServicePermissions.INIssueDetailSerials.Edit, L("Permission:Edit"));
+        //iNIssueDetailSerialPermission.AddChild(InventoryServicePermissions.INIssueDetailSerials.Delete, L("Permission:Delete"));
 
-		//var wHLocationPermission = myGroup.AddPermission(InventoryServicePermissions.WHLocations.Default, L("Permission:WHLocations"));
-		//wHLocationPermission.AddChild(InventoryServicePermissions.WHLocations.Create, L("Permission:Create"));
-		//wHLocationPermission.AddChild(InventoryServicePermissions.WHLocations.Edit, L("Permission:Edit"));
-		//wHLocationPermission.AddChild(InventoryServicePermissions.WHLocations.Delete, L("Permission:Delete"));
+        //var warehousePermission = myGroup.AddPermission(InventoryServicePermissions.Warehouses.Default, L("Permission:Warehouses"));
+        ////warehousePermission.AddChild(InventoryServicePermissions.Warehouses.Create, L("Permission:Create"));
+        ////warehousePermission.AddChild(InventoryServicePermissions.Warehouses.Edit, L("Permission:Edit"));
+        ////warehousePermission.AddChild(InventoryServicePermissions.Warehouses.Delete, L("Permission:Delete"));
 
-		//var wHImagePermission = myGroup.AddPermission(InventoryServicePermissions.WHImages.Default, L("Permission:WHImages"));
-		//wHImagePermission.AddChild(InventoryServicePermissions.WHImages.Create, L("Permission:Create"));
-		//wHImagePermission.AddChild(InventoryServicePermissions.WHImages.Edit, L("Permission:Edit"));
-		//wHImagePermission.AddChild(InventoryServicePermissions.WHImages.Delete, L("Permission:Delete"));
+        //var wHLocationPermission = myGroup.AddPermission(InventoryServicePermissions.WHLocations.Default, L("Permission:WHLocations"));
+        //wHLocationPermission.AddChild(InventoryServicePermissions.WHLocations.Create, L("Permission:Create"));
+        //wHLocationPermission.AddChild(InventoryServicePermissions.WHLocations.Edit, L("Permission:Edit"));
+        //wHLocationPermission.AddChild(InventoryServicePermissions.WHLocations.Delete, L("Permission:Delete"));
 
-		//var inventoryPermission = myGroup.AddPermission(InventoryServicePermissions.Inventories.Default, L("Permission:Inventories"));
-		//inventoryPermission.AddChild(InventoryServicePermissions.Inventories.Create, L("Permission:Create"));
-		//inventoryPermission.AddChild(InventoryServicePermissions.Inventories.Edit, L("Permission:Edit"));
-		//inventoryPermission.AddChild(InventoryServicePermissions.Inventories.Delete, L("Permission:Delete"));
+        //var wHImagePermission = myGroup.AddPermission(InventoryServicePermissions.WHImages.Default, L("Permission:WHImages"));
+        //wHImagePermission.AddChild(InventoryServicePermissions.WHImages.Create, L("Permission:Create"));
+        //wHImagePermission.AddChild(InventoryServicePermissions.WHImages.Edit, L("Permission:Edit"));
+        //wHImagePermission.AddChild(InventoryServicePermissions.WHImages.Delete, L("Permission:Delete"));
 
-		//var invtBatchPermission = myGroup.AddPermission(InventoryServicePermissions.InvtBatches.Default, L("Permission:InvtBatches"));
-		//invtBatchPermission.AddChild(InventoryServicePermissions.InvtBatches.Create, L("Permission:Create"));
-		//invtBatchPermission.AddChild(InventoryServicePermissions.InvtBatches.Edit, L("Permission:Edit"));
-		//invtBatchPermission.AddChild(InventoryServicePermissions.InvtBatches.Delete, L("Permission:Delete"));
+        //var inventoryPermission = myGroup.AddPermission(InventoryServicePermissions.Inventories.Default, L("Permission:Inventories"));
+        //inventoryPermission.AddChild(InventoryServicePermissions.Inventories.Create, L("Permission:Create"));
+        //inventoryPermission.AddChild(InventoryServicePermissions.Inventories.Edit, L("Permission:Edit"));
+        //inventoryPermission.AddChild(InventoryServicePermissions.Inventories.Delete, L("Permission:Delete"));
 
-		//var invtSerialPermission = myGroup.AddPermission(InventoryServicePermissions.InvtSerials.Default, L("Permission:InvtSerials"));
-		//invtSerialPermission.AddChild(InventoryServicePermissions.InvtSerials.Create, L("Permission:Create"));
-		//invtSerialPermission.AddChild(InventoryServicePermissions.InvtSerials.Edit, L("Permission:Edit"));
-		//invtSerialPermission.AddChild(InventoryServicePermissions.InvtSerials.Delete, L("Permission:Delete"));
+        //var invtBatchPermission = myGroup.AddPermission(InventoryServicePermissions.InvtBatches.Default, L("Permission:InvtBatches"));
+        //invtBatchPermission.AddChild(InventoryServicePermissions.InvtBatches.Create, L("Permission:Create"));
+        //invtBatchPermission.AddChild(InventoryServicePermissions.InvtBatches.Edit, L("Permission:Edit"));
+        //invtBatchPermission.AddChild(InventoryServicePermissions.InvtBatches.Delete, L("Permission:Delete"));
 
-		//var iNItemTrackingPermission = myGroup.AddPermission(InventoryServicePermissions.INItemTrackings.Default, L("Permission:INItemTrackings"));
-		//iNItemTrackingPermission.AddChild(InventoryServicePermissions.INItemTrackings.Create, L("Permission:Create"));
-		//iNItemTrackingPermission.AddChild(InventoryServicePermissions.INItemTrackings.Edit, L("Permission:Edit"));
-		//iNItemTrackingPermission.AddChild(InventoryServicePermissions.INItemTrackings.Delete, L("Permission:Delete"));
+        //var invtSerialPermission = myGroup.AddPermission(InventoryServicePermissions.InvtSerials.Default, L("Permission:InvtSerials"));
+        //invtSerialPermission.AddChild(InventoryServicePermissions.InvtSerials.Create, L("Permission:Create"));
+        //invtSerialPermission.AddChild(InventoryServicePermissions.InvtSerials.Edit, L("Permission:Edit"));
+        //invtSerialPermission.AddChild(InventoryServicePermissions.InvtSerials.Delete, L("Permission:Delete"));
 
-		//var iNItemTrackingDetailPermission = myGroup.AddPermission(InventoryServicePermissions.INItemTrackingDetails.Default, L("Permission:INItemTrackingDetails"));
-		//iNItemTrackingDetailPermission.AddChild(InventoryServicePermissions.INItemTrackingDetails.Create, L("Permission:Create"));
-		//iNItemTrackingDetailPermission.AddChild(InventoryServicePermissions.INItemTrackingDetails.Edit, L("Permission:Edit"));
-		//iNItemTrackingDetailPermission.AddChild(InventoryServicePermissions.INItemTrackingDetails.Delete, L("Permission:Delete"));
+        //var iNItemTrackingPermission = myGroup.AddPermission(InventoryServicePermissions.INItemTrackings.Default, L("Permission:INItemTrackings"));
+        //iNItemTrackingPermission.AddChild(InventoryServicePermissions.INItemTrackings.Create, L("Permission:Create"));
+        //iNItemTrackingPermission.AddChild(InventoryServicePermissions.INItemTrackings.Edit, L("Permission:Edit"));
+        //iNItemTrackingPermission.AddChild(InventoryServicePermissions.INItemTrackings.Delete, L("Permission:Delete"));
 
-		//var iNTransferPermission = myGroup.AddPermission(InventoryServicePermissions.INTransfers.Default, L("Permission:INTransfers"));
-		//iNTransferPermission.AddChild(InventoryServicePermissions.INTransfers.Create, L("Permission:Create"));
-		//iNTransferPermission.AddChild(InventoryServicePermissions.INTransfers.Edit, L("Permission:Edit"));
-		//iNTransferPermission.AddChild(InventoryServicePermissions.INTransfers.Delete, L("Permission:Delete"));
+        //var iNItemTrackingDetailPermission = myGroup.AddPermission(InventoryServicePermissions.INItemTrackingDetails.Default, L("Permission:INItemTrackingDetails"));
+        //iNItemTrackingDetailPermission.AddChild(InventoryServicePermissions.INItemTrackingDetails.Create, L("Permission:Create"));
+        //iNItemTrackingDetailPermission.AddChild(InventoryServicePermissions.INItemTrackingDetails.Edit, L("Permission:Edit"));
+        //iNItemTrackingDetailPermission.AddChild(InventoryServicePermissions.INItemTrackingDetails.Delete, L("Permission:Delete"));
 
-		//var iNTransferDetailPermission = myGroup.AddPermission(InventoryServicePermissions.INTransferDetails.Default, L("Permission:INTransferDetails"));
-		//iNTransferDetailPermission.AddChild(InventoryServicePermissions.INTransferDetails.Create, L("Permission:Create"));
-		//iNTransferDetailPermission.AddChild(InventoryServicePermissions.INTransferDetails.Edit, L("Permission:Edit"));
-		//iNTransferDetailPermission.AddChild(InventoryServicePermissions.INTransferDetails.Delete, L("Permission:Delete"));
+        //var iNTransferPermission = myGroup.AddPermission(InventoryServicePermissions.INTransfers.Default, L("Permission:INTransfers"));
+        //iNTransferPermission.AddChild(InventoryServicePermissions.INTransfers.Create, L("Permission:Create"));
+        //iNTransferPermission.AddChild(InventoryServicePermissions.INTransfers.Edit, L("Permission:Edit"));
+        //iNTransferPermission.AddChild(InventoryServicePermissions.INTransfers.Delete, L("Permission:Delete"));
 
-		//var iNTransferSerialPermission = myGroup.AddPermission(InventoryServicePermissions.INTransferSerials.Default, L("Permission:INTransferSerials"));
-		//iNTransferSerialPermission.AddChild(InventoryServicePermissions.INTransferSerials.Create, L("Permission:Create"));
-		//iNTransferSerialPermission.AddChild(InventoryServicePermissions.INTransferSerials.Edit, L("Permission:Edit"));
-		//iNTransferSerialPermission.AddChild(InventoryServicePermissions.INTransferSerials.Delete, L("Permission:Delete"));
+        //var iNTransferDetailPermission = myGroup.AddPermission(InventoryServicePermissions.INTransferDetails.Default, L("Permission:INTransferDetails"));
+        //iNTransferDetailPermission.AddChild(InventoryServicePermissions.INTransferDetails.Create, L("Permission:Create"));
+        //iNTransferDetailPermission.AddChild(InventoryServicePermissions.INTransferDetails.Edit, L("Permission:Edit"));
+        //iNTransferDetailPermission.AddChild(InventoryServicePermissions.INTransferDetails.Delete, L("Permission:Delete"));
 
-		//var iNTransferSplitPermission = myGroup.AddPermission(InventoryServicePermissions.INTransferSplits.Default, L("Permission:INTransferSplits"));
-		//iNTransferSplitPermission.AddChild(InventoryServicePermissions.INTransferSplits.Create, L("Permission:Create"));
-		//iNTransferSplitPermission.AddChild(InventoryServicePermissions.INTransferSplits.Edit, L("Permission:Edit"));
-		//iNTransferSplitPermission.AddChild(InventoryServicePermissions.INTransferSplits.Delete, L("Permission:Delete"));
-	}
+        //var iNTransferSerialPermission = myGroup.AddPermission(InventoryServicePermissions.INTransferSerials.Default, L("Permission:INTransferSerials"));
+        //iNTransferSerialPermission.AddChild(InventoryServicePermissions.INTransferSerials.Create, L("Permission:Create"));
+        //iNTransferSerialPermission.AddChild(InventoryServicePermissions.INTransferSerials.Edit, L("Permission:Edit"));
+        //iNTransferSerialPermission.AddChild(InventoryServicePermissions.INTransferSerials.Delete, L("Permission:Delete"));
+
+        //var iNTransferSplitPermission = myGroup.AddPermission(InventoryServicePermissions.INTransferSplits.Default, L("Permission:INTransferSplits"));
+        //iNTransferSplitPermission.AddChild(InventoryServicePermissions.INTransferSplits.Create, L("Permission:Create"));
+        //iNTransferSplitPermission.AddChild(InventoryServicePermissions.INTransferSplits.Edit, L("Permission:Edit"));
+        //iNTransferSplitPermission.AddChild(InventoryServicePermissions.INTransferSplits.Delete, L("Permission:Delete"));
+    }
 	private static void AddModuleSaaSMenuItem(MenuConfigurationContext context)
 	{
         var l = context.GetLocalizer<SaasResource>();
@@ -787,7 +861,7 @@ public class OMSMenuContributor : IMenuContributor
 	private static void AddMenuProductItems(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
 	{
 		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
-			   MdmServiceMenus.ItemMaster,
+			   MdmServiceMenus.Items,
 			   context.GetLocalizer<OMSResource>()["Menu:MdmService:Product"],
 			   null,
 			   icon: "fa fa-product-hunt"
@@ -865,9 +939,9 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.Items,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:Items"],
-				"/Items",
-				icon: "fa fa-file-alt",
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemMasters"],
+                "/Mdm/ItemMasters",
+				icon: "fa fa-folder-open",
 				requiredPermissionName: MdmServicePermissions.Items.Default
 			).RequireFeatures(MdmFeatures.Items)
 		);
@@ -1066,15 +1140,15 @@ public class OMSMenuContributor : IMenuContributor
 		//	).RequireFeatures(MdmFeatures.SalesOrgs)
 		//);
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.CompanyInZones,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CompanyInZone"],
-		//		"/Mdm/CompanyInZones",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.CompanyInZones.Default
-		//	).RequireFeatures(MdmFeatures.SellingZones)
-		//);
+		groupMenu.AddItem(
+			new ApplicationMenuItem(
+				MdmServiceMenus.CompanyInZones,
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:SellingZones"],
+                "/Mdm/SellingZones",
+				icon: "fa fa-map-marker",
+				requiredPermissionName: MdmServicePermissions.CompanyInZones.Default
+            ).RequireFeatures(MdmFeatures.SellingZones)
+		);
 
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
@@ -1082,7 +1156,7 @@ public class OMSMenuContributor : IMenuContributor
 		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CustomerInZone"],
 		//		"/Mdm/CustomerInZones",
 		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.CustomerInZones.Default
+		//		requiredPermissionName: 
 		//	).RequireFeatures(MdmFeatures.SellingZones)
 		//);
 
@@ -1095,7 +1169,6 @@ public class OMSMenuContributor : IMenuContributor
 		//		requiredPermissionName: MdmServicePermissions.EmployeeInZones.Default
 		//	).RequireFeatures(MdmFeatures.SellingZones)
 		//);
-
 	}
 
 	private static void AddMenuItemCustomers(MenuConfigurationContext context, ApplicationMenuItem parentMenu)

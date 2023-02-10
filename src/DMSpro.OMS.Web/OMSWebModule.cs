@@ -216,7 +216,7 @@ public class OMSWebModule : AbpModule
                 options.Scope.Add("InventoryService");
                 options.Scope.Add("SurveyService");
                 options.Scope.Add("OrderService");
-                options.Scope.Add("FileManagementService");
+               // options.Scope.Add("FileManagementService");
                 options.AccessDeniedPath = "/Account/AccessDenied2";
                 //options.UseTokenLifetime = true;
                 //options.AutomaticRefreshInterval = 1000;
