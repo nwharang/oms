@@ -1070,7 +1070,16 @@ public class OMSMenuContributor : IMenuContributor
 
 		parentMenu.AddItem(groupMenu);
 
-		groupMenu.AddItem(
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                "MdmService.SalesOrganizations.EmployeeTypes",
+                context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:EmployeeTypes"],
+                "/Mdm/EmployeeTypes",
+                icon: "fa fa-users"
+            ).RequireFeatures(MdmFeatures.EmployeeProfiles)
+        );
+
+        groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.WorkingPositions,
 				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:WorkingPositions"],
