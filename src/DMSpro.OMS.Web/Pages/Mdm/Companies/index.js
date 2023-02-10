@@ -4,7 +4,23 @@
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
 
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
@@ -91,143 +107,64 @@
 
     var gridCompanies = $('#dgCompanies').dxDataGrid({
         dataSource: customStore,
-        keyExpr: "id",
-        parentIdExpr: "parentId",
-        editing: {
-            mode: "popup",
-            allowAdding: abp.auth.isGranted('MdmService.CompanyMasters.Create'),
-            allowUpdating: abp.auth.isGranted('MdmService.CompanyMasters.Edit'),
-            allowDeleting: abp.auth.isGranted('MdmService.CompanyMasters.Delete'),
-            useIcons: true,
-            popup: {
-                title: l("Page:Title:CompanyProfiles"),
-                showTitle: true,
-                height: 720
-            },
-            texts: {
-                editRow: l("Edit"),
-                deleteRow: l("Delete"),
-                confirmDeleteMessage: l("DeleteConfirmationMessage")
-            },
-            form: {
-                colCount: 2,
-                items: [
-                    {
-                        dataField: "code",
-                        cssClass: "pr-5",
-                    },
-                    {
-                        dataField: "name",
-                        cssClass: "pl-5",
-                    },
-                    {
-                        dataField: "geoLevel0Id",
-                        cssClass: "pr-5",
-                    },
-                    {
-                        dataField: "geoLevel1Id",
-                        cssClass: "pl-5",
-                    },
-                    {
-                        dataField: "geoLevel2Id",
-                        cssClass: "pr-5",
-                    },
-                    {
-                        dataField: "geoLevel3Id",
-                        cssClass: "pl-5",
-                    },
-                    {
-                        dataField: "geoLevel4Id",
-                        cssClass: "pr-5",
-                    },
-                    {
-                        dataField: "street",
-                        cssClass: "pl-5",
-                    },
-                    {
-                        dataField: "address",
-                        cssClass: "pr-5",
-                    },
-                    {
-                        dataField: "phone",
-                        cssClass: "pl-5",
-                    },
-                    {
-                        dataField: "license",
-                        cssClass: "pr-5",
-                    },
-                    {
-                        dataField: "taxCode",
-                        cssClass: "pl-5",
-                    },
-                    {
-                        dataField: "erpCode",
-                        cssClass: "pr-5",
-                    },
-                    {
-                        dataField: "parentId",
-                        cssClass: "pl-5",
-                    },
-                    {
-                        dataField: "vatName",
-                        cssClass: "pr-5",
-                    },
-                    {
-                        dataField: "vatAddress",
-                        cssClass: "pl-5",
-                    },
-                    {
-                        dataField: "active",
-                        cssClass: "pr-5",
-                    },
-                    {
-                        dataField: "isHO",
-                        cssClass: "pl-5",
-                    },
-                    {
-                        dataField: "effectiveDate",
-                        cssClass: "pr-5",
-                    },
-                    {
-                        dataField: "endDate",
-                        cssClass: "pl-5",
-                    },
-                    {
-                        dataField: "latitude",
-                        cssClass: "pr-5",
-                    },
-                    {
-                        dataField: "longitude",
-                        cssClass: "pl-5",
-                    },
-                    {
-                        dataField: "contactName",
-                        cssClass: "pr-5",
-                    },
-                    {
-                        dataField: "contactPhone",
-                        cssClass: "pl-5",
-                    }
-                ]
-            },
+        remoteOperations: true, 
+        cacheEnabled: true, 
+        export: {
+            enabled: true,
+           // allowExportSelectedData: true,
         },
-        remoteOperations: true,
-        showBorders: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
-        rowAlternationEnabled: true,
-        columnAutoWidth: true,
-        //columnHidingEnabled: true,
-        errorRowEnabled: false,
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Companies');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Companies.xlsx');
+                });
+            });
+            e.cancel = true;
+        }, 
+        showRowLines: true,
+        showBorders: true, 
+        focusedRowEnabled: true, 
+        allowColumnReordering: true, 
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
+        columnMinWidth: 50,
+        columnAutoWidth: true,  
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
         filterRow: {
-            visible: false
+            visible: true,
         },
+        groupPanel: {
+            visible: true,
+        },
+        headerFilter: {
+            visible: true,
+        }, 
+        rowAlternationEnabled: true, 
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
-        },
+        //scrolling: {
+        //    mode: 'standard'
+        //},
+        
+        stateStoring: { //save state in localStorage
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgCompanies',
+        }, 
         paging: {
             enabled: true,
             pageSize: 10
@@ -238,203 +175,254 @@
             allowedPageSizes: [10, 20, 50, 100],
             showInfo: true,
             showNavigationButtons: true
+        }, 
+        editing: {
+            mode: "popup",
+            allowAdding: abp.auth.isGranted('MdmService.CompanyMasters.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.CompanyMasters.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.CompanyMasters.Delete'),
+            useIcons: true,
+            popup: {
+                title: l("Page:Title:CompanyProfiles"),
+                showTitle: true,
+                height: 720,
+            },
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            }, 
         },
-        onEditorPreparing(e) {
-            if (e.dataField === 'parentId' && e.editorOptions.value == 0) {
-                e.editorOptions.value = '';
-            }
-        },
-        onRowUpdating: function (e) {
-            e.newData = Object.assign({}, e.oldData, e.newData);
-        },
-        onRowInserting: function (e) {
-            // for create first data - if parentId = 0, update parentId = null
-            if (e.data && e.data.parentId == 0) {
-                e.data.parentId = null;
-            }
+        toolbar: {
+            items: [
+                "groupPanel",
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        gridCompanies.addRow();
+                    },
+                },
+                
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
         },
         columns: [
             {
                 type: 'buttons',
                 caption: l("Actions"),
-                width: 90,
+                //width: 90,
                 buttons: ['edit', 'delete'],
+                fixed: true,
+                fixedPosition: "left",
+                allowExporting: false,
+                //alignment: 'right',
+            },
+            {
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                fixed: true,
+                fixedPosition: "left",
+                visible: false,
             },
             {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Code"),
-                width: 70,
+                //fixed: true,
+                //width: 70,
                 validationRules: [{ type: "required" }],
                 dataType: 'string',
+                fixed: true,
+                fixedPosition: "left",
             },
             {
                 dataField: 'name',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Name"),
-                width: 110,
+                //fixed: true,
+                //width: 110,
                 validationRules: [{ type: "required" }],
                 dataType: 'string',
+                fixed: true,
+                fixedPosition: "left"
             },
             {
                 dataField: "geoLevel0Id",
                 caption: l1("GeoLevel0Name"),
-                width: 110,
+                //calculateDisplayValue: "geoLevel0Id", // provides display values
+                //width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel0Id = value;
-                    rowData.geoLevel1Id = null;
+                    rowData.geoLevel1Id = '';
+                    rowData.geoLevel2Id = '';
+                    rowData.geoLevel3Id = '';
+                    rowData.geoLevel4Id = '';
                 },
                 lookup: {
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? ['level', '=', 0] : null,
+                            filter: ['level', '=', 0],
                         };
                     },
                     valueExpr: "id",
                     displayExpr: "name"
-                }
+                },
+                dataType: 'string',
             },
             {
                 dataField: "geoLevel1Id",
                 caption: l1("GeoLevel1Name"),
-                width: 110,
+                //width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel1Id = value;
-                    rowData.geoLevel2Id = null;
-                    rowData.geoLevel3Id = null;
-                    rowData.geoLevel4Id = null;
+                    rowData.geoLevel2Id = '';
+                    rowData.geoLevel3Id = '';
+                    rowData.geoLevel4Id = '';
                 },
                 lookup: {
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : null,
+                            filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : ['level', '=', 1],
                         };
                     },
                     valueExpr: 'id',
                     displayExpr: 'name',
                 },
+                dataType: 'string',
             },
             {
                 dataField: "geoLevel2Id",
                 caption: l1("GeoLevel2Name"),
-                width: 110,
+                //width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel2Id = value;
-                    rowData.geoLevel3Id = null;
-                    rowData.geoLevel4Id = null;
+                    rowData.geoLevel3Id = '';
+                    rowData.geoLevel4Id = '';
                 },
                 lookup: {
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : null,
+                            filter: options.data ? ['parentId', '=', (options.data.geoLevel1Id ?? '')] : ['level', '=', 2],
                         };
                     },
                     valueExpr: 'id',
                     displayExpr: 'name',
                 },
+                dataType: 'string',
             },
             {
                 dataField: "geoLevel3Id",
                 caption: l1("GeoLevel3Name"),
-                width: 110,
+                //width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel3Id = value;
-                    rowData.geoLevel4Id = null;
+                    rowData.geoLevel4Id = '';
                 },
                 lookup: {
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoLevel2Id] : null,
+                            filter: options.data ? ['parentId', '=', (options.data.geoLevel2Id ?? '')] : ['level', '=', 3],
                         };
                     },
                     valueExpr: 'id',
                     displayExpr: 'name',
-                }
+                },
+                dataType: 'string',
             },
             {
                 dataField: "geoLevel4Id",
                 caption: l1("GeoLevel4Name"),
-                width: 110,
+                //width: 110,
                 lookup: {
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : null,
+                            filter: options.data ? ['parentId', '=', (options.data.geoLevel3Id ?? '')] : ['level', '=', 4],
                         };
                     },
                     valueExpr: 'id',
                     displayExpr: 'name',
-                }
+                },
+                dataType: 'string',
             },
             {
                 dataField: 'street',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Street"),
-                width: 150,
+                //width: 150,
                 dataType: 'string',
             },
             {
                 dataField: 'address',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Address"),
-                width: 150,
-                dataType: 'string',
+                //width: 150,
+                dataType: 'string', 
             },
             {
                 dataField: 'phone',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Phone"),
-                width: 110,
+                //width: 110,
                 dataType: 'string',
             },
             {
                 dataField: 'license',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:License"),
-                width: 70,
+                //width: 70,
                 dataType: 'string',
+                visible: false,
             },
             {
                 dataField: 'taxCode',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:TaxCode"),
-                width: 90,
+                //width: 90,
                 dataType: 'string',
+                visible: false,
             },
             {
                 dataField: 'erpCode',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:ERPCode"),
-                width: 80,
+                //width: 80,
                 dataType: 'string',
+                visible: false,
             },
             {
                 dataField: 'parentId',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:ParentName"),
-                width: 145,
-                lookup: {
-                    dataSource(options) {
-                        return {
-                            store: customStore,
-                            filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
-                        };
-                    },
-                    displayExpr: 'name',
-                    valueExpr: 'id',
-                }
+                //width: 145,
+                visible: false,
+                dataType: 'string', 
             },
             {
                 dataField: 'vatName',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:VATName"),
-                width: 90,
+                //width: 90,
                 dataType: 'string',
+                visible: false,
             },
             {
                 dataField: 'vatAddress',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:VATAddress"),
-                width: 200,
+                //width: 200,
                 dataType: 'string',
+                visible: false,
             },
             {
                 dataField: 'active',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Active"),
-                width: 70,
+                //width: 70,
                 alignment: 'center',
                 dataType: 'boolean',
                 cellTemplate(container, options) {
@@ -446,7 +434,7 @@
             {
                 dataField: 'isHO',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:IsHO"),
-                width: 70,
+                //width: 70,
                 alignment: 'center',
                 dataType: 'boolean',
                 cellTemplate(container, options) {
@@ -454,80 +442,80 @@
                         .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
                         .appendTo(container);
                 },
+                visible: false,
             },
             {
                 dataField: 'effectiveDate',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:EffectiveDate"),
-                width: 110,
+                //width: 110,
                 dataType: 'date',
+                visible: false,
             },
             {
                 dataField: 'endDate',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:EndDate"),
-                width: 90,
+                //width: 90,
                 dataType: 'date',
+                visible: false,
             },
             {
                 dataField: 'latitude',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Latitude"),
-                width: 110,
+                //width: 110,
                 dataType: 'string',
+                visible: false,
             },
             {
                 dataField: 'longitude',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Longitude"),
-                width: 110,
+                //width: 110,
                 dataType: 'string',
+                visible: false,
             },
             {
                 dataField: 'contactName',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:ContactName"),
-                width: 110,
+                //width: 110,
                 dataType: 'string',
+                visible: false,
             },
             {
                 dataField: 'contactPhone',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:ContactPhone"),
-                width: 110,
+                //width: 110,
                 dataType: 'string',
+                visible: false,
             }
         ],
-    }).dxDataGrid("instance");
 
-    $("input#Search").on("input", function () {
-        gridCompanies.searchByText($(this).val());
-    });
+        //onEditorPreparing(e) {
+        //    if (e.dataField === 'parentId' && e.editorOptions.value == 0) {
+        //        e.editorOptions.value = '';
+        //    }
+        //},
+        onRowUpdating: function (e) {
+            e.newData = Object.assign({}, e.oldData, e.newData);
+        },
+        onRowInserting: function (e) {
+            // for create first data - if parentId = 0, update parentId = null
+            //if (e.data && e.data.parentId == 0) {
+            //    e.data.parentId = null;
+            //}
+        },
 
-    $("#btnNewCompany").click(function (e) {
-        gridCompanies.addRow();
-    });
+        onContextMenuPreparing: function (e) {
+            if (e.target == "header") {
+                // e.items can be undefined
+                if (!e.items) e.items = [];
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
-
-        companyService.getDownloadToken().then(
-            function(result){
-                    var input = getFilter();
-                    var url =  abp.appPath + 'api/mdm-service/companies/as-excel-file' + 
-                        abp.utils.buildQueryString([
-                            { name: 'downloadToken', value: result.token },
-                            { name: 'filterText', value: input.filterText }, 
-                            { name: 'code', value: input.code }, 
-                            { name: 'name', value: input.name }, 
-                            { name: 'address', value: input.address }, 
-                            { name: 'phone', value: input.phone }, 
-                            { name: 'license', value: input.license }, 
-                            { name: 'taxCode', value: input.taxCode }, 
-                            { name: 'erpCode', value: input.erpCode }, 
-                            { name: 'parentId', value: input.parentId }, 
-                            { name: 'inactive', value: input.inactive }, 
-                            { name: 'isHO', value: input.isHO }
-                            ]);
-                            
-                    var downloadWindow = window.open(url, '_blank');
-                    downloadWindow.focus();
+                // Add a custom menu item
+                e.items.push({
+                    text: l("Hide Column"),
+                    onItemClick: function () {
+                        gridCompanies.columnOption(e.column.dataField, "visible", false);  
+                    }
+                });
             }
-        )
-    });
-    
+        } 
+    }).dxDataGrid("instance"); 
 });
