@@ -33,7 +33,9 @@ div.dx-treelist-container table tbody > tr.dx-header-row > td {
 div.dx-datagrid div.dx-datagrid-header-panel div.dx-datagrid-search-panel.dx-searchbox {
     width: 250px !important;
 }
-
+.panel-container{
+    padding:7px;
+}
 div.panel-container.show > div.panel-content button.buttons-collection,
 div.panel-container.show > div.panel-content button.buttons-csv,
 div.panel-container.show > div.panel-content button.buttons-copy,
@@ -41,7 +43,7 @@ div.panel-container.show > div.panel-content button.buttons-print {
     padding: 0.35rem 1.125rem !important;
 }
 
-div.dx-datagrid .dx-toolbar-items-container,
+/*div.dx-datagrid .dx-toolbar-items-container,*/
 div.dx-treelist-container div.dx-toolbar-items-container {
     display: none;
 }

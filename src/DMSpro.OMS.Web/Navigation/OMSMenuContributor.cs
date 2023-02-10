@@ -1040,7 +1040,7 @@ public class OMSMenuContributor : IMenuContributor
 			new ApplicationMenuItem(
 				MdmServiceMenus.SalesOrgHeaders,
 				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:SalesOrganization"],
-				"/Mdm/SalesOrgHeaders",
+                "/Mdm/SalesOrganization",
 				icon: "fa fa-check-square",
 				requiredPermissionName: MdmServicePermissions.SalesOrgHeaders.Default
 			).RequireFeatures(MdmFeatures.SalesOrgs)
