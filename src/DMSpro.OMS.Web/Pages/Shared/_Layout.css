@@ -273,6 +273,6 @@ table.companies > tbody > tr{
     margin-left:unset;
 }
 
-/*div.dx-datagrid div.dx-toolbar-items-container button.btn, #btnActions {
-    border-radius: 0px;
-}*/
+.nav-menu li > ul li a > [class*='fa-'], .nav-menu li > ul li a > .ni {
+    text-align: left !important;
+}

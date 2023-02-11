@@ -54,6 +54,7 @@ $(function () {
     });
 
     var companyStore = new DevExpress.data.CustomStore({ 
+        key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -62,7 +63,7 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            debugger
+            console.log(args)
             companyService.getListDevextremes(args)
                 .done(result => { 
 
@@ -263,86 +264,30 @@ $(function () {
                 //        .append($('<span>' + options.data.companyName + '</span>'))
                 //        .appendTo(container);
                 //},
-
-                lookup: {
-                    dataSource() {
-                        return {
-                            store: companyStore,
-                            pageSize: 30,
-                            paginate: true,
-                            requireTotalCount: true  
-                        };
+                calculateDisplayValue: "companyName",
+                lookup: { 
+                    dataSource : {
+                        pageSize: 30,
+                        paginate: true,
+                        store: companyStore
                     },
                     displayExpr: 'name',
-                    valueExpr: 'id'
+                    valueExpr: 'id', 
+                    searchEnabled: true,
+                    searchOperation: 'contains'
                 }
             }
         ],
         //onEditorPreparing: function (e) {
         //    if (e.dataField == "companyId" && e.parentType == "dataRow") {
-        //        e.editorName = "dxDropDownBox";
-        //        e.editorOptions.dropDownOptions = {
-        //            //height: 500
-        //        };
-        //        e.editorOptions.contentTemplate = function (args, container) {
-        //            var value = args.component.option("value"),
-        //                $dataGrid = $("<div>").dxDataGrid({
-        //                    width: '100%',
-        //                    dataSource: companyStore,
-        //                    //keyExpr: "id",
-        //                    columns: [,
-        //                        {
-        //                            caption: "code",
-        //                            dataField: "code"
-        //                        }, {
-        //                            caption: "Name",
-        //                            dataField: "name"
-        //                        }],
-        //                    remoteOperations: true,
-        //                    paging: {
-        //                        enabled: true,
-        //                        pageSize: 10
-        //                    },
-        //                    pager: {
-        //                        visible: true,
-        //                        showPageSizeSelector: true,
-        //                        allowedPageSizes: [10, 20, 50, 100],
-        //                        showInfo: true,
-        //                        showNavigationButtons: true
-        //                    }, 
-        //                    hoverStateEnabled: true,
-        //                    paging: { enabled: true, pageSize: 10 },
-        //                    filterRow: { visible: true },
-        //                    scrolling: { mode: "infinite" },
-        //                    height: '90%',
-        //                    showRowLines: true,
-        //                    showBorders: true,
-        //                    selection: { mode: "single" },
-        //                    selectedRowKeys: value,
-        //                    onSelectionChanged: function (selectedItems) {
-        //                        var keys = selectedItems.selectedRowKeys;
-        //                        args.component.option("value", keys);
-        //                    }
-        //                });
-
-        //            var dataGrid = $dataGrid.dxDataGrid("instance");
-
-        //            args.component.on("valueChanged", function (args) {
-        //                var value = args.value;
-        //                debugger
-        //                dataGrid.selectRows(value, false);
-        //                if (value != args.previousValue && value.length > 0) {
-        //                    var items = dataGrid.getDataSource().items();
-        //                    var obj = items.filter(x => x.id == value)[0];
-        //                    e.component.cellValue(e.row.rowIndex, "companyId", value);
-        //                    e.component.cellValue(e.row.rowIndex, "companyName", obj.name); 
-        //                }
-        //            });
-        //            container.append($dataGrid);
-        //            return container;
-        //        };
+        //        //e.value = e.row.data.companyName; 
+        //        e.editorOptions.dataSource = {
+        //            pageSize: 30,
+        //            paginate: true,
+        //            store: companyStore
+        //        }; 
         //    }
-        //},
+        //}
     }).dxDataGrid("instance");
      
 });
