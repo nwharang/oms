@@ -1,0 +1,95 @@
+@page
+@using DMSpro.OMS.Localization;
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using DMSpro.OMS.MdmService.Permissions
+@using DMSpro.OMS.MdmService.Web.Menus
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@inject IHtmlLocalizer<OMSWebResource> L1
+@inject IAuthorizationService Authorization
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = L["PriceUpdateDetails"].Value;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.PriceUpdateDetails;
+}
+
+@section scripts {
+    <abp-script src="/Pages/Mdm/PriceUpdates/details.js" />
+}
+
+@section breadcrumb {
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
+        <li class="breadcrumb-item">@L["Item"].Value</li>
+        <li class="breadcrumb-item active">@L["Menu:MdmService:PriceUpdateDetails"].Value</li>
+    </ol>
+}
+
+<div class="col-lg-12">
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="ui-sortable-handle">
+                <i class="subheader-icon fa fa-info-circle"></i> @L["Page.Title.PriceUpdateDetails"].Value
+            </h2>
+        </div>
+        <div class="panel-container show">
+            <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
+                <abp-card>
+                    <abp-card-body>
+                        <abp-row>
+                            <div style="padding-left:12px" class="buttons-header-grid">
+                                <button id="SaveButton" type="submit" class="btn btn-sm btn-outline-default waves-effect waves-themed" form="form-container">
+                                    <i class="fa fa-check"></i>
+                                    @L1["Button.Save"].Value
+                                </button>
+                                <button id="CloseButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                    <i class="fa fa-times"></i>
+                                    <span>@L1["Button.Close"].Value</span>
+                                </button>
+                                <button id="CancelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                    <i class="fa fa-times"></i>
+                                    <span>@L1["Button.Cancel"].Value</span>
+                                </button>
+                            </div>
+                        </abp-row>
+                        <div class="dx-viewport">
+                            <form id="form-container">
+                                <div id="priceUpdateForm"></div>
+                            </form>
+                        </div>
+                    </abp-card-body>
+                </abp-card>
+                <abp-card>
+                    <abp-card-body>
+                        <abp-row>
+                            <div style="padding-left:12px" class="buttons-header-grid">
+                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.PriceUpdateDetails.Create))
+                                {
+                                    <button id="NewPriceUpdateDetailButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                        <i class="fa fa-plus"></i> <span>@L["Button.New.PriceUpdateDetail"].Value</span>
+                                    </button>
+                                }
+                                <div class="dx-datagrid-search-panel dx-show-invalid-badge dx-textbox dx-texteditor dx-editor-outlined dx-searchbox dx-show-clear-button dx-texteditor-empty dx-widget dx-state-hover" style="width: 250px;">
+                                    <div class="dx-texteditor-container">
+                                        <div class="dx-texteditor-input-container">
+                                            <div class="dx-icon dx-icon-search"></div>
+                                            <input id="Search" autocomplete="off" aria-label="Search in the data grid" class="dx-texteditor-input" type="text" spellcheck="false" tabindex="0" role="textbox">
+                                        </div>
+                                        <div class="dx-texteditor-buttons-container">
+                                            <span class="dx-clear-button-area"><span class="dx-icon dx-icon-clear"></span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </abp-row>
+                        <div class="dx-viewport">
+                            <div id="priceUpdateDetailContainer"></div>
+                        </div>
+                    </abp-card-body>
+                </abp-card>
+            </div>
+        </div>
+    </div>
+</div>

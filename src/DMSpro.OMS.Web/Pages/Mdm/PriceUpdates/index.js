@@ -1,200 +1,224 @@
 $(function () {
     var l = abp.localization.getResource("MdmService");
-	var priceUpdateService = window.dMSpro.oMS.mdmService.controllers.priceUpdates.priceUpdate;
-	
-        var lastNpIdId = '';
-        var lastNpDisplayNameId = '';
+    var l1 = abp.localization.getResource("OMSWeb");
+    var priceUpdateService = window.dMSpro.oMS.mdmService.controllers.priceUpdates.priceUpdate;
+    var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
 
-        var _lookupModal = new abp.ModalManager({
-            viewUrl: abp.appPath + "Shared/LookupModal",
-            scriptUrl: "/Pages/Shared/lookupModal.js",
-            modalClass: "navigationPropertyLookup"
-        });
+    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
-        $('.lookupCleanButton').on('click', '', function () {
-            $(this).parent().find('input').val('');
-        });
-
-        _lookupModal.onClose(function () {
-            var modal = $(_lookupModal.getModal());
-            $('#' + lastNpIdId).val(modal.find('#CurrentLookupId').val());
-            $('#' + lastNpDisplayNameId).val(modal.find('#CurrentLookupDisplayName').val());
-        });
-	
-    var createModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "PriceUpdates/CreateModal",
-        scriptUrl: "/Pages/PriceUpdates/createModal.js",
-        modalClass: "priceUpdateCreate"
-    });
-
-	var editModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "PriceUpdates/EditModal",
-        scriptUrl: "/Pages/PriceUpdates/editModal.js",
-        modalClass: "priceUpdateEdit"
-    });
-
-	var getFilter = function() {
-        return {
-            filterText: $("#FilterText").val(),
-            code: $("#CodeFilter").val(),
-			description: $("#DescriptionFilter").val(),
-			effectiveDateMin: $("#EffectiveDateFilterMin").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			effectiveDateMax: $("#EffectiveDateFilterMax").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			status: $("#StatusFilter").val(),
-			updateStatusDateMin: $("#UpdateStatusDateFilterMin").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			updateStatusDateMax: $("#UpdateStatusDateFilterMax").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			priceListId: $("#PriceListIdFilter").val()
-        };
-    };
-
-    var dataTable = $("#PriceUpdatesTable").DataTable(abp.libs.datatables.normalizeConfiguration({
-        processing: true,
-        serverSide: true,
-        paging: true,
-        searching: false,
-        scrollX: true,
-        autoWidth: true,
-        scrollCollapse: true,
-        order: [[1, "asc"]],
-        ajax: abp.libs.datatables.createAjax(priceUpdateService.getList, getFilter),
-        columnDefs: [
-            {
-                rowAction: {
-                    items:
-                        [
-                            {
-                                text: l("Edit"),
-                                visible: abp.auth.isGranted('MdmService.PriceUpdates.Edit'),
-                                action: function (data) {
-                                    editModal.open({
-                                     id: data.record.priceUpdate.id
-                                     });
-                                }
-                            },
-                            {
-                                text: l("Delete"),
-                                visible: abp.auth.isGranted('MdmService.PriceUpdates.Delete'),
-                                confirmMessage: function () {
-                                    return l("DeleteConfirmationMessage");
-                                },
-                                action: function (data) {
-                                    priceUpdateService.delete(data.record.priceUpdate.id)
-                                        .then(function () {
-                                            abp.notify.info(l("SuccessfullyDeleted"));
-                                            dataTable.ajax.reload();
-                                        });
-                                }
-                            }
-                        ]
+    /****custom store*****/
+    var priceUpdateStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
                 }
-            },
-			{ data: "priceUpdate.code" },
-			{ data: "priceUpdate.description" },
-            {
-                data: "priceUpdate.effectiveDate",
-                render: function (effectiveDate) {
-                    if (!effectiveDate) {
-                        return "";
-                    }
-                    
-					var date = Date.parse(effectiveDate);
-                    return (new Date(date)).toLocaleDateString(abp.localization.currentCulture.name);
-                }
-            },
-            {
-                data: "priceUpdate.status",
-                render: function (status) {
-                    if (status === undefined ||
-                        status === null) {
-                        return "";
-                    }
+            });
 
-                    var localizationKey = "Enum:PriceUpdateStatus." + status;
-                    var localized = l(localizationKey);
+            priceUpdateService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
 
-                    if (localized === localizationKey) {
-                        abp.log.warn("No localization found for " + localizationKey);
-                        return "";
-                    }
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
 
-                    return localized;
-                }
-            },
-            {
-                data: "priceUpdate.updateStatusDate",
-                render: function (updateStatusDate) {
-                    if (!updateStatusDate) {
-                        return "";
-                    }
-                    
-					var date = Date.parse(updateStatusDate);
-                    return (new Date(date)).toLocaleDateString(abp.localization.currentCulture.name);
-                }
-            },
-            {
-                data: "priceList.code",
-                defaultContent : ""
-            }
-        ]
-    }));
-
-    createModal.onResult(function () {
-        dataTable.ajax.reload();
-    });
-
-    editModal.onResult(function () {
-        dataTable.ajax.reload();
-    });
-
-    $("#NewPriceUpdateButton").click(function (e) {
-        e.preventDefault();
-        createModal.open();
-    });
-
-	$("#SearchForm").submit(function (e) {
-        e.preventDefault();
-        dataTable.ajax.reload();
-    });
-
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
-
-        priceUpdateService.getDownloadToken().then(
-            function(result){
-                    var input = getFilter();
-                    var url =  abp.appPath + 'api/mdm-service/price-updates/as-excel-file' + 
-                        abp.utils.buildQueryString([
-                            { name: 'downloadToken', value: result.token },
-                            { name: 'filterText', value: input.filterText }, 
-                            { name: 'code', value: input.code }, 
-                            { name: 'description', value: input.description },
-                            { name: 'effectiveDateMin', value: input.effectiveDateMin },
-                            { name: 'effectiveDateMax', value: input.effectiveDateMax }, 
-                            { name: 'status', value: input.status },
-                            { name: 'updateStatusDateMin', value: input.updateStatusDateMin },
-                            { name: 'updateStatusDateMax', value: input.updateStatusDateMax }, 
-                            { name: 'priceListId', value: input.priceListId }
-                            ]);
-                            
-                    var downloadWindow = window.open(url, '_blank');
-                    downloadWindow.focus();
-            }
-        )
-    });
-
-    $('#AdvancedFilterSectionToggler').on('click', function (e) {
-        $('#AdvancedFilterSection').toggle();
-    });
-
-    $('#AdvancedFilterSection').on('keypress', function (e) {
-        if (e.which === 13) {
-            dataTable.ajax.reload();
+            var d = new $.Deferred();
+            priceUpdateService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        },
+        insert(values) {
+            return priceUpdateService.create(values, { contentType: "application/json" });
+        },
+        update(key, values) {
+            return priceUpdateService.update(key, values, { contentType: "application/json" });
+        },
+        remove(key) {
+            return priceUpdateService.delete(key);
         }
     });
 
-    $('#AdvancedFilterSection select').change(function() {
-        dataTable.ajax.reload();
+    var priceListStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            priceListService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            priceListService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        },
+        insert(values) {
+            return priceListService.create(values, { contentType: "application/json" });
+        },
+        update(key, values) {
+            return priceListService.update(key, values, { contentType: "application/json" });
+        },
+        remove(key) {
+            return priceListService.delete(key);
+        }
     });
-    
-    
+
+    const statusStore = [
+        {
+            id: 'OPEN',
+            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:OPEN')
+        },
+        {
+            id: 'CONFIRMED',
+            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:CONFIRMED')
+        },
+        {
+            id: 'RELEASED',
+            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:RELEASED')
+        },
+        {
+            id: 'CANCELLED',
+            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:CANCELLED')
+        },
+        {
+            id: 'COMPLETED',
+            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:COMPLETED')
+        },
+        {
+            id: 'FAILED',
+            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:FAILED')
+        },
+        {
+            id: 'INCOMPLETED',
+            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:INCOMPLETED')
+        }
+    ];
+
+    /****control*****/
+    //Grid Price Update
+    const priceUpdateContainer = $('#priceUpdateContainer').dxDataGrid({
+        dataSource: priceUpdateStore,
+        remoteOperations: true,
+        showBorders: true,
+        focusedRowEnabled: true,
+        allowColumnReordering: false,
+        rowAlternationEnabled: true,
+        columnAutoWidth: true,
+        columnHidingEnabled: true,
+        errorRowEnabled: false,
+        noDataText: l1('NoData'),
+        filterRow: {
+            visible: false
+        },
+        searchPanel: {
+            visible: false
+        },
+        scrolling: {
+            mode: 'standard'
+        },
+        paging: {
+            enabled: true,
+            pageSize: 20
+        },
+        pager: {
+            visible: true,
+            showPageSizeSelector: true,
+            allowedPageSizes: [10, 20, 50, 100],
+            showInfo: true,
+            showNavigationButtons: true
+        },
+        columns: [
+            {
+                caption: l("Actions"),
+                type: 'buttons',
+                width: 80,
+                buttons: [
+                    {
+                        text: l1('Button.ViewDetail'),
+                        icon: "fieldchooser",
+                        onClick: function (e) {
+                            var newtab = window.open('/Mdm/PriceUpdates/Details', '_blank');
+                            newtab.sessionStorage.setItem("PriceUpdate", JSON.stringify(e.row.data));
+                        }
+                    }
+                ]
+            },
+            {
+                caption: l('EntityFieldName:MDMService:PriceUpdate:Code'),
+                dataField: 'code',
+                dataType: 'string'
+            },
+            {
+                caption: l('EntityFieldName:MDMService:PriceUpdate:Description'),
+                dataField: 'description',
+                dataType: 'string'
+            },
+            {
+                caption: l('EntityFieldName:MDMService:PriceUpdate:PriceList'),
+                dataField: 'priceListId',
+                validationRules: [{ type: "required" }],
+                lookup: {
+                    dataSource: priceListStore,
+                    displayExpr: 'name',
+                    valueExpr: 'id'
+                }
+            },
+            {
+                caption: l('EntityFieldName:MDMService:PriceUpdate:EffectiveDate'),
+                dataField: 'effectiveDate',
+                dataType: 'datetime'
+            },
+            {
+                caption: l('EntityFieldName:MDMService:PriceUpdate:Status'),
+                dataField: 'status',
+                lookup: {
+                    dataSource: statusStore,
+                    displayExpr: 'text',
+                    valueExpr: 'id'
+                }
+            }
+        ]
+    }).dxDataGrid("instance");
+
+    /****button*****/
+    $("#NewPriceUpdateButton").click(function (e) {
+        e.preventDefault();
+        var newtab = window.open('/Mdm/PriceUpdates/Details', '_blank');
+        newtab.sessionStorage.setItem("PriceUpdate", null);
+    });
+
+    /****function*****/
+    function isNotEmpty(value) {
+        return value !== undefined && value !== null && value !== '';
+    }
 });
