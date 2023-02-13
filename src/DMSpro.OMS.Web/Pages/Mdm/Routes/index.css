@@ -1,32 +1,38 @@
 ﻿
-    
-div.dx-datagrid .dx-toolbar-items-container, div.dx-treelist-container div.dx-toolbar-items-container{
-    display:block !important;
+#txtBarCode .dx-placeholder::before {
+    padding: 5px 9px 8px;
 }
+
+div.dx-datagrid .dx-toolbar-items-container, div.dx-treelist-container div.dx-toolbar-items-container {
+    display: block !important;
+}
+
 .dx-button-has-text .dx-button-content {
     padding: 6px 8px 6px;
 }
  
-.dx-toolbar .dx-button .dx-icon{
-    margin-right:0;
+
+.dx-toolbar .dx-button .dx-icon {
+    margin-right: 0;
 }
-.dx-toolbar-text-auto-hide .dx-button .dx-button-content,
-div.dx-toolbar-after  div.dx-button-content {
-    padding: 6px;
-}
- div.dx-toolbar-before > div:nth-child(2) > div > div{
-     /*margin-left:10px;*/
-}
+
  
+
+div.dx-toolbar-before > div:nth-child(2) > div > div {
+    margin-left: 10px;
+}
+
 div.dx-toolbar-items-container
 div.dx-button-content {
-    font-size:12px;
+    font-size: 12px;
 }
+
     div.dx-toolbar-items-container
     div.dx-button-content
-    i.dx-icon.fa  {
+    i.dx-icon.fa {
         font-size: 14px;
     }
+
 div.dx-toolbar-items-container
 div.dx-button-has-text.dx-button-has-icon
 div.dx-button-content
@@ -36,45 +42,35 @@ i.dx-icon.fa {
 
 #resizable {
     padding: 10px;
-    height: 300px;
-} 
+    height: 140px;
+}
 
 .dx-resizable-handle-bottom {
     border-bottom: 1px dotted #999;
 }
 
-.dx-resizable-handle-bottom::after {
-    content: "";
-    position: absolute;
-    width: 9px;
-    height: 9px;
-    border: none;
-    border-radius: 50%;
-    background-color: #fff;
-    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.24);
-} 
-.dx-resizable-handle-bottom::after {
-    bottom: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-}
+    .dx-resizable-handle-bottom::after {
+        content: "";
+        position: absolute;
+        width: 9px;
+        height: 9px;
+        border: none;
+        border-radius: 50%;
+        background-color: #fff;
+        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.24);
+    }
+
+    .dx-resizable-handle-bottom::after {
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
 
 #resizable > div.wrapper {
     overflow: auto;
     height: 100%;
 }
+
 div.close-popup div[role=button] {
     border: none;
-}
-.increaseFontWeight > a {
-    font-weight: 500;
-}
-.wrapper-routes div.dx-overlay-wrapper.dx-popup-wrapper div.dx-overlay-content.dx-popup-normal{
-    width:auto !important;
-}
-    .wrapper-routes div.dx-overlay-wrapper.dx-popup-wrapper div.dx-overlay-content.dx-popup-normal > div.dx-popup-content > div.dx-widget.dx-visibility-change-handler {
-        width: 400px !important;
-    }
-#gridRoutes tr.dx-master-detail-row div.dx-multiview-item-container div.form-container{
-    padding:10px;
 }

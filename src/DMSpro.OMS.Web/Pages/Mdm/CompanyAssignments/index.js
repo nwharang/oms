@@ -4,7 +4,24 @@ var userService = window.dMSpro.oMS.identityService.controllers.identityUsers.id
 
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
+
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
@@ -21,7 +38,9 @@ $(function () {
 
             assignmentService.getListDevextremes(args)
                 .done(result => {
-                    result.data.forEach(x => x.companyName = "x");
+
+                    console.log(result.data);
+                    //result.data.forEach(x => x.companyName = "x");
                     
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -33,13 +52,23 @@ $(function () {
             return deferred.promise();
         },
         insert(values) {
-            return assignmentService.create(values, { contentType: "application/json" });
+            
+            return assignmentService.create({
+                companyId: values.companyIdentityUserAssignment.companyId,
+                identityUserId: values.companyIdentityUserAssignment.identityUserId,
+            }, { contentType: "application/json" });
         },
         update(key, values) {
-            return assignmentService.update(key, values, { contentType: "application/json" });
+            
+            return assignmentService.update(key.companyIdentityUserAssignment.id,
+                {
+                    companyId: values.companyIdentityUserAssignment.companyId,
+                    identityUserId: values.companyIdentityUserAssignment.identityUserId
+                }, { contentType: "application/json" });
         },
         remove(key) {
-            return assignmentService.delete(key);
+            
+            return assignmentService.delete(key.companyIdentityUserAssignment.id);
         },
         byKey: function (key) {
             if (key == 0) return null;
@@ -66,7 +95,7 @@ $(function () {
             console.log(args)
             companyService.getListDevextremes(args)
                 .done(result => { 
-
+                    console.log(result.data);
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -78,7 +107,7 @@ $(function () {
         },
         byKey: function (key) {
             if (key == 0) return null;
-
+            console.log('byKey')
             var d = new $.Deferred();
             companyService.get(key)
                 .done(data => {
@@ -87,6 +116,7 @@ $(function () {
             return d.promise();
         }
     });
+
     var userStore = new DevExpress.data.CustomStore({ 
         key: 'id',
         load: function (loadOptions) {
@@ -105,7 +135,7 @@ $(function () {
                 if (i in loadOptions && isNotEmpty(loadOptions[i]))
                     params[i] = JSON.stringify(loadOptions[i]);
             });
-             
+           
             userService.getListDevextremes(params)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -127,7 +157,23 @@ $(function () {
         }
     });
      
-    
+    function selectBoxEditorTemplate(cellElement, cellInfo) {
+        return $('<div>').dxLookup({
+            valueExpr: "id",
+            displayExpr: "name",
+            dataSource: new DevExpress.data.DataSource({
+                store: companyStore, 
+                paginate: true,
+                pageSize: 2
+            }), 
+            searchEnabled: true, 
+            searchMode: 'contains',
+            searchExpr: ['name'],
+            onValueChanged(data) {
+                //cellInfo.setValue(data.value);
+            },
+        });
+    }
     var gridComAssignments = $('#dgComAssignments').dxDataGrid({
         dataSource: assignmentStore, 
         editing: {
@@ -143,7 +189,7 @@ $(function () {
             }
         }, 
         remoteOperations: true,
-        cacheEnabled: true,
+        //cacheEnabled: true,
         export: {
             enabled: true,
             // allowExportSelectedData: true,
@@ -198,7 +244,7 @@ $(function () {
         stateStoring: { //save state in localStorage
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgCompanies',
+            storageKey: 'dgComAssignments',
         },
         paging: {
             enabled: true,
@@ -240,41 +286,45 @@ $(function () {
                 caption: l("Actions"),
                 width: 110,
                 buttons: ['edit', 'delete'],
+                fixedPosition: "left",
             },
             {
-                dataField: 'identityUserId',
+                dataField: 'companyIdentityUserAssignment.identityUserId',
                 caption: l("UserName"),
                 validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource() {
                         return {
-                            store: userStore
+                            store: userStore,
+                            paginate: true,
+                            pageSize: 2
                         };
                     },
                     displayExpr: 'userName',
                     valueExpr: 'id', 
+                    searchEnabled: true,
+                    searchMode: 'contains',
+                    minSearchLength: 2,
+                    showDataBeforeSearch: true
                 }
             },
             {
-                dataField: 'companyId',
+                dataField: 'companyIdentityUserAssignment.companyId',
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
                 validationRules: [{ type: "required" }], 
-                //cellTemplate(container, options) {
-                //    $('<div>')
-                //        .append($('<span>' + options.data.companyName + '</span>'))
-                //        .appendTo(container);
-                //},
-                calculateDisplayValue: "companyName",
+                calculateDisplayValue:"company.name",
+                //editCellTemplate: selectBoxEditorTemplate,
                 lookup: { 
-                    dataSource : {
-                        pageSize: 30,
+                    dataSource : { 
+                        store: companyStore,
                         paginate: true,
-                        store: companyStore
+                        pageSize: 2,
+
                     },
                     displayExpr: 'name',
-                    valueExpr: 'id', 
+                    valueExpr: 'id',
                     searchEnabled: true,
-                    searchOperation: 'contains'
+                    searchMode: 'contains'
                 }
             }
         ],

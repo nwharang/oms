@@ -56,43 +56,80 @@ $(function () {
         handles: "bottom"
     }).dxResizable('instance');
 
-    var gridMCPHeaders = $('#gridMCPHeaders')
+    var dgMCPHeaders = $('#dgMCPHeaders')
         .dxDataGrid({
             dataSource: dataSource,
-            stateStoring: {
-                enabled: true,
-                type: 'localStorage',
-                storageKey: 'storage',
+            editing: {
+                mode: "row",
+                allowAdding: abp.auth.isGranted('MdmService.MCPHeaders.Create'),
+                allowUpdating: abp.auth.isGranted('MdmService.MCPHeaders.Delete'),
+                allowDeleting: abp.auth.isGranted('MdmService.MCPHeaders.Delete'),
+                useIcons: true,
+                texts: {
+                    editRow: l("Edit"),
+                    deleteRow: l("Delete"),
+                    confirmDeleteMessage: l("DeleteConfirmationMessage")
+                }
+            }, 
+            remoteOperations: true,
+            export: {
+                enabled: true, 
             },
-            showBorders: true,
+            onExporting(e) {
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('Data');
+
+                DevExpress.excelExporter.exportDataGrid({
+                    component: e.component,
+                    worksheet,
+                    autoFilterEnabled: true,
+                }).then(() => {
+                    workbook.xlsx.writeBuffer().then((buffer) => {
+                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                    });
+                });
+                e.cancel = true;
+            },
+            showRowLines: true,
+            showBorders: true, 
+            allowColumnReordering: true,
+            allowColumnResizing: true,
+            columnResizingMode: 'widget',
+            columnMinWidth: 50,
             columnAutoWidth: true,
-            scrolling: {
-                columnRenderingMode: 'virtual',
+
+            columnMinWidth: 50,
+
+            columnChooser: {
+                enabled: true,
+                mode: "select"
             },
+            columnFixing: {
+                enabled: true,
+            },
+            filterRow: {
+                visible: true,
+            },
+            groupPanel: {
+                visible: true,
+            },
+            headerFilter: {
+                visible: true,
+            },
+            rowAlternationEnabled: true,
             searchPanel: {
                 visible: true
             },
-            allowColumnResizing: true,
-            allowColumnReordering: true,
+
+            stateStoring: { //save state in localStorage
+                enabled: true,
+                type: 'localStorage',
+                storageKey: 'dgMCPHeaders',
+            },
             paging: {
                 enabled: true,
                 pageSize: 10
             },
-            rowAlternationEnabled: true,
-            filterRow: {
-                visible: true,
-                applyFilter: 'auto',
-            },
-            headerFilter: {
-                visible: false,
-            },
-            columnChooser: {
-                enabled: true,
-                mode: "select" // or "select"
-            },
-            //columnFixing: {
-            //    enabled: true
-            //},
             pager: {
                 visible: true,
                 showPageSizeSelector: true,
@@ -101,101 +138,35 @@ $(function () {
                 showNavigationButtons: true
             },
             toolbar: {
-                items: [{
-                    location: 'before',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'fa fa-plus',
-                        text: 'Add Row',
+                items: [
+                    "groupPanel",
+                    {
+                        location: 'after',
+                        template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                         onClick() {
-                            gridMCPHeaders.addRow();
+                            dgMCPHeaders.addRow();
                         },
                     },
-                },
+
                     'columnChooserButton',
-                    'exportButton',
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'fa fa-upload',
+                    "exportButton",
+                    {
+                        location: 'after',
+                        template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
                         onClick() {
-                            //dataGridContainer.refresh();
+                            //todo
                         },
                     },
-                }, "searchPanel"
+                    "searchPanel"
                 ],
-            },
-            export: {
-                enabled: true,
-                // formats: ['excel','pdf'],
-                allowExportSelectedData: true,
-            },
-            editing: {
-                mode: "row",
-                //allowAdding: abp.auth.isGranted('MdmService.u-oMs.Create'),
-                //allowUpdating: abp.auth.isGranted('MdmService.u-oMs.Edit'),
-                //allowDeleting: abp.auth.isGranted('MdmService.u-oMs.Delete'),
-                allowAdding: true,
-                allowUpdating: true,
-                allowDeleting: true,
-                useIcons: true,
-                texts: {
-                    editRow: l("Edit"),
-                    deleteRow: l("Delete"),
-                    confirmDeleteMessage: l("DeleteConfirmationMessage")
-                }
-            },
-            onEditorPreparing: function (e) {
-                if (e.dataField == "code" && e.parentType == "dataRow") {
-                    e.editorName = "dxDropDownBox";
-                    e.editorOptions.dropDownOptions = {
-                        //height: 500
-                    };
-                    e.editorOptions.contentTemplate = function (args, container) {
-                        var value = args.component.option("value"),
-                            $dataGrid = $("<div>").dxDataGrid({
-                                width: '100%',
-                                dataSource: args.component.option("dataSource"),
-                                keyExpr: "ID",
-                                columns: [{
-                                    caption: "Item Code",
-                                    dataField: "Name"
-                                }, "BarCode"],
-                                hoverStateEnabled: true,
-                                paging: { enabled: true, pageSize: 10 },
-                                filterRow: { visible: true },
-                                scrolling: { mode: "infinite" },
-                                height: '90%',
-                                showRowLines: true,
-                                showBorders: true,
-                                selection: { mode: "single" },
-                                selectedRowKeys: value,
-                                onSelectionChanged: function (selectedItems) {
-                                    var keys = selectedItems.selectedRowKeys;
-                                    args.component.option("value", keys);
-                                }
-                            });
-
-                        var dataGrid = $dataGrid.dxDataGrid("instance");
-
-                        args.component.on("valueChanged", function (args) {
-                            var value = args.value;
-
-                            dataGrid.selectRows(value, false);
-                        });
-                        container.append($dataGrid);
-                        return container;
-                    };
-                }
             },
             columns: [
                 {
-                    width: 100,
                     type: 'buttons',
-                    caption: l('Actions'),
+                    caption: l("Actions"),
+                    width: 110,
                     buttons: ['edit', 'delete'],
-                    //fixed: true,
+                    fixedPosition: "left",
                 },
                 {
                     caption: "outlet Id",

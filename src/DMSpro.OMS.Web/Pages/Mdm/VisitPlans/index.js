@@ -1,204 +1,265 @@
+﻿var l = abp.localization.getResource("MdmService");
 $(function () {
-    var l = abp.localization.getResource("MdmService");
-	var visitPlanService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
-	
-        var lastNpIdId = '';
-        var lastNpDisplayNameId = '';
 
-        var _lookupModal = new abp.ModalManager({
-            viewUrl: abp.appPath + "Shared/LookupModal",
-            scriptUrl: "/Pages/Shared/lookupModal.js",
-            modalClass: "navigationPropertyLookup"
-        });
+    //DevExpress.config({
+    //    editorStylingMode: 'underlined',
+    //});
 
-        $('.lookupCleanButton').on('click', '', function () {
-            $(this).parent().find('input').val('');
-        });
-
-        _lookupModal.onClose(function () {
-            var modal = $(_lookupModal.getModal());
-            $('#' + lastNpIdId).val(modal.find('#CurrentLookupId').val());
-            $('#' + lastNpDisplayNameId).val(modal.find('#CurrentLookupDisplayName').val());
-        });
-	
-    var createModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "VisitPlans/CreateModal",
-        scriptUrl: "/Pages/VisitPlans/createModal.js",
-        modalClass: "visitPlanCreate"
-    });
-
-	var editModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "VisitPlans/EditModal",
-        scriptUrl: "/Pages/VisitPlans/editModal.js",
-        modalClass: "visitPlanEdit"
-    });
-
-	var getFilter = function() {
-        return {
-            filterText: $("#FilterText").val(),
-            dateVisitMin: $("#DateVisitFilterMin").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			dateVisitMax: $("#DateVisitFilterMax").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			distanceMin: $("#DistanceFilterMin").val(),
-			distanceMax: $("#DistanceFilterMax").val(),
-			visitOrderMin: $("#VisitOrderFilterMin").val(),
-			visitOrderMax: $("#VisitOrderFilterMax").val(),
-			dayOfWeek: $("#DayOfWeekFilter").val(),
-			weekMin: $("#WeekFilterMin").val(),
-			weekMax: $("#WeekFilterMax").val(),
-			monthMin: $("#MonthFilterMin").val(),
-			monthMax: $("#MonthFilterMax").val(),
-			yearMin: $("#YearFilterMin").val(),
-			yearMax: $("#YearFilterMax").val(),
-			mCPDetailId: $("#MCPDetailIdFilter").val()
-        };
-    };
-
-    var dataTable = $("#VisitPlansTable").DataTable(abp.libs.datatables.normalizeConfiguration({
-        processing: true,
-        serverSide: true,
-        paging: true,
-        searching: false,
-        scrollX: true,
-        autoWidth: true,
-        scrollCollapse: true,
-        order: [[1, "asc"]],
-        ajax: abp.libs.datatables.createAjax(visitPlanService.getList, getFilter),
-        columnDefs: [
-            {
-                rowAction: {
-                    items:
-                        [
-                            {
-                                text: l("Edit"),
-                                visible: abp.auth.isGranted('MdmService.VisitPlans.Edit'),
-                                action: function (data) {
-                                    editModal.open({
-                                     id: data.record.visitPlan.id
-                                     });
-                                }
-                            },
-                            {
-                                text: l("Delete"),
-                                visible: abp.auth.isGranted('MdmService.VisitPlans.Delete'),
-                                confirmMessage: function () {
-                                    return l("DeleteConfirmationMessage");
-                                },
-                                action: function (data) {
-                                    visitPlanService.delete(data.record.visitPlan.id)
-                                        .then(function () {
-                                            abp.notify.info(l("SuccessfullyDeleted"));
-                                            dataTable.ajax.reload();
-                                        });
-                                }
-                            }
-                        ]
+    var dgVisitPlans = $('#dgVisitPlans')
+        .dxDataGrid({
+            dataSource: dataSource,
+            editing: {
+                mode: "row",
+                allowAdding: abp.auth.isGranted('MdmService.MCPHeaders.Create'),
+                allowUpdating: abp.auth.isGranted('MdmService.MCPHeaders.Delete'),
+                allowDeleting: abp.auth.isGranted('MdmService.MCPHeaders.Delete'),
+                useIcons: true,
+                texts: {
+                    editRow: l("Edit"),
+                    deleteRow: l("Delete"),
+                    confirmDeleteMessage: l("DeleteConfirmationMessage")
                 }
             },
-			{
-                data: "visitPlan.dateVisit",
-                render: function (dateVisit) {
-                    if (!dateVisit) {
-                        return "";
-                    }
-                    
-					var date = Date.parse(dateVisit);
-                    return (new Date(date)).toLocaleDateString(abp.localization.currentCulture.name);
-                }
+            remoteOperations: true,
+            export: {
+                enabled: true,
+                allowExportSelectedData: true,
             },
-			{ data: "visitPlan.distance" },
-			{ data: "visitPlan.visitOrder" },
-            {
-                data: "visitPlan.dayOfWeek",
-                render: function (dayOfWeek) {
-                    if (dayOfWeek === undefined ||
-                        dayOfWeek === null) {
-                        return "";
-                    }
+            onExporting(e) {
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('Data');
 
-                    var localizationKey = "EntityFieldValue:MDMService:VisitPlan:DayOfWeek:" + dayOfWeek;
-                    var localized = l(localizationKey);
-
-                    if (localized === localizationKey) {
-                        abp.log.warn("No localization found for " + localizationKey);
-                        return "";
-                    }
-
-                    return localized;
-                }
+                DevExpress.excelExporter.exportDataGrid({
+                    component: e.component,
+                    worksheet,
+                    autoFilterEnabled: true,
+                }).then(() => {
+                    workbook.xlsx.writeBuffer().then((buffer) => {
+                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                    });
+                });
+                e.cancel = true;
             },
-			{ data: "visitPlan.week" },
-			{ data: "visitPlan.month" },
-			{ data: "visitPlan.year" },
-            {
-                data: "mcpDetail.code",
-                defaultContent : ""
-            }
-        ]
-    }));
+            showRowLines: true,
+            showBorders: true,
+            allowColumnReordering: true,
+            allowColumnResizing: true,
+            columnResizingMode: 'widget',
+            columnMinWidth: 50,
+            columnAutoWidth: true,  
+            columnChooser: {
+                enabled: true,
+                mode: "select"
+            },
+            columnFixing: {
+                enabled: true,
+            },
+            filterRow: {
+                visible: true,
+            },
+            groupPanel: {
+                visible: true,
+            },
+            headerFilter: {
+                visible: true,
+            },
+            rowAlternationEnabled: true,
+            searchPanel: {
+                visible: true
+            }, 
+            stateStoring: { //save state in localStorage
+                enabled: true,
+                type: 'localStorage',
+                storageKey: 'dgVisitPlans',
+            },
+            paging: {
+                enabled: true,
+                pageSize: 10
+            },
+            pager: {
+                visible: true,
+                showPageSizeSelector: true,
+                allowedPageSizes: [10, 20, 50, 100],
+                showInfo: true,
+                showNavigationButtons: true
+            },
+            selection: {
+                mode: 'multiple',
+            },
+            toolbar: {
+                items: [
+                    "groupPanel",
+                    {
+                        location: 'after',
+                        template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                        onClick() {
+                            dgVisitPlans.addRow();
+                        },
+                    },
 
-    createModal.onResult(function () {
-        dataTable.ajax.reload();
-    });
+                    'columnChooserButton',
+                    "exportButton",
+                    {
+                        location: 'after',
+                        template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                        onClick() {
+                            //todo
+                        },
+                    },
+                    "searchPanel"
+                ],
+            },
+            columns: [
+                {
+                    type: 'buttons',
+                    caption: l("Actions"),
+                    width: 110,
+                    buttons: ['edit', 'delete'],
+                    fixedPosition: "left",
+                },
+                {
+                    caption: "outlet Id",
+                    dataField: "outletId",
+                },
+                {
+                    caption: "outlet Name",
+                    dataField: "outletName",
+                },
+                {
+                    caption: "Address",
+                    dataField: "address"
+                },
+                {
+                    caption: "Effective Date",
+                    dataField: "effectiveDate"
+                }, {
 
-    editModal.onResult(function () {
-        dataTable.ajax.reload();
-    });
+                    caption: "EndDate",
+                    dataField: "endDate"
+                }, {
 
-    $("#NewVisitPlanButton").click(function (e) {
-        e.preventDefault();
-        createModal.open();
-    });
+                    caption: "Distance",
+                    dataField: "distance"
+                }, {
 
-	$("#SearchForm").submit(function (e) {
-        e.preventDefault();
-        dataTable.ajax.reload();
-    });
+                    caption: "Monday",
+                    dataField: "Monday",
+                    dataType: "boolean",
+                }
+                , {
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
+                    caption: "Tuesday",
+                    dataField: "Tuesday",
+                    dataType: "boolean",
+                }, {
 
-        visitPlanService.getDownloadToken().then(
-            function(result){
-                    var input = getFilter();
-                    var url =  abp.appPath + 'api/mdm-service/visit-plans/as-excel-file' + 
-                        abp.utils.buildQueryString([
-                            { name: 'downloadToken', value: result.token },
-                            { name: 'filterText', value: input.filterText },
-                            { name: 'dateVisitMin', value: input.dateVisitMin },
-                            { name: 'dateVisitMax', value: input.dateVisitMax },
-                            { name: 'distanceMin', value: input.distanceMin },
-                            { name: 'distanceMax', value: input.distanceMax },
-                            { name: 'visitOrderMin', value: input.visitOrderMin },
-                            { name: 'visitOrderMax', value: input.visitOrderMax }, 
-                            { name: 'dayOfWeek', value: input.dayOfWeek },
-                            { name: 'weekMin', value: input.weekMin },
-                            { name: 'weekMax', value: input.weekMax },
-                            { name: 'monthMin', value: input.monthMin },
-                            { name: 'monthMax', value: input.monthMax },
-                            { name: 'yearMin', value: input.yearMin },
-                            { name: 'yearMax', value: input.yearMax }, 
-                            { name: 'mCPDetailId', value: input.mCPDetailId }
-                            ]);
-                            
-                    var downloadWindow = window.open(url, '_blank');
-                    downloadWindow.focus();
-            }
-        )
-    });
+                    caption: "Wednesday",
+                    dataField: "Wednesday",
+                    dataType: "boolean",
+                }, {
 
-    $('#AdvancedFilterSectionToggler').on('click', function (e) {
-        $('#AdvancedFilterSection').toggle();
-    });
+                    caption: "Thursday",
+                    dataField: "Thursday",
+                    dataType: "boolean",
+                }, {
 
-    $('#AdvancedFilterSection').on('keypress', function (e) {
-        if (e.which === 13) {
-            dataTable.ajax.reload();
-        }
-    });
+                    caption: "Friday",
+                    dataField: "Friday",
+                    dataType: "boolean",
+                }, {
 
-    $('#AdvancedFilterSection select').change(function() {
-        dataTable.ajax.reload();
-    });
-    
-    
+                    caption: "Saturday",
+                    dataField: "Saturday",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Sunday",
+                    dataField: "Sunday",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Week1",
+                    dataField: "Week1",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Week2",
+                    dataField: "Week2",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Week3",
+                    dataField: "Week3",
+                    dataType: "boolean",
+                }, {
+
+                    caption: "Week4",
+                    dataField: "Week4",
+                    dataType: "boolean",
+                }
+            ],
+        })
 });
+
+var dataSource = [
+    {
+        id: 1,
+        outletId: "C001",
+        outletName: "Cửa hàng A2",
+        address: "Quận 2, Hồ Chí Minh",
+        effectiveDate: "01/01/2023",
+        endDate: "02/11/2023",
+        distance: 100,
+        Monday: true,
+        Tuesday: true,
+        Wednesday: true,
+        Thursday: true,
+        Friday: true,
+        Saturday: true,
+        Sunday: true,
+        Week1: true,
+        Week2: true,
+        Week3: true,
+        Week4: true,
+    },
+    {
+        id: 2,
+        outletId: "C002",
+        outletName: "Cửa hàng A2",
+        address: "Quận 2, Hồ Chí Minh",
+        effectiveDate: "10/01/2023",
+        endDate: "12/11/2023",
+        distance: 100,
+        Monday: true,
+        Tuesday: true,
+        Wednesday: false,
+        Thursday: false,
+        Friday: true,
+        Saturday: true,
+        Sunday: true,
+        Week1: true,
+        Week2: false,
+        Week3: false,
+        Week4: true,
+    },
+    {
+        id: 3,
+        outletId: "C003",
+        outletName: "Cửa hàng A3",
+        address: "Quận 4, Hồ Chí Minh",
+        effectiveDate: "15/01/2023",
+        endDate: "15/11/2023",
+        distance: 400,
+        Monday: false,
+        Tuesday: false,
+        Wednesday: true,
+        Thursday: true,
+        Friday: false,
+        Saturday: false,
+        Sunday: false,
+        Week1: true,
+        Week2: false,
+        Week3: false,
+        Week4: false,
+    }
+];
