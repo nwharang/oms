@@ -12,12 +12,18 @@ $(function () {
     //get data from sessionStorage
     var PriceUpdateModel = JSON.parse(sessionStorage.getItem("PriceUpdate"));
     var stateMode = "home";
-    var priceUpdateIdIdFilter = null;
 
     /****custom store*****/
     var priceUpdateDetailStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
+
+            //if (loadOptions.filter == undefined) {
+            //    loadOptions.filter = ['priceListId', '=', PriceUpdateModel ? PriceUpdateModel.id : null];
+            //} else {
+            //    loadOptions.filter = [['priceListId', '=', PriceUpdateModel ? PriceUpdateModel.id : null], 'and', loadOptions.filter];
+            //}
+
             const deferred = $.Deferred();
             const args = {};
             requestOptions.forEach((i) => {
@@ -60,7 +66,9 @@ $(function () {
 
     var priceListDetailStore = new DevExpress.data.CustomStore({
         key: 'id',
+        loadMode: 'raw',
         load(loadOptions) {
+            loadOptions.filter = ['priceListDetail.priceListId', '=', PriceUpdateModel ? PriceUpdateModel.priceListId : null];
             const deferred = $.Deferred();
             const args = {};
             requestOptions.forEach((i) => {
@@ -83,10 +91,12 @@ $(function () {
         byKey: function (key) {
             if (key == 0) return null;
 
+            var filter = JSON.stringify(['priceListDetail.id', '=', key]);
+
             var d = new $.Deferred();
-            priceListDetailService.get(key)
-                .done(data => {
-                    d.resolve(data);
+            priceListDetailService.getListDevextremes({ filter: filter })
+                .done(result => {
+                    d.resolve(result.data);
                 });
             return d.promise();
         }
@@ -280,27 +290,66 @@ $(function () {
     //DataGrid - Price Update Detail
     var priceUpdateDetailContainer = $('#priceUpdateDetailContainer').dxDataGrid({
         dataSource: priceUpdateDetailStore,
-        remoteOperations: true,
+        remoteOperations: false,
+        export: {
+            enabled: true,
+            // allowExportSelectedData: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('PriceUpdatesDetail');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PriceUpdatesDetail.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        showRowLines: true,
         showBorders: true,
         focusedRowEnabled: true,
-        allowColumnReordering: false,
-        rowAlternationEnabled: true,
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
+        columnMinWidth: 50,
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
-        noDataText: l1('NoData'),
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
         filterRow: {
-            visible: false
+            visible: true,
         },
+        groupPanel: {
+            visible: true,
+        },
+        headerFilter: {
+            visible: true,
+        },
+        rowAlternationEnabled: true,
         searchPanel: {
-            visible: false
+            visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        //scrolling: {
+        //    mode: 'standard'
+        //},
+
+        stateStoring: { //save state in localStorage
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'priceUpdateDetailContainer',
         },
         paging: {
             enabled: true,
-            pageSize: 20
+            pageSize: 10
         },
         pager: {
             visible: true,
@@ -321,53 +370,82 @@ $(function () {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
+        toolbar: {
+            items: [
+                "groupPanel",
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        priceUpdateDetailContainer.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
         onInitNewRow(e) {
+            if (PriceUpdateModel == null || (PriceUpdateModel && PriceUpdateModel.status == 'CANCELLED')) {
+                window.setTimeout(function () { e.component.cancelEditData(); }, 0);
+            }
             //e.data.status = 'OPEN';
             e.data.priceUpdateId = PriceUpdateModel.id;
         },
         onRowUpdating: function (e) {
-            //var objectRequire = ['code', 'description', 'priceListId', 'effectiveDate', 'status'];
-            //for (var property in e.oldData) {
-            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-            //        e.newData[property] = e.oldData[property];
-            //    }
-            //}
+            e.newData = Object.assign({}, e.oldData, e.newData);
         },
         columns: [
             {
                 caption: l("Actions"),
                 type: 'buttons',
                 width: 100,
-                buttons: ['edit']
+                buttons: ['edit'],
+                fixed: true,
+                fixedPosition: "left",
+                allowExporting: false,
             },
-            //{
-            //    caption: l('EntityFieldName:MDMService:PriceList:Code'),
-            //    dataField: 'code',
-            //},
-            //{
-            //    caption: l('EntityFieldName:MDMService:PriceList:Name'),
-            //    dataField: 'name',
-            //},
-            //{
-            //    caption: l('EntityFieldName:MDMService:PriceListDetail:Item'),
-            //    dataField: 'itemId',
-            //},
             {
                 caption: l('EntityFieldName:MDMService:PriceListDetail:PriceList'),
-                dataField: 'PriceListDetailId',
+                dataField: 'priceListDetailId',
+                validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource: priceListDetailStore,
-                    displayExpr: 'itemId',
-                    valueExpr: 'id'
+                    displayExpr(data) {
+                        if (data && data.item) {
+                            return `${data.item.code} - ${data.item.name}`;
+                        }
+                        return null;
+                    },
+                    valueExpr: "priceListDetail.id"
                 },
-                editCellTemplate: dropDownBoxPriceListDetailTemplate,
+                setCellValue: function (rowData, value) {
+                    rowData.priceListDetailId = value;
+
+                    var filter = JSON.stringify(['priceListDetail.id', '=', value]);
+                    var d = new $.Deferred();
+                    priceListDetailService.getListDevextremes({ filter: filter })
+                        .done(result => {
+                            d.resolve(rowData.priceBeforeUpdate = result.data[0].priceListDetail.price);
+                        });
+                    return d.promise();
+                }
             },
             {
                 caption: l1('EntityFieldName:MDMService:PriceListDetail:PriceBeforeUpdate'),
-                dataField: 'priceBeforeUpdate'
+                dataField: 'priceBeforeUpdate',
+                allowEditing: false
             },
             {
                 caption: l('EntityFieldName:MDMService:PriceListDetail:Price'),
+                validationRules: [{ type: "required" }],
                 dataField: 'newPrice',
             },
             {
@@ -443,54 +521,16 @@ $(function () {
         });
     });
 
-    $("#NewPriceUpdateDetailButton").click(function (e) {
-        e.preventDefault();
-        priceUpdateDetailContainer.addRow();
-    });
-
     /****function*****/
     function isNotEmpty(value) {
         return value !== undefined && value !== null && value !== '';
-    }
-
-    function dropDownBoxPriceListDetailTemplate(cellElement, cellInfo) {
-        return $('<div>').dxDropDownBox({
-            dropDownOptions: { width: 500 },
-            dataSource: itemMasterStore,
-            value: cellInfo.value,
-            valueExpr: 'id',
-            displayExpr(item) {
-                return item && `${item.code} - ${item.name}`;
-            },
-            contentTemplate(e) {
-                return $('<div>').dxDataGrid({
-                    dataSource: itemMasterStore,
-                    remoteOperations: true,
-                    columns: ['code', 'name'],
-                    hoverStateEnabled: true,
-                    scrolling: { mode: 'virtual' },
-                    height: 250,
-                    selection: { mode: 'single' },
-                    selectedRowKeys: [cellInfo.value],
-                    focusedRowEnabled: true,
-                    focusedRowKey: cellInfo.value,
-                    onSelectionChanged(selectionChangedArgs) {
-                        e.component.option('value', selectionChangedArgs.selectedRowKeys[0]);
-                        cellInfo.setValue(selectionChangedArgs.selectedRowKeys[0]);
-                        if (selectionChangedArgs.selectedRowKeys.length > 0) {
-                            e.component.close();
-                        }
-                    },
-                });
-            },
-        });
     }
 
     function LoadData() {
         PriceUpdateModel = JSON.parse(sessionStorage.getItem("PriceUpdate"));
         if (PriceUpdateModel == null) {
             stateMode = 'add';
-            $('#NewPriceUpdateDetailButton, #CancelButton').prop('disabled', true);
+            $('#CancelButton').prop('disabled', true);
         } else {
             stateMode = 'edit';
             priceUpdateIdIdFilter = PriceUpdateModel.id;
@@ -498,9 +538,9 @@ $(function () {
             if (PriceUpdateModel && PriceUpdateModel.status == 'CANCELLED') {
                 priceUpdateForm.option('formData', PriceUpdateModel);
                 priceUpdateForm.option('disabled', true);
-                $('#SaveButton, #CancelButton, #NewPriceUpdateDetailButton').prop('disabled', true);
+                $('#SaveButton, #CancelButton').prop('disabled', true);
             } else {
-                $('#SaveButton, #CancelButton, #NewPriceUpdateDetailButton').prop('disabled', false);
+                $('#SaveButton, #CancelButton').prop('disabled', false);
             }
         }
     }

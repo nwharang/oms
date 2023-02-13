@@ -128,23 +128,62 @@ $(function () {
     //Grid Price Update
     const priceUpdateContainer = $('#priceUpdateContainer').dxDataGrid({
         dataSource: priceUpdateStore,
-        remoteOperations: true,
+        remoteOperations: false,
+        cacheEnabled: true,
+        export: {
+            enabled: true,
+            // allowExportSelectedData: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('PriceUpdates');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PriceUpdates.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        showRowLines: true,
         showBorders: true,
         focusedRowEnabled: true,
-        allowColumnReordering: false,
-        rowAlternationEnabled: true,
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
+        columnMinWidth: 50,
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
-        noDataText: l1('NoData'),
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
         filterRow: {
-            visible: false
+            visible: true,
         },
+        groupPanel: {
+            visible: true,
+        },
+        headerFilter: {
+            visible: true,
+        },
+        rowAlternationEnabled: true,
         searchPanel: {
-            visible: false
+            visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        //scrolling: {
+        //    mode: 'standard'
+        //},
+        stateStoring: { //save state in localStorage
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'priceUpdateContainer',
         },
         paging: {
             enabled: true,
@@ -157,11 +196,25 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
+        toolbar: {
+            items: [
+                "groupPanel",
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
         columns: [
             {
                 caption: l("Actions"),
                 type: 'buttons',
-                width: 80,
                 buttons: [
                     {
                         text: l1('Button.ViewDetail'),
@@ -171,7 +224,10 @@ $(function () {
                             newtab.sessionStorage.setItem("PriceUpdate", JSON.stringify(e.row.data));
                         }
                     }
-                ]
+                ],
+                fixed: true,
+                fixedPosition: "left",
+                allowExporting: false,
             },
             {
                 caption: l('EntityFieldName:MDMService:PriceUpdate:Code'),

@@ -14,6 +14,8 @@
 }
 
 @section scripts {
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/Mdm/PriceUpdates/index.js" />
 }
 
@@ -33,35 +35,18 @@
             </h2>
         </div>
         <div class="panel-container show">
-            <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
-                <abp-card>
-                    <abp-card-body>
-                        <abp-row>
-                            <div style="padding-left:12px" class="buttons-header-grid pb-2">
-                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.PriceUpdates.Create))
-                                {
-                                    <button id="NewPriceUpdateButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                        <i class="fa fa-plus"></i> <span>@L["Button.New.PriceUpdate"].Value</span>
-                                    </button>
-                                }
-                                <div class="dx-datagrid-search-panel dx-show-invalid-badge dx-textbox dx-texteditor dx-editor-outlined dx-searchbox dx-show-clear-button dx-texteditor-empty dx-widget dx-state-hover" style="width: 250px;">
-                                    <div class="dx-texteditor-container">
-                                        <div class="dx-texteditor-input-container">
-                                            <div class="dx-icon dx-icon-search"></div>
-                                            <input id="Search" autocomplete="off" aria-label="Search in the data grid" class="dx-texteditor-input" type="text" spellcheck="false" tabindex="0" role="textbox">
-                                        </div>
-                                        <div class="dx-texteditor-buttons-container">
-                                            <span class="dx-clear-button-area"><span class="dx-icon dx-icon-clear"></span></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </abp-row>
-                        <div class="dx-viewport">
-                            <div id="priceUpdateContainer"></div>
-                        </div>
-                    </abp-card-body>
-                </abp-card>
+            <div class="panel-content jqvmap-bg-ocean p-0" style="min-height: 330px;">
+                <div style="padding-left:12px" class="buttons-header-grid pb-2">
+                    @if (await Authorization.IsGrantedAsync(MdmServicePermissions.PriceUpdates.Create))
+                    {
+                        <button id="NewPriceUpdateButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                            <i class="fa fa-plus"></i> <span>@L["Button.New.PriceUpdate"].Value</span>
+                        </button>
+                    }
+                </div>
+                <div class="dx-viewport">
+                    <div id="priceUpdateContainer"></div>
+                </div>
             </div>
         </div>
     </div>
