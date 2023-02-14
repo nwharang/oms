@@ -1,204 +1,473 @@
+var visitPlansService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
+var mcpHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
+var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
+var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
+var mcpDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
 $(function () {
     var l = abp.localization.getResource("MdmService");
-	var visitPlanService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
-	
-        var lastNpIdId = '';
-        var lastNpDisplayNameId = '';
+    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
-        var _lookupModal = new abp.ModalManager({
-            viewUrl: abp.appPath + "Shared/LookupModal",
-            scriptUrl: "/Pages/Shared/lookupModal.js",
-            modalClass: "navigationPropertyLookup"
-        });
+    var isNotEmpty = function (value) {
+        return value !== undefined && value !== null && value !== '';
+    }
 
-        $('.lookupCleanButton').on('click', '', function () {
-            $(this).parent().find('input').val('');
-        });
+    const dayOfWeek = [
+        {
+            id: 0,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:MONDAY')
+        },
+        {
+            id: 1,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:TUESDAY')
+        },
+        {
+            id: 2,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:WEDNESDAY')
+        },
+        {
+            id: 3,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:THURSDAY')
+        },
+        {
+            id: 4,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:FRIDAY')
+        },
+        {
+            id: 5,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:SATURDAY')
+        },
+        {
+            id: 6,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:SUNDAY')
+        }
+    ]
 
-        _lookupModal.onClose(function () {
-            var modal = $(_lookupModal.getModal());
-            $('#' + lastNpIdId).val(modal.find('#CurrentLookupId').val());
-            $('#' + lastNpDisplayNameId).val(modal.find('#CurrentLookupDisplayName').val());
-        });
-	
-    var createModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "VisitPlans/CreateModal",
-        scriptUrl: "/Pages/VisitPlans/createModal.js",
-        modalClass: "visitPlanCreate"
-    });
-
-	var editModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "VisitPlans/EditModal",
-        scriptUrl: "/Pages/VisitPlans/editModal.js",
-        modalClass: "visitPlanEdit"
-    });
-
-	var getFilter = function() {
-        return {
-            filterText: $("#FilterText").val(),
-            dateVisitMin: $("#DateVisitFilterMin").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			dateVisitMax: $("#DateVisitFilterMax").data().datepicker.getFormattedDate('yyyy-mm-dd'),
-			distanceMin: $("#DistanceFilterMin").val(),
-			distanceMax: $("#DistanceFilterMax").val(),
-			visitOrderMin: $("#VisitOrderFilterMin").val(),
-			visitOrderMax: $("#VisitOrderFilterMax").val(),
-			dayOfWeek: $("#DayOfWeekFilter").val(),
-			weekMin: $("#WeekFilterMin").val(),
-			weekMax: $("#WeekFilterMax").val(),
-			monthMin: $("#MonthFilterMin").val(),
-			monthMax: $("#MonthFilterMax").val(),
-			yearMin: $("#YearFilterMin").val(),
-			yearMax: $("#YearFilterMax").val(),
-			mCPDetailId: $("#MCPDetailIdFilter").val()
-        };
-    };
-
-    var dataTable = $("#VisitPlansTable").DataTable(abp.libs.datatables.normalizeConfiguration({
-        processing: true,
-        serverSide: true,
-        paging: true,
-        searching: false,
-        scrollX: true,
-        autoWidth: true,
-        scrollCollapse: true,
-        order: [[1, "asc"]],
-        ajax: abp.libs.datatables.createAjax(visitPlanService.getList, getFilter),
-        columnDefs: [
-            {
-                rowAction: {
-                    items:
-                        [
-                            {
-                                text: l("Edit"),
-                                visible: abp.auth.isGranted('MdmService.VisitPlans.Edit'),
-                                action: function (data) {
-                                    editModal.open({
-                                     id: data.record.visitPlan.id
-                                     });
-                                }
-                            },
-                            {
-                                text: l("Delete"),
-                                visible: abp.auth.isGranted('MdmService.VisitPlans.Delete'),
-                                confirmMessage: function () {
-                                    return l("DeleteConfirmationMessage");
-                                },
-                                action: function (data) {
-                                    visitPlanService.delete(data.record.visitPlan.id)
-                                        .then(function () {
-                                            abp.notify.info(l("SuccessfullyDeleted"));
-                                            dataTable.ajax.reload();
-                                        });
-                                }
-                            }
-                        ]
+    const visitPlansStore = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'processed',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
                 }
-            },
-			{
-                data: "visitPlan.dateVisit",
-                render: function (dateVisit) {
-                    if (!dateVisit) {
-                        return "";
-                    }
-                    
-					var date = Date.parse(dateVisit);
-                    return (new Date(date)).toLocaleDateString(abp.localization.currentCulture.name);
-                }
-            },
-			{ data: "visitPlan.distance" },
-			{ data: "visitPlan.visitOrder" },
-            {
-                data: "visitPlan.dayOfWeek",
-                render: function (dayOfWeek) {
-                    if (dayOfWeek === undefined ||
-                        dayOfWeek === null) {
-                        return "";
-                    }
+            });
+            visitPlansService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
 
-                    var localizationKey = "EntityFieldValue:MDMService:VisitPlan:DayOfWeek:" + dayOfWeek;
-                    var localized = l(localizationKey);
-
-                    if (localized === localizationKey) {
-                        abp.log.warn("No localization found for " + localizationKey);
-                        return "";
-                    }
-
-                    return localized;
-                }
-            },
-			{ data: "visitPlan.week" },
-			{ data: "visitPlan.month" },
-			{ data: "visitPlan.year" },
-            {
-                data: "mcpDetail.code",
-                defaultContent : ""
-            }
-        ]
-    }));
-
-    createModal.onResult(function () {
-        dataTable.ajax.reload();
-    });
-
-    editModal.onResult(function () {
-        dataTable.ajax.reload();
-    });
-
-    $("#NewVisitPlanButton").click(function (e) {
-        e.preventDefault();
-        createModal.open();
-    });
-
-	$("#SearchForm").submit(function (e) {
-        e.preventDefault();
-        dataTable.ajax.reload();
-    });
-
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
-
-        visitPlanService.getDownloadToken().then(
-            function(result){
-                    var input = getFilter();
-                    var url =  abp.appPath + 'api/mdm-service/visit-plans/as-excel-file' + 
-                        abp.utils.buildQueryString([
-                            { name: 'downloadToken', value: result.token },
-                            { name: 'filterText', value: input.filterText },
-                            { name: 'dateVisitMin', value: input.dateVisitMin },
-                            { name: 'dateVisitMax', value: input.dateVisitMax },
-                            { name: 'distanceMin', value: input.distanceMin },
-                            { name: 'distanceMax', value: input.distanceMax },
-                            { name: 'visitOrderMin', value: input.visitOrderMin },
-                            { name: 'visitOrderMax', value: input.visitOrderMax }, 
-                            { name: 'dayOfWeek', value: input.dayOfWeek },
-                            { name: 'weekMin', value: input.weekMin },
-                            { name: 'weekMax', value: input.weekMax },
-                            { name: 'monthMin', value: input.monthMin },
-                            { name: 'monthMax', value: input.monthMax },
-                            { name: 'yearMin', value: input.yearMin },
-                            { name: 'yearMax', value: input.yearMax }, 
-                            { name: 'mCPDetailId', value: input.mCPDetailId }
-                            ]);
-                            
-                    var downloadWindow = window.open(url, '_blank');
-                    downloadWindow.focus();
-            }
-        )
-    });
-
-    $('#AdvancedFilterSectionToggler').on('click', function (e) {
-        $('#AdvancedFilterSection').toggle();
-    });
-
-    $('#AdvancedFilterSection').on('keypress', function (e) {
-        if (e.which === 13) {
-            dataTable.ajax.reload();
+            var d = new $.Deferred();
+            visitPlansService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
+        },
+        insert(values) {
+            return visitPlansService.create(values, { contentType: 'application/json' });
+        },
+        update(key, values) {
+            return visitPlansService.update(key, values, { contentType: 'application/json' });
+        },
+        remove(key) {
+            return visitPlansService.delete(key);
         }
     });
 
-    $('#AdvancedFilterSection select').change(function() {
-        dataTable.ajax.reload();
+    const getMCPHeaders = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'processed',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            mcpHeaderService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            mcpHeaderService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
+        }
     });
-    
-    
+
+    const getItemGroup = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'processed',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            itemGroupService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            itemGroupService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
+        }
+    });
+
+    const getCustomer = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'processed',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            customerService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            customerService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
+        }
+    });
+
+    const getMCPDetails = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'processed',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            mcpDetailsService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            mcpDetailsService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
+        }
+    });
+
+    var gridVisitPlans = $('#gridVisitPlans').dxDataGrid({
+        dataSource: visitPlansStore,
+        remoteOperations: true,
+        showRowLines: true,
+        showBorders: true,
+        cacheEnabled: true,
+        allowColumnReordering: true,
+        rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
+        columnAutoWidth: true,
+        selection: {
+            mode: 'multiple',
+        },
+        filterRow: {
+            visible: true
+        },
+        groupPanel: {
+            visible: true,
+        },
+        searchPanel: {
+            visible: true
+        },
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'gridVisitPlans',
+        },
+        paging: {
+            enabled: true,
+            pageSize: 10
+        },
+        pager: {
+            visible: true,
+            showPageSizeSelector: true,
+            allowedPageSizes: [10, 20, 50, 100],
+            showInfo: true,
+            showNavigationButtons: true
+        },
+        editing: {
+            mode: "row",
+            allowAdding: false,
+            allowUpdating: abp.auth.isGranted('MdmService.VisitPlans.Edit'),
+            allowDeleting: false,
+            useIcons: true
+        },
+        onRowUpdating: function (e) {
+            var objectRequire = ['code', 'name'];
+            for (var property in e.oldData) {
+                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+                    e.newData[property] = e.oldData[property];
+                }
+            }
+        },
+        toolbar: {
+            items: [
+                "groupPanel",
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
+        columns: [
+            {
+                type: 'buttons',
+                caption: l('Actions'),
+                buttons: ['edit'],
+                width: 110,
+                fixedPosition: 'left'
+            },
+            {
+                dataField: 'routeId',
+                caption: l("EntityFieldName:MDMService:VisitPlan:RouteCode"),
+                dataType: 'string',
+                validationRules: [
+                    {
+                        type: 'required',
+                        message: 'Route code is required'
+                    }
+                ]
+            },
+            {
+                dataField: 'customerId',
+                caption: l("EntityFieldName:MDMService:VisitPlan:CustomerCode"),
+                validationRules: [
+                    {
+                        type: 'required',
+                        message: 'Customer is required'
+                    }
+                ],
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getCustomer,
+                    valueExpr: 'id',
+                    displayExpr: function (e) {
+                        return e.code + ' - ' + e.name
+                    }
+                }
+            },
+            {
+                dataField: 'dateVisit',
+                caption: l('EntityFieldName:MDMService:VisitPlan:DateVisit'),
+                dataType: 'date',
+                validationRules: [
+                    {
+                        type: 'required',
+                        message: 'Date visit is required'
+                    }
+                ]
+            },
+            {
+                dataField: 'companyId',
+                caption: l("EntityFieldName:MDMService:VisitPlan:CompanyCode"),
+                validationRules: [
+                    {
+                        type: 'required',
+                        message: 'Company is required'
+                    }
+                ],
+                //editorType: 'dxSelectBox',
+                //lookup: {
+                //    dataSource: getMCPHeaders,
+                //    valueExpr: 'id',
+                //    displayExpr: function (e) {
+                //        return e.code + ' - ' + e.name
+                //    }
+                //}
+            },
+            {
+                dataField: 'itemGroupId',
+                caption: l('EntityFieldName:MDMService:VisitPlan:ItemGroup'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getItemGroup,
+                    valueExpr: 'id',
+                    displayExpr: function (e) {
+                        return e.code + ' - ' + e.name
+                    }
+                }
+            },
+            {
+                dataField: 'distance',
+                caption: l('EntityFieldName:MDMService:VisitPlan:Distance'),
+                dataType: 'number',
+                validationRules: [
+                    {
+                        type: 'required',
+                        message: 'Distance is required'
+                    }
+                ]
+            },
+            {
+                dataField: 'visitOrder',
+                caption: l('EntityFieldName:MDMService:VisitPlan:VisitOrder'),
+                dataType: 'number',
+                validationRules: [
+                    {
+                        type: 'required',
+                        message: 'Visit Order is required'
+                    }
+                ],
+                value: 0
+            },
+            {
+                dataField: 'dateVisit',
+                caption: l('EntityFieldName:MDMService:VisitPlan:Week'),
+                dataType: 'number',
+                validationRules: [
+                    {
+                        type: 'required',
+                        message: 'Week is required'
+                    }
+                ]
+            },
+            {
+                dataField: 'dateVisit',
+                caption: l('EntityFieldName:MDMService:VisitPlan:Month'),
+                dataType: 'number',
+                validationRules: [
+                    {
+                        type: 'required',
+                        message: 'Month is required'
+                    }
+                ]
+            },
+            {
+                dataField: 'dateVisit',
+                caption: l('EntityFieldName:MDMService:VisitPlan:Year'),
+                dataType: 'number',
+                validationRules: [
+                    {
+                        type: 'required',
+                        message: 'Year is required'
+                    }
+                ]
+            },
+            {
+                dataField: 'dayOfWeek',
+                caption: l('EntityFieldName:MDMService:VisitPlan:DayOfWeek'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: dayOfWeek,
+                    valueExpr: 'id',
+                    displayExpr: 'text'
+                }
+            },
+            {
+                dataField: 'mcpDetailId',
+                caption: l('MCP Detail'),
+                editorType: 'dxSelectBox',
+                lookup: {
+                    dataSource: getMCPDetails,
+                    valueExpr: 'id',
+                    displayExpr: 'code'
+                }
+            }
+        ]
+    }).dxDataGrid('instance');
 });

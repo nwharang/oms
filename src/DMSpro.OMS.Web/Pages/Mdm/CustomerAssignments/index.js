@@ -78,33 +78,70 @@ $(function () {
     //        return d.promise();
     //    }
     //});
-    var customersLookup = [];
-    var companiesLookup = [];
+    var customersLookup = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const argsGeo = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
 
-    var urlCus = abp.appPath + 'api/mdm-service/customer-assignments/customer-profile-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    var urlCompany = abp.appPath + 'api/mdm-service/customer-assignments/company-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    $.ajax({
-        url: `${urlCus}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            console.log('data call customersLookup ajax: ', data);
-            customersLookup = data.items;
+            customerService.getListDevextremes(argsGeo)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            customerService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
         }
     });
-    $.ajax({
-        url: `${urlCompany}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            console.log('data call companiesLookup ajax: ', data);
-            companiesLookup = data.items;
+    var companiesLookup = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const argsGeo = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            companyService.getListDevextremes(argsGeo)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            companyService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
         }
     });
 
@@ -282,7 +319,7 @@ $(function () {
                 lookup: {
                     dataSource: customersLookup,
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "code"
                 }
                 //lookup: {
                 //    dataSource() {

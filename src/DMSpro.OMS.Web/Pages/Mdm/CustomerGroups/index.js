@@ -1,22 +1,24 @@
 ﻿$(function () {
     var l = abp.localization.getResource("MdmService");
-	var customerGroupService = window.dMSpro.oMS.mdmService.controllers.customerGroups.customerGroup;
+    var customerGroupService = window.dMSpro.oMS.mdmService.controllers.customerGroups.customerGroup;
 
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
-    var GroupModes = [{
-        id: "ATTRIBUTE",
-        displayName: "By Attribute"
-    },
-    {
-        id: "LIST",
-        displayName: "By List"
-    },
-    {
-        id: "GEO",
-        displayName: "By Geo"
-        }];
+    var GroupModes = [
+        {
+            id: "ATTRIBUTE",
+            displayName: "By Attribute"
+        },
+        {
+            id: "LIST",
+            displayName: "By List"
+        },
+        {
+            id: "GEO",
+            displayName: "By Geo"
+        }
+    ];
 
     //Custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
@@ -463,17 +465,17 @@
                 });
                 gridDiv.appendTo(element);
             }
-        //}, {
-        //    title: "By Attrinute",
-        //    template: function (itemData, itemIndex, element) {
-        //        const formDiv = $("<div style='padding:15px'>")
-        //        formDiv.dxForm({
-        //            formData: cusAttributes,
-        //            colCount: 2,
-        //            items: ["attribute00", "attribute01", "attribute02", "attribute03", "attribute04", "attribute05", "attribute06", "attribute07", "attribute08", "attribute09"]
-        //        });
-        //        formDiv.appendTo(element);
-        //    }
+            //}, {
+            //    title: "By Attrinute",
+            //    template: function (itemData, itemIndex, element) {
+            //        const formDiv = $("<div style='padding:15px'>")
+            //        formDiv.dxForm({
+            //            formData: cusAttributes,
+            //            colCount: 2,
+            //            items: ["attribute00", "attribute01", "attribute02", "attribute03", "attribute04", "attribute05", "attribute06", "attribute07", "attribute08", "attribute09"]
+            //        });
+            //        formDiv.appendTo(element);
+            //    }
         }, {
             title: "By List",
             template: function (itemData, itemIndex, element) {
@@ -546,6 +548,6 @@
             }
         }]
     });
-    
-    
+
+
 });

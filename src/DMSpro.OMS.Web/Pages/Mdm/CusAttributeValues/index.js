@@ -1,25 +1,48 @@
 $(function () {
     var l = abp.localization.getResource("MdmService");
     var cusAttributesValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
+    var cusAttributeService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
 
-    var cusAttributes = [];
+    var cusAttributes = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            [
+                'skip',
+                'take',
+                'requireTotalCount',
+                'requireGroupCount',
+                'sort',
+                'filter',
+                'totalSummary',
+                'group',
+                'groupSummary',
+            ].forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
 
-    var url = abp.appPath + 'api/mdm-service/cus-attribute-values/customer-attribute-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    $.ajax({
-        url: `${url}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            console.log('data call ajax: ', data);
-            cusAttributes = data.items;
+            cusAttributeService.getListDevextremes(args)
+                .done(result => {
+                    console.log('data:', result)
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            return key == 0 ? cusAttributeService.get(key) : null;
         }
-    })
+    });
 
     //Custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
@@ -206,7 +229,7 @@ $(function () {
                 lookup: {
                     dataSource: cusAttributes,
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "attrName"
                 }
             },
             {

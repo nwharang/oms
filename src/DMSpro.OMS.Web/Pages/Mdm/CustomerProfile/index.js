@@ -6,49 +6,113 @@
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
     var cusAttachService = window.dMSpro.oMS.mdmService.controllers.customerAttachments.customerAttachment;
     var cusContactService = window.dMSpro.oMS.mdmService.controllers.customerContacts.customerContact;
+    var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
+    var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
+    var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-    var pricelistLookup = [];
-    var systemDataLookup = [];
-    var cusAttrLookup = [];
 
-    var urlPriceList = abp.appPath + 'api/mdm-service/customers/price-list-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    var urlSystemData = abp.appPath + 'api/mdm-service/customers/system-data-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    var urlCusAttr = abp.appPath + 'api/mdm-service/customers/cus-attribute-value-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
+    var pricelistLookup = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const argsGeo = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
 
-    $.ajax({
-        url: `${urlPriceList}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            pricelistLookup = data.items;
+            priceListService.getListDevextremes(argsGeo)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            priceListService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
         }
     });
-    $.ajax({
-        url: `${urlSystemData}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            systemDataLookup = data.items;
+
+    var systemDataLookup = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const argsGeo = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            systemDataService.getListDevextremes(argsGeo)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            systemDataService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
         }
     });
-    $.ajax({
-        url: `${urlCusAttr}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            cusAttrLookup = data.items;
+
+    var cusAttrLookup = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const argsGeo = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            cusAttributeValueService.getListDevextremes(argsGeo)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            cusAttributeValueService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
         }
     });
     
@@ -758,7 +822,7 @@
                 lookup: {
                     dataSource: systemDataLookup,
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "code"
                 }
             },
             {
@@ -781,7 +845,7 @@
                 lookup: {
                     dataSource: pricelistLookup,
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "code"
                 }
             },
             {
@@ -890,7 +954,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -900,7 +964,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -910,7 +974,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -920,7 +984,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -930,7 +994,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -940,7 +1004,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -950,7 +1014,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -960,7 +1024,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -970,7 +1034,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -980,7 +1044,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -990,7 +1054,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -1000,7 +1064,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -1010,7 +1074,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -1020,7 +1084,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -1030,7 +1094,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -1040,7 +1104,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -1050,7 +1114,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -1060,7 +1124,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -1070,7 +1134,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -1080,7 +1144,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
         ],

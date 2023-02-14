@@ -17,18 +17,33 @@
 
 @section scripts
 {
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/Mdm/VisitPlans/index.js" />
 }
 
-@*@section content_toolbar {
-    <abp-button id="ExportToExcelButton" text="@L["ExportToExcel"].Value" icon="download" size="Small" button-type="Primary" />
-    @if (await Authorization.IsGrantedAsync(MdmServicePermissions.VisitPlans.Create))
+@section breadcrumb
     {
-        <abp-button id="NewVisitPlanButton" text="@L["NewVisitPlan"].Value" icon="plus" size="Small" button-type="Primary" />
-    }
-}*@
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
+        <li class="breadcrumb-item">@L["Menu:MdmService:RouteAndMCP"].Value</li>
+        <li class="breadcrumb-item active">@L["Menu:MdmService:VisitPlans"].Value</li>
+    </ol>
+}
 
-<abp-card>
-    <abp-card-body>
-    </abp-card-body>
-</abp-card>
+<div class="col-lg-12">
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="ui-sortable-handle">
+                <i class="subheader-icon fal fal fa-window"></i>
+            </h2>
+        </div>
+        <div class="panel-container show" style="padding: 10px">
+            <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
+                <div class="dx-viewport" style="overflow: auto">
+                    <div id="gridVisitPlans"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

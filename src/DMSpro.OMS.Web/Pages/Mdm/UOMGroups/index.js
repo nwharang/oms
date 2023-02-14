@@ -174,7 +174,7 @@ $(function () {
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgUOMGroups',
+            storageKey: 'gridUOMGroups',
         },
         paging: {
             enabled: true,

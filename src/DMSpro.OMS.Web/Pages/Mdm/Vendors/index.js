@@ -4,71 +4,104 @@ $(function () {
 	
     var vendorService = window.dMSpro.oMS.mdmService.controllers.vendors.vendor;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
+    var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
+    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-
     var geoMasterStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: "raw",
+        key: "id",
+        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
-            const argsGeo = {};
+            const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-
-            geoMasterService.getListDevextremes(argsGeo)
+            geoMasterService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
-                        groupCount: result.groupCount,
+                        groupCount: result.groupCount
                     });
                 });
-
             return deferred.promise();
         },
         byKey: function (key) {
             if (key == 0) return null;
-
             var d = new $.Deferred();
             geoMasterService.get(key)
                 .done(data => {
                     d.resolve(data);
-                });
+                })
             return d.promise();
         }
     });
 
-    var pricelistLookup = [];
-    var companiesLookup = [];
-
-    var urlPriceList = abp.appPath + 'api/mdm-service/vendors/price-list-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    var urlCompany = abp.appPath + 'api/mdm-service/vendors/company-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    $.ajax({
-        url: `${urlPriceList}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            pricelistLookup = data.items;
+    var pricelistLookup = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'processed',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            priceListService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+            var d = new $.Deferred();
+            priceListService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
         }
     });
-    $.ajax({
-        url: `${urlCompany}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            companiesLookup = data.items;
+    var companiesLookup = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'processed',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            companyService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+            var d = new $.Deferred();
+            companyService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
         }
     });
 
@@ -112,7 +145,7 @@ $(function () {
 
     var gridVendors = $('#dgVendors').dxDataGrid({
         dataSource: customStore,
-        keyExpr: "id",
+        //keyExpr: "id",
         editing: {
             mode: "popup",
             allowAdding: abp.auth.isGranted('MdmService.Vendors.Create'),
@@ -288,7 +321,7 @@ $(function () {
                 lookup: {
                     dataSource: companiesLookup,
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "code"
                 }
             },
             //{
@@ -310,7 +343,7 @@ $(function () {
                 lookup: {
                     dataSource: pricelistLookup,
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "code"
                 }
             },
             {

@@ -98,7 +98,7 @@ $(function () {
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgUOMs',
+            storageKey: 'gridUOMs',
         },
         paging: {
             enabled: true,
