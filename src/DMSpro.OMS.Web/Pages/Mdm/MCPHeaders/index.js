@@ -17,13 +17,25 @@ $(function () {
                 itemType: "group",
                 items: [
                     {
-                        dataField: 'RefMCP',
+                        dataField: 'Route',
+                        editorType: 'dxSelectBox',
+                        editorOptions: {
+                            placeholder: ''
+                        }
                     },
                     {
-                        dataField: 'EffectiveDate',
-                        editorType: 'dxDateBox',
-                    }, {
-                        dataField: 'OutletQuantity',
+                        dataField: 'ItemGroup',
+                        editorType: 'dxSelectBox',
+                        editorOptions: {
+                            placeholder: ''
+                        }
+                    },
+                    {
+                        dataField: 'Company',
+                        editorType: 'dxSelectBox',
+                        editorOptions: {
+                            placeholder: ''
+                        }
                     }
                 ]
             },
@@ -31,21 +43,24 @@ $(function () {
                 itemType: "group",
                 items: [
                     {
-                        dataField: 'Description',
+                        dataField: 'Code',
                     },
                     {
-                        dataField: 'Route',
-
-                    }, {
-                        dataField: 'Enddate',
-                        editorType: 'dxDateBox'
+                        dataField: 'Name',
+                    } , {
+                        dataField: 'IsGPSLocked',
+                        editorType: 'dxCheckBox'
                     }]
             },
             {
                 itemType: "group",
                 items: [
                     {
-                        dataField: 'EmployeeName',
+                        dataField: 'EffectiveDate',
+                        editorType: 'dxDateBox',
+                    }, {
+                        dataField: 'EndDate',
+                        editorType: 'dxDateBox',
                     }]
             }
         ]
@@ -56,7 +71,7 @@ $(function () {
         handles: "bottom"
     }).dxResizable('instance');
 
-    var dgMCPHeaders = $('#dgMCPHeaders')
+    var dgMCP = $('#dgMCP')
         .dxDataGrid({
             dataSource: dataSource,
             editing: {
@@ -70,10 +85,10 @@ $(function () {
                     deleteRow: l("Delete"),
                     confirmDeleteMessage: l("DeleteConfirmationMessage")
                 }
-            }, 
+            },
             remoteOperations: true,
             export: {
-                enabled: true, 
+                enabled: true,
             },
             onExporting(e) {
                 const workbook = new ExcelJS.Workbook();
@@ -91,15 +106,12 @@ $(function () {
                 e.cancel = true;
             },
             showRowLines: true,
-            showBorders: true, 
+            showBorders: true,
             allowColumnReordering: true,
             allowColumnResizing: true,
             columnResizingMode: 'widget',
             columnMinWidth: 50,
             columnAutoWidth: true,
-
-            columnMinWidth: 50,
-
             columnChooser: {
                 enabled: true,
                 mode: "select"
@@ -120,11 +132,10 @@ $(function () {
             searchPanel: {
                 visible: true
             },
-
             stateStoring: { //save state in localStorage
                 enabled: true,
                 type: 'localStorage',
-                storageKey: 'dgMCPHeaders',
+                storageKey: 'dgMCP',
             },
             paging: {
                 enabled: true,
@@ -144,7 +155,7 @@ $(function () {
                         location: 'after',
                         template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                         onClick() {
-                            dgMCPHeaders.addRow();
+                            dgMCP.addRow();
                         },
                     },
 

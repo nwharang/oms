@@ -45,7 +45,7 @@ $(function () {
     //DataGrid - Sales Org
     const dataGridContainer = $('#dataGridContainer').dxDataGrid({
         dataSource: salesOrgHeaderStore,
-        remoteOperations: true,
+        remoteOperations: false,
         showBorders: true,
         focusedRowEnabled: true,
         allowColumnReordering: false,
