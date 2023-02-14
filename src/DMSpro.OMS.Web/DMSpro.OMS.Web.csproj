@@ -237,8 +237,6 @@
     <None Remove="DMSpro.OMS.IdentityService.Web" />
     <None Remove="DMSpro.OMS.MdmService.HttpApi.Client" />
     <None Remove="DMSpro.OMS.MdmService.Web" />
-    <None Remove="DMSpro.OMS.MobileService.HttpApi.Client" />
-    <None Remove="DMSpro.OMS.MobileService.Web" />
     <None Remove="DMSpro.OMS.OrderService.HttpApi.Client" />
     <None Remove="DMSpro.OMS.OrderService.Web" />
     <None Remove="DMSpro.OMS.ProductService.HttpApi.Client" />
@@ -264,8 +262,6 @@
     <None Remove="DMSpro.OMS.InventoryService.Domain.Shared" />
     <None Remove="DMSpro.OMS.AdministrationService.Domain.Shared" />
     <None Remove="DMSpro.OMS.IdentityService.Domain.Shared" />
-    <None Remove="DMSpro.OMS.MobileService.Application.Contracts" />
-    <None Remove="DMSpro.OMS.MobileService.Domain.Shared" />
     <None Remove="DMSpro.OMS.ProductService.Application.Contracts" />
     <None Remove="DMSpro.OMS.ProductService.Domain.Shared" />
     <None Remove="DMSpro.OMS.SaasService.Domain.Shared" />
@@ -321,12 +317,7 @@
     <Reference Include="DMSpro.OMS.MdmService.Web">
       <HintPath>..\..\..\commondll\Development\Services\mdm\DMSpro.OMS.MdmService.Web.dll</HintPath>
     </Reference>
-    <Reference Include="DMSpro.OMS.MobileService.HttpApi.Client">
-      <HintPath>..\..\..\commondll\Development\Services\mobile\DMSpro.OMS.MobileService.HttpApi.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="DMSpro.OMS.MobileService.Web">
-      <HintPath>..\..\..\commondll\Development\Services\mobile\DMSpro.OMS.MobileService.Web.dll</HintPath>
-    </Reference>
+    
     <Reference Include="DMSpro.OMS.OrderService.HttpApi.Client">
       <HintPath>..\..\..\commondll\Development\Services\order\DMSpro.OMS.OrderService.HttpApi.Client.dll</HintPath>
     </Reference>
@@ -402,12 +393,7 @@
     <Reference Include="DMSpro.OMS.IdentityService.Domain.Shared">
       <HintPath>..\..\..\commondll\Development\Services\identity\DMSpro.OMS.IdentityService.Domain.Shared.dll</HintPath>
     </Reference>
-    <Reference Include="DMSpro.OMS.MobileService.Application.Contracts">
-      <HintPath>..\..\..\commondll\Development\Services\mobile\DMSpro.OMS.MobileService.Application.Contracts.dll</HintPath>
-    </Reference>
-    <Reference Include="DMSpro.OMS.MobileService.Domain.Shared">
-      <HintPath>..\..\..\commondll\Development\Services\mobile\DMSpro.OMS.MobileService.Domain.Shared.dll</HintPath>
-    </Reference>
+    
     <Reference Include="DMSpro.OMS.ProductService.Application.Contracts">
       <HintPath>..\..\..\commondll\Development\Services\product\DMSpro.OMS.ProductService.Application.Contracts.dll</HintPath>
     </Reference>
