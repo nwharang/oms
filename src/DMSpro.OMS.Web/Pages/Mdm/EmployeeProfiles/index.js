@@ -118,21 +118,56 @@ $(function () {
     const dataGridContainer = $('#dataGridContainer').dxDataGrid({
         dataSource: employeeProfileStore,
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
-            visible: false
+            visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgEmployeeProfiles',
         },
         paging: {
             enabled: true,
@@ -295,7 +330,8 @@ $(function () {
                 caption: l("Actions"),
                 type: 'buttons',
                 width: 120,
-                buttons: ['edit', 'delete']
+                buttons: ['edit', 'delete'],
+                fixedPosition: 'left'
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:ERPCode"),
@@ -398,9 +434,9 @@ $(function () {
     }).dxDataGrid("instance");
 
     /****button*****/
-    $("#NewEmployeeProfileButton").click(function () {
-        dataGridContainer.addRow();
-    });
+    //$("#NewEmployeeProfileButton").click(function () {
+    //    dataGridContainer.addRow();
+    //});
 
     /****function*****/
     function isNotEmpty(value) {

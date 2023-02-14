@@ -55,21 +55,56 @@ $(function () {
     const dataGridContainer = $('#dataGridContainer').dxDataGrid({
         dataSource: systemDataStore,
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
-            visible: false
+            visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgEmployeeTypes',
         },
         paging: {
             enabled: true,
@@ -83,7 +118,7 @@ $(function () {
             showNavigationButtons: true
         },
         editing: {
-            mode: 'row',
+            mode: "row",
             allowAdding: true,
             allowUpdating: true,
             allowDeleting: true,
@@ -106,12 +141,35 @@ $(function () {
                 }
             }
         },
+        toolbar: {
+            items: [
+                "groupPanel",
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        dataGridContainer.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
         columns: [
             {
                 caption: l("Actions"),
                 type: 'buttons',
                 width: 120,
-                buttons: ['edit', 'delete']
+                buttons: ['edit', 'delete'],
+                fixedPosition: 'left'
             },
             {
                 caption: l("EntityFieldName:MDMService:SystemData:Code"),
@@ -141,32 +199,32 @@ $(function () {
     }).dxDataGrid("instance");
 
     /****event*****/
-    $("input#Search").on("input", function () {
-        var searchStr = $(this).val();
-        dataGridContainer.filter([['code', '=', 'MD03'], 'and', [['valueCode', 'contains', searchStr], 'or', ['valueName', 'contains', searchStr]]]);
-    });
+    //$("input#Search").on("input", function () {
+    //    var searchStr = $(this).val();
+    //    dataGridContainer.filter([['code', '=', 'MD03'], 'and', [['valueCode', 'contains', searchStr], 'or', ['valueName', 'contains', searchStr]]]);
+    //});
 
-    /****button*****/
-    $("#NewEmployeeTypeButton").click(function () {
-        dataGridContainer.addRow();
-    });
+    ///****button*****/
+    //$("#NewEmployeeTypeButton").click(function () {
+    //    dataGridContainer.addRow();
+    //});
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
+    //$("#ExportToExcelButton").click(function (e) {
+    //    e.preventDefault();
 
-        systemDataService.getDownloadToken().then(
-            function (result) {
-                var url = abp.appPath + 'api/mdm-service/system-datas/as-excel-file' +
-                    abp.utils.buildQueryString([
-                        { name: 'downloadToken', value: result.token },
-                        { name: 'code', value: "MD03" }
-                    ]);
+    //    systemDataService.getDownloadToken().then(
+    //        function (result) {
+    //            var url = abp.appPath + 'api/mdm-service/system-datas/as-excel-file' +
+    //                abp.utils.buildQueryString([
+    //                    { name: 'downloadToken', value: result.token },
+    //                    { name: 'code', value: "MD03" }
+    //                ]);
 
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
+    //            var downloadWindow = window.open(url, '_blank');
+    //            downloadWindow.focus();
+    //        }
+    //    )
+    //});
 
     /****function*****/
     function isNotEmpty(value) {

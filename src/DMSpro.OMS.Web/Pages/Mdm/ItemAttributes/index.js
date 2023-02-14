@@ -1,11 +1,8 @@
-﻿$(function () {
-    // language
+﻿var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
+$(function () {
     var l = abp.localization.getResource("MdmService");
-    // load mdmService
-    var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
-
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-    // custom store
+    
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
         loadMode: 'processed',
@@ -50,24 +47,57 @@
 
     const dataGrid = $('#gridProdAttribute').dxDataGrid({
         dataSource: customStore,
-        keyExpr: 'id',
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        autoExpandAll: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
             visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgSystemDatas',
         },
         paging: {
             enabled: true,
@@ -81,10 +111,10 @@
             showNavigationButtons: true
         },
         editing: {
-            mode: 'row',
-            allowAdding: true,
-            allowUpdating: true,
-            allowDeleting: true,
+            mode: "row",
+            /*allowAdding: abp.auth.isGranted('MdmService.ItemAttributes.Create'),*/
+            allowUpdating: abp.auth.isGranted('MdmService.ItemAttributes.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.ItemAttributes.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -102,17 +132,33 @@
         },
         toolbar: {
             items: [
+                "groupPanel",
+                //{
+                //    location: 'after',
+                //    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                //    onClick() {
+                //        dataGrid.addRow();
+                //    },
+                //},
+                'columnChooserButton',
+                "exportButton",
                 {
-                    name: "searchPanel",
-                    location: 'after'
-                }
-            ]
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
         },
         columns: [
             {
                 type: 'buttons',
                 buttons: ['edit'],
                 caption: l('Actions'),
+                width: 110,
+                fixedPosition: 'left'
             },
             {
                 dataField: 'attrNo',
@@ -158,28 +204,28 @@
         ]
     }).dxDataGrid('instance');
 
-    $("#NewProductAttributeButton").click(function () {
-        dataGrid.addRow();
-    });
+    //$("#NewProductAttributeButton").click(function () {
+    //    dataGrid.addRow();
+    //});
 
-    $("input#Search").on("input", function () {
-        dataGrid.searchByText($(this).val());
-    });
+    //$("input#Search").on("input", function () {
+    //    dataGrid.searchByText($(this).val());
+    //});
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
+    //$("#ExportToExcelButton").click(function (e) {
+    //    e.preventDefault();
 
-        itemAttrService.getDownloadToken().then(
-            function (result) {
-                var url = abp.appPath + 'api/mdm-service/item-attributes/as-excel-file' + abp.utils.buildQueryString([
-                    { name: 'downloadToken', value: result.token }
-                ]);
+    //    itemAttrService.getDownloadToken().then(
+    //        function (result) {
+    //            var url = abp.appPath + 'api/mdm-service/item-attributes/as-excel-file' + abp.utils.buildQueryString([
+    //                { name: 'downloadToken', value: result.token }
+    //            ]);
 
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
+    //            var downloadWindow = window.open(url, '_blank');
+    //            downloadWindow.focus();
+    //        }
+    //    )
+    //});
 
     function isNotEmpty(value) {
         return value !== undefined && value !== null && value !== '';

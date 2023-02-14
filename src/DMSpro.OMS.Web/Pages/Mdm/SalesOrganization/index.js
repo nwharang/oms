@@ -46,25 +46,60 @@ $(function () {
     const dataGridContainer = $('#dataGridContainer').dxDataGrid({
         dataSource: salesOrgHeaderStore,
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
-            visible: false
+            visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
-            visible: false
+            visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgSalesOrganization',
         },
         paging: {
             enabled: true,
-            pageSize: 20
+            pageSize: 10
         },
         pager: {
             visible: true,
@@ -72,6 +107,33 @@ $(function () {
             allowedPageSizes: [10, 20, 50, 100],
             showInfo: true,
             showNavigationButtons: true
+        },
+        editing: {
+            allowAdding: true,
+            useIcons: true
+        },
+        toolbar: {
+            items: [
+                "groupPanel",
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        var newtab = window.open('/Mdm/SalesOrganization/Details', '_blank');
+                        newtab.sessionStorage.setItem("SalesOrg", null);
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
         },
         columns: [
             {
@@ -85,7 +147,8 @@ $(function () {
                         var newtab = window.open('/Mdm/SalesOrganization/Details', '_blank');
                         newtab.sessionStorage.setItem("SalesOrg", JSON.stringify(e.row.data));
                     }
-                }]
+                }],
+                fixedPosition: 'left'
             },
             {
                 caption: l('EntityFieldName:MDMService:SalesOrgHeader:Code'),
@@ -103,12 +166,17 @@ $(function () {
     }).dxDataGrid("instance");
 
     /****button*****/
-    $("#NewSalesOrgButton").click(function (e) {
-        e.preventDefault();
+    //$("#NewSalesOrgButton").click(function (e) {
+    //    e.preventDefault();
+    //    var newtab = window.open('/Mdm/SalesOrganization/Details', '_blank');
+    //    newtab.sessionStorage.setItem("SalesOrg", null);
+    //});
+
+    function addNewSalesOrg() {
+        debugger
         var newtab = window.open('/Mdm/SalesOrganization/Details', '_blank');
         newtab.sessionStorage.setItem("SalesOrg", null);
-    });
-
+    }
     /****function*****/
     function isNotEmpty(value) {
         return value !== undefined && value !== null && value !== '';

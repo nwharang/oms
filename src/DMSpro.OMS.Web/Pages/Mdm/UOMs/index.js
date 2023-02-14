@@ -1,11 +1,9 @@
-﻿$(function () {
+﻿var uOMsService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
+$(function () {
     // language
     var l = abp.localization.getResource("MdmService");
-    // load mdmService
-    var uOMsService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
-
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-    // custom store - for load, update, delete
+
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
         loadMode: 'processed',
@@ -50,21 +48,57 @@
 
     var gridUOMs = $('#gridUOMs').dxDataGrid({
         dataSource: customStore,
-        keyExpr: 'id',
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        autoExpandAll: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        groupPanel: {
+            visible: true,
+        },
+        searchPanel: {
+            visible: true
+        },
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgUOMs',
         },
         paging: {
             enabled: true,
@@ -78,10 +112,10 @@
             showNavigationButtons: true
         },
         editing: {
-            mode: 'row',
-            allowAdding: true,
-            allowUpdating: true,
-            allowDeleting: true,
+            mode: "row",
+            allowAdding: abp.auth.isGranted('MdmService.UOMs.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.UOMs.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.UOMs.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -97,59 +131,35 @@
                 }
             }
         },
-        //toolbar: {
-        //    items: [
-        //        {
-        //            location: 'before',
-        //            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>' + l('Button.New.UOM') +'</span></button>',
-        //            onClick() {
-        //                gridUOMs.addRow();
-        //            }
-        //        },
-        //        {
-        //            location: 'after',
-        //            widget: 'dxButton',
-        //            options: {
-        //                icon: 'refresh',
-        //                onClick() {
-        //                    gridUOMs.refresh();
-        //                },
-        //            }
-        //        },
-        //        'columnChooserButton',
-        //        'exportButton',
-        //        {
-        //            location: 'after',
-        //            widget: 'dxButton',
-        //            options: {
-        //                icon: 'upload',
-        //                onclick() {
-        //                    //todo
-        //                }
-        //            }
-        //        },
-        //        'searchPanel'
-        //    ]
-        //},
-        //export: {
-        //    enabled: true
-        //},
-        //onExporting(e) {
-        //    uOMsService.getDownloadToken().then(
-        //        function (result) {
-        //            var url = abp.appPath + 'api/mdm-service/u-oMs/as-excel-file' + abp.utils.buildQueryString([
-        //                { name: 'downloadToken', value: result.token }
-        //            ]);
-        //            var downloadWindow = window.open(url, '_blank');
-        //            downloadWindow.focus();
-        //        }
-        //    )
-        //},
+        toolbar: {
+            items: [
+                "groupPanel",
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        gridUOMs.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
         columns: [
             {
                 type: 'buttons',
                 caption: l('Actions'),
                 buttons: ['edit', 'delete'],
+                width: 110,
+                fixedPosition: 'left'
             },
             {
                 dataField: 'code',
@@ -175,29 +185,6 @@
             }
         ]
     }).dxDataGrid('instance');
-
-    $("#NewUomSButton").click(function () {
-        gridUOMs.addRow();
-    });
-
-    $("input#Search").on("input", function () {
-        gridUOMs.searchByText($(this).val());
-    });
-
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
-
-        uOMsService.getDownloadToken().then(
-            function (result) {
-                var url = abp.appPath + 'api/mdm-service/u-oMs/as-excel-file' + abp.utils.buildQueryString([
-                    { name: 'downloadToken', value: result.token }
-                ]);
-
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
 
     function isNotEmpty(value) {
         return value !== undefined && value !== null && value !== '';

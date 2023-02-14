@@ -17,6 +17,8 @@
 
 @section scripts
 {
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/Mdm/EmployeeProfiles/index.js" />
 }
 
@@ -35,9 +37,12 @@
                 <i class="subheader-icon fa fa-user"></i> @L["Page.Title.EmployeeProfiles"].Value
             </h2>
         </div>
-        <div class="panel-container show">
+        <div class="panel-container show" style="padding: 10px">
             <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
-                <abp-card>
+                <div class="dx-viewport" style="overflow: auto">
+                    <div id="dataGridContainer"></div>
+                </div>
+                @*<abp-card>
                     <abp-card-body>
                         <abp-row>
                             <div style="padding-left:12px" class="buttons-header-grid">
@@ -67,7 +72,7 @@
                             <div id="dataGridContainer"></div>
                         </div>
                     </abp-card-body>
-                </abp-card>
+                </abp-card>*@
             </div>
         </div>
     </div>

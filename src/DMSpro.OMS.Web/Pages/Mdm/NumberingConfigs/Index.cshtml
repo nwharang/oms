@@ -15,8 +15,9 @@
     PageLayout.Content.MenuItemName = MdmServiceMenus.NumberingConfig;
 }
 
-@section scripts
-    {
+@section scripts{
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/Mdm/NumberingConfigs/index.js" />
 }
 
@@ -36,44 +37,11 @@
                 <i class="subheader-icon fal fa-credit-card-front"></i>
             </h2>
         </div>
-        <div class="panel-container show">
+        <div class="panel-container show" style="padding: 10px">
             <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
-                <abp-card>
-                    <abp-card-body>
-                        <abp-row>
-                            <div style="padding-left:12px" class="buttons-header-grid">
-                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.NumberingConfigs.Create))
-                                {
-                                    <button id="NewNumberingConfigButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                        <i class="fa fa-plus"></i> <span>@L["Button.New.NumberingConfig"].Value</span>
-                                    </button>
-                                }
-                                <button id="ExportToExcelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                    <i class="fa fa-download"></i> <span>@L["ExportToExcel"].Value</span>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                                    <i class="fa fa-upload"></i> <span>Import from Excel</span>
-                                </button>
-                                <div class="dx-datagrid-search-panel dx-show-invalid-badge dx-textbox dx-texteditor dx-editor-outlined dx-searchbox dx-show-clear-button dx-texteditor-empty dx-widget dx-state-hover" style="width: 250px;">
-                                    <div class="dx-texteditor-container">
-                                        <div class="dx-texteditor-input-container">
-                                            <div class="dx-icon dx-icon-search"></div>
-                                            <input autocomplete="off" aria-label="Search in the data grid" class="dx-texteditor-input" type="text" spellcheck="false" tabindex="0" role="textbox">
-
-                                        </div>
-                                        <div class="dx-texteditor-buttons-container">
-                                            <span class="dx-clear-button-area"><span class="dx-icon dx-icon-clear"></span></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </abp-row>
-                        <div class="dx-viewport">
-                            <div id="loadPanel"></div>
-                            <div id="gridNumberingConfigs"></div>
-                        </div>
-                    </abp-card-body>
-                </abp-card>
+                <div class="dx-viewport" style="overflow:auto">
+                    <div id="gridNumberingConfigs"></div>
+                </div>
             </div>
         </div>
     </div>

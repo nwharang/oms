@@ -264,25 +264,60 @@ $(function () {
     const dataGridContainer = $('#dataGridContainer').dxDataGrid({
         dataSource: salesOrgEmpAssignmentStore,
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
-            visible: false
+            visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
-            visible: false
+            visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgSystemDatas',
         },
         paging: {
             enabled: true,
-            pageSize: 20
+            pageSize: 10
         },
         pager: {
             visible: true,
@@ -314,12 +349,27 @@ $(function () {
                 }
             }
         },
+        toolbar: {
+            items: [
+                "groupPanel",
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        dataGridContainer.addRow();
+                    },
+                },
+                "exportButton",
+                "searchPanel"
+            ],
+        },
         columns: [
             {
                 caption: l("Actions"),
                 type: 'buttons',
                 width: 100,
-                buttons: ['edit', 'delete']
+                buttons: ['edit', 'delete'],
+                fixedPosition: 'left'
             },
             {
                 caption: l('EntityFieldName:MDMService:SalesOrgEmpAssignment:EmployeeFullName'),

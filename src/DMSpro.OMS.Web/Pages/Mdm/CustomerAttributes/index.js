@@ -99,6 +99,40 @@ $(function () {
         scrolling: {
             mode: 'standard'
         },
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgCustomerAttributes',
+        },
         paging: {
             enabled: true,
             pageSize: 10
@@ -110,12 +144,28 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
+        toolbar: {
+            items: [
+                "groupPanel",
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
         columns: [
             {
                 type: 'buttons',
                 caption: l("Actions"),
                 width: 90,
                 buttons: ['edit'],
+                fixedPosition: 'left'
             },
             {
                 dataField: 'attrNo',
@@ -151,37 +201,37 @@ $(function () {
         ],
     }).dxDataGrid("instance");
 
-    $("#btnNewCusAttribute").click(function (e) {
-        if (dataCusAttributes.length < 20) {
-            gridCusAttribute.addRow();
-        }
-    });
+    //$("#btnNewCusAttribute").click(function (e) {
+    //    if (dataCusAttributes.length < 20) {
+    //        gridCusAttribute.addRow();
+    //    }
+    //});
 
-    $("input#Search").on("input", function () {
-        gridCusAttribute.searchByText($(this).val());
-    });
+    //$("input#Search").on("input", function () {
+    //    gridCusAttribute.searchByText($(this).val());
+    //});
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
+    //$("#ExportToExcelButton").click(function (e) {
+    //    e.preventDefault();
 
-        customerAttributeService.getDownloadToken().then(
-            function(result){
-                    var input = getFilter();
-                    var url =  abp.appPath + 'api/mdm-service/customer-attributes/as-excel-file' + 
-                        abp.utils.buildQueryString([
-                            { name: 'downloadToken', value: result.token },
-                            { name: 'filterText', value: input.filterText },
-                            { name: 'attrNoMin', value: input.attrNoMin },
-                            { name: 'attrNoMax', value: input.attrNoMax }, 
-                            { name: 'attrName', value: input.attrName },
-                            { name: 'hierarchyLevelMin', value: input.hierarchyLevelMin },
-                            { name: 'hierarchyLevelMax', value: input.hierarchyLevelMax }, 
-                            { name: 'active', value: input.active }
-                            ]);
+    //    customerAttributeService.getDownloadToken().then(
+    //        function(result){
+    //                var input = getFilter();
+    //                var url =  abp.appPath + 'api/mdm-service/customer-attributes/as-excel-file' + 
+    //                    abp.utils.buildQueryString([
+    //                        { name: 'downloadToken', value: result.token },
+    //                        { name: 'filterText', value: input.filterText },
+    //                        { name: 'attrNoMin', value: input.attrNoMin },
+    //                        { name: 'attrNoMax', value: input.attrNoMax }, 
+    //                        { name: 'attrName', value: input.attrName },
+    //                        { name: 'hierarchyLevelMin', value: input.hierarchyLevelMin },
+    //                        { name: 'hierarchyLevelMax', value: input.hierarchyLevelMax }, 
+    //                        { name: 'active', value: input.active }
+    //                        ]);
                             
-                    var downloadWindow = window.open(url, '_blank');
-                    downloadWindow.focus();
-            }
-        )
-    });
+    //                var downloadWindow = window.open(url, '_blank');
+    //                downloadWindow.focus();
+    //        }
+    //    )
+    //});
 });
