@@ -233,11 +233,45 @@ function initItemAttributeTab() {
                 filterRow: {
                     visible: true
                 },
+                groupPanel: {
+                    visible: true,
+                },
                 searchPanel: {
                     visible: true
                 },
-                scrolling: {
-                    mode: 'standard'
+                columnMinWidth: 50,
+                columnChooser: {
+                    enabled: true,
+                    mode: "select"
+                },
+                columnFixing: {
+                    enabled: true,
+                },
+                export: {
+                    enabled: true,
+                },
+                onExporting(e) {
+                    const workbook = new ExcelJS.Workbook();
+                    const worksheet = workbook.addWorksheet('Data');
+
+                    DevExpress.excelExporter.exportDataGrid({
+                        component: e.component,
+                        worksheet,
+                        autoFilterEnabled: true,
+                    }).then(() => {
+                        workbook.xlsx.writeBuffer().then((buffer) => {
+                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                        });
+                    });
+                    e.cancel = true;
+                },
+                headerFilter: {
+                    visible: true,
+                },
+                stateStoring: {
+                    enabled: true,
+                    type: 'localStorage',
+                    storageKey: 'gridItemAttribute',
                 },
                 paging: {
                     enabled: true,
@@ -263,7 +297,7 @@ function initItemAttributeTab() {
                     }
                 },
                 onRowUpdating: function (e) {
-                    var objectRequire = ['code', 'name'];
+                    var objectRequire = ['dummy', 'attr0Id', 'attr1Id', 'attr2Id', 'attr3Id', 'attr4Id', 'attr5Id', 'attr6Id', 'attr7Id', 'attr8Id', 'attr9Id', 'attr10Id', 'attr11Id', 'attr12Id', 'attr13Id', 'attr14Id', 'attr15Id', 'attr16Id', 'attr17Id', 'attr18d', 'attr19Id',];
                     for (var property in e.oldData) {
                         if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                             e.newData[property] = e.oldData[property];
@@ -273,11 +307,20 @@ function initItemAttributeTab() {
                 toolbar: {
                     items: [
                         {
-                            location: 'before',
-                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>' + l("Button.New.ItemGroupAttr") + '</span></button>',
+                            location: 'after',
+                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                             onClick() {
                                 $('#gridItemAttribute').data('dxDataGrid').addRow();
-                            }
+                            },
+                        },
+                        'columnChooserButton',
+                        "exportButton",
+                        {
+                            location: 'after',
+                            template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                            onClick() {
+                                //todo
+                            },
                         },
                         'searchPanel'
                     ]
@@ -312,11 +355,45 @@ function initListItemTab() {
                 filterRow: {
                     visible: true
                 },
+                groupPanel: {
+                    visible: true,
+                },
                 searchPanel: {
                     visible: true
                 },
-                scrolling: {
-                    mode: 'standard'
+                columnMinWidth: 50,
+                columnChooser: {
+                    enabled: true,
+                    mode: "select"
+                },
+                columnFixing: {
+                    enabled: true,
+                },
+                export: {
+                    enabled: true,
+                },
+                onExporting(e) {
+                    const workbook = new ExcelJS.Workbook();
+                    const worksheet = workbook.addWorksheet('Data');
+
+                    DevExpress.excelExporter.exportDataGrid({
+                        component: e.component,
+                        worksheet,
+                        autoFilterEnabled: true,
+                    }).then(() => {
+                        workbook.xlsx.writeBuffer().then((buffer) => {
+                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                        });
+                    });
+                    e.cancel = true;
+                },
+                headerFilter: {
+                    visible: true,
+                },
+                stateStoring: {
+                    enabled: true,
+                    type: 'localStorage',
+                    storageKey: 'gridListItem',
                 },
                 paging: {
                     enabled: true,
@@ -341,6 +418,11 @@ function initListItemTab() {
                         confirmDeleteMessage: l("DeleteConfirmationMessage")
                     }
                 },
+                onRowInserting: function (e) {
+                    if (e.data.rate == null) {
+                        e.data.rate = 1
+                    }
+                },
                 onRowUpdating: function (e) {
                     var objectRequire = ['itemGroupId', 'itemId', 'uomId', 'rate', 'price'];
                     for (var property in e.oldData) {
@@ -352,11 +434,20 @@ function initListItemTab() {
                 toolbar: {
                     items: [
                         {
-                            location: 'before',
-                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>' + l("Button.New.ItemGroupList") + '</span></button>',
+                            location: 'after',
+                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                             onClick() {
                                 $('#gridListItem').data('dxDataGrid').addRow();
-                            }
+                            },
+                        },
+                        'columnChooserButton',
+                        "exportButton",
+                        {
+                            location: 'after',
+                            template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                            onClick() {
+                                //todo
+                            },
                         },
                         'searchPanel'
                     ]
@@ -365,7 +456,8 @@ function initListItemTab() {
                     {
                         type: 'buttons',
                         caption: l('Actions'),
-                        buttons: ['edit', 'delete']
+                        buttons: ['edit', 'delete'],
+                        fixedPosition: 'left'
                     },
                     {
                         dataField: 'id',
@@ -398,7 +490,7 @@ function initListItemTab() {
                     {
                         dataField: 'rate',
                         caption: l("EntityFieldName:MDMService:ItemGroupList:Rate"),
-                        validationRules: [{ type: "required" }],
+                        /*validationRules: [{ type: "required" }],*/
                         dataType: 'number',
                         value: 1
                     },
@@ -582,7 +674,13 @@ function getItemAttributeColumns(dxGrid) {
                         {
                             type: 'buttons',
                             caption: l('Actions'),
-                            buttons: ['edit', 'delete']
+                            buttons: ['edit', 'delete'],
+                            fixedPosition: 'left'
+                        },
+                        {
+                            dataField: 'dummy',
+                            dataType: 'string',
+                            visible: false
                         }
                     ];
                     for (let i = 0; i < listAttrActive.length; i++) {
@@ -642,6 +740,7 @@ function getDataSourceAttrGrid(itemGroupId) {
         },
         insert(values) {
             values.itemGroupId = itemGroup.id;
+            values.dummy = '0';
             return itemGroupAttributeService.create(values, { contentType: 'application/json' });
         },
         update(key, values) {

@@ -171,6 +171,14 @@ $(function () {
                 "searchPanel"
             ],
         },
+        onEditorPreparing: function (e) {
+            if (e.dataField == "type" && e.parentType == "dataRow" && e.row.data.status != 'OPEN') {
+                e.editorOptions.disabled = !e.row.inserted;
+            }
+        },
+        //onEditingStart: function (e) {
+        //    e.component.option('column[4].allowEditing', false);
+        //},
         onRowInserting: function (e) {
             e.data.status = 'OPEN';
             if (e.data && e.data.id == 0) {
@@ -205,7 +213,7 @@ $(function () {
                             } else {
                                 w.sessionStorage.setItem("itemGroup", JSON.stringify(e.row.data));
                             }
-                            
+
                         }
                     },
                     'edit', 'delete'],
@@ -283,4 +291,8 @@ $(function () {
     function isNotEmpty(value) {
         return value !== undefined && value !== null && value !== '';
     }
+});
+
+$(window).focus(function () {
+    $('#gridItemGroups').data('dxDataGrid').refresh();
 });
