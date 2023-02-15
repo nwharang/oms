@@ -167,7 +167,7 @@ $(function () {
         }
     });
 
-    var gridVisitPlans = $('#gridVisitPlans').dxDataGrid({
+    var dgVisitPlans = $('#dgVisitPlans').dxDataGrid({
         dataSource: visitPlansStore,
         remoteOperations: true,
         showRowLines: true,
@@ -222,7 +222,7 @@ $(function () {
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'gridVisitPlans',
+            storageKey: 'dgVisitPlans',
         },
         paging: {
             enabled: true,

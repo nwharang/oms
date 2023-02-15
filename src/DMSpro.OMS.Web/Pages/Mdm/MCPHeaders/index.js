@@ -179,13 +179,26 @@ $(function () {
     var mCPDetailsStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
+            const deferred = $.Deferred();
+            if (!MCPHeaderModel)
+                return deferred.resolve([], {
+                    totalCount: -1,
+                    groupCount: -1,
+                    summary: null,
+                }).promise();
+
+            if (loadOptions.filter == null) {
+                loadOptions.filter = ["mcpHeaderId", "=", MCPHeaderModel.id];
+            } else {
+                loadOptions.filter = [loadOptions.filter, "and", ["mcpHeaderId", "=", MCPHeaderModel.id]];
+            }
             const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            const deferred = $.Deferred();
+          
             mCPDetailsService.getListDevextremes(args)
                 .done(result => {
                     result.data.forEach(x => {
@@ -451,6 +464,7 @@ $(function () {
                 var component = e.component,
                     rowIndex = e.row && e.row.rowIndex;
                 if (e.dataField === "customerId") {
+                    e.editorOptions.placeholder = '';
                     var onValueChanged = e.editorOptions.onValueChanged;
                     e.editorOptions.onValueChanged = function (e) {
                         onValueChanged.call(this, e);
