@@ -1,4 +1,4 @@
-var visitPlansService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
+﻿var visitPlansService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
 var mcpHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
 var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
 var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
@@ -11,60 +11,11 @@ $(function () {
         return value !== undefined && value !== null && value !== '';
     }
 
-    const dayOfWeek = [
-        {
-            id: 0,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:MONDAY')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:TUESDAY')
-        },
-        {
-            id: 2,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:WEDNESDAY')
-        },
-        {
-            id: 3,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:THURSDAY')
-        },
-        {
-            id: 4,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:FRIDAY')
-        },
-        {
-            id: 5,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:SATURDAY')
-        },
-        {
-            id: 6,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:SUNDAY')
-        }
-    ]
-
-    const visitPlansStore = new DevExpress.data.CustomStore({
-        key: "id",
-        loadMode: 'processed',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            visitPlansService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
+        var _lookupModal = new abp.ModalManager({
+            viewUrl: abp.appPath + "Shared/LookupModal",
+            scriptUrl: "/Pages/Shared/lookupModal.js",
+            modalClass: "navigationPropertyLookup"
+        });
 
             var d = new $.Deferred();
             visitPlansService.get(key)
@@ -216,7 +167,7 @@ $(function () {
         }
     });
 
-    var gridVisitPlans = $('#gridVisitPlans').dxDataGrid({
+    var dgVisitPlans = $('#dgVisitPlans').dxDataGrid({
         dataSource: visitPlansStore,
         remoteOperations: true,
         showRowLines: true,
@@ -271,7 +222,7 @@ $(function () {
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'gridVisitPlans',
+            storageKey: 'dgVisitPlans',
         },
         paging: {
             enabled: true,

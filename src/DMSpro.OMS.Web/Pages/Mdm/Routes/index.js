@@ -233,7 +233,7 @@ $(function () {
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'storage',
+            storageKey: 'gridRoutes',
         },
         showBorders: true,
         columnAutoWidth: true,

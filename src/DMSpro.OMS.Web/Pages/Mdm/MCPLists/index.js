@@ -1,60 +1,47 @@
 ﻿var l = abp.localization.getResource("MdmService");
 $(function () {
+    var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
 
-    DevExpress.config({
-        editorStylingMode: 'underlined',
-    });
-
-    $("#top-section").dxForm({
-        formData: {
-            // Docdate: currentDate(),
-            // PostingDate: currentDate()
-        },
-        labelMode: 'floating',
-        colCount: 4,
-        items: [
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'RefMCP',
-                    },
-                    {
-                        dataField: 'EffectiveDate',
-                        editorType: 'dxDateBox',
-                    }, {
-                        dataField: 'OutletQuantity',
-                    }
-                ]
-            },
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'Description',
-                    },
-                    {
-                        dataField: 'Route',
-
-                    }, {
-                        dataField: 'Enddate',
-                        editorType: 'dxDateBox'
-                    }]
-            },
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'EmployeeName',
-                    }]
+    var salesOrgHierarchyStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            var filter = ["isSellingZone", "=", true];
+            if (loadOptions.searchValue != null && loadOptions.searchValue != '') {
+                filter = [["isSellingZone", "=", true], "and", [loadOptions.searchExpr, loadOptions.searchOperation, loadOptions.searchValue]];
             }
-        ]
-    });
 
-    $('#resizable').dxResizable({
-        minHeight: 120,
-        handles: "bottom"
-    }).dxResizable('instance');
+            const deferred = $.Deferred();
+            salesOrgHierarchyService.getListDevextremes({ filter: JSON.stringify(filter) })
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            salesOrgHierarchyService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        },
+        insert(values) {
+            return salesOrgHierarchyService.create(values, { contentType: "application/json" });
+        },
+        update(key, values) {
+            return salesOrgHierarchyService.update(key, values, { contentType: "application/json" });
+        },
+        remove(key) {
+            return salesOrgHierarchyService.delete(key);
+        }
+    });
 
     var dgMCPHeaders = $('#dgMCPHeaders')
         .dxDataGrid({
@@ -97,9 +84,6 @@ $(function () {
             columnResizingMode: 'widget',
             columnMinWidth: 50,
             columnAutoWidth: true,
-
-            columnMinWidth: 50,
-
             columnChooser: {
                 enabled: true,
                 mode: "select"
@@ -120,7 +104,6 @@ $(function () {
             searchPanel: {
                 visible: true
             },
-
             stateStoring: { //save state in localStorage
                 enabled: true,
                 type: 'localStorage',
@@ -147,7 +130,6 @@ $(function () {
                             dgMCPHeaders.addRow();
                         },
                     },
-
                     'columnChooserButton',
                     "exportButton",
                     {
@@ -169,15 +151,27 @@ $(function () {
                     fixedPosition: "left",
                 },
                 {
-                    caption: "outlet Id",
+                    caption: "Company Name",
                     dataField: "outletId",
                 },
                 {
-                    caption: "outlet Name",
+                    caption: "SellingZone",
                     dataField: "outletName",
                 },
                 {
-                    caption: "Address",
+                    caption: "RouteCode",
+                    dataField: "address"
+                }, {
+                    caption: "RouteName",
+                    dataField: "address"
+                }, {
+                    caption: "Employee",
+                    dataField: "address"
+                }, {
+                    caption: "MCP Code",
+                    dataField: "address"
+                }, {
+                    caption: "MCP Description",
                     dataField: "address"
                 },
                 {
@@ -189,64 +183,83 @@ $(function () {
                     dataField: "endDate"
                 }, {
 
-                    caption: "Distance",
+                    caption: "GPS Lock",
+                    dataField: "distance"
+                }, {
+
+                    caption: "Num of customer",
                     dataField: "distance"
                 }, {
 
                     caption: "Monday",
                     dataField: "Monday",
                     dataType: "boolean",
+                    cellTemplate(container, options) {
+                        $('<div>')
+                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
+                            .appendTo(container);
+                    },
                 }
                 , {
 
                     caption: "Tuesday",
                     dataField: "Tuesday",
                     dataType: "boolean",
+                    cellTemplate(container, options) {
+                        $('<div>')
+                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
+                            .appendTo(container);
+                    },
                 }, {
 
                     caption: "Wednesday",
                     dataField: "Wednesday",
                     dataType: "boolean",
+                    cellTemplate(container, options) {
+                        $('<div>')
+                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
+                            .appendTo(container);
+                    },
                 }, {
 
                     caption: "Thursday",
                     dataField: "Thursday",
                     dataType: "boolean",
+                    cellTemplate(container, options) {
+                        $('<div>')
+                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
+                            .appendTo(container);
+                    },
                 }, {
 
                     caption: "Friday",
                     dataField: "Friday",
                     dataType: "boolean",
+                    cellTemplate(container, options) {
+                        $('<div>')
+                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
+                            .appendTo(container);
+                    },
                 }, {
 
                     caption: "Saturday",
                     dataField: "Saturday",
                     dataType: "boolean",
+                    cellTemplate(container, options) {
+                        $('<div>')
+                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
+                            .appendTo(container);
+                    },
                 }, {
 
                     caption: "Sunday",
                     dataField: "Sunday",
                     dataType: "boolean",
-                }, {
-
-                    caption: "Week1",
-                    dataField: "Week1",
-                    dataType: "boolean",
-                }, {
-
-                    caption: "Week2",
-                    dataField: "Week2",
-                    dataType: "boolean",
-                }, {
-
-                    caption: "Week3",
-                    dataField: "Week3",
-                    dataType: "boolean",
-                }, {
-
-                    caption: "Week4",
-                    dataField: "Week4",
-                    dataType: "boolean",
+                    cellTemplate(container, options) {
+                        $('<div>')
+                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
+                            .appendTo(container);
+                    },
                 }
             ],
         })

@@ -4,7 +4,24 @@ var userService = window.dMSpro.oMS.identityService.controllers.identityUsers.id
 
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
+
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
@@ -21,7 +38,9 @@ $(function () {
 
             assignmentService.getListDevextremes(args)
                 .done(result => {
-                    result.data.forEach(x => x.companyName = "x");
+
+                    console.log(result.data);
+                    //result.data.forEach(x => x.companyName = "x");
                     
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -33,13 +52,23 @@ $(function () {
             return deferred.promise();
         },
         insert(values) {
-            return assignmentService.create(values, { contentType: "application/json" });
+            
+            return assignmentService.create({
+                companyId: values.companyIdentityUserAssignment.companyId,
+                identityUserId: values.companyIdentityUserAssignment.identityUserId,
+            }, { contentType: "application/json" });
         },
         update(key, values) {
-            return assignmentService.update(key, values, { contentType: "application/json" });
+            
+            return assignmentService.update(key.companyIdentityUserAssignment.id,
+                {
+                    companyId: values.companyIdentityUserAssignment.companyId,
+                    identityUserId: values.companyIdentityUserAssignment.identityUserId
+                }, { contentType: "application/json" });
         },
         remove(key) {
-            return assignmentService.delete(key);
+            
+            return assignmentService.delete(key.companyIdentityUserAssignment.id);
         },
         byKey: function (key) {
             if (key == 0) return null;
@@ -54,6 +83,7 @@ $(function () {
     });
 
     var companyStore = new DevExpress.data.CustomStore({ 
+        key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -62,10 +92,10 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            debugger
+            console.log(args)
             companyService.getListDevextremes(args)
                 .done(result => { 
-
+                    console.log(result.data);
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -77,7 +107,7 @@ $(function () {
         },
         byKey: function (key) {
             if (key == 0) return null;
-
+            console.log('byKey')
             var d = new $.Deferred();
             companyService.get(key)
                 .done(data => {
@@ -86,6 +116,7 @@ $(function () {
             return d.promise();
         }
     });
+
     var userStore = new DevExpress.data.CustomStore({ 
         key: 'id',
         load: function (loadOptions) {
@@ -104,7 +135,7 @@ $(function () {
                 if (i in loadOptions && isNotEmpty(loadOptions[i]))
                     params[i] = JSON.stringify(loadOptions[i]);
             });
-             
+           
             userService.getListDevextremes(params)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -126,7 +157,23 @@ $(function () {
         }
     });
      
-    
+    function selectBoxEditorTemplate(cellElement, cellInfo) {
+        return $('<div>').dxLookup({
+            valueExpr: "id",
+            displayExpr: "name",
+            dataSource: new DevExpress.data.DataSource({
+                store: companyStore, 
+                paginate: true,
+                pageSize: 2
+            }), 
+            searchEnabled: true, 
+            searchMode: 'contains',
+            searchExpr: ['name'],
+            onValueChanged(data) {
+                //cellInfo.setValue(data.value);
+            },
+        });
+    }
     var gridComAssignments = $('#dgComAssignments').dxDataGrid({
         dataSource: assignmentStore, 
         editing: {
@@ -142,7 +189,7 @@ $(function () {
             }
         }, 
         remoteOperations: true,
-        cacheEnabled: true,
+        //cacheEnabled: true,
         export: {
             enabled: true,
             // allowExportSelectedData: true,
@@ -197,7 +244,7 @@ $(function () {
         stateStoring: { //save state in localStorage
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgCompanies',
+            storageKey: 'dgComAssignments',
         },
         paging: {
             enabled: true,
@@ -239,110 +286,58 @@ $(function () {
                 caption: l("Actions"),
                 width: 110,
                 buttons: ['edit', 'delete'],
+                fixedPosition: "left",
             },
             {
-                dataField: 'identityUserId',
+                dataField: 'companyIdentityUserAssignment.identityUserId',
                 caption: l("UserName"),
                 validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource() {
                         return {
-                            store: userStore
+                            store: userStore,
+                            paginate: true,
+                            pageSize: 2
                         };
                     },
                     displayExpr: 'userName',
                     valueExpr: 'id', 
+                    searchEnabled: true,
+                    searchMode: 'contains',
+                    minSearchLength: 2,
+                    showDataBeforeSearch: true
                 }
             },
             {
-                dataField: 'companyId',
+                dataField: 'companyIdentityUserAssignment.companyId',
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
                 validationRules: [{ type: "required" }], 
-                //cellTemplate(container, options) {
-                //    $('<div>')
-                //        .append($('<span>' + options.data.companyName + '</span>'))
-                //        .appendTo(container);
-                //},
+                calculateDisplayValue:"company.name",
+                //editCellTemplate: selectBoxEditorTemplate,
+                lookup: { 
+                    dataSource : { 
+                        store: companyStore,
+                        paginate: true,
+                        pageSize: 2,
 
-                lookup: {
-                    dataSource() {
-                        return {
-                            store: companyStore,
-                            pageSize: 30,
-                            paginate: true,
-                            requireTotalCount: true  
-                        };
                     },
                     displayExpr: 'name',
-                    valueExpr: 'id'
+                    valueExpr: 'id',
+                    searchEnabled: true,
+                    searchMode: 'contains'
                 }
             }
         ],
         //onEditorPreparing: function (e) {
         //    if (e.dataField == "companyId" && e.parentType == "dataRow") {
-        //        e.editorName = "dxDropDownBox";
-        //        e.editorOptions.dropDownOptions = {
-        //            //height: 500
-        //        };
-        //        e.editorOptions.contentTemplate = function (args, container) {
-        //            var value = args.component.option("value"),
-        //                $dataGrid = $("<div>").dxDataGrid({
-        //                    width: '100%',
-        //                    dataSource: companyStore,
-        //                    //keyExpr: "id",
-        //                    columns: [,
-        //                        {
-        //                            caption: "code",
-        //                            dataField: "code"
-        //                        }, {
-        //                            caption: "Name",
-        //                            dataField: "name"
-        //                        }],
-        //                    remoteOperations: true,
-        //                    paging: {
-        //                        enabled: true,
-        //                        pageSize: 10
-        //                    },
-        //                    pager: {
-        //                        visible: true,
-        //                        showPageSizeSelector: true,
-        //                        allowedPageSizes: [10, 20, 50, 100],
-        //                        showInfo: true,
-        //                        showNavigationButtons: true
-        //                    }, 
-        //                    hoverStateEnabled: true,
-        //                    paging: { enabled: true, pageSize: 10 },
-        //                    filterRow: { visible: true },
-        //                    scrolling: { mode: "infinite" },
-        //                    height: '90%',
-        //                    showRowLines: true,
-        //                    showBorders: true,
-        //                    selection: { mode: "single" },
-        //                    selectedRowKeys: value,
-        //                    onSelectionChanged: function (selectedItems) {
-        //                        var keys = selectedItems.selectedRowKeys;
-        //                        args.component.option("value", keys);
-        //                    }
-        //                });
-
-        //            var dataGrid = $dataGrid.dxDataGrid("instance");
-
-        //            args.component.on("valueChanged", function (args) {
-        //                var value = args.value;
-        //                debugger
-        //                dataGrid.selectRows(value, false);
-        //                if (value != args.previousValue && value.length > 0) {
-        //                    var items = dataGrid.getDataSource().items();
-        //                    var obj = items.filter(x => x.id == value)[0];
-        //                    e.component.cellValue(e.row.rowIndex, "companyId", value);
-        //                    e.component.cellValue(e.row.rowIndex, "companyName", obj.name); 
-        //                }
-        //            });
-        //            container.append($dataGrid);
-        //            return container;
-        //        };
+        //        //e.value = e.row.data.companyName; 
+        //        e.editorOptions.dataSource = {
+        //            pageSize: 30,
+        //            paginate: true,
+        //            store: companyStore
+        //        }; 
         //    }
-        //},
+        //}
     }).dxDataGrid("instance");
      
 });
