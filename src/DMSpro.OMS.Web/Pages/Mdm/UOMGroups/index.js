@@ -1,14 +1,10 @@
+var uomGroupService = window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGroup;
+var uomGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail;
+var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 $(function () {
-    // language text
     var l = abp.localization.getResource("MdmService");
-    // load mdmService
-    var uomGroupService = window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGroup;
-    var uomGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail;
-    var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
-
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
-    // custom store
     var groupStore = new DevExpress.data.CustomStore({
         key: "id",
         loadMode: 'processed',
@@ -127,29 +123,62 @@ $(function () {
 
     const dataGrid = $('#gridUOMGroups').dxDataGrid({
         dataSource: groupStore,
-        keyExpr: 'id',
+        //keyExpr: 'id',
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        autoExpandAll: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
-        scrolling: {
-            mode: 'standard',
-        },
         filterRow: {
             visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        paging:
-        {
+        columnMinWidth: 50,
+        columnChooser: {
             enabled: true,
-            pageSize: 10,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'gridUOMGroups',
+        },
+        paging: {
+            enabled: true,
+            pageSize: 10
         },
         pager: {
             visible: true,
@@ -159,10 +188,10 @@ $(function () {
             showNavigationButtons: true
         },
         editing: {
-            mode: 'row',
-            allowAdding: true,
-            allowUpdating: true,
-            allowDeleting: true,
+            mode: "row",
+            allowAdding: abp.auth.isGranted('MdmService.UOMGroups.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.UOMGroups.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.UOMGroups.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -178,11 +207,33 @@ $(function () {
                 }
             }
         },
+        items: [
+            "groupPanel",
+            {
+                location: 'after',
+                template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                onClick() {
+                    dataGrid.addRow();
+                },
+            },
+            'columnChooserButton',
+            "exportButton",
+            {
+                location: 'after',
+                template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                onClick() {
+                    //todo
+                },
+            },
+            "searchPanel"
+        ],
         columns: [
             {
                 type: 'buttons',
                 buttons: ['edit', 'delete'],
-                caption: l("Actions")
+                caption: l("Actions"),
+                width: 110,
+                fixedPosition: 'left'
             },
             {
                 caption: l("EntityFieldName:MDMService:UOM:Code"),
@@ -215,24 +266,59 @@ $(function () {
                             store: detailStore,
                             filter: ['uomGroupId', '=', options.key]
                         },
-                        keyExpr: 'id',
                         remoteOperations: true,
+                        showRowLines: true,
                         showBorders: true,
-                        autoExpandAll: true,
-                        focusedRowEnabled: true,
-                        allowColumnReordering: false,
+                        cacheEnabled: true,
+                        allowColumnReordering: true,
                         rowAlternationEnabled: true,
+                        allowColumnResizing: true,
+                        columnResizingMode: 'widget',
                         columnAutoWidth: true,
-                        columnHidingEnabled: true,
-                        errorRowEnabled: false,
                         filterRow: {
                             visible: true
                         },
-                        scrolling: {
-                            mode: 'standard'
+                        groupPanel: {
+                            visible: true,
                         },
-                        paging:
-                        {
+                        searchPanel: {
+                            visible: true
+                        },
+                        columnMinWidth: 50,
+                        columnChooser: {
+                            enabled: true,
+                            mode: "select"
+                        },
+                        columnFixing: {
+                            enabled: true,
+                        },
+                        export: {
+                            enabled: true,
+                        },
+                        onExporting(e) {
+                            const workbook = new ExcelJS.Workbook();
+                            const worksheet = workbook.addWorksheet('Data');
+
+                            DevExpress.excelExporter.exportDataGrid({
+                                component: e.component,
+                                worksheet,
+                                autoFilterEnabled: true,
+                            }).then(() => {
+                                workbook.xlsx.writeBuffer().then((buffer) => {
+                                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                                });
+                            });
+                            e.cancel = true;
+                        },
+                        headerFilter: {
+                            visible: true,
+                        },
+                        stateStoring: {
+                            enabled: true,
+                            type: 'localStorage',
+                            storageKey: 'dgUOMGroupDetails' + options.key,
+                        },
+                        paging: {
                             enabled: true,
                             pageSize: 10
                         },
@@ -243,12 +329,11 @@ $(function () {
                             showInfo: true,
                             showNavigationButtons: true
                         },
-                        editing:
-                        {
-                            mode: 'row',
-                            allowAdding: true,
-                            allowUpdating: true,
-                            allowDeleting: true,
+                        editing: {
+                            mode: "row",
+                            allowAdding: abp.auth.isGranted('MdmService.UOMGroupDetails.Create'),
+                            allowUpdating: abp.auth.isGranted('MdmService.UOMGroupDetails.Edit'),
+                            allowDeleting: abp.auth.isGranted('MdmService.UOMGroupDetails.Delete'),
                             useIcons: true,
                             texts: {
                                 editRow: l("Edit"),
@@ -272,6 +357,8 @@ $(function () {
                                 type: 'buttons',
                                 caption: l('Actions'),
                                 buttons: ['edit', 'delete'],
+                                width: 110,
+                                fixedPosition: 'left'
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:AltQty"),

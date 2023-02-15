@@ -231,22 +231,56 @@ $(function () {
     var companyAssginContainer = $('#companyAssgin').dxDataGrid({
         dataSource: companyInZoneStore,
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        autoExpandAll: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
-            visible: false
+            visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgCompanyAssign',
         },
         paging: {
             enabled: true,
@@ -296,23 +330,37 @@ $(function () {
                     e.newData[property] = e.oldData[property];
                 }
             }
-
             e.newData["salesOrgHierarchyId"] = salesOrgHierarchyId;
         },
         toolbar: {
             items: [
+                "groupPanel",
                 {
-                    name: "searchPanel",
-                    location: 'after'
-                }
-            ]
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        companyAssginContainer.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
         },
         columns: [
             {
                 caption: l("Actions"),
                 type: 'buttons',
                 width: 120,
-                buttons: ['edit', 'delete']
+                buttons: ['edit', 'delete'],
+                fixedPosition: 'left'
             },
             {
                 caption: l1("CompanyInZone.Company"),
@@ -389,22 +437,56 @@ $(function () {
     var customerAssginContainer = $('#customerAssgin').dxDataGrid({
         dataSource: customerInZoneStore,
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        autoExpandAll: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
-            visible: false
+            visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgCustomerAssgin',
         },
         paging: {
             enabled: true,
@@ -459,18 +541,33 @@ $(function () {
         },
         toolbar: {
             items: [
+                "groupPanel",
                 {
-                    name: "searchPanel",
-                    location: 'after'
-                }
-            ]
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        customerAssginContainer.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
         },
         columns: [
             {
                 caption: l("Actions"),
                 type: 'buttons',
                 width: 120,
-                buttons: ['edit', 'delete']
+                buttons: ['edit', 'delete'],
+                fixedPosition: 'left'
             },
             {
                 caption: l("EntityFieldName:MDMService:CustomerInZone:Customer"),
@@ -544,13 +641,13 @@ $(function () {
     }).dxDataGrid("instance");
 
     /****button*****/
-    $("#NewCompanyAssginButton").click(function () {
-        companyAssginContainer.addRow();
-    });
+    //$("#NewCompanyAssginButton").click(function () {
+    //    companyAssginContainer.addRow();
+    //});
 
-    $("#NewCustomerButton").click(function () {
-        customerAssginContainer.addRow();
-    });
+    //$("#NewCustomerButton").click(function () {
+    //    customerAssginContainer.addRow();
+    //});
 
     $("#tab1").click(function () {
         companyAssginContainer.refresh();

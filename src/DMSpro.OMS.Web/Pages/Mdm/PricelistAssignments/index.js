@@ -1,10 +1,8 @@
+var pricelistAssignmentService = window.dMSpro.oMS.mdmService.controllers.pricelistAssignments.pricelistAssignment;
+var pricelistService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
+var customerService = window.dMSpro.oMS.mdmService.controllers.customerGroups.customerGroup;
 $(function () {
-    // language text
     var l = abp.localization.getResource("MdmService");
-    // load mdmservice
-    var pricelistAssignmentService = window.dMSpro.oMS.mdmService.controllers.pricelistAssignments.pricelistAssignment;
-    var pricelistService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
-    var customerService = window.dMSpro.oMS.mdmService.controllers.customerGroups.customerGroup;
 
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
@@ -92,7 +90,7 @@ $(function () {
         }
     });
 
-    var customerGroupStore = new DevExpress.data.CustomStore({
+    var getCustomers = new DevExpress.data.CustomStore({
         key: "id",
         loadMode: 'processed',
         load(loadOptions) {
@@ -103,7 +101,6 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            const args2 = { 'loadOptions': args };
             customerService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -126,50 +123,82 @@ $(function () {
         }
     });
 
-    // get customers
-    var customers = [];
-    var urlCustomersLookup = abp.appPath + 'api/mdm-service/pricelist-assignments/customer-group-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    $.ajax({
-        url: `${urlCustomersLookup}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            console.log('data call geoList ajax: ', data);
-            customers = data.items;
-        }
-    });
-    var getCustomers = function () {
-        return customers;
-    }
+    //// get customers
+    //var customers = [];
+    //var urlCustomersLookup = abp.appPath + 'api/mdm-service/pricelist-assignments/customer-group-lookup' +
+    //    abp.utils.buildQueryString([
+    //        { name: 'maxResultCount', value: 1000 }
+    //    ]);
+    //$.ajax({
+    //    url: `${urlCustomersLookup}`,
+    //    dataType: 'json',
+    //    async: false,
+    //    success: function (data) {
+    //        console.log('data call geoList ajax: ', data);
+    //        customers = data.items;
+    //    }
+    //});
+    //var getCustomers = function () {
+    //    return customers;
+    //}
 
     const dataGrid = $('#gridPriceListAssignment').dxDataGrid({
         dataSource: priceListStore,
-        keyExpr: 'id',
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        autoExpandAll: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
-        scrolling: {
-            mode: 'standard',
-        },
         filterRow: {
             visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        paging:
-        {
+        columnMinWidth: 50,
+        columnChooser: {
             enabled: true,
-            pageSize: 10,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgPriceListAssignment',
+        },
+        paging: {
+            enabled: true,
+            pageSize: 10
         },
         pager: {
             visible: true,
@@ -178,38 +207,22 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
-        //editing: {
-        //    mode: 'row',
-        //    allowAdding: true,
-        //    allowUpdating: true,
-        //    allowDeleting: true,
-        //    useIcons: true,
-        //    texts: {
-        //        editRow: l("Edit"),
-        //        deleteRow: l("Delete"),
-        //        confirmDeleteMessage: l("DeleteConfirmationMessage")
-        //    }
-        //},
-        //onRowInserting: function (e) {
-        //    debugger
-        //    if (e.data && e.data.id == 0) {
-        //        e.data.id = null;
-        //    }
-        //},
-        //onRowUpdating: function (e) {
-        //    var objectRequire = ['code', 'name'];
-        //    for (var property in e.oldData) {
-        //        if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-        //            e.newData[property] = e.oldData[property];
-        //        }
-        //    }
-        //},
+        toolbar: {
+            items: [
+                "groupPanel",
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
         columns: [
-            //{
-            //    type: 'buttons',
-            //    buttons: ['edit', 'delete'],
-            //    caption: l("Actions")
-            //},
             {
                 caption: l("EntityFieldName:MDMService:PriceListAssignment:PriceListCode"),
                 dataField: "code",
@@ -231,24 +244,59 @@ $(function () {
                             store: pricelistAssignmentStore,
                             filter: ['priceListId', '=', options.key]
                         },
-                        keyExpr: 'id',
                         remoteOperations: true,
+                        showRowLines: true,
                         showBorders: true,
-                        autoExpandAll: true,
-                        focusedRowEnabled: true,
-                        allowColumnReordering: false,
+                        cacheEnabled: true,
+                        allowColumnReordering: true,
                         rowAlternationEnabled: true,
+                        allowColumnResizing: true,
+                        columnResizingMode: 'widget',
                         columnAutoWidth: true,
-                        columnHidingEnabled: true,
-                        errorRowEnabled: false,
                         filterRow: {
                             visible: true
                         },
-                        scrolling: {
-                            mode: 'standard'
+                        groupPanel: {
+                            visible: true,
                         },
-                        paging:
-                        {
+                        searchPanel: {
+                            visible: true
+                        },
+                        columnMinWidth: 50,
+                        columnChooser: {
+                            enabled: true,
+                            mode: "select"
+                        },
+                        columnFixing: {
+                            enabled: true,
+                        },
+                        export: {
+                            enabled: true,
+                        },
+                        onExporting(e) {
+                            const workbook = new ExcelJS.Workbook();
+                            const worksheet = workbook.addWorksheet('Data');
+
+                            DevExpress.excelExporter.exportDataGrid({
+                                component: e.component,
+                                worksheet,
+                                autoFilterEnabled: true,
+                            }).then(() => {
+                                workbook.xlsx.writeBuffer().then((buffer) => {
+                                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                                });
+                            });
+                            e.cancel = true;
+                        },
+                        headerFilter: {
+                            visible: true,
+                        },
+                        stateStoring: {
+                            enabled: true,
+                            type: 'localStorage',
+                            storageKey: 'dgPriceListAssignmentDetail' + options.key,
+                        },
+                        paging: {
                             enabled: true,
                             pageSize: 10
                         },
@@ -259,36 +307,15 @@ $(function () {
                             showInfo: true,
                             showNavigationButtons: true
                         },
-                        editing:
-                        {
-                            mode: 'row',
-                            allowAdding: true,
-                            //allowUpdating: true,
-                            //allowDeleting: true,
-                            useIcons: true,
-                            //texts: {
-                            //    editRow: l("Edit"),
-                            //    deleteRow: l("Delete"),
-                            //    confirmDeleteMessage: l("DeleteConfirmationMessage")
-                            //}
+                        editing: {
+                            mode: "row",
+                            allowAdding: abp.auth.isGranted('MdmService.PricelistAssignments.Create'),
+                            //useIcons: true
                         },
                         onRowInserting: function (e) {
                             e.data.priceListId = options.key
                         },
-                        onRowUpdating: function (e) {
-                            var objectRequire = ['priceListId', 'customerGroupId'];
-                            for (var property in e.oldData) {
-                                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                                    e.newData[property] = e.oldData[property];
-                                }
-                            }
-                        },
                         columns: [
-                            //{
-                            //    type: 'buttons',
-                            //    caption: l('Actions'),
-                            //    buttons: ['edit', 'delete'],
-                            //},
                             {
                                 caption: l("EntityFieldName:MDMService:CustomerGroup:Name"),
                                 dataField: "customerGroupId",
@@ -296,7 +323,7 @@ $(function () {
                                 lookup: {
                                     dataSource: getCustomers,
                                     valueExpr: 'id',
-                                    displayExpr: 'displayName'
+                                    displayExpr: 'code'
                                 }
                             }
                         ]
@@ -304,21 +331,6 @@ $(function () {
             }
         }
     }).dxDataGrid('instance');
-
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
-
-        pricelistAssignmentService.getDownloadToken().then(
-            function (result) {
-                var url = abp.appPath + 'api/mdm-service/pricelist-assignments/as-excel-file' + abp.utils.buildQueryString([
-                    { name: 'downloadToken', value: result.token }
-                ]);
-
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
 
     function isNotEmpty(value) {
         return value !== undefined && value !== null && value !== '';

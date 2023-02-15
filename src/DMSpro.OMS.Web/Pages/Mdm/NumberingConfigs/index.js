@@ -1,28 +1,17 @@
+var numberingConfigService = window.dMSpro.oMS.mdmService.controllers.numberingConfigs.numberingConfig;
+var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
 $(function () {
-    // language
     var l = abp.localization.getResource("MdmService");
-    // load mdmService
-    var numberingConfigService = window.dMSpro.oMS.mdmService.controllers.numberingConfigs.numberingConfig;
-    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    var isNotEmpty = function (value) {
+        return value !== undefined && value !== null && value !== '';
+    }
 
-    // custom store
     var numberingConfigStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: "raw",
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
@@ -50,7 +39,7 @@ $(function () {
             return numberingConfigService.create(values, { contentType: "application/json" });
         },
         update(key, values) {
-            return numberingConfigService.update(key, values, { contentType: "application/json" });
+            return numberingConfigService.update(key.id, values, { contentType: "application/json" });
         },
         remove(key) {
             return numberingConfigService.delete(key);
@@ -58,27 +47,14 @@ $(function () {
     });
 
     var companyStore = new DevExpress.data.CustomStore({
-        key: "id",
-        loadMode: 'raw',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            const args2 = { 'loadOptions': args };
             companyService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -103,24 +79,57 @@ $(function () {
 
     var gridgridNumberingConfigs = $('#gridNumberingConfigs').dxDataGrid({
         dataSource: numberingConfigStore,
-        keyExpr: 'id',
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        autoExpandAll: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
             visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgNumberingConfigs',
         },
         paging: {
             enabled: true,
@@ -134,10 +143,10 @@ $(function () {
             showNavigationButtons: true
         },
         editing: {
-            mode: 'row',
-            allowAdding: true,
-            allowUpdating: true,
-            allowDeleting: true,
+            mode: "row",
+            allowAdding: abp.auth.isGranted('MdmService.SystemConfig.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.SystemConfig.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.SystemConfig.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -145,14 +154,8 @@ $(function () {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        //onRowInserting: function (e) {
-        //    debugger
-        //    if (e.data && e.data.code == null) {
-        //        e.data.code = e.data.Code;
-        //    }
-        //},
         onRowUpdating: function (e) {
-            var objectRequire = ['startNumber', 'length'];
+            var objectRequire = ['companyId', 'prefix', 'startNumber', 'length'];
             for (var property in e.oldData) {
                 if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                     e.newData[property] = e.oldData[property];
@@ -161,26 +164,39 @@ $(function () {
         },
         toolbar: {
             items: [
+                "groupPanel",
                 {
-                    name: "searchPanel",
-                    location: 'after'
-                }
-            ]
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        gridgridNumberingConfigs.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
         },
         columns: [
             {
                 type: 'buttons',
                 caption: l('Actions'),
                 buttons: ['edit', 'delete'],
+                width: 110,
+                fixedPosition: 'left'
             },
             {
                 dataField: 'companyId',
                 caption: l("EntityFieldName:MDMService:NumberingConfig:CompanyName"),
                 lookup: {
-                    dataSource:
-                    {
-                        store: companyStore,
-                    },
+                    dataSource: companyStore,
                     valueExpr: 'id',
                     displayExpr: 'name'
                 }
@@ -195,11 +211,6 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:NumberingConfig:Prefix"),
                 dataType: 'string'
             },
-            //{
-            //    dataField: 'suffix',
-            //    caption: l("EntityFieldName:MDMService:NumberingConfig:Suffix"),
-            //    dataType: 'string'
-            //},
             {
                 dataField: 'length',
                 caption: l("EntityFieldName:MDMService:NumberingConfig:Length"),
@@ -207,22 +218,4 @@ $(function () {
             }
         ]
     }).dxDataGrid('instance');
-
-    $("#NewNumberingConfigButton").click(function () {
-        gridgridNumberingConfigs.addRow();
-    });
-
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
-
-        numberingConfigService.getDownloadToken().then(
-            function (result) {
-                var url = abp.appPath + 'api/mdm-service/numbering-configs/as-excel-file' + abp.utils.buildQueryString([
-                    { name: 'downloadToken', value: result.token }
-                ]);
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
 });

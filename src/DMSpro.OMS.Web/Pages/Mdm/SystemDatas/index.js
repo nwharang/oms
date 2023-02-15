@@ -1,31 +1,20 @@
+var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
 $(function () {
-    // language
     var l = abp.localization.getResource("MdmService");
-    // load mdmService
-    var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
-    // custom store
+    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    var isNotEmpty = function (value) {
+        return value !== undefined && value !== null && value !== '';
+    }
+
     var customStore = new DevExpress.data.CustomStore({
-        key: "id",
-        loadMode: 'raw',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            const args2 = { 'loadOptions': args };
             systemDataService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -52,30 +41,63 @@ $(function () {
             return systemDataService.update(key, values, { contentType: 'application/json' });
         },
         remove(key) {
-            return systemDataService.delete(key);
+            return systemDataService.delete(key.id);
         }
     });
 
     var gridSystemData = $('#gridSystemDatas').dxDataGrid({
         dataSource: customStore,
-        keyExpr: 'id',
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        autoExpandAll: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
             visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgSystemDatas',
         },
         paging: {
             enabled: true,
@@ -89,10 +111,10 @@ $(function () {
             showNavigationButtons: true
         },
         editing: {
-            mode: 'row',
-            allowAdding: true,
-            allowUpdating: true,
-            allowDeleting: true,
+            mode: "row",
+            allowAdding: abp.auth.isGranted('MdmService.SystemData.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.SystemData.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.SystemData.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -100,12 +122,6 @@ $(function () {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        //onRowInserting: function (e) {
-        //    debugger
-        //    if (e.data && e.data.code == null) {
-        //        e.data.code = e.data.Code;
-        //    }
-        //},
         onRowUpdating: function (e) {
             var objectRequire = ['code', 'valueCode', 'valueName'];
             for (var property in e.oldData) {
@@ -116,17 +132,33 @@ $(function () {
         },
         toolbar: {
             items: [
+                "groupPanel",
                 {
-                    name: "searchPanel",
-                    location: 'after'
-                }
-            ]
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        gridSystemData.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
         },
         columns: [
             {
                 type: 'buttons',
                 caption: l('Actions'),
                 buttons: ['edit', 'delete'],
+                width: 110,
+                fixedPosition: 'left'
             },
             {
                 dataField: 'code',
@@ -145,23 +177,4 @@ $(function () {
             }
         ]
     }).dxDataGrid('instance');
-
-    $("#NewSystemDataButton").click(function () {
-        gridSystemData.addRow();
-    });
-
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
-
-        systemDataService.getDownloadToken().then(
-            function (result) {
-                var url = abp.appPath + 'api/mdm-service/system-datas/as-excel-file' + abp.utils.buildQueryString([
-                    { name: 'downloadToken', value: result.token }
-                ]);
-
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
 });

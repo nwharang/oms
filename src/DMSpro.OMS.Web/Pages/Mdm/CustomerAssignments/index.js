@@ -78,33 +78,70 @@ $(function () {
     //        return d.promise();
     //    }
     //});
-    var customersLookup = [];
-    var companiesLookup = [];
+    var customersLookup = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const argsGeo = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
 
-    var urlCus = abp.appPath + 'api/mdm-service/customer-assignments/customer-profile-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    var urlCompany = abp.appPath + 'api/mdm-service/customer-assignments/company-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    $.ajax({
-        url: `${urlCus}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            console.log('data call customersLookup ajax: ', data);
-            customersLookup = data.items;
+            customerService.getListDevextremes(argsGeo)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            customerService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
         }
     });
-    $.ajax({
-        url: `${urlCompany}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            console.log('data call companiesLookup ajax: ', data);
-            companiesLookup = data.items;
+    var companiesLookup = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const argsGeo = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            companyService.getListDevextremes(argsGeo)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            companyService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
         }
     });
 
@@ -164,21 +201,56 @@ $(function () {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        //columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
-            visible: false
+            visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgCustomerAssignments',
         },
         paging: {
             enabled: true,
@@ -191,12 +263,35 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
+        toolbar: {
+            items: [
+                "groupPanel",
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        gridCusAssignments.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
         columns: [
             {
                 type: 'buttons',
                 caption: l("Actions"),
                 width: 110,
                 buttons: ['edit', 'delete'],
+                fixedPosition: 'left'
             },
             {
                 dataField: 'companyId',
@@ -224,7 +319,7 @@ $(function () {
                 lookup: {
                     dataSource: customersLookup,
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "code"
                 }
                 //lookup: {
                 //    dataSource() {
@@ -250,31 +345,31 @@ $(function () {
         ],
     }).dxDataGrid("instance");
 
-    $("input#Search").on("input", function () {
-        gridCusAssignments.searchByText($(this).val());
-    });
+    //$("input#Search").on("input", function () {
+    //    gridCusAssignments.searchByText($(this).val());
+    //});
 
-    $("#btnNewCusAssignment").click(function (e) {
-        gridCusAssignments.addRow();
-    });
+    //$("#btnNewCusAssignment").click(function (e) {
+    //    gridCusAssignments.addRow();
+    //});
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
+    //$("#ExportToExcelButton").click(function (e) {
+    //    e.preventDefault();
 
-        cusAttributesValueService.getDownloadToken().then(
-            function (result) {
-                var input = getFilter();
-                var url = abp.appPath + 'api/mdm-service/sales-channels/as-excel-file' +
-                    abp.utils.buildQueryString([
-                        { name: 'downloadToken', value: result.token },
-                        { name: 'filterText', value: input.filterText },
-                        { name: 'code', value: input.code },
-                        { name: 'name', value: input.name }
-                    ]);
+    //    cusAttributesValueService.getDownloadToken().then(
+    //        function (result) {
+    //            var input = getFilter();
+    //            var url = abp.appPath + 'api/mdm-service/sales-channels/as-excel-file' +
+    //                abp.utils.buildQueryString([
+    //                    { name: 'downloadToken', value: result.token },
+    //                    { name: 'filterText', value: input.filterText },
+    //                    { name: 'code', value: input.code },
+    //                    { name: 'name', value: input.name }
+    //                ]);
 
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
+    //            var downloadWindow = window.open(url, '_blank');
+    //            downloadWindow.focus();
+    //        }
+    //    )
+    //});
 });

@@ -24,6 +24,8 @@
 }
 
 @section scripts {
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/Mdm/SalesOrganization/Details.js" />
 }
 
@@ -101,13 +103,13 @@
                                         <div class="col">
                                             <div class="dx-fieldset-header d-flex">Employee</div>
                                         </div>
-                                        <div class="col-auto mr-auto">
+                                        @*<div class="col-auto mr-auto">
                                             <div class="buttons-header-grid">
                                                 <button id="NewSalesOrgEmpAssignmentButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" disabled>
                                                     <i class="fa fa-plus"></i> <span>@L["Button.New.SalesOrgEmpAssignment"].Value</span>
                                                 </button>
                                             </div>
-                                        </div>
+                                        </div>*@
                                     </div>
                                     <div id="dataGridContainer"></div>
                                 </div>

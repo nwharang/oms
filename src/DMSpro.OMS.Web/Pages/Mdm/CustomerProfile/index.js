@@ -6,49 +6,113 @@
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
     var cusAttachService = window.dMSpro.oMS.mdmService.controllers.customerAttachments.customerAttachment;
     var cusContactService = window.dMSpro.oMS.mdmService.controllers.customerContacts.customerContact;
+    var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
+    var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
+    var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-    var pricelistLookup = [];
-    var systemDataLookup = [];
-    var cusAttrLookup = [];
 
-    var urlPriceList = abp.appPath + 'api/mdm-service/customers/price-list-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    var urlSystemData = abp.appPath + 'api/mdm-service/customers/system-data-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    var urlCusAttr = abp.appPath + 'api/mdm-service/customers/cus-attribute-value-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
+    var pricelistLookup = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const argsGeo = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
 
-    $.ajax({
-        url: `${urlPriceList}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            pricelistLookup = data.items;
+            priceListService.getListDevextremes(argsGeo)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            priceListService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
         }
     });
-    $.ajax({
-        url: `${urlSystemData}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            systemDataLookup = data.items;
+
+    var systemDataLookup = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const argsGeo = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            systemDataService.getListDevextremes(argsGeo)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            systemDataService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
         }
     });
-    $.ajax({
-        url: `${urlCusAttr}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            cusAttrLookup = data.items;
+
+    var cusAttrLookup = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const argsGeo = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            cusAttributeValueService.getListDevextremes(argsGeo)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            cusAttributeValueService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
         }
     });
     
@@ -562,21 +626,56 @@
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        //columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
-            visible: false
+            visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgCustomerProfile',
         },
         paging: {
             enabled: true,
@@ -589,12 +688,35 @@
             showInfo: true,
             showNavigationButtons: true
         },
+        toolbar: {
+            items: [
+                "groupPanel",
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        gridCustomers.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
         columns: [
             {
                 type: 'buttons',
                 caption: l("Actions"),
                 width: 90,
                 buttons: ['edit'],
+                fixedPosition: 'left'
             },
             {
                 dataField: 'code',
@@ -700,7 +822,7 @@
                 lookup: {
                     dataSource: systemDataLookup,
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "code"
                 }
             },
             {
@@ -723,7 +845,7 @@
                 lookup: {
                     dataSource: pricelistLookup,
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "code"
                 }
             },
             {
@@ -832,7 +954,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -842,7 +964,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -852,7 +974,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -862,7 +984,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -872,7 +994,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -882,7 +1004,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -892,7 +1014,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -902,7 +1024,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -912,7 +1034,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -922,7 +1044,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -932,7 +1054,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -942,7 +1064,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -952,7 +1074,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -962,7 +1084,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -972,7 +1094,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -982,7 +1104,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -992,7 +1114,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -1002,7 +1124,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -1012,7 +1134,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
             {
@@ -1022,7 +1144,7 @@
                 lookup: {
                     dataSource: cusAttrLookup,
                     valueExpr: 'id',
-                    displayExpr: 'displayName',
+                    displayExpr: 'attrValName',
                 }
             },
         ],

@@ -10,9 +10,12 @@
     "Button.Save": "Save",
     "Button.Close": "Close",
     "Button.Cancel": "Cancel",
+    "Button.ViewDetail": "View Details",
     "Active": "Active",
     "ConfirmationMessage.UnSavedAndLeave": "Changes you made may not be saved.",
     "ConfirmationMessage.UnSavedAndLeaveTitle": "Do you want to leave this site?",
+    "ConfirmationMessage.Cancel": "Do you want to cancel this schedule?",
+    "WarnMessage.RequiredField": "There are incompleted required fields. Please complete them.",
     "SalesOrgHierarchies.Context.Edit": "Edit",
     "SalesOrgHierarchies.Context.AddSub": "Add sub",
     "SalesOrgHierarchies.Context.AddRoute": "Add route",
@@ -87,6 +90,7 @@
     "AttributeName19": "Attribute 19",
     "CompanyInZone.Company": "Company",
     "CustomerInZone.CustomerCode": "Customer Code",
-    "CustomerInZone.CustomerName": "Customer Name"
+    "CustomerInZone.CustomerName": "Customer Name",
+    "EntityFieldName:MDMService:PriceListDetail:PriceBeforeUpdate": "Price Before Update"
   }
 }

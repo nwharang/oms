@@ -4,71 +4,104 @@ $(function () {
 	
     var vendorService = window.dMSpro.oMS.mdmService.controllers.vendors.vendor;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
+    var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
+    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
     const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-
     var geoMasterStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: "raw",
+        key: "id",
+        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
-            const argsGeo = {};
+            const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-
-            geoMasterService.getListDevextremes(argsGeo)
+            geoMasterService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
-                        groupCount: result.groupCount,
+                        groupCount: result.groupCount
                     });
                 });
-
             return deferred.promise();
         },
         byKey: function (key) {
             if (key == 0) return null;
-
             var d = new $.Deferred();
             geoMasterService.get(key)
                 .done(data => {
                     d.resolve(data);
-                });
+                })
             return d.promise();
         }
     });
 
-    var pricelistLookup = [];
-    var companiesLookup = [];
-
-    var urlPriceList = abp.appPath + 'api/mdm-service/vendors/price-list-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    var urlCompany = abp.appPath + 'api/mdm-service/vendors/company-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    $.ajax({
-        url: `${urlPriceList}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            pricelistLookup = data.items;
+    var pricelistLookup = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'processed',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            priceListService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+            var d = new $.Deferred();
+            priceListService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
         }
     });
-    $.ajax({
-        url: `${urlCompany}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            companiesLookup = data.items;
+    var companiesLookup = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'processed',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            companyService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+            var d = new $.Deferred();
+            companyService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
         }
     });
 
@@ -112,7 +145,7 @@ $(function () {
 
     var gridVendors = $('#dgVendors').dxDataGrid({
         dataSource: customStore,
-        keyExpr: "id",
+        //keyExpr: "id",
         editing: {
             mode: "popup",
             allowAdding: abp.auth.isGranted('MdmService.Vendors.Create'),
@@ -132,21 +165,56 @@ $(function () {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        //columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
-            visible: false
+            visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgVendors',
         },
         paging: {
             enabled: true,
@@ -159,12 +227,35 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
+        toolbar: {
+            items: [
+                "groupPanel",
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        gridVendors.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
         columns: [
             {
                 type: 'buttons',
                 caption: l("Actions"),
                 width: 90,
                 buttons: ['edit'],
+                fixedPosition: 'left'
             },
             {
                 dataField: 'code',
@@ -230,7 +321,7 @@ $(function () {
                 lookup: {
                     dataSource: companiesLookup,
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "code"
                 }
             },
             //{
@@ -252,7 +343,7 @@ $(function () {
                 lookup: {
                     dataSource: pricelistLookup,
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "code"
                 }
             },
             {
@@ -376,57 +467,57 @@ $(function () {
         ],
     }).dxDataGrid("instance");
 
-    $("#btnNewVendor").click(function (e) {
-        gridVendors.addRow();
-    });
+//    $("#btnNewVendor").click(function (e) {
+//        gridVendors.addRow();
+//    });
 
-    $("input#Search").on("input", function () {
-        gridVendors.searchByText($(this).val());
-    });
+//    $("input#Search").on("input", function () {
+//        gridVendors.searchByText($(this).val());
+//    });
 
 	
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
+//    $("#ExportToExcelButton").click(function (e) {
+//        e.preventDefault();
 
-        vendorService.getDownloadToken().then(
-            function(result){
-                    var input = getFilter();
-                    var url =  abp.appPath + 'api/mdm-service/vendors/as-excel-file' + 
-                        abp.utils.buildQueryString([
-                            { name: 'downloadToken', value: result.token },
-                            { name: 'filterText', value: input.filterText }, 
-                            { name: 'code', value: input.code }, 
-                            { name: 'name', value: input.name }, 
-                            { name: 'shortName', value: input.shortName }, 
-                            { name: 'phone1', value: input.phone1 }, 
-                            { name: 'phone2', value: input.phone2 }, 
-                            { name: 'erpCode', value: input.erpCode }, 
-                            { name: 'active', value: input.active },
-                            { name: 'endDateMin', value: input.endDateMin },
-                            { name: 'endDateMax', value: input.endDateMax }, 
-                            { name: 'warehouseId', value: input.warehouseId }, 
-                            { name: 'street', value: input.street }, 
-                            { name: 'address', value: input.address }, 
-                            { name: 'latitude', value: input.latitude }, 
-                            { name: 'longitude', value: input.longitude }, 
-                            { name: 'linkedCompanyId', value: input.linkedCompanyId }
-, 
-                            { name: 'priceListId', value: input.priceListId }
-, 
-                            { name: 'geoMaster0Id', value: input.geoMaster0Id }
-, 
-                            { name: 'geoMaster1Id', value: input.geoMaster1Id }
-, 
-                            { name: 'geoMaster2Id', value: input.geoMaster2Id }
-, 
-                            { name: 'geoMaster3Id', value: input.geoMaster3Id }
-, 
-                            { name: 'geoMaster4Id', value: input.geoMaster4Id }
-                            ]);
+//        vendorService.getDownloadToken().then(
+//            function(result){
+//                    var input = getFilter();
+//                    var url =  abp.appPath + 'api/mdm-service/vendors/as-excel-file' + 
+//                        abp.utils.buildQueryString([
+//                            { name: 'downloadToken', value: result.token },
+//                            { name: 'filterText', value: input.filterText }, 
+//                            { name: 'code', value: input.code }, 
+//                            { name: 'name', value: input.name }, 
+//                            { name: 'shortName', value: input.shortName }, 
+//                            { name: 'phone1', value: input.phone1 }, 
+//                            { name: 'phone2', value: input.phone2 }, 
+//                            { name: 'erpCode', value: input.erpCode }, 
+//                            { name: 'active', value: input.active },
+//                            { name: 'endDateMin', value: input.endDateMin },
+//                            { name: 'endDateMax', value: input.endDateMax }, 
+//                            { name: 'warehouseId', value: input.warehouseId }, 
+//                            { name: 'street', value: input.street }, 
+//                            { name: 'address', value: input.address }, 
+//                            { name: 'latitude', value: input.latitude }, 
+//                            { name: 'longitude', value: input.longitude }, 
+//                            { name: 'linkedCompanyId', value: input.linkedCompanyId }
+//, 
+//                            { name: 'priceListId', value: input.priceListId }
+//, 
+//                            { name: 'geoMaster0Id', value: input.geoMaster0Id }
+//, 
+//                            { name: 'geoMaster1Id', value: input.geoMaster1Id }
+//, 
+//                            { name: 'geoMaster2Id', value: input.geoMaster2Id }
+//, 
+//                            { name: 'geoMaster3Id', value: input.geoMaster3Id }
+//, 
+//                            { name: 'geoMaster4Id', value: input.geoMaster4Id }
+//                            ]);
                             
-                    var downloadWindow = window.open(url, '_blank');
-                    downloadWindow.focus();
-            }
-        )
-    });
+//                    var downloadWindow = window.open(url, '_blank');
+//                    downloadWindow.focus();
+//            }
+//        )
+//    });
 });

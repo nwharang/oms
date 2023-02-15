@@ -1,25 +1,48 @@
 $(function () {
     var l = abp.localization.getResource("MdmService");
     var cusAttributesValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
+    var cusAttributeService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
 
-    var cusAttributes = [];
+    var cusAttributes = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            [
+                'skip',
+                'take',
+                'requireTotalCount',
+                'requireGroupCount',
+                'sort',
+                'filter',
+                'totalSummary',
+                'group',
+                'groupSummary',
+            ].forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
 
-    var url = abp.appPath + 'api/mdm-service/cus-attribute-values/customer-attribute-lookup' +
-        abp.utils.buildQueryString([
-            { name: 'maxResultCount', value: 1000 }
-        ]);
-    $.ajax({
-        url: `${url}`,
-        dataType: 'json',
-        async: false,
-        success: function (data) {
-            console.log('data call ajax: ', data);
-            cusAttributes = data.items;
+            cusAttributeService.getListDevextremes(args)
+                .done(result => {
+                    console.log('data:', result)
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            return key == 0 ? cusAttributeService.get(key) : null;
         }
-    })
+    });
 
     //Custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
@@ -102,21 +125,56 @@ $(function () {
             }
         },
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
-            visible: false
+            visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgCusAttributeValues',
         },
         paging: {
             enabled: true,
@@ -129,12 +187,35 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
+        toolbar: {
+            items: [
+                "groupPanel",
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        gridCusAttributeValues.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
         columns: [
             {
                 type: 'buttons',
                 caption: l("Actions"),
                 width: 110,
                 buttons: ['edit', 'delete'],
+                fixedPosition: 'left'
             },
             {
                 dataField: 'attrValName',
@@ -148,7 +229,7 @@ $(function () {
                 lookup: {
                     dataSource: cusAttributes,
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "attrName"
                 }
             },
             {
@@ -180,31 +261,31 @@ $(function () {
         ],
     }).dxDataGrid("instance");
 
-    $("input#Search").on("input", function () {
-        gridCusAttributeValues.searchByText($(this).val());
-    });
+    //$("input#Search").on("input", function () {
+    //    gridCusAttributeValues.searchByText($(this).val());
+    //});
 
-    $("#btnNewCusAttributeValue").click(function (e) {
-        gridCusAttributeValues.addRow();
-    });
+    //$("#btnNewCusAttributeValue").click(function (e) {
+    //    gridCusAttributeValues.addRow();
+    //});
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
+    //$("#ExportToExcelButton").click(function (e) {
+    //    e.preventDefault();
 
-        cusAttributesValueService.getDownloadToken().then(
-            function (result) {
-                var input = getFilter();
-                var url = abp.appPath + 'api/mdm-service/sales-channels/as-excel-file' +
-                    abp.utils.buildQueryString([
-                        { name: 'downloadToken', value: result.token },
-                        { name: 'filterText', value: input.filterText },
-                        { name: 'code', value: input.code },
-                        { name: 'name', value: input.name }
-                    ]);
+    //    cusAttributesValueService.getDownloadToken().then(
+    //        function (result) {
+    //            var input = getFilter();
+    //            var url = abp.appPath + 'api/mdm-service/sales-channels/as-excel-file' +
+    //                abp.utils.buildQueryString([
+    //                    { name: 'downloadToken', value: result.token },
+    //                    { name: 'filterText', value: input.filterText },
+    //                    { name: 'code', value: input.code },
+    //                    { name: 'name', value: input.name }
+    //                ]);
 
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
+    //            var downloadWindow = window.open(url, '_blank');
+    //            downloadWindow.focus();
+    //        }
+    //    )
+    //});
 });

@@ -17,6 +17,8 @@
 
 @section scripts
     {
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/Mdm/SellingZones/index.js" />
 }
 
@@ -53,24 +55,24 @@
                                 <div class="tab-content py-2">
                                     <div class="tab-pane fade show active" id="tab_company" role="tabpanel">
                                         <div class="buttons-header-grid">
-                                            <button id="NewCompanyAssginButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" disabled>
+                                            @*<button id="NewCompanyAssginButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" disabled>
                                                 <i class="fa fa-plus"></i> <span>@L["Button.New.CompanyInZone"].Value</span>
                                             </button>
                                             <button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
                                                 <i class="fa fa-upload"></i> <span>@L["ImportFromExcel"].Value</span>
-                                            </button>
+                                            </button>*@
                                         </div>
                                         <div id="companyAssgin"></div>
                                     </div>
                                     <div class="tab-pane fade" id="tab_customer" role="tabpanel">
-                                        <div class="buttons-header-grid pb-2">
+                                        @*<div class="buttons-header-grid pb-2">
                                             <button id="NewCustomerButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" disabled>
                                                 <i class="fa fa-plus"></i> <span>@L["Button.New.CustomerInZone"].Value</span>
                                             </button>
                                             <button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
                                                 <i class="fa fa-upload"></i> <span>@L["ImportFromExcel"].Value</span>
                                             </button>
-                                        </div>
+                                        </div>*@
                                         <div id="customerAssgin"></div>
                                     </div>
                                 </div>

@@ -946,15 +946,15 @@ public class OMSMenuContributor : IMenuContributor
 			).RequireFeatures(MdmFeatures.Items)
 		);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.ItemImages,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:ItemImages"],
-                "/Mdm/ItemImages",
-				icon: "fa fa-file-image-o",
-				requiredPermissionName: MdmServicePermissions.Items.Default
-			).RequireFeatures(MdmFeatures.Items)
-		);
+		//groupMenu.AddItem(
+		//	new ApplicationMenuItem(
+		//		MdmServiceMenus.ItemImages,
+		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:ItemImages"],
+  //              "/Mdm/ItemImages",
+		//		icon: "fa fa-file-image-o",
+		//		requiredPermissionName: MdmServicePermissions.Items.Default
+		//	).RequireFeatures(MdmFeatures.Items)
+		//);
 
 		//parentMenu.AddItem(
 		//	new ApplicationMenuItem(
@@ -976,15 +976,15 @@ public class OMSMenuContributor : IMenuContributor
 			).RequireFeatures(MdmFeatures.ItemGroups)
 		);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.ItemGroupAttributes,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:ItemGroupAttrs"],
-                "/Mdm/ItemGroupAttrs",
-				icon: "fa fa-clone",
-				requiredPermissionName: MdmServicePermissions.ItemGroups.Default
-			).RequireFeatures(MdmFeatures.ItemGroups)
-		);
+		//groupMenu.AddItem(
+		//	new ApplicationMenuItem(
+		//		MdmServiceMenus.ItemGroupAttributes,
+		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:ItemGroupAttrs"],
+  //              "/Mdm/ItemGroupAttrs",
+		//		icon: "fa fa-clone",
+		//		requiredPermissionName: MdmServicePermissions.ItemGroups.Default
+		//	).RequireFeatures(MdmFeatures.ItemGroups)
+		//);
 
 		//parentMenu.AddItem(
 		//	new ApplicationMenuItem(
@@ -1006,15 +1006,15 @@ public class OMSMenuContributor : IMenuContributor
 			).RequireFeatures(MdmFeatures.PriceLists)
 		);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.PriceListDetails,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:PriceListDetails"],
-				"/Mdm/PriceListDetails",
-				icon: "fa fa-list",
-				requiredPermissionName: MdmServicePermissions.PriceListDetails.Default
-			).RequireFeatures(MdmFeatures.PriceLists)
-		);
+		//groupMenu.AddItem(
+		//	new ApplicationMenuItem(
+		//		MdmServiceMenus.PriceListDetails,
+		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:PriceListDetails"],
+		//		"/Mdm/PriceListDetails",
+		//		icon: "fa fa-list",
+		//		requiredPermissionName: MdmServicePermissions.PriceListDetails.Default
+		//	).RequireFeatures(MdmFeatures.PriceLists)
+		//);
 
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
@@ -1026,15 +1026,15 @@ public class OMSMenuContributor : IMenuContributor
 			).RequireFeatures(MdmFeatures.PriceUpdate)
 		);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.PriceUpdateDetails,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:PriceUpdateDetails"],
-				"/Mdm/PriceUpdateDetails",
-				icon: "fa fa-info-circle",
-				requiredPermissionName: MdmServicePermissions.PriceUpdateDetails.Default
-			).RequireFeatures(MdmFeatures.PriceUpdate)
-		);
+		//groupMenu.AddItem(
+		//	new ApplicationMenuItem(
+		//		MdmServiceMenus.PriceUpdateDetails,
+		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:PriceUpdateDetails"],
+		//		"/Mdm/PriceUpdateDetails",
+		//		icon: "fa fa-info-circle",
+		//		requiredPermissionName: MdmServicePermissions.PriceUpdateDetails.Default
+		//	).RequireFeatures(MdmFeatures.PriceUpdate)
+		//);
 
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
@@ -1070,7 +1070,16 @@ public class OMSMenuContributor : IMenuContributor
 
 		parentMenu.AddItem(groupMenu);
 
-		groupMenu.AddItem(
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                "MdmService.SalesOrganizations.EmployeeTypes",
+                context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:EmployeeTypes"],
+                "/Mdm/EmployeeTypes",
+                icon: "fa fa-users"
+            ).RequireFeatures(MdmFeatures.EmployeeProfiles)
+        );
+
+        groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.WorkingPositions,
 				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:WorkingPositions"],

@@ -1,6 +1,6 @@
+var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
 
     const status = [
         {
@@ -74,39 +74,61 @@ $(function () {
 
     const dataGrid = $('#gridItemGroups').dxDataGrid({
         dataSource: groupStore,
-        //keyExpr: 'id',
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        autoExpandAll: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
-        scrolling: {
-            //mode: 'standard',
-            columnRenderingMode: 'virtual'
-        },
         filterRow: {
+            visible: true
+        },
+        groupPanel: {
             visible: true,
-            applyFilter: 'auto'
         },
         searchPanel: {
-            visible: true,
-            placeholder: 'Search...'
+            visible: true
         },
-        headerFilter: {
-            visible: false,
-        },
+        columnMinWidth: 50,
         columnChooser: {
             enabled: true,
             mode: "select"
         },
-        paging:
-        {
+        columnFixing: {
             enabled: true,
-            pageSize: 10,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgItemGroups',
+        },
+        paging: {
+            enabled: true,
+            pageSize: 10
         },
         pager: {
             visible: true,
@@ -115,69 +137,39 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
-        groupPanel: {
-            visible: true,
-        },
-        //toolbar: {
-        //    items: [
-        //        {
-        //            location: 'before',
-        //            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>New Item Group</span></button>',
-        //            onClick() {
-        //                //var w = window.open('/Mdm/ItemGroups/Details');
-        //                //w.sessionStorage.setItem('modelId', 0);
-        //                dataGrid.addRow();
-        //            }
-        //        },
-        //        {
-        //            location: 'after',
-        //            widget: 'dxButton',
-        //            options: {
-        //                icon: 'refresh',
-        //                onClick() {
-        //                    dataGrid.refresh();
-        //                },
-        //            }
-        //        },
-        //        'columnChooserButton',
-        //        'exportButton',
-        //        {
-        //            location: 'after',
-        //            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-upload"></i> <span>Import from Excel</span> </button>',
-        //            onClick() {
-        //                //todo
-        //            },
-        //        },
-        //        'searchPanel'
-        //    ]
-        //},
-        //export: {
-        //    enabled: true
-        //},
-        //onExporting(e) {
-        //    //e.preventDefault();
-
-        //    itemGroupService.getDownloadToken().then(
-        //        function (result) {
-        //            var url = abp.appPath + 'api/mdm-service/item-groups/as-excel-file' + abp.utils.buildQueryString([
-        //                { name: 'downloadToken', value: result.token }
-        //            ]);
-        //            var downloadWindow = window.open(url, '_blank');
-        //            downloadWindow.focus();
-        //        }
-        //    )
-        //},
         editing: {
-            mode: 'row',
-            allowAdding: true,
-            allowUpdating: true,
-            allowDeleting: true,
+            mode: "row",
+            allowAdding: abp.auth.isGranted('MdmService.ItemGroups.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.ItemGroups.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.ItemGroups.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
+        },
+        toolbar: {
+            items: [
+                "groupPanel",
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        dataGrid.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
         },
         onRowInserting: function (e) {
             e.data.status = 'OPEN';
@@ -216,7 +208,8 @@ $(function () {
                             
                         }
                     },
-                    'edit', 'delete']
+                    'edit', 'delete'],
+                fixedPosition: 'left'
             },
             {
                 caption: l("EntityFieldName:MDMService:ItemGroup:Code"),
@@ -266,26 +259,26 @@ $(function () {
         ]
     }).dxDataGrid('instance');
 
-    $("#NewItemGroupButton").click(function () {
-        dataGrid.addRow()
-    });
+    //$("#NewItemGroupButton").click(function () {
+    //    dataGrid.addRow()
+    //});
 
-    $("input#Search").on("input", function () {
-        dataGrid.searchByText($(this).val());
-    });
+    //$("input#Search").on("input", function () {
+    //    dataGrid.searchByText($(this).val());
+    //});
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
-        itemGroupService.getDownloadToken().then(
-            function (result) {
-                var url = abp.appPath + 'api/mdm-service/item-groups/as-excel-file' + abp.utils.buildQueryString([
-                    { name: 'downloadToken', value: result.token }
-                ]);
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
+    //$("#ExportToExcelButton").click(function (e) {
+    //    e.preventDefault();
+    //    itemGroupService.getDownloadToken().then(
+    //        function (result) {
+    //            var url = abp.appPath + 'api/mdm-service/item-groups/as-excel-file' + abp.utils.buildQueryString([
+    //                { name: 'downloadToken', value: result.token }
+    //            ]);
+    //            var downloadWindow = window.open(url, '_blank');
+    //            downloadWindow.focus();
+    //        }
+    //    )
+    //});
 
     function isNotEmpty(value) {
         return value !== undefined && value !== null && value !== '';
