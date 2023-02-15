@@ -41,17 +41,24 @@
                 <i class="subheader-icon fa fa-file-alt"></i>
             </h2>
         </div>
-        <div class="panel-container show">
+        <div class="panel-container show" style="padding-top:10px">
             <div class="panel-content jqvmap-bg-ocean p-0" style="">
-
-                <div style="padding-left:12px" class="buttons-header-grid">
+                <div style="padding-left:10px" class="buttons-header-grid">
+                    <button id="SaveButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed hvr-icon-pop">
+                        <i class="fa fa-check hvr-icon" style="padding-right: 2px"></i>
+                        Save
+                    </button> 
                     <button type="button" class="btn btn-light btn-sm hvr-icon-pop">
-                        <i class="fa fa-check hvr-icon"></i>
+                        <i class="fa fa-random hvr-icon" style="padding-right: 2px"></i>
                         <span class="">Generate visit plan</span>
                     </button>
                     <button type="button" class="btn btn-light btn-sm hvr-icon-pop">
-                        <i class="fa fa-times hvr-icon"></i>
+                        <i class="fa fa-power-off hvr-icon" style="padding-right: 2px"></i>
                         <span class="">Enddate MCP</span>
+                    </button>
+                    <button id="CloseButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                        <i class="fa fa-times" style="padding-right: 2px"></i>
+                        <span>Close</span>
                     </button>
                 </div>
 
@@ -60,7 +67,7 @@
                         <div id="top-section"></div>
                     </div>
                     <div class=" py-2">
-                        <div id="dgMCP"> </div>
+                        <div id="dgMCPDetails"> </div>
                     </div>
                 </div>
             </div>
