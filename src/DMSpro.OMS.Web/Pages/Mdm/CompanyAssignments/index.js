@@ -292,6 +292,7 @@ $(function () {
                 dataField: 'companyIdentityUserAssignment.identityUserId',
                 caption: l("UserName"),
                 validationRules: [{ type: "required" }],
+                calculateDisplayValue: "companyIdentityUserAssignment.identityUsername",
                 lookup: {
                     dataSource() {
                         return {

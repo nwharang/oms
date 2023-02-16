@@ -66,7 +66,7 @@
             displayExpr: "name",
             dataSource: new DevExpress.data.DataSource({
                 store: geoMasterStore,
-                filter: ['level', '=', 2],
+                //filter: ['level', '=', 0],
                 paginate: true,
                 pageSize: 2
             }),
@@ -128,7 +128,7 @@
         /*keyExpr: "id",*/
         export: {
             enabled: true,
-            // allowExportSelectedData: true,
+            //allowExportSelectedData: true,
         },
         showRowLines: true,
         showBorders: true,
@@ -213,7 +213,7 @@
                     location: 'after',
                     template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                     onClick() {
-                        gridComAssignments.addRow();
+                        gridCompanies.addRow();
                     },
                 },
 
@@ -282,7 +282,7 @@
                     },
                 },
 
-                editCellTemplate: selectBoxEditorTemplate,
+                //editCellTemplate: selectBoxEditorTemplate,
                 dataType: 'string',
             },
             {
@@ -308,63 +308,66 @@
                 },
                 dataType: 'string',
             },
-            // {
-            //     dataField: "geoLevel2Id",
-            //     caption: l1("GeoLevel2Name"),
-            //     //width: 110,
-            //     setCellValue(rowData, value) {
-            //         rowData.geoLevel2Id = value;
-            //         rowData.geoLevel3Id = '';
-            //         rowData.geoLevel4Id = '';
-            //     },
-            //     lookup: {
-            //         dataSource(options) {
-            //             return {
-            //                 store: geoMasterStore,
-            //                 filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
-            //             };
-            //         },
-            //         valueExpr: 'id',
-            //         displayExpr: 'name',
-            //     },
-            //     dataType: 'string',
-            // },
-            // {
-            //     dataField: "geoLevel3Id",
-            //     caption: l1("GeoLevel3Name"),
-            //     //width: 110,
-            //     setCellValue(rowData, value) {
-            //         rowData.geoLevel3Id = value;
-            //         rowData.geoLevel4Id = '';
-            //     },
-            //     lookup: {
-            //         dataSource(options) {
-            //             return {
-            //                 store: geoMasterStore,
-            //                 filter: options.data ? ['parentId', '=', options.data.geoLevel2Id] : ['level', '=', 3],
-            //             };
-            //         },
-            //         valueExpr: 'id',
-            //         displayExpr: 'name',
-            //     },
-            //     dataType: 'string',
-            // },
-            // {
-            //     dataField: "geoLevel4Id",
-            //     caption: l1("GeoLevel4Name"),
-            //     //width: 110,
-            //     lookup: {
-            //         dataSource(options) {
-            //             return {
-            //                 store: geoMasterStore,
-            //                 filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : ['level', '=', 4],
-            //             };
-            //         },
-            //         valueExpr: 'id',
-            //         displayExpr: 'name',
-            //     },
-            //     dataType: 'string',
-            // },
+            {
+                dataField: "geoLevel2Id",
+                caption: l1("GeoLevel2Name"),
+                calculateDisplayValue: "geoLevel2Id",
+                //width: 110,
+                setCellValue(rowData, value) {
+                    rowData.geoLevel2Id = value;
+                    rowData.geoLevel3Id = '';
+                    rowData.geoLevel4Id = '';
+                },
+                lookup: {
+                    dataSource(options) {
+                        return {
+                            store: geoMasterStore,
+                            filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
+                        };
+                    },
+                    valueExpr: 'id',
+                    displayExpr: 'name',
+                },
+                dataType: 'string',
+            },
+            {
+                dataField: "geoLevel3Id",
+                caption: l1("GeoLevel3Name"),
+                calculateDisplayValue: "geoLevel3Id",
+                //width: 110,
+                setCellValue(rowData, value) {
+                    rowData.geoLevel3Id = value;
+                    rowData.geoLevel4Id = '';
+                },
+                lookup: {
+                    dataSource(options) {
+                        return {
+                            store: geoMasterStore,
+                            filter: options.data ? ['parentId', '=', options.data.geoLevel2Id] : ['level', '=', 3],
+                        };
+                    },
+                    valueExpr: 'id',
+                    displayExpr: 'name',
+                },
+                dataType: 'string',
+            },
+            {
+                dataField: "geoLevel4Id",
+                caption: l1("GeoLevel4Name"),
+                calculateDisplayValue: "geoLevel4Id",
+                //width: 110,
+                lookup: {
+                    dataSource(options) {
+                        return {
+                            store: geoMasterStore,
+                            filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : ['level', '=', 4],
+                        };
+                    },
+                    valueExpr: 'id',
+                    displayExpr: 'name',
+                },
+                dataType: 'string',
+            },
 
             //#region 
             {

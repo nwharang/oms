@@ -1,13 +1,29 @@
 ﻿$(function () {
     var l = abp.localization.getResource("MdmService");
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
 
     /****custom store*****/
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "raw",
         load(loadOptions) {
+            console.log(loadOptions);
             const deferred = $.Deferred();
             const args = {};
 
@@ -64,6 +80,7 @@
         columnAutoWidth: true,
         columnHidingEnabled: true,
         errorRowEnabled: false,
+
         filterRow: {
             visible: true
         },
@@ -139,23 +156,25 @@
                 buttons: ['add', 'edit', 'delete']
             },
             {
-                caption: l("EntityFieldName:MDMService:GeoMaster:Name"),
-                dataField: "name",
-                validationRules: [{ type: "required" }]
-            },
-            {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Code"),
                 dataField: "code",
                 validationRules: [{ type: "required" }]
             },
             {
+                caption: l("EntityFieldName:MDMService:GeoMaster:Name"),
+                dataField: "name",
+                validationRules: [{ type: "required" }]
+            },
+            {
                 caption: l("EntityFieldName:MDMService:GeoMaster:ParentName"),
                 dataField: "parentId",
+                calculateDisplayValue: "parentId",
                 lookup: {
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
+                            //filter: options.data ? ["!", ["parentId", "=", options.data.parentId]] : null,
                         };
                     },
                     displayExpr: 'name',
@@ -168,7 +187,12 @@
                 alignment: 'left',
                 allowEditing: false
             }
-        ]
+        ],
+        //stateStoring: { //save state in localStorage
+        //    enabled: true,
+        //    type: 'localStorage',
+        //    storageKey: 'dataTreeContainer',
+        //},
     }).dxTreeList("instance");
 
     /****event*****/

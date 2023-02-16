@@ -34,40 +34,6 @@
         <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic" Version="7.0.0" />
     </ItemGroup>
 
-
-  <ItemGroup>
-    <!--<ProjectReference Include="..\..\..\..\shared\DMSpro.OMS.Shared.Hosting.AspNetCore\DMSpro.OMS.Shared.Hosting.AspNetCore.csproj" />
-    
-    <ProjectReference Include="..\..\..\..\shared\DMSpro.OMS.Shared.Localization\DMSpro.OMS.Shared.Localization.csproj" />
-    
-    <ProjectReference Include="..\..\..\..\services\product\src\DMSpro.OMS.ProductService.HttpApi.Client\DMSpro.OMS.ProductService.HttpApi.Client.csproj" />
-    <ProjectReference Include="..\..\..\..\services\product\src\DMSpro.OMS.ProductService.Web\DMSpro.OMS.ProductService.Web.csproj" />
-    <ProjectReference Include="..\..\..\..\services\mdm\src\DMSpro.OMS.MdmService.HttpApi.Client\DMSpro.OMS.MdmService.HttpApi.Client.csproj" />
-    <ProjectReference Include="..\..\..\..\services\mdm\src\DMSpro.OMS.MdmService.Web\DMSpro.OMS.MdmService.Web.csproj" />
-
-    <ProjectReference Include="..\..\..\..\services\survey\src\DMSpro.OMS.SurveyService.HttpApi.Client\DMSpro.OMS.SurveyService.HttpApi.Client.csproj" />
-    <ProjectReference Include="..\..\..\..\services\survey\src\DMSpro.OMS.SurveyService.Web\DMSpro.OMS.SurveyService.Web.csproj" />
-
-    <ProjectReference Include="..\..\..\..\services\survey\modules\Volo.Forms\src\Volo.Forms.HttpApi.Client\Volo.Forms.HttpApi.Client.csproj" />
-    <ProjectReference Include="..\..\..\..\services\survey\modules\Volo.Forms\src\Volo.Forms.Web\Volo.Forms.Web.csproj" />
-
-    <ProjectReference Include="..\..\..\..\services\inventory\src\DMSpro.OMS.InventoryService.HttpApi.Client\DMSpro.OMS.InventoryService.HttpApi.Client.csproj" />
-    <ProjectReference Include="..\..\..\..\services\inventory\src\DMSpro.OMS.InventoryService.Web\DMSpro.OMS.InventoryService.Web.csproj" />
-    <ProjectReference Include="..\..\..\..\services\order\src\DMSpro.OMS.OrderService.HttpApi.Client\DMSpro.OMS.OrderService.HttpApi.Client.csproj" />
-    <ProjectReference Include="..\..\..\..\services\order\src\DMSpro.OMS.OrderService.Web\DMSpro.OMS.OrderService.Web.csproj" />
-
-    <ProjectReference Include="..\..\..\..\services\mobile\src\DMSpro.OMS.MobileService.HttpApi.Client\DMSpro.OMS.MobileService.HttpApi.Client.csproj" />
-    <ProjectReference Include="..\..\..\..\services\mobile\src\DMSpro.OMS.MobileService.Web\DMSpro.OMS.MobileService.Web.csproj" />
-
-
-    <ProjectReference Include="..\..\..\..\services\administration\src\DMSpro.OMS.AdministrationService.HttpApi.Client\DMSpro.OMS.AdministrationService.HttpApi.Client.csproj" />
-    <ProjectReference Include="..\..\..\..\services\administration\src\DMSpro.OMS.AdministrationService.Web\DMSpro.OMS.AdministrationService.Web.csproj" />
-    <ProjectReference Include="..\..\..\..\services\identity\src\DMSpro.OMS.IdentityService.HttpApi.Client\DMSpro.OMS.IdentityService.HttpApi.Client.csproj" />
-    <ProjectReference Include="..\..\..\..\services\identity\src\DMSpro.OMS.IdentityService.Web\DMSpro.OMS.IdentityService.Web.csproj" />
-    <ProjectReference Include="..\..\..\..\services\saas\src\DMSpro.OMS.SaasService.HttpApi.Client\DMSpro.OMS.SaasService.HttpApi.Client.csproj" />
-    <ProjectReference Include="..\..\..\..\services\saas\src\DMSpro.OMS.SaasService.Web\DMSpro.OMS.SaasService.Web.csproj" />-->
-  </ItemGroup>
-
   <!-- Product -->
   <ItemGroup>
     <PackageReference Include="Volo.Abp.Http.Client" Version="7.0.0" />
@@ -281,6 +247,10 @@
   </ItemGroup>
 	
   <ItemGroup>
+    <None Include="Components\MainMenu\Default.cshtml" />
+    <None Include="Components\MainMenu\_MenuItem.cshtml" />
+    <None Include="Components\Toolbar\LoginLink\Default.cshtml" />
+    <None Include="Components\_ViewImports.cshtml" />
     <None Include="Pages\Mdm\CustomerProfile\index.cshtml" />
   </ItemGroup>
 	
