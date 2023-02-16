@@ -1325,8 +1325,7 @@ public class OMSMenuContributor : IMenuContributor
 			.RequirePermissions(false, MdmServicePermissions.Holidays.Default,
 				MdmServicePermissions.HolidayDetails.Default,
 				MdmServicePermissions.Routes.Default,
-				MdmServicePermissions.MCPHeaders.Default,
-				MdmServicePermissions.MCPDetails.Default,
+				MdmServicePermissions.MCPs.Default,
 				MdmServicePermissions.VisitPlans.Default,
 				MdmServicePermissions.RouteAssignments.Default)
 			.RequireFeatures(false, MdmFeatures.Holidays, MdmFeatures.Routes,
@@ -1370,7 +1369,7 @@ public class OMSMenuContributor : IMenuContributor
 				context.GetLocalizer<OMSResource>()["Menu:MdmService:MCP"],
 				"/Mdm/MCPHeaders",
 				icon: "fa fa-calendar-minus-o",
-				requiredPermissionName: MdmServicePermissions.MCPHeaders.Default
+				requiredPermissionName: MdmServicePermissions.MCPs.Default
 			).RequireFeatures(MdmFeatures.MCPs)
 		);
 
