@@ -39,16 +39,18 @@
         <div class="panel-container show">
             <div class="panel-content jqvmap-bg-ocean p-0" style="min-height: 330px;">
                 <div class="buttons-header-grid pl-2">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-primary btn-sm waves-effect waves-themed dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Action
-                        </button>
-                        <div class="dropdown-menu fadeindown">
-                            <button class="dropdown-item" id="SaveButton" type="submit" form="form-container">@L1["Button.Save"].Value</button>
-                            <button class="dropdown-item" id="CancelButton" type="button">@L1["Button.Cancel"].Value</button>
-                            <button class="dropdown-item" id="CloseButton" type="button">@L1["Button.Close"].Value</button>
-                        </div>
-                    </div>
+                    <button id="SaveButton" type="submit" class="btn btn-sm btn-outline-default waves-effect waves-themed" form="form-container">
+                        <i class="fa fa-check"></i>
+                        @L1["Button.Save"].Value
+                    </button>
+                    <button id="CloseButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                        <i class="fa fa-times"></i>
+                        <span>@L1["Button.Close"].Value</span>
+                    </button>
+                    <button id="CancelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                        <i class="fa fa-times"></i>
+                        <span>@L1["Button.Cancel"].Value</span>
+                    </button>
                 </div>
                 <div class="dx-viewport p-2">
                     <form id="form-container">

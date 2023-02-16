@@ -18,11 +18,11 @@ $(function () {
         key: 'id',
         load(loadOptions) {
 
-            //if (loadOptions.filter == undefined) {
-            //    loadOptions.filter = ['priceListId', '=', PriceUpdateModel ? PriceUpdateModel.id : null];
-            //} else {
-            //    loadOptions.filter = [['priceListId', '=', PriceUpdateModel ? PriceUpdateModel.id : null], 'and', loadOptions.filter];
-            //}
+            if (loadOptions.filter == undefined) {
+                loadOptions.filter = ['priceUpdateId', '=', PriceUpdateModel ? PriceUpdateModel.id : null];
+            } else {
+                loadOptions.filter = [['priceUpdateId', '=', PriceUpdateModel ? PriceUpdateModel.id : null], 'and', loadOptions.filter];
+            }
 
             const deferred = $.Deferred();
             const args = {};
@@ -377,8 +377,9 @@ $(function () {
                     location: 'after',
                     template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                     onClick() {
-                        priceUpdateDetailContainer.addRow();
-                    },
+                        if (PriceUpdateModel != null)
+                            priceUpdateDetailContainer.addRow();
+                    }
                 },
                 'columnChooserButton',
                 "exportButton",

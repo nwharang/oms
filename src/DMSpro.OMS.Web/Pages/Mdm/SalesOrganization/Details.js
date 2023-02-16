@@ -313,7 +313,7 @@ $(function () {
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgSystemDatas',
+            storageKey: 'salesOrgEmpAssignment',
         },
         paging: {
             enabled: true,
@@ -356,7 +356,8 @@ $(function () {
                     location: 'after',
                     template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                     onClick() {
-                        dataGridContainer.addRow();
+                        if (salesOrgHierarchyIdFilter != null)
+                            dataGridContainer.addRow();
                     },
                 },
                 "exportButton",

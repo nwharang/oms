@@ -199,6 +199,15 @@ $(function () {
         toolbar: {
             items: [
                 "groupPanel",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("Button.New.PriceUpdate")}" style="height: 36px;"> <i class="fa fa-plus"></i> <span></span> </button>`,
+                    onClick() {
+                        var newtab = window.open('/Mdm/PriceUpdates/Details', '_blank');
+                        newtab.sessionStorage.setItem("PriceUpdate", null);
+                    },
+                    visible: abp.auth.isGranted('MdmService.PriceUpdates.Create')
+                },
                 'columnChooserButton',
                 "exportButton",
                 {
@@ -267,11 +276,6 @@ $(function () {
     }).dxDataGrid("instance");
 
     /****button*****/
-    $("#NewPriceUpdateButton").click(function (e) {
-        e.preventDefault();
-        var newtab = window.open('/Mdm/PriceUpdates/Details', '_blank');
-        newtab.sessionStorage.setItem("PriceUpdate", null);
-    });
 
     /****function*****/
     function isNotEmpty(value) {
