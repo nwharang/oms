@@ -168,7 +168,7 @@
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:ParentName"),
                 dataField: "parentId",
-                calculateDisplayValue: "parentId",
+                calculateDisplayValue: "name",
                 lookup: {
                     dataSource(options) {
                         return {

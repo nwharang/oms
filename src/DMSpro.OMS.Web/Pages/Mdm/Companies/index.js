@@ -262,7 +262,7 @@
             {
                 dataField: "geoLevel0Id",
                 caption: l1("GeoLevel0Name"),
-                calculateDisplayValue: "geoLevel0Id", // provides display values
+                //calculateDisplayValue: "geoLevel0Id", // provides display values
                 //width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel0Id = value;
@@ -288,7 +288,7 @@
             {
                 dataField: "geoLevel1Id",
                 caption: l1("GeoLevel1Name"),
-                calculateDisplayValue: "geoLevel1Id",
+                //calculateDisplayValue: "geoLevel1Id",
                 //width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel1Id = value;
@@ -311,7 +311,7 @@
             {
                 dataField: "geoLevel2Id",
                 caption: l1("GeoLevel2Name"),
-                calculateDisplayValue: "geoLevel2Id",
+                //calculateDisplayValue: "geoLevel2Id",
                 //width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel2Id = value;
@@ -333,7 +333,7 @@
             {
                 dataField: "geoLevel3Id",
                 caption: l1("GeoLevel3Name"),
-                calculateDisplayValue: "geoLevel3Id",
+                //calculateDisplayValue: "geoLevel3Id",
                 //width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel3Id = value;
@@ -354,7 +354,7 @@
             {
                 dataField: "geoLevel4Id",
                 caption: l1("GeoLevel4Name"),
-                calculateDisplayValue: "geoLevel4Id",
+                //calculateDisplayValue: "geoLevel4Id",
                 //width: 110,
                 lookup: {
                     dataSource(options) {

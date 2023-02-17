@@ -7,6 +7,7 @@ $(function () {
     }
 
     var customStore = new DevExpress.data.CustomStore({
+        key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -41,7 +42,7 @@ $(function () {
             return systemDataService.update(key, values, { contentType: 'application/json' });
         },
         remove(key) {
-            return systemDataService.delete(key.id);
+            return systemDataService.delete(key);
         }
     });
 

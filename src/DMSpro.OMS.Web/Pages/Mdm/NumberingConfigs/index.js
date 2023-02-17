@@ -8,6 +8,7 @@ $(function () {
     }
 
     var numberingConfigStore = new DevExpress.data.CustomStore({
+        key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -39,7 +40,7 @@ $(function () {
             return numberingConfigService.create(values, { contentType: "application/json" });
         },
         update(key, values) {
-            return numberingConfigService.update(key.id, values, { contentType: "application/json" });
+            return numberingConfigService.update(key, values, { contentType: "application/json" });
         },
         remove(key) {
             return numberingConfigService.delete(key);
@@ -47,6 +48,7 @@ $(function () {
     });
 
     var companyStore = new DevExpress.data.CustomStore({
+        key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -129,7 +131,7 @@ $(function () {
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgNumberingConfigs',
+            storageKey: 'gridNumberingConfigs',
         },
         paging: {
             enabled: true,
@@ -196,9 +198,14 @@ $(function () {
                 dataField: 'companyId',
                 caption: l("EntityFieldName:MDMService:NumberingConfig:CompanyName"),
                 lookup: {
-                    dataSource: companyStore,
                     valueExpr: 'id',
-                    displayExpr: 'name'
+                    displayExpr: 'name',
+                    dataSource: {
+                        store: companyStore,
+                        //filter: ['level', '=', 0],
+                        paginate: true,
+                        pageSize: 2
+                    }
                 }
             },
             {
