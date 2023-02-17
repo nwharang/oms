@@ -70,7 +70,6 @@ using Volo.FileManagement.Web;
 using Volo.Abp.Localization;
 using Volo.Abp.Validation;
 using Volo.Abp.Validation.Localization;
-using Volo.Abp.Account.Public.Web;
 using Microsoft.AspNetCore.Identity;
 
 namespace DMSpro.OMS.Web;
@@ -216,7 +215,7 @@ public class OMSWebModule : AbpModule
                 options.Scope.Add("InventoryService");
                 options.Scope.Add("SurveyService");
                 options.Scope.Add("OrderService");
-               // options.Scope.Add("FileManagementService");
+                options.Scope.Add("FileManagementService");
                 options.AccessDeniedPath = "/Account/AccessDenied2";
                 //options.UseTokenLifetime = true;
                 //options.AutomaticRefreshInterval = 1000;

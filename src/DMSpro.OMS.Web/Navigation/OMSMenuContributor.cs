@@ -149,6 +149,22 @@ public class OMSMenuContributor : IMenuContributor
         AddMenuItemArCreditMemoHeaders(context, soMenu);
         AddMenuItemProcessSalesOrderHeaders(context, soMenu);
         AddMenuItemProcessDeliveryHeaders(context, soMenu);
+
+		//maps
+        var mapsMenu = AddModuleMapsMenuItem(context);
+    }
+    private static ApplicationMenuItem AddModuleMapsMenuItem(MenuConfigurationContext context)
+    {
+        var moduleMenu = new ApplicationMenuItem(
+            MdmServiceMenus.Maps,
+            context.GetLocalizer<OMSResource>()["Menu:MdmService:Maps"],
+            "/Mdm/Maps",
+            icon: "fas fa-map-marked",
+            requiredPermissionName: MdmServicePermissions.GeoMasters.Default
+        ).RequireFeatures(MdmFeatures.GeoMaster);
+
+        context.Menu.Items.AddIfNotContains(moduleMenu);
+        return moduleMenu;
     }
     private static ApplicationMenuItem AddModulePOMenuItem(MenuConfigurationContext context)
     {
@@ -786,15 +802,15 @@ public class OMSMenuContributor : IMenuContributor
 		);
 		//map
 		//set tạm thời. vì chưa có permission cho map
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.Maps,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:Maps"],
-				"/Mdm/Maps",
-				icon: "fas fa-map-marked",
-                requiredPermissionName: MdmServicePermissions.GeoMasters.Default
-            ).RequireFeatures(MdmFeatures.GeoMaster)
-        );
+		//groupMenu.AddItem(
+		//	new ApplicationMenuItem(
+		//		MdmServiceMenus.Maps,
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:Maps"],
+		//		"/Mdm/Maps",
+		//		icon: "fas fa-map-marked",
+  //              requiredPermissionName: MdmServicePermissions.GeoMasters.Default
+  //          ).RequireFeatures(MdmFeatures.GeoMaster)
+  //      );
 	}
 
 	private static void AddMenuItemCompanies(MenuConfigurationContext context, ApplicationMenuItem parentMenu)

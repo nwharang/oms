@@ -211,20 +211,35 @@
                 "groupPanel",
                 {
                     location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        gridCompanies.addRow();
+                    //template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'fa fa-plus',
+                        onClick() {
+                            gridCompanies.addRow();
+                        },
                     },
+                    
                 },
 
-                'columnChooserButton',
+                "columnChooserButton",
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
-                    },
+                    template: `<button type="file" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    //widget: 'dxFileUploader',
+                    //options: {
+                    //    selectButtonText: l("ImportFromExcel"),
+                    //    labelText: '',
+                    //    uploadMode: 'useForm',
+                    //    //width: 136,
+                    //    height: 36,
+                    //    onClick() {
+                    //        //const expanding = e.component.option('text') === 'Expand All';
+                    //        //dataGrid.option('grouping.autoExpandAll', expanding);
+                    //        //e.component.option('text', expanding ? 'Collapse All' : 'Expand All');
+                    //    },
+                    //},
                 },
                 "searchPanel"
             ],
@@ -315,8 +330,8 @@
                 //width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel2Id = value;
-                    rowData.geoLevel3Id = '';
-                    rowData.geoLevel4Id = '';
+                    rowData.geoLevel3Id = null;
+                    rowData.geoLevel4Id = null;
                 },
                 lookup: {
                     dataSource(options) {
@@ -337,7 +352,7 @@
                 //width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel3Id = value;
-                    rowData.geoLevel4Id = '';
+                    rowData.geoLevel4Id = null;
                 },
                 lookup: {
                     dataSource(options) {
@@ -517,9 +532,23 @@
         ],
 
         onEditorPreparing(e) {
-            if (e.parentType === 'dataRow' && e.dataField === 'geoLevel1Id') {
-                e.editorOptions.disabled = (typeof e.row.data.geoLevel0Id !== 'string');
+            if (e.parentType === 'dataRow') {
                 e.editorOptions.showClearButton = true;
+                switch (e.dataField) {
+                    case 'geoLevel1Id':
+                        e.editorOptions.disabled = (typeof e.row.data.geoLevel0Id !== 'string');
+                        break;
+                    case 'geoLevel2Id':
+                        e.editorOptions.disabled = (typeof e.row.data.geoLevel1Id !== 'string');
+                        break;
+                    case 'geoLevel3Id':
+                        e.editorOptions.disabled = (typeof e.row.data.geoLevel2Id !== 'string');
+                        break;
+                    case 'geoLevel4Id':
+                        e.editorOptions.disabled = (typeof e.row.data.geoLevel3Id !== 'string');
+                        break;
+                    default:
+                }
             }
         },
         //onEditorPreparing(e) {
