@@ -28,15 +28,17 @@
 
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
+        //loadMode: 'raw',
+        //cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const argsGeo = {};
+
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     argsGeo[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            console.log(argsGeo)
             geoMasterService.getListDevextremes(argsGeo)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -49,8 +51,6 @@
             return deferred.promise();
         },
         byKey: function (key) {
-            if (key == 0) return null;
-
             var d = new $.Deferred();
             geoMasterService.get(key)
                 .done(data => {
@@ -59,24 +59,6 @@
             return d.promise();
         },
     });
-
-    function selectBoxEditorTemplate(cellElement, cellInfo) {
-        return $('<div>').dxLookup({
-            valueExpr: "id",
-            displayExpr: "name",
-            dataSource: new DevExpress.data.DataSource({
-                store: geoMasterStore,
-                //filter: ['level', '=', 0],
-                paginate: true,
-                pageSize: 2
-            }),
-
-            searchEnabled: true,
-            onValueChanged(data) {
-                //cellInfo.setValue(data.value);
-            },
-        });
-    }
 
     //Custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
@@ -125,14 +107,47 @@
     var gridCompanies = $('#dgCompanies').dxDataGrid({
         dataSource: customStore,
         remoteOperations: true,
+
+        showColumnLines: true,
+        showRowLines: false,
+        rowAlternationEnabled: true,
+        showBorders: false,
+
         /*keyExpr: "id",*/
+        /*Export Excel*/
         export: {
             enabled: true,
+            //formats: ['xlsx', 'pdf'],
             //allowExportSelectedData: true,
         },
-        showRowLines: true,
-        showBorders: true,
+        onExporting: function (e) {
+            if (e.format === 'xlsx') {
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('Companies');
+                DevExpress.excelExporter.exportDataGrid({
+                    component: e.component,
+                    worksheet,
+                    autoFilterEnabled: true,
+                }).then(() => {
+                    workbook.xlsx.writeBuffer().then((buffer) => {
+                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Companies.xlsx');
+                    });
+                });
+                e.cancel = true;
+            }
+            else if (e.format === 'pdf') {
+                const doc = new jsPDF();
+                DevExpress.pdfExporter.exportDataGrid({
+                    jsPDFDocument: doc,
+                    component: e.component,
+                }).then(() => {
+                    doc.save('Companies.pdf');
+                });
+            }
+        },
+        /*End Export Excel*/
 
+        //#region Setting Grid
         focusedRowEnabled: true,
 
         allowColumnReordering: true,
@@ -146,6 +161,7 @@
 
         columnChooser: {
             enabled: true,
+            allowSearch: true,
         },
         columnFixing: {
             enabled: true,
@@ -159,8 +175,6 @@
         headerFilter: {
             visible: true,
         },
-
-        rowAlternationEnabled: true,
 
         //columnHidingEnabled: true,
         //errorRowEnabled: false,
@@ -184,10 +198,11 @@
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: [10, 20, 50],
             showInfo: true,
             showNavigationButtons: true
         },
+        //#endregion Setting Grid
 
         editing: {
             mode: "popup",
@@ -209,20 +224,23 @@
         toolbar: {
             items: [
                 "groupPanel",
-                {
-                    location: 'after',
-                    //template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'fa fa-plus',
-                        onClick() {
-                            gridCompanies.addRow();
-                        },
-                    },
+                //{
+                //    location: 'after',
+                //    //template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                //    widget: 'dxButton',
+                //    options: {
+                //        icon: 'fa fa-plus',
+                //        onClick() {
+                //            gridCompanies.addRow();
+                //        },
+                //    },
                     
+                //},
+                "addRowButton",
+                {
+                    name: "columnChooserButton",
+                    locateInMenu: "auto",
                 },
-
-                "columnChooserButton",
                 "exportButton",
                 {
                     location: 'after',
@@ -241,7 +259,7 @@
                     //    },
                     //},
                 },
-                "searchPanel"
+                "searchPanel",
             ],
         },
         columns: [
@@ -255,10 +273,20 @@
                 //alignment: 'right',
             },
             {
+                dataField: 'id',
+                caption: l("EntityFieldName:MDMService:CompanyProfile:Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                fixed: true,
+                fixedPosition: "left",
+                formItem: {
+                    visible: false
+                },  
+            },
+            {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Code"),
-                //fixed: true,
-                //width: 70,
                 validationRules: [{ type: "required" }],
                 dataType: 'string',
                 fixed: true,
@@ -267,8 +295,6 @@
             {
                 dataField: 'name',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Name"),
-                //fixed: true,
-                //width: 110,
                 validationRules: [{ type: "required" }],
                 dataType: 'string',
                 fixed: true,
@@ -276,9 +302,8 @@
             },
             {
                 dataField: "geoLevel0Id",
-                caption: l1("GeoLevel0Name"),
-                calculateDisplayValue: "geoLevel0Id", // provides display values
-                //width: 110,
+                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel0Id"),
+                //calculateDisplayValue: "geoLevel0.name", // provides display values
                 setCellValue(rowData, value) {
                     rowData.geoLevel0Id = value;
                     rowData.geoLevel1Id = null;
@@ -287,12 +312,17 @@
                     rowData.geoLevel4Id = null;
                 },
                 lookup: {
+                    //dataSource: geoMasterStore,
                     valueExpr: "id",
                     displayExpr: "name",
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
                             filter: ['level', '=', 0],
+                            paginate: true,
+                            pageSize: 10,
+                            searchEnabled: true,
+                            //sort: [{ "selector": "name", "desc": false }],
                         };
                     },
                 },
@@ -302,8 +332,8 @@
             },
             {
                 dataField: "geoLevel1Id",
-                caption: l1("GeoLevel1Name"),
-                calculateDisplayValue: "geoLevel1Id",
+                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel1Id"),
+                calculateDisplayValue: "geoLevel1.name",
                 //width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel1Id = value;
@@ -318,6 +348,7 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : ['level', '=', 1],
+                            paginate: true,
                         };
                     },
                 },
@@ -325,8 +356,8 @@
             },
             {
                 dataField: "geoLevel2Id",
-                caption: l1("GeoLevel2Name"),
-                calculateDisplayValue: "geoLevel2Id",
+                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel2Id"),
+                calculateDisplayValue: "geoLevel2.name",
                 //width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel2Id = value;
@@ -347,8 +378,8 @@
             },
             {
                 dataField: "geoLevel3Id",
-                caption: l1("GeoLevel3Name"),
-                calculateDisplayValue: "geoLevel3Id",
+                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel3Id"),
+                calculateDisplayValue: "geoLevel3.name",
                 //width: 110,
                 setCellValue(rowData, value) {
                     rowData.geoLevel3Id = value;
@@ -368,8 +399,12 @@
             },
             {
                 dataField: "geoLevel4Id",
-                caption: l1("GeoLevel4Name"),
-                calculateDisplayValue: "geoLevel4Id",
+                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel4Id"),
+                visible: false,
+                calculateDisplayValue: "geoLevel4.name",
+                formItem: {
+                    visible: false,
+                }, 
                 //width: 110,
                 lookup: {
                     dataSource(options) {
@@ -432,20 +467,24 @@
             },
             {
                 dataField: 'parentId',
-                caption: l("EntityFieldName:MDMService:CompanyProfile:ParentName"),
+                caption: l("EntityFieldName:MDMService:CompanyProfile:ParentId"),
                 //width: 145,
                 visible: false,
                 dataType: 'string',
-                //lookup: {
-                //    dataSource(options) {
-                //        return {
-                //            store: customStore,
-                //            filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
-                //        };
-                //    },
-                //    displayExpr: 'name',
-                //    valueExpr: 'id',
-                //}
+                calculateDisplayValue: "parent.name",
+                lookup: {
+                    dataSource(options) {
+                        console.log(options.data.id);
+                        return {
+                            store: customStore,
+                            //filter: options.data ? ["!", ["id", "=", options.data.id]] : null,
+                            paginate: true,
+                            pageSize: 10,
+                        };
+                    },
+                    displayExpr: 'name',
+                    valueExpr: 'id',
+                }
             },
             {
                 dataField: 'vatName',
