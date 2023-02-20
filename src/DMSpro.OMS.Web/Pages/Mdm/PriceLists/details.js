@@ -6,7 +6,23 @@ var itemGroupAttributeService = window.dMSpro.oMS.mdmService.controllers.itemGro
 var itemListService = window.dMSpro.oMS.mdmService.controllers.itemGroupLists.itemGroupList;
 var itemAttributeService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
 
-const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+const requestOptions = [
+    "filter",
+    "group",
+    "groupSummary",
+    "parentIds",
+    "requireGroupCount",
+    "requireTotalCount",
+    "searchExpr",
+    "searchOperation",
+    "searchValue",
+    "select",
+    "sort",
+    "skip",
+    "take",
+    "totalSummary",
+    "userData"
+];
 
 const status = [
     {

@@ -7,7 +7,23 @@ $(function () {
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
     var itemMasterService = window.dMSpro.oMS.mdmService.controllers.items.item;
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
 
     //get data from sessionStorage
     var PriceUpdateModel = JSON.parse(sessionStorage.getItem("PriceUpdate"));
@@ -249,7 +265,12 @@ $(function () {
                     text: l('EntityFieldName:MDMService:PriceUpdate:PriceList')
                 },
                 editorOptions: {
-                    dataSource: priceListStore,
+                    //dataSource: priceListStore,
+                    dataSource: {
+                        store: priceListStore,
+                        paginate: true,
+                        pageSize: 10
+                    },
                     displayExpr: 'name',
                     valueExpr: 'id'
                 },

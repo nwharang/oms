@@ -5,6 +5,25 @@ $(function () {
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
+
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
+
     var dataCusAttributes = [];
     //Custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
@@ -12,17 +31,7 @@ $(function () {
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }

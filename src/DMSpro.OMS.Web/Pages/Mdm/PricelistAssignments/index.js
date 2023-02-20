@@ -4,12 +4,27 @@ var customerService = window.dMSpro.oMS.mdmService.controllers.customerGroups.cu
 $(function () {
     var l = abp.localization.getResource("MdmService");
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
 
     // custom store
     var priceListStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -51,7 +66,6 @@ $(function () {
 
     var pricelistAssignmentStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -92,7 +106,6 @@ $(function () {
 
     var getCustomers = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -310,7 +323,8 @@ $(function () {
                         editing: {
                             mode: "row",
                             allowAdding: abp.auth.isGranted('MdmService.PricelistAssignments.Create'),
-                            //useIcons: true
+                            allowUpdating: false,
+                            allowDeleting: false
                         },
                         onRowInserting: function (e) {
                             e.data.priceListId = options.key
@@ -321,9 +335,16 @@ $(function () {
                                 dataField: "customerGroupId",
                                 editorType: 'dxSelectBox',
                                 lookup: {
-                                    dataSource: getCustomers,
+                                    //dataSource: getCustomers,
+                                    dataSource: {
+                                        store: getCustomers,
+                                        paginate: true,
+                                        pageSize: 10
+                                    },
                                     valueExpr: 'id',
-                                    displayExpr: 'code'
+                                    displayExpr: function (e) {
+                                        return e.code + ' - ' + e.name
+                                    }
                                 }
                             }
                         ]

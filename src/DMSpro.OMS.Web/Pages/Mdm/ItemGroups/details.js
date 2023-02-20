@@ -15,7 +15,23 @@ var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
 var uOMsService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
 
-const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+const requestOptions = [
+    "filter",
+    "group",
+    "groupSummary",
+    "parentIds",
+    "requireGroupCount",
+    "requireTotalCount",
+    "searchExpr",
+    "searchOperation",
+    "searchValue",
+    "select",
+    "sort",
+    "skip",
+    "take",
+    "totalSummary",
+    "userData"
+];
 
 $(function () {
     DevExpress.config({
@@ -469,7 +485,12 @@ function initListItemTab() {
                         validationRules: [{ type: "required" }],
                         editorType: 'dxSelectBox',
                         lookup: {
-                            dataSource: getItemList,
+                            //dataSource: getItemList,
+                            dataSource: {
+                                store: getItemList,
+                                paginate: true,
+                                pageSize: 10
+                            },
                             valueExpr: 'id',
                             displayExpr: function (e) {
                                 return e.code + ' - ' + e.name
@@ -482,7 +503,12 @@ function initListItemTab() {
                         validationRules: [{ type: "required" }],
                         editorType: 'dxSelectBox',
                         lookup: {
-                            dataSource: getUOMs,
+                            //dataSource: getUOMs,
+                            dataSource: {
+                                store: getUOMs,
+                                paginate: true,
+                                pageSize: 10
+                            },
                             valueExpr: 'id',
                             displayExpr: 'code'
                         }
@@ -512,7 +538,6 @@ function initListItemTab() {
 
 var groupAttributeStore = new DevExpress.data.CustomStore({
     key: "id",
-    loadMode: 'processed',
     load(loadOptions) {
         const deferred = $.Deferred();
         const args = {};
@@ -555,7 +580,6 @@ var groupAttributeStore = new DevExpress.data.CustomStore({
 
 var itemGroupListStore = new DevExpress.data.CustomStore({
     key: "id",
-    loadMode: 'processed',
     load(loadOptions) {
         const deferred = $.Deferred();
         const args = {};
@@ -597,7 +621,6 @@ var itemGroupListStore = new DevExpress.data.CustomStore({
 
 var getItemList = new DevExpress.data.CustomStore({
     key: "id",
-    loadMode: 'processed',
     load(loadOptions) {
         const deferred = $.Deferred();
         const args = {};
@@ -630,7 +653,6 @@ var getItemList = new DevExpress.data.CustomStore({
 
 var getUOMs = new DevExpress.data.CustomStore({
     key: "id",
-    loadMode: 'processed',
     load(loadOptions) {
         const deferred = $.Deferred();
         const args = {};
@@ -697,7 +719,12 @@ function generateAttrOptions(attr) {
         caption: l('EntityFieldName:MDMService:ItemGroupAttr:Attr' + attr.attrNo + 'Name'),
         editorType: 'dxSelectBox',
         lookup: {
-            dataSource: listAttrValue.filter(x => x.itemAttributeId == attr.id),
+            //dataSource: listAttrValue.filter(x => x.itemAttributeId == attr.id),
+            dataSource: {
+                store: listAttrValue.filter(x => x.itemAttributeId == attr.id),
+                paginate: true,
+                pageSize: 10
+            },
             valueExpr: 'id',
             displayExpr: 'attrValName'
         }
@@ -707,7 +734,6 @@ function generateAttrOptions(attr) {
 function getDataSourceAttrGrid(itemGroupId) {
     return new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             if (loadOptions.filter == undefined)
                 loadOptions.filter = ['itemGroupId', '=', itemGroupId]
@@ -755,7 +781,6 @@ function getDataSourceAttrGrid(itemGroupId) {
 function getDataSourceListGrid(itemGroupId) {
     return new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             if (loadOptions.filter == undefined)
                 loadOptions.filter = ['itemGroupId', '=', itemGroupId]

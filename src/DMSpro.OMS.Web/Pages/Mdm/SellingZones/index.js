@@ -7,7 +7,23 @@ $(function () {
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
 
     var salesOrgHierarchyId = null;
 
@@ -372,6 +388,8 @@ $(function () {
                         return {
                             store: companyStore,
                             filter: options.data ? ["!", ["id", "=", options.data.companyId]] : null,
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                     displayExpr: 'name',
@@ -386,7 +404,9 @@ $(function () {
                 lookup: {
                     dataSource() {
                         return {
-                            store: companyStore
+                            store: companyStore,
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                     displayExpr: 'code',
@@ -401,7 +421,9 @@ $(function () {
                 lookup: {
                     dataSource() {
                         return {
-                            store: companyStore
+                            store: companyStore,
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                     displayExpr: 'name',
@@ -578,7 +600,9 @@ $(function () {
                     dataSource(options) {
                         return {
                             store: customerStore,
-                            filter: options.data ? ["!", ["id", "=", options.data.customerId]] : null
+                            filter: options.data ? ["!", ["id", "=", options.data.customerId]] : null,
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                     displayExpr: 'name',
@@ -593,7 +617,9 @@ $(function () {
                 lookup: {
                     dataSource() {
                         return {
-                            store: customerStore
+                            store: customerStore,
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                     displayExpr: 'code',
@@ -608,7 +634,9 @@ $(function () {
                 lookup: {
                     dataSource() {
                         return {
-                            store: customerStore
+                            store: customerStore,
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                     displayExpr: 'name',

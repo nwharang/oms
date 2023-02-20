@@ -6,7 +6,23 @@ $(function () {
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
 
 
     //var companyStore = new DevExpress.data.CustomStore({
@@ -82,14 +98,14 @@ $(function () {
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
-            const argsGeo = {};
+            const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
 
-            customerService.getListDevextremes(argsGeo)
+            customerService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -115,14 +131,14 @@ $(function () {
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
-            const argsGeo = {};
+            const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
 
-            companyService.getListDevextremes(argsGeo)
+            companyService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -298,9 +314,13 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource: companiesLookup,
+                    dataSource: {
+                        store: companiesLookup,
+                        paginate: true,
+                        pageSize: 10
+                    },
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "code"
                 }
                 //lookup: {
                 //    dataSource() {
@@ -317,7 +337,11 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CustomerShortName"),
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource: customersLookup,
+                    dataSource: {
+                        store: customersLookup,
+                        paginate: true,
+                        pageSize: 10
+                    },
                     valueExpr: "id",
                     displayExpr: "code"
                 }

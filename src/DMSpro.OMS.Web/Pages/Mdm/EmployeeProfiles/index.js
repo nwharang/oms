@@ -4,7 +4,23 @@ $(function () {
     var workingPositionService = window.dMSpro.oMS.mdmService.controllers.workingPositions.workingPosition;
     var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
 
     /****custom store*****/
     var employeeProfileStore = new DevExpress.data.CustomStore({
@@ -392,7 +408,9 @@ $(function () {
                 lookup: {
                     dataSource() {
                         return {
-                            store: workingPositionStore
+                            store: workingPositionStore,
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                     displayExpr: 'name',
@@ -406,7 +424,9 @@ $(function () {
                 lookup: {
                     dataSource() {
                         return {
-                            store: employeeTypeStore
+                            store: employeeTypeStore,
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                     displayExpr: 'valueName',

@@ -4,11 +4,26 @@ var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
 
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -51,7 +66,6 @@ $(function () {
     // get detail store
     var detailStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -84,7 +98,6 @@ $(function () {
     // get price list
     var getPriceList = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -119,7 +132,6 @@ $(function () {
     // get UOM list
     var getUOMs = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -152,7 +164,6 @@ $(function () {
     // get item list
     var getItemList = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -356,7 +367,12 @@ $(function () {
                     cssClass: 'fieldBasePrice',
                     editorType: 'dxSelectBox',
                     lookup: {
-                        dataSource: getPriceList,
+                        //dataSource: getPriceList,
+                        dataSource: {
+                            store: getPriceList,
+                            paginate: true,
+                            pageSize: 10
+                        },
                         valueExpr: 'id',
                         displayExpr: 'code'
                     },
@@ -476,7 +492,12 @@ $(function () {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:PriceList"),
                                 dataField: "priceListId",
                                 lookup: {
-                                    dataSource: getPriceList,
+                                    //dataSource: getPriceList,
+                                    dataSource: {
+                                        store: getPriceList,
+                                        paginate: true,
+                                        pageSize: 10
+                                    },
                                     valueExpr: 'id',
                                     displayExpr: 'code'
                                 }
@@ -485,7 +506,12 @@ $(function () {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Item"),
                                 dataField: "itemId",
                                 lookup: {
-                                    dataSource: getItemList,
+                                    //dataSource: getItemList,
+                                    dataSource: {
+                                        store: getItemList,
+                                        paginate: true,
+                                        pageSize: 10
+                                    },
                                     valueExpr: 'id',
                                     displayExpr: function (e) {
                                         return e.code + ' - ' + e.name
@@ -496,7 +522,12 @@ $(function () {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:UOM"),
                                 dataField: "uomId",
                                 lookup: {
-                                    dataSource: getUOMs,
+                                    //dataSource: getUOMs,
+                                    dataSource: {
+                                        store: getUOMs,
+                                        paginate: true,
+                                        pageSize: 10
+                                    },
                                     valueExpr: 'id',
                                     displayExpr: 'code'
                                 }

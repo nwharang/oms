@@ -6,22 +6,30 @@ $(function () {
         return value !== undefined && value !== null && value !== '';
     }
 
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
+
     var cusAttributes = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
@@ -50,17 +58,7 @@ $(function () {
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
@@ -123,6 +121,9 @@ $(function () {
             if (e.data && e.data.parentCusAttributeValueId == 0) {
                 e.data.parentCusAttributeValueId = null;
             }
+        },
+        onRowUpdating: function (e) {
+            e.newData = Object.assign({}, e.oldData, e.newData);
         },
         remoteOperations: true,
         showRowLines: true,
@@ -227,7 +228,12 @@ $(function () {
                 dataField: 'customerAttributeId',
                 caption: l("EntityFieldName:MDMService:CusAttributeValue:AttrNo"),
                 lookup: {
-                    dataSource: cusAttributes,
+                    //dataSource: cusAttributes,
+                    dataSource: {
+                        store: cusAttributes,
+                        paginate: true,
+                        pageSize: 10
+                    },
                     valueExpr: "id",
                     displayExpr: "attrName"
                 }
@@ -240,6 +246,8 @@ $(function () {
                         return {
                             store: customStore,
                             filter: options.data ? ["!", ["attrValName", "=", options.data.attrValName]] : null,
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                     valueExpr: "id",

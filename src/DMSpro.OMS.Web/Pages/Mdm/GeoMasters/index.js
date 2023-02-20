@@ -175,6 +175,8 @@
                             store: geoMasterStore,
                             filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
                             //filter: options.data ? ["!", ["parentId", "=", options.data.parentId]] : null,
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                     displayExpr: 'name',

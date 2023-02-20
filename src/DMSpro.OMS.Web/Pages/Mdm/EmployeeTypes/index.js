@@ -2,7 +2,23 @@ $(function () {
     var l = abp.localization.getResource("MdmService");
     var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
 
     /****custom store*****/
     var systemDataStore = new DevExpress.data.CustomStore({
@@ -174,14 +190,14 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:SystemData:Code"),
                 dataField: "code",
-                validationRules: [{ type: "required" }],
+                //validationRules: [{ type: "required" }],
                 visible: false,
                 allowEditing: false
             },
             {
                 caption: l("EntityFieldName:MDMService:SystemData:Name"),
                 dataField: "name",
-                validationRules: [{ type: "required" }],
+                //validationRules: [{ type: "required" }],
                 visible: false,
                 allowEditing: false
             },

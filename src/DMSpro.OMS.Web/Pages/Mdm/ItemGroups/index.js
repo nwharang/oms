@@ -28,11 +28,26 @@ $(function () {
         }
     ];
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
     // custom store
     var groupStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -124,7 +139,7 @@ $(function () {
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgItemGroups',
+            storageKey: 'gridItemGroups',
         },
         paging: {
             enabled: true,

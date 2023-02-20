@@ -3,11 +3,26 @@ var uomGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDet
 var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
 
     var groupStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -49,7 +64,6 @@ $(function () {
 
     var detailStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -91,7 +105,6 @@ $(function () {
     // get UOMs
     var getUOMs = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};

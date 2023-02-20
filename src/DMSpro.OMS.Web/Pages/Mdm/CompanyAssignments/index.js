@@ -188,6 +188,9 @@ $(function () {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         }, 
+        onRowUpdating: function (e) {
+            e.newData = Object.assign({}, e.oldData, e.newData);
+        },
         remoteOperations: true,
         //cacheEnabled: true,
         export: {
@@ -298,7 +301,7 @@ $(function () {
                         return {
                             store: userStore,
                             paginate: true,
-                            pageSize: 2
+                            pageSize: 10
                         };
                     },
                     displayExpr: 'userName',
@@ -319,7 +322,7 @@ $(function () {
                     dataSource : { 
                         store: companyStore,
                         paginate: true,
-                        pageSize: 2,
+                        pageSize: 10,
 
                     },
                     displayExpr: 'name',

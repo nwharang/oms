@@ -278,6 +278,8 @@
                         return {
                             store: geoMasterStore,
                             filter: ['level', '=', 0],
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                 },
@@ -303,6 +305,8 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : ['level', '=', 1],
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                 },
@@ -323,6 +327,8 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                     valueExpr: 'id',
@@ -344,6 +350,8 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoLevel2Id] : ['level', '=', 3],
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                     valueExpr: 'id',
@@ -361,6 +369,8 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : ['level', '=', 4],
+                            paginate: true,
+                            pageSize: 10
                         };
                     },
                     valueExpr: 'id',

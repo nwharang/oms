@@ -4,7 +4,23 @@ $(function () {
     var priceUpdateService = window.dMSpro.oMS.mdmService.controllers.priceUpdates.priceUpdate;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
 
     /****custom store*****/
     var priceUpdateStore = new DevExpress.data.CustomStore({
@@ -253,7 +269,12 @@ $(function () {
                 dataField: 'priceListId',
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource: priceListStore,
+                    //dataSource: priceListStore,
+                    dataSource: {
+                        store: priceListStore,
+                        paginate: true,
+                        pageSize: 10
+                    },
                     displayExpr: 'name',
                     valueExpr: 'id'
                 }
