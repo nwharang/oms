@@ -1,6 +1,6 @@
 ﻿var assignmentService = window.dMSpro.oMS.mdmService.controllers.companyIdentityUserAssignments.companyIdentityUserAssignment;
 var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
-var userService = window.dMSpro.oMS.identityService.controllers.identityUsers.identityUserCustom
+var userService = window.dMSpro.oMS.identityService.controllers.identityUsers.identityUserCustom;
 
 $(function () {
     var l = abp.localization.getResource("MdmService");
@@ -62,7 +62,7 @@ $(function () {
             
             return assignmentService.update(key.companyIdentityUserAssignment.id,
                 {
-                    companyId: values.companyIdentityUserAssignment.companyId,
+                    companyId: values.company.id,
                     identityUserId: values.companyIdentityUserAssignment.identityUserId
                 }, { contentType: "application/json" });
         },
@@ -295,7 +295,7 @@ $(function () {
                 dataField: 'companyIdentityUserAssignment.identityUserId',
                 caption: l("UserName"),
                 validationRules: [{ type: "required" }],
-                calculateDisplayValue: "companyIdentityUserAssignment.identityUsername",
+                calculateDisplayValue: "companyIdentityUserAssignment.identityUserId",
                 lookup: {
                     dataSource() {
                         return {
@@ -343,5 +343,4 @@ $(function () {
         //    }
         //}
     }).dxDataGrid("instance");
-     
 });

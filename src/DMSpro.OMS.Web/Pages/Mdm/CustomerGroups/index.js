@@ -5,6 +5,25 @@
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';
     }
+
+    const requestOptions = [
+        "filter",
+        "group",
+        "groupSummary",
+        "parentIds",
+        "requireGroupCount",
+        "requireTotalCount",
+        "searchExpr",
+        "searchOperation",
+        "searchValue",
+        "select",
+        "sort",
+        "skip",
+        "take",
+        "totalSummary",
+        "userData"
+    ];
+
     var GroupModes = [
         {
             id: "ATTRIBUTE",
@@ -23,35 +42,22 @@
     //Custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "raw",
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
             customerGroupService.getListDevextremes(args)
                 .done(result => {
-                    console.log('data ne: ', result);
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
                         groupCount: result.groupCount,
                     });
                 });
-
             return deferred.promise();
         },
         byKey: function (key) {
@@ -256,128 +262,128 @@
     //});
 
 
-    var outletInfos = [{
-        code: "KH001_S1",
-        name: "KH 01",
-    }, {
-        code: "KH002_S2",
-        name: "KH 02",
-    }, {
-        code: "KH003_S3",
-        name: "KH 03",
-    }]
-    var cusInfo = {
-        code: "CEO",
-        name: "John Heart",
-        shortname: "JHeart",
-        pricelist: 901,
-        phone1: "0905111222",
-        phone2: "01234567890",
-        isActive: true,
-        createDate: new Date(2022, 4, 13),
-        effDate: new Date(2022, 4, 13),
-        endDate: new Date(),
-        outletType: "",
-        paymentCode: "JS13343JDD3",
-        creditLimit: "400",
-        paymentTerm: "JS as3999",
-        taxCode: "JB893",
-        license: "AH2002",
-        linkedCompany: "ABC bcx",
-        WHId: "CE2342O",
-        contactID: "20",
-        VATName: "VAT name",
-        VATAddress: "Binh Duong, Thang Binh",
-        geolevel0: "VN",
-        geolevel1: "QN",
-        geolevel2: "DB",
-        geolevel3: "DNT",
-        geolevel4: "QLB",
-        street: "Dien Bien Phu",
-        address: "quang lang B",
-        latitude: 82.2333,
-        longitude: 932.23,
-    };
-    var cusAddress = {
-        geolevel0: "VN",
-        geolevel1: "QN",
-        geolevel2: "DB",
-        geolevel3: "DNT",
-        geolevel4: "QLB",
-        street: "Dien Bien Phu",
-        address: "quang lang B",
-        latitude: 82.2333,
-        longitude: 932.23,
-    }
-    var geoMaster = [
-        {
-            code: "VN",
-            name: "Viet Nam"
-        },
-        {
-            code: "QN",
-            name: "Quang Nam"
-        },
-        {
-            code: "DB",
-            name: "Dien Ban"
-        },
-        {
-            code: "DNT",
-            name: "Dien Nam Trung"
-        },
-        {
-            code: "QLB",
-            name: "Quang Lang B"
-        }
-    ];
-    var cusImage = {
-        isActive: true,
-        isAvatar: false,
-        url: "https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_960_720.jpg",
-        createDate: new Date()
-    };
-    var cusAttributes = [{
-        attribute00: "attr00",
-        attribute01: "attr01",
-        attribute02: "attr02",
-        attribute03: "attr03",
-        attribute04: "attr04",
-        attribute05: "attr05",
-        attribute06: "attr06",
-        attribute07: "attr07",
-        attribute08: "attr08",
-        attribute09: "attr09"
-    }];
-    var cusContact = {
-        firstName: "Tran",
-        lastName: "Bo",
-        gender: "Nam",
-        dateOfBirth: new Date(),
-        email: "abc@gmail.com",
-        phone: "",
-        address: "",
-        identityNumber: "",
-        bankName: "",
-        accountName: "",
-        accountNumber: ""
-    }
-    var cusAssigments = [
-        {
-            id: 1,
-            name: "Thông tin hợp đồng điểm bán",
-            attachment: "D:\abc.txt",
-            createDate: new Date(),
-            isActive: false
-        },
-        {
-            id: 2,
-            name: "Thông tin đại lý bán hàng",
-            attachment: "D:\daily.txt",
-            createDate: new Date(),
-            isActive: true
-        }
-    ];
+    //var outletInfos = [{
+    //    code: "KH001_S1",
+    //    name: "KH 01",
+    //}, {
+    //    code: "KH002_S2",
+    //    name: "KH 02",
+    //}, {
+    //    code: "KH003_S3",
+    //    name: "KH 03",
+    //}]
+    //var cusInfo = {
+    //    code: "CEO",
+    //    name: "John Heart",
+    //    shortname: "JHeart",
+    //    pricelist: 901,
+    //    phone1: "0905111222",
+    //    phone2: "01234567890",
+    //    isActive: true,
+    //    createDate: new Date(2022, 4, 13),
+    //    effDate: new Date(2022, 4, 13),
+    //    endDate: new Date(),
+    //    outletType: "",
+    //    paymentCode: "JS13343JDD3",
+    //    creditLimit: "400",
+    //    paymentTerm: "JS as3999",
+    //    taxCode: "JB893",
+    //    license: "AH2002",
+    //    linkedCompany: "ABC bcx",
+    //    WHId: "CE2342O",
+    //    contactID: "20",
+    //    VATName: "VAT name",
+    //    VATAddress: "Binh Duong, Thang Binh",
+    //    geolevel0: "VN",
+    //    geolevel1: "QN",
+    //    geolevel2: "DB",
+    //    geolevel3: "DNT",
+    //    geolevel4: "QLB",
+    //    street: "Dien Bien Phu",
+    //    address: "quang lang B",
+    //    latitude: 82.2333,
+    //    longitude: 932.23,
+    //};
+    //var cusAddress = {
+    //    geolevel0: "VN",
+    //    geolevel1: "QN",
+    //    geolevel2: "DB",
+    //    geolevel3: "DNT",
+    //    geolevel4: "QLB",
+    //    street: "Dien Bien Phu",
+    //    address: "quang lang B",
+    //    latitude: 82.2333,
+    //    longitude: 932.23,
+    //}
+    //var geoMaster = [
+    //    {
+    //        code: "VN",
+    //        name: "Viet Nam"
+    //    },
+    //    {
+    //        code: "QN",
+    //        name: "Quang Nam"
+    //    },
+    //    {
+    //        code: "DB",
+    //        name: "Dien Ban"
+    //    },
+    //    {
+    //        code: "DNT",
+    //        name: "Dien Nam Trung"
+    //    },
+    //    {
+    //        code: "QLB",
+    //        name: "Quang Lang B"
+    //    }
+    //];
+    //var cusImage = {
+    //    isActive: true,
+    //    isAvatar: false,
+    //    url: "https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_960_720.jpg",
+    //    createDate: new Date()
+    //};
+    //var cusAttributes = [{
+    //    attribute00: "attr00",
+    //    attribute01: "attr01",
+    //    attribute02: "attr02",
+    //    attribute03: "attr03",
+    //    attribute04: "attr04",
+    //    attribute05: "attr05",
+    //    attribute06: "attr06",
+    //    attribute07: "attr07",
+    //    attribute08: "attr08",
+    //    attribute09: "attr09"
+    //}];
+    //var cusContact = {
+    //    firstName: "Tran",
+    //    lastName: "Bo",
+    //    gender: "Nam",
+    //    dateOfBirth: new Date(),
+    //    email: "abc@gmail.com",
+    //    phone: "",
+    //    address: "",
+    //    identityNumber: "",
+    //    bankName: "",
+    //    accountName: "",
+    //    accountNumber: ""
+    //}
+    //var cusAssigments = [
+    //    {
+    //        id: 1,
+    //        name: "Thông tin hợp đồng điểm bán",
+    //        attachment: "D:\abc.txt",
+    //        createDate: new Date(),
+    //        isActive: false
+    //    },
+    //    {
+    //        id: 2,
+    //        name: "Thông tin đại lý bán hàng",
+    //        attachment: "D:\daily.txt",
+    //        createDate: new Date(),
+    //        isActive: true
+    //    }
+    //];
 
     $("#frmCusGroup").dxForm({
         formData: {
@@ -548,6 +554,4 @@
             }
         }]
     });
-
-
 });

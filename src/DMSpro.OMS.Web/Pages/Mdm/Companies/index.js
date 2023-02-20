@@ -216,7 +216,6 @@
                         gridCompanies.addRow();
                     },
                 },
-
                 'columnChooserButton',
                 "exportButton",
                 {
@@ -431,16 +430,18 @@
                 //width: 145,
                 visible: false,
                 dataType: 'string',
-                //lookup: {
-                //    dataSource(options) {
-                //        return {
-                //            store: customStore,
-                //            filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
-                //        };
-                //    },
-                //    displayExpr: 'name',
-                //    valueExpr: 'id',
-                //}
+                lookup: {
+                    dataSource(options) {
+                        return {
+                            store: customStore,
+                            filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
+                            paginate: true,
+                            pageSize: 10
+                        };
+                    },
+                    displayExpr: 'name',
+                    valueExpr: 'id',
+                }
             },
             {
                 dataField: 'vatName',
@@ -541,12 +542,17 @@
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
         onRowInserting: function (e) {
-            // for create first data - if parentId = 0, update parentId = null
-            //if (e.data && e.data.parentId == 0) {
-            //    e.data.parentId = null;
-            //}
-        },
-
+            if (e.data.geoLevel0Id == '')
+                e.data.geoLevel0Id = null
+            if (e.data.geoLevel1Id == '')
+                e.data.geoLevel1Id = null
+            if (e.data.geoLevel2Id == '')
+                e.data.geoLevel2Id = null
+            if (e.data.geoLevel3Id == '')
+                e.data.geoLevel3Id = null
+            if (e.data.geoLevel4Id == '')
+                e.data.geoLevel4Id = null
+        }
     }).dxDataGrid("instance");
 
     //$("input#Search").on("input", function () {

@@ -312,7 +312,7 @@ $(function () {
                 width: 70,
                 alignment: 'center',
                 dataType: 'boolean',
-                validationRules: [{ type: "required" }],
+                //validationRules: [{ type: "required" }],
                 cellTemplate(container, options) {
                     $('<div>')
                         .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
@@ -331,8 +331,8 @@ $(function () {
                 dataType: 'date',
             },
             {
-                dataField: 'linkedCompanyId',
-                caption: l("EntityFieldName:MDMService:Vendor:LinkedCompany"),
+                dataField: 'companyId',
+                caption: 'Company',
                 validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource: {
@@ -343,6 +343,21 @@ $(function () {
                     valueExpr: "id",
                     displayExpr: "code"
                 }
+            },
+            {
+                dataField: 'linkedCompany',
+                caption: l("EntityFieldName:MDMService:Vendor:LinkedCompany"),
+                validationRules: [{ type: "required" }],
+                dataType: 'string'
+                //lookup: {
+                //    dataSource: {
+                //        store: companiesLookup,
+                //        paginate: true,
+                //        pageSize: 10
+                //    },
+                //    valueExpr: "id",
+                //    displayExpr: "code"
+                //}
             },
             //{
             //    dataField: 'warehouseId',

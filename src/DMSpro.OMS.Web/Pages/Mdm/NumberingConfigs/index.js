@@ -174,12 +174,13 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['companyId', 'prefix', 'startNumber', 'length'];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            e.newData = Object.assign({}, e.oldData, e.newData);
+            //var objectRequire = ['companyId', 'prefix', 'startNumber', 'length'];
+            //for (var property in e.oldData) {
+            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+            //        e.newData[property] = e.oldData[property];
+            //    }
+            //}
         },
         toolbar: {
             items: [
