@@ -7,24 +7,6 @@ $(function () {
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
     var itemMasterService = window.dMSpro.oMS.mdmService.controllers.items.item;
 
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
-
     //get data from sessionStorage
     var PriceUpdateModel = JSON.parse(sessionStorage.getItem("PriceUpdate"));
     var stateMode = "home";
@@ -269,7 +251,7 @@ $(function () {
                     dataSource: {
                         store: priceListStore,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     displayExpr: 'name',
                     valueExpr: 'id'
@@ -370,12 +352,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -439,7 +421,13 @@ $(function () {
                 dataField: 'priceListDetailId',
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource: priceListDetailStore,
+                    dataSource() {
+                        return {
+                            store: priceListDetailStore,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
+                        };
+                    },
                     displayExpr(data) {
                         if (data && data.item) {
                             return `${data.item.code} - ${data.item.name}`;
@@ -544,10 +532,6 @@ $(function () {
     });
 
     /****function*****/
-    function isNotEmpty(value) {
-        return value !== undefined && value !== null && value !== '';
-    }
-
     function LoadData() {
         PriceUpdateModel = JSON.parse(sessionStorage.getItem("PriceUpdate"));
         if (PriceUpdateModel == null) {

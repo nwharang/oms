@@ -3,27 +3,6 @@ $(function () {
     var customerAssignmentService = window.dMSpro.oMS.mdmService.controllers.customerAssignments.customerAssignment;
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
-
 
     //var companyStore = new DevExpress.data.CustomStore({
     //    key: 'id',
@@ -270,12 +249,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -317,7 +296,7 @@ $(function () {
                     dataSource: {
                         store: companiesLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: "id",
                     displayExpr: "code"
@@ -340,7 +319,7 @@ $(function () {
                     dataSource: {
                         store: customersLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: "id",
                     displayExpr: "code"

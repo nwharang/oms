@@ -140,7 +140,7 @@
         rowAlternationEnabled: true,
         paging:
         {
-            pageSize: 10,
+            pageSize: pageSize,
         },
         pager: {
             visible: true,

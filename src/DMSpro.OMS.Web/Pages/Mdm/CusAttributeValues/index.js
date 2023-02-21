@@ -2,27 +2,6 @@ $(function () {
     var l = abp.localization.getResource("MdmService");
     var cusAttributesValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
     var cusAttributeService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
-
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
 
     var cusAttributes = new DevExpress.data.CustomStore({
         key: 'id',
@@ -179,12 +158,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -232,7 +211,7 @@ $(function () {
                     dataSource: {
                         store: cusAttributes,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: "id",
                     displayExpr: "attrName"
@@ -247,7 +226,7 @@ $(function () {
                             store: customStore,
                             filter: options.data ? ["!", ["attrValName", "=", options.data.attrValName]] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: "id",

@@ -15,24 +15,6 @@ var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
 var uOMsService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
 
-const requestOptions = [
-    "filter",
-    "group",
-    "groupSummary",
-    "parentIds",
-    "requireGroupCount",
-    "requireTotalCount",
-    "searchExpr",
-    "searchOperation",
-    "searchValue",
-    "select",
-    "sort",
-    "skip",
-    "take",
-    "totalSummary",
-    "userData"
-];
-
 $(function () {
     DevExpress.config({
         editorStylingMode: 'underlined',
@@ -291,12 +273,12 @@ function initItemAttributeTab() {
                 },
                 paging: {
                     enabled: true,
-                    pageSize: 10
+                    pageSize: pageSize
                 },
                 pager: {
                     visible: true,
                     showPageSizeSelector: true,
-                    allowedPageSizes: [10, 20, 50, 100],
+                    allowedPageSizes: allowedPageSizes,
                     showInfo: true,
                     showNavigationButtons: true
                 },
@@ -413,12 +395,12 @@ function initListItemTab() {
                 },
                 paging: {
                     enabled: true,
-                    pageSize: 10
+                    pageSize: pageSize
                 },
                 pager: {
                     visible: true,
                     showPageSizeSelector: true,
-                    allowedPageSizes: [10, 20, 50, 100],
+                    allowedPageSizes: allowedPageSizes,
                     showInfo: true,
                     showNavigationButtons: true
                 },
@@ -489,7 +471,7 @@ function initListItemTab() {
                             dataSource: {
                                 store: getItemList,
                                 paginate: true,
-                                pageSize: 10
+                                pageSize: pageSizeForLookup
                             },
                             valueExpr: 'id',
                             displayExpr: function (e) {
@@ -507,7 +489,7 @@ function initListItemTab() {
                             dataSource: {
                                 store: getUOMs,
                                 paginate: true,
-                                pageSize: 10
+                                pageSize: pageSizeForLookup
                             },
                             valueExpr: 'id',
                             displayExpr: 'code'
@@ -723,7 +705,7 @@ function generateAttrOptions(attr) {
             dataSource: {
                 store: listAttrValue.filter(x => x.itemAttributeId == attr.id),
                 paginate: true,
-                pageSize: 10
+                pageSize: pageSizeForLookup
             },
             valueExpr: 'id',
             displayExpr: 'attrValName'
@@ -856,8 +838,4 @@ function action(e) {
     sessionStorage.clear();
     sessionStorage.setItem('itemGroup', JSON.stringify(dataForm));
     location.reload();
-}
-
-function isNotEmpty(value) {
-    return value !== undefined && value !== null && value !== '';
 }

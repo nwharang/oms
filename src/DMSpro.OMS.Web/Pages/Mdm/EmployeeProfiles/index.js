@@ -4,24 +4,6 @@ $(function () {
     var workingPositionService = window.dMSpro.oMS.mdmService.controllers.workingPositions.workingPosition;
     var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
 
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
-
     /****custom store*****/
     var employeeProfileStore = new DevExpress.data.CustomStore({
         key: 'id',
@@ -187,12 +169,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -410,7 +392,7 @@ $(function () {
                         return {
                             store: workingPositionStore,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     displayExpr: 'name',
@@ -426,7 +408,7 @@ $(function () {
                         return {
                             store: employeeTypeStore,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     displayExpr: 'valueName',
@@ -459,7 +441,5 @@ $(function () {
     //});
 
     /****function*****/
-    function isNotEmpty(value) {
-        return value !== undefined && value !== null && value !== '';
-    }
+
 });

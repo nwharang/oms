@@ -2,28 +2,6 @@
     var l = abp.localization.getResource("MdmService");
     var customerGroupService = window.dMSpro.oMS.mdmService.controllers.customerGroups.customerGroup;
 
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
-
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
-
     var GroupModes = [
         {
             id: "ATTRIBUTE",
@@ -150,12 +128,12 @@
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -458,7 +436,7 @@
                     //},
                     //paging:
                     //{
-                    //    pageSize: 10,
+                    //    pageSize: pageSize,
                     //},
                     //pager: {
                     //    visible: false,

@@ -6,26 +6,7 @@ $(function () {
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
+
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: "id",
         loadMode: 'processed',
@@ -234,12 +215,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -338,7 +319,7 @@ $(function () {
                     dataSource: {
                         store: companiesLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: "id",
                     displayExpr: "code"
@@ -353,7 +334,7 @@ $(function () {
                 //    dataSource: {
                 //        store: companiesLookup,
                 //        paginate: true,
-                //        pageSize: 10
+                //        pageSize: pageSizeForLookup
                 //    },
                 //    valueExpr: "id",
                 //    displayExpr: "code"
@@ -379,7 +360,7 @@ $(function () {
                     dataSource: {
                         store: pricelistLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: "id",
                     displayExpr: "code"
@@ -399,7 +380,7 @@ $(function () {
                             store: geoMasterStore,
                             filter: options.data ? ['level', '=', 0] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: "id",
@@ -422,7 +403,7 @@ $(function () {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoMaster0Id] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -444,7 +425,7 @@ $(function () {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoMaster1Id] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -465,7 +446,7 @@ $(function () {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoMaster2Id] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -482,7 +463,7 @@ $(function () {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoMaster3Id] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',

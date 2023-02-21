@@ -128,8 +128,6 @@ $(function () {
     var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
     var salesOrgHeaderService = window.dMSpro.oMS.mdmService.controllers.salesOrgHeaders.salesOrgHeader;
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-
     var salesOrgHeaders = [];
     var salesOrgHierarchies = [];
     var salesOrgHierarchiesStore = new DevExpress.data.CustomStore({
@@ -247,7 +245,7 @@ $(function () {
         allowColumnReordering: true,
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         rowAlternationEnabled: true,
         filterRow: {
@@ -268,7 +266,7 @@ $(function () {
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -365,7 +363,7 @@ $(function () {
                                     dataField: "name"
                                 }],
                             hoverStateEnabled: true,
-                            paging: { enabled: true, pageSize: 10 },
+                            paging: { enabled: true, pageSize: pageSize },
                             filterRow: { visible: true },
                             scrolling: { mode: "infinite" },
                             height: '90%',
@@ -415,7 +413,7 @@ $(function () {
                                     dataField: "valueName"
                                 }],
                             hoverStateEnabled: true,
-                            paging: { enabled: true, pageSize: 10 },
+                            paging: { enabled: true, pageSize: pageSize },
                             filterRow: { visible: true },
                             scrolling: { mode: "infinite" },
                             height: '90%',

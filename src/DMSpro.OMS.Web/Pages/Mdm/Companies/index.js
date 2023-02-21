@@ -4,28 +4,6 @@
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
 
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
-
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
-
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
@@ -68,7 +46,7 @@
                 store: geoMasterStore,
                 //filter: ['level', '=', 0],
                 paginate: true,
-                pageSize: 2
+                pageSize: pageSizeForLookup
             }),
 
             searchEnabled: true,
@@ -179,12 +157,12 @@
 
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -278,7 +256,7 @@
                             store: geoMasterStore,
                             filter: ['level', '=', 0],
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                 },
@@ -305,7 +283,7 @@
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : ['level', '=', 1],
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                 },
@@ -327,7 +305,7 @@
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -350,7 +328,7 @@
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoLevel2Id] : ['level', '=', 3],
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -369,7 +347,7 @@
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : ['level', '=', 4],
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -436,7 +414,7 @@
                             store: customStore,
                             filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     displayExpr: 'name',

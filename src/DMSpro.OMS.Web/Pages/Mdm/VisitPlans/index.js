@@ -5,17 +5,67 @@ var customerService = window.dMSpro.oMS.mdmService.controllers.customers.custome
 var mcpDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
+    const dayOfWeek = [
+        {
+            id: 0,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:MONDAY')
+        },
+        {
+            id: 1,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:TUESDAY')
+        },
+        {
+            id: 2,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:WEDNESDAY')
+        },
+        {
+            id: 3,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:THURSDAY')
+        },
+        {
+            id: 4,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:FRIDAY')
+        },
+        {
+            id: 5,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:SATURDAY')
+        },
+        {
+            id: 6,
+            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:SUNDAY')
+        }
+    ]
 
-        var _lookupModal = new abp.ModalManager({
-            viewUrl: abp.appPath + "Shared/LookupModal",
-            scriptUrl: "/Pages/Shared/lookupModal.js",
-            modalClass: "navigationPropertyLookup"
-        });
+    var _lookupModal = new abp.ModalManager({
+        viewUrl: abp.appPath + "Shared/LookupModal",
+        scriptUrl: "/Pages/Shared/lookupModal.js",
+        modalClass: "navigationPropertyLookup"
+    });
+
+    const visitPlansStore = new DevExpress.data.CustomStore({
+        key: "id",
+        loadMode: 'processed',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            visitPlansService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
 
             var d = new $.Deferred();
             visitPlansService.get(key)
@@ -226,12 +276,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -368,6 +418,7 @@ $(function () {
             },
             {
                 dataField: 'dateVisit',
+                name: 'VisitPlan:Week',
                 caption: l('EntityFieldName:MDMService:VisitPlan:Week'),
                 dataType: 'number',
                 validationRules: [
@@ -379,6 +430,7 @@ $(function () {
             },
             {
                 dataField: 'dateVisit',
+                name: 'VisitPlan:Month',
                 caption: l('EntityFieldName:MDMService:VisitPlan:Month'),
                 dataType: 'number',
                 validationRules: [
@@ -390,6 +442,7 @@ $(function () {
             },
             {
                 dataField: 'dateVisit',
+                name: 'VisitPlan:Year',
                 caption: l('EntityFieldName:MDMService:VisitPlan:Year'),
                 dataType: 'number',
                 validationRules: [

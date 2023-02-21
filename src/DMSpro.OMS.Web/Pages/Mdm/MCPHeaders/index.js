@@ -6,27 +6,7 @@ $(function () {
     DevExpress.config({
         editorStylingMode: 'underlined',
     });
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
 
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
     var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
     var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
     var companyInZoneService = window.dMSpro.oMS.mdmService.controllers.companyInZones.companyInZone;
@@ -258,7 +238,7 @@ $(function () {
                                 store: salesOrgHierarchyStore,
                                 filter: ["isRoute", "=", true],
                                 paginate: true,
-                                pageSize: 10
+                                pageSize: pageSizeForLookup
                             }),
                             showClearButton: true,
                             placeholder: '',
@@ -279,7 +259,7 @@ $(function () {
                             //    store: companyInZoneStore,
                             //    filter: ["salesOrgHierarchyId", "=", -1],
                             //    paginate: true,
-                            //    pageSize: 2
+                            //    pageSize: pageSize
                             //}),
                             showClearButton: true,
                             placeholder: '',
@@ -294,7 +274,7 @@ $(function () {
                             dataSource: new DevExpress.data.DataSource({
                                 store: itemGroupStore,
                                 paginate: true,
-                                pageSize: 10
+                                pageSize: pageSizeForLookup
                             }),
                             showClearButton: true,
                             placeholder: '',
@@ -428,12 +408,12 @@ $(function () {
             },
             paging: {
                 enabled: true,
-                pageSize: 10
+                pageSize: pageSize
             },
             pager: {
                 visible: true,
                 showPageSizeSelector: true,
-                allowedPageSizes: [10, 20, 50, 100],
+                allowedPageSizes: allowedPageSizes,
                 showInfo: true,
                 showNavigationButtons: true
             },
@@ -516,7 +496,7 @@ $(function () {
                                 store: customerStore,
                                 /*  filter: ["employeeTypeId", "=", "4623cb59-c099-1615-149f-3a0861252b0d"],//salesman*/
                                 paginate: true,
-                                pageSize: 10
+                                pageSize: pageSizeForLookup
                             };
                         },
                         displayExpr: 'name',
@@ -535,7 +515,7 @@ $(function () {
                                 store: customerStore,
                                 /*  filter: ["employeeTypeId", "=", "4623cb59-c099-1615-149f-3a0861252b0d"],//salesman*/
                                 paginate: true,
-                                pageSize: 10
+                                pageSize: pageSizeForLookup
                             };
                         },
                         displayExpr: 'address',
@@ -829,7 +809,7 @@ $(function () {
                 store: companyInZoneStore,
                 filter: ["salesOrgHierarchyId", "=", selectedItem.parentId],
                 paginate: true,
-                pageSize: 10
+                pageSize: pageSize
             }));
 
         } else {

@@ -7,24 +7,6 @@ $(function () {
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
 
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
-
     var salesOrgHierarchyId = null;
 
     /****custom store*****/
@@ -168,8 +150,15 @@ $(function () {
     var companyStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
             const deferred = $.Deferred();
-            companyService.getListDevextremes('')
+            companyService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -195,8 +184,14 @@ $(function () {
     var customerStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
             const deferred = $.Deferred();
-            customerService.getListDevextremes('')
+            customerService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -300,12 +295,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -389,7 +384,7 @@ $(function () {
                             store: companyStore,
                             filter: options.data ? ["!", ["id", "=", options.data.companyId]] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     displayExpr: 'name',
@@ -406,7 +401,7 @@ $(function () {
                         return {
                             store: companyStore,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     displayExpr: 'code',
@@ -423,7 +418,7 @@ $(function () {
                         return {
                             store: companyStore,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     displayExpr: 'name',
@@ -512,12 +507,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -602,7 +597,7 @@ $(function () {
                             store: customerStore,
                             filter: options.data ? ["!", ["id", "=", options.data.customerId]] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     displayExpr: 'name',
@@ -619,7 +614,7 @@ $(function () {
                         return {
                             store: customerStore,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     displayExpr: 'code',
@@ -636,7 +631,7 @@ $(function () {
                         return {
                             store: customerStore,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     displayExpr: 'name',
@@ -686,7 +681,5 @@ $(function () {
     });
 
     /****function*****/
-    function isNotEmpty(value) {
-        return value !== undefined && value !== null && value !== '';
-    }
+
 });

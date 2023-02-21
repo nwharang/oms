@@ -4,23 +4,6 @@ var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
 
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
@@ -270,12 +253,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -371,7 +354,7 @@ $(function () {
                         dataSource: {
                             store: getPriceList,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         },
                         valueExpr: 'id',
                         displayExpr: 'code'
@@ -478,12 +461,12 @@ $(function () {
                         },
                         paging: {
                             enabled: true,
-                            pageSize: 10
+                            pageSize: pageSize
                         },
                         pager: {
                             visible: true,
                             showPageSizeSelector: true,
-                            allowedPageSizes: [10, 20, 50, 100],
+                            allowedPageSizes: allowedPageSizes,
                             showInfo: true,
                             showNavigationButtons: true
                         },
@@ -496,7 +479,7 @@ $(function () {
                                     dataSource: {
                                         store: getPriceList,
                                         paginate: true,
-                                        pageSize: 10
+                                        pageSize: pageSizeForLookup
                                     },
                                     valueExpr: 'id',
                                     displayExpr: 'code'
@@ -510,7 +493,7 @@ $(function () {
                                     dataSource: {
                                         store: getItemList,
                                         paginate: true,
-                                        pageSize: 10
+                                        pageSize: pageSizeForLookup
                                     },
                                     valueExpr: 'id',
                                     displayExpr: function (e) {
@@ -526,7 +509,7 @@ $(function () {
                                     dataSource: {
                                         store: getUOMs,
                                         paginate: true,
-                                        pageSize: 10
+                                        pageSize: pageSizeForLookup
                                     },
                                     valueExpr: 'id',
                                     displayExpr: 'code'
@@ -550,8 +533,4 @@ $(function () {
             }
         }
     }).dxDataGrid('instance');
-
-    function isNotEmpty(value) {
-        return value !== undefined && value !== null && value !== '';
-    }
 });

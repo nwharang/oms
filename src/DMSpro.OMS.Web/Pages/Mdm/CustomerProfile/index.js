@@ -9,26 +9,6 @@
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
     var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
     var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
 
     var pricelistLookup = new DevExpress.data.CustomStore({
         key: 'id',
@@ -426,12 +406,12 @@
                                     },
                                     paging: {
                                         enabled: true,
-                                        pageSize: 10
+                                        pageSize: pageSize
                                     },
                                     pager: {
                                         visible: true,
                                         showPageSizeSelector: true,
-                                        allowedPageSizes: [10, 20, 50, 100],
+                                        allowedPageSizes: allowedPageSizes,
                                         showInfo: true,
                                         showNavigationButtons: true
                                     },
@@ -554,12 +534,12 @@
                                     },
                                     paging: {
                                         enabled: true,
-                                        pageSize: 10
+                                        pageSize: pageSize
                                     },
                                     pager: {
                                         visible: true,
                                         showPageSizeSelector: true,
-                                        allowedPageSizes: [10, 20, 50, 100],
+                                        allowedPageSizes: allowedPageSizes,
                                         showInfo: true,
                                         showNavigationButtons: true
                                     },
@@ -695,12 +675,12 @@
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -839,7 +819,7 @@
                     dataSource: {
                         store: systemDataLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: "id",
                     displayExpr: "code"
@@ -866,7 +846,7 @@
                     dataSource: {
                         store: pricelistLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: "id",
                     displayExpr: "code"
@@ -882,7 +862,7 @@
                             store: geoMasterStore,
                             filter: options.data ? ['level', '=', 0] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: "id",
@@ -899,7 +879,7 @@
                             store: geoMasterStore,
                             filter: options.data ? ['level', '=', 1] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -916,7 +896,7 @@
                             store: geoMasterStore,
                             filter: options.data ? ['level', '=', 2] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -933,7 +913,7 @@
                             store: geoMasterStore,
                             filter: options.data ? ['level', '=', 3] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -950,7 +930,7 @@
                             store: geoMasterStore,
                             filter: options.data ? ['level', '=', 4] : null,
                             paginate: true,
-                            pageSize: 10
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -989,7 +969,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1003,7 +983,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1017,7 +997,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1031,7 +1011,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1045,7 +1025,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1059,7 +1039,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1073,7 +1053,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1087,7 +1067,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1101,7 +1081,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1115,7 +1095,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1129,7 +1109,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1143,7 +1123,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1157,7 +1137,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1171,7 +1151,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1185,7 +1165,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1199,7 +1179,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1213,7 +1193,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1227,7 +1207,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1241,7 +1221,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
@@ -1255,7 +1235,7 @@
                     dataSource: {
                         store: cusAttrLookup,
                         paginate: true,
-                        pageSize: 10
+                        pageSize: pageSizeForLookup
                     },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',

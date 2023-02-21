@@ -1,27 +1,6 @@
 var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
-
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
 
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
@@ -119,12 +98,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },

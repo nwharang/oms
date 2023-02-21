@@ -6,7 +6,6 @@ $(function () {
     var salesOrgEmpAssignmentService = window.dMSpro.oMS.mdmService.controllers.salesOrgEmpAssignments.salesOrgEmpAssignment;
     var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
     const menuItems = [{ id: '1', text: l1('SalesOrgHierarchies.Context.Edit') }, { id: '2', text: l1('SalesOrgHierarchies.Context.AddSub') }, { id: '3', text: l1('SalesOrgHierarchies.Context.AddRoute') }, { id: '4', text: l1('SalesOrgHierarchies.Context.Delete') }];
 
     //get data from sessionStorage
@@ -180,12 +179,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 20
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -317,12 +316,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -377,9 +376,11 @@ $(function () {
                 dataField: "employeeProfileId",
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource() {
+                    dataSource(options) {
                         return {
-                            store: employeeProfileStore
+                            store: employeeProfileStore,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     displayExpr: 'firstName',
@@ -558,10 +559,6 @@ $(function () {
     });
 
     /****function*****/
-    function isNotEmpty(value) {
-        return value !== undefined && value !== null && value !== '';
-    }
-
     function onTreeListItemContextMenu(e) {
         const isRoute = e.row.data.isRoute;
         const active = SalesOrgHeaderModel.active;
