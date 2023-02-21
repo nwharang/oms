@@ -185,11 +185,11 @@
         //    mode: 'standard'
         //},
 
-        stateStoring: { //save state in localStorage
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dgCompanies',
-        },
+        //stateStoring: { //save state in localStorage
+        //    enabled: true,
+        //    type: 'localStorage',
+        //    storageKey: 'dgCompanies',
+        //},
 
         paging: {
             enabled: true,
@@ -223,19 +223,11 @@
         },
         toolbar: {
             items: [
-                "groupPanel",
                 //{
-                //    location: 'after',
-                //    //template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                //    widget: 'dxButton',
-                //    options: {
-                //        icon: 'fa fa-plus',
-                //        onClick() {
-                //            gridCompanies.addRow();
-                //        },
-                //    },
-                    
+                //    location: 'before',
+                //    name: 'addRowButton',
                 //},
+                "groupPanel",
                 "addRowButton",
                 {
                     name: "columnChooserButton",
@@ -244,20 +236,17 @@
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="file" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    //widget: 'dxFileUploader',
-                    //options: {
-                    //    selectButtonText: l("ImportFromExcel"),
-                    //    labelText: '',
-                    //    uploadMode: 'useForm',
-                    //    //width: 136,
-                    //    height: 36,
-                    //    onClick() {
-                    //        //const expanding = e.component.option('text') === 'Expand All';
-                    //        //dataGrid.option('grouping.autoExpandAll', expanding);
-                    //        //e.component.option('text', expanding ? 'Collapse All' : 'Expand All');
-                    //    },
-                    //},
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            id: "import-excel",
+                            class: "import-excel",
+                        },
+                        onClick() {
+                            popup.show();
+                        },
+                    },
                 },
                 "searchPanel",
             ],
@@ -301,9 +290,23 @@
                 fixedPosition: "left"
             },
             {
+                dataField: "geoLevel0.name",
+                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel0Id"),
+                formItem: {
+                    visible: false
+                },  
+            },
+            {
                 dataField: "geoLevel0Id",
                 caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel0Id"),
+                visible: false,
+                formItem: {
+                    visible: true,
+                },  
                 //calculateDisplayValue: "geoLevel0.name", // provides display values
+                //calculateCellValue: function (rowData) {
+                //    return rowData.geoLevel0.name;
+                //},
                 setCellValue(rowData, value) {
                     rowData.geoLevel0Id = value;
                     rowData.geoLevel1Id = null;
@@ -312,7 +315,6 @@
                     rowData.geoLevel4Id = null;
                 },
                 lookup: {
-                    //dataSource: geoMasterStore,
                     valueExpr: "id",
                     displayExpr: "name",
                     dataSource(options) {
@@ -320,13 +322,20 @@
                             store: geoMasterStore,
                             filter: ['level', '=', 0],
                             paginate: true,
-                            pageSize: 10,
-                            searchEnabled: true,
-                            //sort: [{ "selector": "name", "desc": false }],
                         };
                     },
+                    //lookup: {
+                    //    valueExpr: 'id',
+                    //    displayExpr: 'name',
+                    //    dataSource(options) {
+                    //        return {
+                    //            store: geoMasterStore,
+                    //            filter: ['level', '=', 0],
+                    //            paginate: true,
+                    //        };
+                    //    },
+                    //},
                 },
-
                 //editCellTemplate: selectBoxEditorTemplate,
                 dataType: 'string',
             },
@@ -344,13 +353,30 @@
                 lookup: {
                     valueExpr: 'id',
                     displayExpr: 'name',
-                    dataSource(options) {
-                        return {
-                            store: geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : ['level', '=', 1],
-                            paginate: true,
-                        };
-                    },
+
+                    store: DevExpress.data.AspNet.createStore({
+                        key: "id",
+                        loadUrl: "api/mdm-service/companies/GetListDevextremes"
+                    })
+
+                    //dataSource(options) {
+                    //    return {
+                    //        store: geoMasterStore,
+                    //        filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : ['level', '=', 1],
+                    //        paginate: true,
+                    //    };
+                    //},
+                    //lookup: {
+                    //    valueExpr: 'id',
+                    //    displayExpr: 'name',
+                    //    dataSource(options) {
+                    //        return {
+                    //            store: geoMasterStore,
+                    //            filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : ['level', '=', 1],
+                    //            paginate: true,
+                    //        };
+                    //    },
+                    //},
                 },
                 dataType: 'string',
             },
@@ -365,14 +391,24 @@
                     rowData.geoLevel4Id = null;
                 },
                 lookup: {
-                    dataSource(options) {
-                        return {
-                            store: geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
-                        };
-                    },
+                    //dataSource(options) {
+                    //    return {
+                    //        store: geoMasterStore,
+                    //        filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
+                    //    };
+                    //},
                     valueExpr: 'id',
                     displayExpr: 'name',
+                    lookup: {
+                        dataSource(options) {
+                            return {
+                                store: geoMasterStore,
+                                filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
+                            };
+                        },
+                        valueExpr: 'id',
+                        displayExpr: 'name',
+                    },
                 },
                 dataType: 'string',
             },
@@ -474,7 +510,6 @@
                 calculateDisplayValue: "parent.name",
                 lookup: {
                     dataSource(options) {
-                        console.log(options.data.id);
                         return {
                             store: customStore,
                             //filter: options.data ? ["!", ["id", "=", options.data.id]] : null,
@@ -574,6 +609,11 @@
             if (e.parentType === 'dataRow') {
                 e.editorOptions.showClearButton = true;
                 switch (e.dataField) {
+                    //case 'geoLevel0Id':
+                    //    e.editorOptions.onValueChanged = function (args) {
+                    //        e.setValue(args.value);
+                    //    };
+                    //    break;
                     case 'geoLevel1Id':
                         e.editorOptions.disabled = (typeof e.row.data.geoLevel0Id !== 'string');
                         break;
@@ -607,40 +647,69 @@
 
     }).dxDataGrid("instance");
 
-    //$("input#Search").on("input", function () {
-    //    gridCompanies.searchByText($(this).val());
-    //});
+    const popup = $('#popup').dxPopup({
+        contentTemplate: "",
+        width: 300,
+        height: 280,
+        container: '#import-excel',
+        showTitle: true,
+        title: 'Information',
+        visible: false,
+        dragEnabled: false,
+        hideOnOutsideClick: true,
+        showCloseButton: true,
+        position: {
+            at: 'top',
+            my: 'right',
+            collision: 'fit',
+        },
+        toolbarItems: [{
+            locateInMenu: 'always',
+            widget: 'dxButton',
+            toolbar: 'top',
+            options: {
+                text: 'More info',
+                onClick() {
+                    //const message = `More info about ${employee.FirstName} ${employee.LastName}`;
 
-    //$("#btnNewCompany").click(function (e) {
-    //    gridCompanies.addRow();
-    //});
-
-    //$("#ExportToExcelButton").click(function (e) {
-    //    e.preventDefault();
-
-    //    companyService.getDownloadToken().then(
-    //        function(result){
-    //                var input = getFilter();
-    //                var url =  abp.appPath + 'api/mdm-service/companies/as-excel-file' + 
-    //                    abp.utils.buildQueryString([
-    //                        { name: 'downloadToken', value: result.token },
-    //                        { name: 'filterText', value: input.filterText }, 
-    //                        { name: 'code', value: input.code }, 
-    //                        { name: 'name', value: input.name }, 
-    //                        { name: 'address', value: input.address }, 
-    //                        { name: 'phone', value: input.phone }, 
-    //                        { name: 'license', value: input.license }, 
-    //                        { name: 'taxCode', value: input.taxCode }, 
-    //                        { name: 'erpCode', value: input.erpCode }, 
-    //                        { name: 'parentId', value: input.parentId }, 
-    //                        { name: 'inactive', value: input.inactive }, 
-    //                        { name: 'isHO', value: input.isHO }
-    //                        ]);
-
-    //                var downloadWindow = window.open(url, '_blank');
-    //                downloadWindow.focus();
-    //        }
-    //    )
-    //});
+                    DevExpress.ui.notify({
+                        message,
+                        position: {
+                            my: 'center top',
+                            at: 'center top',
+                        },
+                    }, 'success', 3000);
+                },
+            },
+        }, {
+            widget: 'dxButton',
+            toolbar: 'bottom',
+            location: 'before',
+            options: {
+                icon: 'email',
+                text: 'Send',
+                onClick() {
+                    //const message = `Email is sent to ${employee.FirstName} ${employee.LastName}`;
+                    DevExpress.ui.notify({
+                        message,
+                        position: {
+                            my: 'center top',
+                            at: 'center top',
+                        },
+                    }, 'success', 3000);
+                },
+            },
+        }, {
+            widget: 'dxButton',
+            toolbar: 'bottom',
+            location: 'after',
+            options: {
+                text: 'Close',
+                onClick() {
+                    popup.hide();
+                },
+            },
+        }],
+    }).dxPopup('instance');
 
 });
