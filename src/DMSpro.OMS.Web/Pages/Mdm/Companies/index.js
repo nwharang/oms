@@ -61,7 +61,7 @@
     });
 
     //Custom store - for load, update, delete
-    var customStore = new DevExpress.data.CustomStore({
+    const customStore = new DevExpress.data.CustomStore({
         key: 'id',
         // loadMode: "processed",
         load(loadOptions) {
@@ -104,7 +104,41 @@
         }
     });
 
-    var gridCompanies = $('#dgCompanies').dxDataGrid({
+    function geoLookupEditorTemplate(cellElement, cellInfo) {
+        console.log(cellInfo);
+        switch (cellInfo.item.dataField) {
+            case 'geoLevel1Id':
+                break;
+            case 'geoLevel2Id':
+                break;
+            case 'geoLevel3Id':
+                break;
+            case 'geoLevel4Id':
+                break;
+            default:
+        }
+
+        return $('<div>').dxLookup({
+            dataSource: {
+                store: geoMasterStore,
+                filter: ['level', '=', 0],
+                key: 'id',
+            },
+            value: cellInfo.value,
+            valueExpr: 'id',
+            displayExpr: 'name',
+            searchMode: "contains",
+            searchEnabled: true,
+            searchExpr: 'name',
+            onValueChanged: function (e) {
+                cellInfo.setValue(e.value);
+                console.log(e.value);
+                console.log(e.previousValue);
+            },
+        });
+    }
+
+    const gridCompanies = $('#dgCompanies').dxDataGrid({
         dataSource: customStore,
         remoteOperations: true,
 
@@ -227,6 +261,7 @@
                 //    location: 'before',
                 //    name: 'addRowButton',
                 //},
+                
                 "groupPanel",
                 "addRowButton",
                 {
@@ -244,10 +279,31 @@
                             class: "import-excel",
                         },
                         onClick() {
+                            //console.log(popup);
+                            popup.option({
+                                contentTemplate: () => popupContentTemplate(),
+                                'position.of': `#import-excel`,
+                            });
                             popup.show();
                         },
                     },
                 },
+                //{
+                //    location: 'center',
+                //    template() {
+                //        return $('<div>')
+                //            .css({ 'margin-top': '-15px', 'width': '150px', 'height': '60px'})
+                //            .dxFileUploader({
+                //                selectButtonText: 'Import Excel',
+                //                icon: 'import',
+                //                labelText: '',
+                //                multiple: false,
+                //                uploadMode: 'useButtons',
+                //                uploadUrl: 'https://js.devexpress.com/Demos/NetCore/FileUploader/Upload',
+                //                allowedFileExtensions: ['.jpg', '.jpeg', '.gif', '.png'],
+                //            });
+                //    },
+                //},
                 "searchPanel",
             ],
         },
@@ -314,29 +370,29 @@
                     rowData.geoLevel3Id = null;
                     rowData.geoLevel4Id = null;
                 },
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "name",
-                    dataSource(options) {
-                        return {
-                            store: geoMasterStore,
-                            filter: ['level', '=', 0],
-                            paginate: true,
-                        };
-                    },
-                    //lookup: {
-                    //    valueExpr: 'id',
-                    //    displayExpr: 'name',
-                    //    dataSource(options) {
-                    //        return {
-                    //            store: geoMasterStore,
-                    //            filter: ['level', '=', 0],
-                    //            paginate: true,
-                    //        };
-                    //    },
-                    //},
-                },
-                //editCellTemplate: selectBoxEditorTemplate,
+                //lookup: {
+                //    valueExpr: "id",
+                //    displayExpr: "name",
+                //    dataSource(options) {
+                //        return {
+                //            store: geoMasterStore,
+                //            filter: ['level', '=', 0],
+                //            paginate: true,
+                //        };
+                //    },
+                //    //lookup: {
+                //    //    valueExpr: 'id',
+                //    //    displayExpr: 'name',
+                //    //    dataSource(options) {
+                //    //        return {
+                //    //            store: geoMasterStore,
+                //    //            filter: ['level', '=', 0],
+                //    //            paginate: true,
+                //    //        };
+                //    //    },
+                //    //},
+                //},
+                editCellTemplate: geoLookupEditorTemplate,
                 dataType: 'string',
             },
             {
@@ -647,56 +703,67 @@
 
     }).dxDataGrid("instance");
 
+    /*thanhhq*/
+    var files = [];
+    var url = `${abp.appPath}api/mdm-service/companies/insert-from-excel`;
+
+    const popupContentTemplate = function () {
+        
+        const content = $('<div />');
+        content.append(
+            $('<div>').dxSelectBox({
+                dataSource: [
+                    { name: l('Insert from Excel'), value: 'I' },
+                    { name: l('Update from Excel'), value: 'U' },
+                ],
+                valueExpr: 'value',
+                displayExpr: 'name',
+                value: 'I',
+                onValueChanged(e) {
+                    if (e.value == 'I') {
+                        url = `${abp.appPath}api/mdm-service/companies/insert-from-excel`;
+                    } else url = `${abp.appPath}api/mdm-service/companies/update-from-excel`
+                },
+            })); 
+        content.append(
+            $('<div>').dxFileUploader({
+                selectButtonText: l('Select a file'),
+                icon: 'import',
+                //labelText: '',
+                multiple: false,
+                uploadMode: 'useForm',
+                allowedFileExtensions: ['.xlsx', '.xls'],
+                onValueChanged(e) {
+                    files = e.value;
+                }
+            })); 
+        return content;
+    };
+
     const popup = $('#popup').dxPopup({
-        contentTemplate: "",
-        width: 300,
-        height: 280,
-        container: '#import-excel',
+        width: 400,
+        height: 300,
+        //container: '#import-excel',
         showTitle: true,
-        title: 'Information',
+        title: l('Import Excel'),
         visible: false,
-        dragEnabled: false,
+        dragEnabled: true,
         hideOnOutsideClick: true,
         showCloseButton: true,
         position: {
-            at: 'top',
-            my: 'right',
-            collision: 'fit',
+            my: 'top',
+            at: 'center',
+            //collision: 'fit',
         },
         toolbarItems: [{
-            locateInMenu: 'always',
-            widget: 'dxButton',
-            toolbar: 'top',
-            options: {
-                text: 'More info',
-                onClick() {
-                    //const message = `More info about ${employee.FirstName} ${employee.LastName}`;
-
-                    DevExpress.ui.notify({
-                        message,
-                        position: {
-                            my: 'center top',
-                            at: 'center top',
-                        },
-                    }, 'success', 3000);
-                },
-            },
-        }, {
             widget: 'dxButton',
             toolbar: 'bottom',
             location: 'before',
             options: {
-                icon: 'email',
-                text: 'Send',
+                icon: 'download',
+                text: l('Download Template'),
                 onClick() {
-                    //const message = `Email is sent to ${employee.FirstName} ${employee.LastName}`;
-                    DevExpress.ui.notify({
-                        message,
-                        position: {
-                            my: 'center top',
-                            at: 'center top',
-                        },
-                    }, 'success', 3000);
+                    companyService.generateExcelTemplates();
                 },
             },
         }, {
@@ -704,12 +771,39 @@
             toolbar: 'bottom',
             location: 'after',
             options: {
-                text: 'Close',
-                onClick() {
-                    popup.hide();
+                icon: 'upload',
+                text: l('Import'),
+                onClick(e) {
+                    if (files.length > 0) {
+                        var formData = new FormData();
+                        formData.append("file", files[0]);
+
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            async: true,
+                            data: formData,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            //timeout: 60000,
+                            success: function (data) {
+                                popup.hide();
+                                gridCompanies.refresh();
+                            },
+                            error: function (msg) {
+                                // handle error
+                                console.log(msg.responseText.error);
+                            },
+                            
+                        });
+                        
+                    }
                 },
             },
-        }],
+        }, 
+        ],
     }).dxPopup('instance');
+    /*thanhhq*/
 
 });
