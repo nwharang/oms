@@ -5,11 +5,9 @@ $(function () {
     var itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
     var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
     //Custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -52,7 +50,6 @@ $(function () {
     // get item attribute
     var getItemAttr = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -87,39 +84,77 @@ $(function () {
         keyExpr: 'id',
         parentIdExpr: 'parentId',
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
+        cacheEnabled: true,
         autoExpandAll: true,
         focusedRowEnabled: true,
-        allowColumnReordering: false,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
+        //columnHidingEnabled: true,
+        //errorRowEnabled: false,
         filterRow: {
             visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'treeProdAttributeValue',
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
         editing: {
             mode: 'row',
-            allowAdding: true,
-            allowUpdating: true,
-            allowDeleting: true,
+            allowAdding: abp.auth.isGranted('MdmService.ItemAttributeValues.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.ItemAttributeValues.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.ItemAttributeValues.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -155,18 +190,33 @@ $(function () {
         },
         toolbar: {
             items: [
+                "groupPanel",
                 {
-                    name: "searchPanel",
-                    location: 'after'
-                }
-            ]
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        dataTreeContainer.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
         },
         columns: [
             {
                 caption: l("Actions"),
                 type: 'buttons',
                 width: 120,
-                buttons: ['add', 'edit', 'delete']
+                buttons: ['add', 'edit', 'delete'],
+                fixedPosition: 'left'
             },
             {
                 dataField: 'attrValName',
@@ -177,9 +227,14 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:ItemAttributeValue:ItemAttributeName"),
                 editorType: 'dxSelectBox',
                 lookup: {
-                    dataSource: getItemAttr,
+                    //dataSource: getItemAttr,
                     valueExpr: 'id',
-                    displayExpr: 'attrName'
+                    displayExpr: 'attrName',
+                    dataSource: {
+                        store: getItemAttr,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    }
                 }
             },
             {
@@ -188,39 +243,40 @@ $(function () {
                 editorType: 'dxSelectBox',
                 visible: false,
                 lookup: {
-                    dataSource: customStore,
+                    //dataSource: customStore,
                     valueExpr: 'id',
-                    displayExpr: 'name'
+                    displayExpr: 'name',
+                    dataSource: {
+                        store: customStore,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    }
                 }
             }
         ]
     }).dxTreeList("instance");
 
-    $("#NewProductAttrValueButton").click(function () {
-        dataTreeContainer.addRow();
-    });
+    //$("#NewProductAttrValueButton").click(function () {
+    //    dataTreeContainer.addRow();
+    //});
 
-    $("input#Search").on("input", function () {
-        dataTreeContainer.searchByText($(this).val());
-    });
+    //$("input#Search").on("input", function () {
+    //    dataTreeContainer.searchByText($(this).val());
+    //});
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
+    //$("#ExportToExcelButton").click(function (e) {
+    //    e.preventDefault();
 
-        itemAttrValueService.getDownloadToken().then(
-            function (result) {
-                var url = abp.appPath + 'api/mdm-service/item-attribute-values/as-excel-file' +
-                    abp.utils.buildQueryString([
-                        { name: 'downloadToken', value: result.token }
-                    ]);
+    //    itemAttrValueService.getDownloadToken().then(
+    //        function (result) {
+    //            var url = abp.appPath + 'api/mdm-service/item-attribute-values/as-excel-file' +
+    //                abp.utils.buildQueryString([
+    //                    { name: 'downloadToken', value: result.token }
+    //                ]);
 
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
-
-    function isNotEmpty(value) {
-        return value !== undefined && value !== null && value !== '';
-    }
+    //            var downloadWindow = window.open(url, '_blank');
+    //            downloadWindow.focus();
+    //        }
+    //    )
+    //});
 });

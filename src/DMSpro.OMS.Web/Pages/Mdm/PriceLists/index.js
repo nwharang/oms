@@ -4,11 +4,9 @@ var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -51,7 +49,6 @@ $(function () {
     // get detail store
     var detailStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -84,7 +81,6 @@ $(function () {
     // get price list
     var getPriceList = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -119,7 +115,6 @@ $(function () {
     // get UOM list
     var getUOMs = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -152,7 +147,6 @@ $(function () {
     // get item list
     var getItemList = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -259,12 +253,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -356,7 +350,12 @@ $(function () {
                     cssClass: 'fieldBasePrice',
                     editorType: 'dxSelectBox',
                     lookup: {
-                        dataSource: getPriceList,
+                        //dataSource: getPriceList,
+                        dataSource: {
+                            store: getPriceList,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
+                        },
                         valueExpr: 'id',
                         displayExpr: 'code'
                     },
@@ -462,12 +461,12 @@ $(function () {
                         },
                         paging: {
                             enabled: true,
-                            pageSize: 10
+                            pageSize: pageSize
                         },
                         pager: {
                             visible: true,
                             showPageSizeSelector: true,
-                            allowedPageSizes: [10, 20, 50, 100],
+                            allowedPageSizes: allowedPageSizes,
                             showInfo: true,
                             showNavigationButtons: true
                         },
@@ -476,7 +475,12 @@ $(function () {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:PriceList"),
                                 dataField: "priceListId",
                                 lookup: {
-                                    dataSource: getPriceList,
+                                    //dataSource: getPriceList,
+                                    dataSource: {
+                                        store: getPriceList,
+                                        paginate: true,
+                                        pageSize: pageSizeForLookup
+                                    },
                                     valueExpr: 'id',
                                     displayExpr: 'code'
                                 }
@@ -485,7 +489,12 @@ $(function () {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Item"),
                                 dataField: "itemId",
                                 lookup: {
-                                    dataSource: getItemList,
+                                    //dataSource: getItemList,
+                                    dataSource: {
+                                        store: getItemList,
+                                        paginate: true,
+                                        pageSize: pageSizeForLookup
+                                    },
                                     valueExpr: 'id',
                                     displayExpr: function (e) {
                                         return e.code + ' - ' + e.name
@@ -496,7 +505,12 @@ $(function () {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:UOM"),
                                 dataField: "uomId",
                                 lookup: {
-                                    dataSource: getUOMs,
+                                    //dataSource: getUOMs,
+                                    dataSource: {
+                                        store: getUOMs,
+                                        paginate: true,
+                                        pageSize: pageSizeForLookup
+                                    },
                                     valueExpr: 'id',
                                     displayExpr: 'code'
                                 }
@@ -519,8 +533,4 @@ $(function () {
             }
         }
     }).dxDataGrid('instance');
-
-    function isNotEmpty(value) {
-        return value !== undefined && value !== null && value !== '';
-    }
 });

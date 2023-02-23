@@ -1,7 +1,6 @@
 ﻿var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
     
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
@@ -101,12 +100,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -226,8 +225,4 @@ $(function () {
     //        }
     //    )
     //});
-
-    function isNotEmpty(value) {
-        return value !== undefined && value !== null && value !== '';
-    }
 });

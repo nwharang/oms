@@ -9,8 +9,6 @@
     var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-
     // get item type list
     var getItemTypes = new DevExpress.data.CustomStore({
         key: 'id',
@@ -331,12 +329,12 @@
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -961,10 +959,6 @@
             }
         )
     });
-
-    function isNotEmpty(value) {
-        return value !== undefined && value !== null && value !== '';
-    }
 
     var listAttrValue = [];
 

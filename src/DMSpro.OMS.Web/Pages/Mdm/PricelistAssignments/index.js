@@ -4,12 +4,9 @@ var customerService = window.dMSpro.oMS.mdmService.controllers.customerGroups.cu
 $(function () {
     var l = abp.localization.getResource("MdmService");
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-
     // custom store
     var priceListStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -51,7 +48,6 @@ $(function () {
 
     var pricelistAssignmentStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -92,7 +88,6 @@ $(function () {
 
     var getCustomers = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -198,12 +193,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -298,19 +293,20 @@ $(function () {
                         },
                         paging: {
                             enabled: true,
-                            pageSize: 10
+                            pageSize: pageSize
                         },
                         pager: {
                             visible: true,
                             showPageSizeSelector: true,
-                            allowedPageSizes: [10, 20, 50, 100],
+                            allowedPageSizes: allowedPageSizes,
                             showInfo: true,
                             showNavigationButtons: true
                         },
                         editing: {
                             mode: "row",
                             allowAdding: abp.auth.isGranted('MdmService.PricelistAssignments.Create'),
-                            //useIcons: true
+                            allowUpdating: false,
+                            allowDeleting: false
                         },
                         onRowInserting: function (e) {
                             e.data.priceListId = options.key
@@ -321,9 +317,16 @@ $(function () {
                                 dataField: "customerGroupId",
                                 editorType: 'dxSelectBox',
                                 lookup: {
-                                    dataSource: getCustomers,
+                                    //dataSource: getCustomers,
+                                    dataSource: {
+                                        store: getCustomers,
+                                        paginate: true,
+                                        pageSize: pageSizeForLookup
+                                    },
                                     valueExpr: 'id',
-                                    displayExpr: 'code'
+                                    displayExpr: function (e) {
+                                        return e.code + ' - ' + e.name
+                                    }
                                 }
                             }
                         ]
@@ -331,8 +334,4 @@ $(function () {
             }
         }
     }).dxDataGrid('instance');
-
-    function isNotEmpty(value) {
-        return value !== undefined && value !== null && value !== '';
-    }
 });

@@ -82,7 +82,7 @@ $(function () {
         allowColumnReordering: true,
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         rowAlternationEnabled: true,
         filterRow: {
@@ -99,7 +99,7 @@ $(function () {
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -186,7 +186,7 @@ $(function () {
                                 dataField: "Name"
                             }, "BarCode"],
                             hoverStateEnabled: true,
-                            paging: { enabled: true, pageSize: 10 },
+                            paging: { enabled: true, pageSize: pageSize },
                             filterRow: { visible: true },
                             scrolling: { mode: "infinite" },
                             height: '90%',

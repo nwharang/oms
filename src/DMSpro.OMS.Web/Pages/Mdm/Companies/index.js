@@ -4,28 +4,6 @@
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
 
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
-
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
-
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
         //loadMode: 'raw',
@@ -59,6 +37,24 @@
             return d.promise();
         },
     });
+
+    function selectBoxEditorTemplate(cellElement, cellInfo) {
+        return $('<div>').dxLookup({
+            valueExpr: "id",
+            displayExpr: "name",
+            dataSource: new DevExpress.data.DataSource({
+                store: geoMasterStore,
+                //filter: ['level', '=', 0],
+                paginate: true,
+                pageSize: pageSizeForLookup
+            }),
+
+            searchEnabled: true,
+            onValueChanged(data) {
+                //cellInfo.setValue(data.value);
+            },
+        });
+    }
 
     //Custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
@@ -193,12 +189,12 @@
 
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -233,6 +229,7 @@
                     name: "columnChooserButton",
                     locateInMenu: "auto",
                 },
+                'columnChooserButton',
                 "exportButton",
                 {
                     location: 'after',
@@ -322,6 +319,7 @@
                             store: geoMasterStore,
                             filter: ['level', '=', 0],
                             paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     //lookup: {
@@ -377,6 +375,14 @@
                     //        };
                     //    },
                     //},
+                    // dataSource(options) {
+                    //     return {
+                    //         store: geoMasterStore,
+                    //         filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : ['level', '=', 1],
+                    //         paginate: true,
+                    //         pageSize: pageSizeForLookup
+                    //     };
+                    // },
                 },
                 dataType: 'string',
             },
@@ -397,6 +403,14 @@
                     //        filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
                     //    };
                     //},
+                    // dataSource(options) {
+                    //     return {
+                    //         store: geoMasterStore,
+                    //         filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
+                    //         paginate: true,
+                    //         pageSize: pageSizeForLookup
+                    //     };
+                    // },
                     valueExpr: 'id',
                     displayExpr: 'name',
                     lookup: {
@@ -426,6 +440,8 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoLevel2Id] : ['level', '=', 3],
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -447,6 +463,8 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : ['level', '=', 4],
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -512,9 +530,9 @@
                     dataSource(options) {
                         return {
                             store: customStore,
-                            //filter: options.data ? ["!", ["id", "=", options.data.id]] : null,
+                            filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
                             paginate: true,
-                            pageSize: 10,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     displayExpr: 'name',
@@ -639,12 +657,17 @@
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
         onRowInserting: function (e) {
-            // for create first data - if parentId = 0, update parentId = null
-            //if (e.data && e.data.parentId == 0) {
-            //    e.data.parentId = null;
-            //}
-        },
-
+            if (e.data.geoLevel0Id == '')
+                e.data.geoLevel0Id = null
+            if (e.data.geoLevel1Id == '')
+                e.data.geoLevel1Id = null
+            if (e.data.geoLevel2Id == '')
+                e.data.geoLevel2Id = null
+            if (e.data.geoLevel3Id == '')
+                e.data.geoLevel3Id = null
+            if (e.data.geoLevel4Id == '')
+                e.data.geoLevel4Id = null
+        }
     }).dxDataGrid("instance");
 
     const popup = $('#popup').dxPopup({

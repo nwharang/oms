@@ -2,12 +2,9 @@ var numberingConfigService = window.dMSpro.oMS.mdmService.controllers.numberingC
 var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
 
     var numberingConfigStore = new DevExpress.data.CustomStore({
+        key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -39,7 +36,7 @@ $(function () {
             return numberingConfigService.create(values, { contentType: "application/json" });
         },
         update(key, values) {
-            return numberingConfigService.update(key.id, values, { contentType: "application/json" });
+            return numberingConfigService.update(key, values, { contentType: "application/json" });
         },
         remove(key) {
             return numberingConfigService.delete(key);
@@ -47,6 +44,7 @@ $(function () {
     });
 
     var companyStore = new DevExpress.data.CustomStore({
+        key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -129,16 +127,16 @@ $(function () {
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgNumberingConfigs',
+            storageKey: 'gridNumberingConfigs',
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -155,12 +153,13 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['companyId', 'prefix', 'startNumber', 'length'];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            e.newData = Object.assign({}, e.oldData, e.newData);
+            //var objectRequire = ['companyId', 'prefix', 'startNumber', 'length'];
+            //for (var property in e.oldData) {
+            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+            //        e.newData[property] = e.oldData[property];
+            //    }
+            //}
         },
         toolbar: {
             items: [
@@ -196,9 +195,14 @@ $(function () {
                 dataField: 'companyId',
                 caption: l("EntityFieldName:MDMService:NumberingConfig:CompanyName"),
                 lookup: {
-                    dataSource: companyStore,
                     valueExpr: 'id',
-                    displayExpr: 'name'
+                    displayExpr: 'name',
+                    dataSource: {
+                        store: companyStore,
+                        //filter: ['level', '=', 0],
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    }
                 }
             },
             {

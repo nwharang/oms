@@ -9,23 +9,19 @@
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
     var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
     var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
     var pricelistLookup = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
-            const argsGeo = {};
+            const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
 
-            priceListService.getListDevextremes(argsGeo)
+            priceListService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -52,14 +48,14 @@
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
-            const argsGeo = {};
+            const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
 
-            systemDataService.getListDevextremes(argsGeo)
+            systemDataService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -86,14 +82,14 @@
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
-            const argsGeo = {};
+            const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
 
-            cusAttributeValueService.getListDevextremes(argsGeo)
+            cusAttributeValueService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -121,14 +117,14 @@
         loadMode: "raw",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const argsGeo = {};
+            const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
 
-            geoMasterService.getListDevextremes(argsGeo)
+            geoMasterService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -410,12 +406,12 @@
                                     },
                                     paging: {
                                         enabled: true,
-                                        pageSize: 10
+                                        pageSize: pageSize
                                     },
                                     pager: {
                                         visible: true,
                                         showPageSizeSelector: true,
-                                        allowedPageSizes: [10, 20, 50, 100],
+                                        allowedPageSizes: allowedPageSizes,
                                         showInfo: true,
                                         showNavigationButtons: true
                                     },
@@ -538,12 +534,12 @@
                                     },
                                     paging: {
                                         enabled: true,
-                                        pageSize: 10
+                                        pageSize: pageSize
                                     },
                                     pager: {
                                         visible: true,
                                         showPageSizeSelector: true,
-                                        allowedPageSizes: [10, 20, 50, 100],
+                                        allowedPageSizes: allowedPageSizes,
                                         showInfo: true,
                                         showNavigationButtons: true
                                     },
@@ -679,12 +675,12 @@
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -820,7 +816,11 @@
                 dataType: 'string',
                 visible: false,
                 lookup: {
-                    dataSource: systemDataLookup,
+                    dataSource: {
+                        store: systemDataLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: "id",
                     displayExpr: "code"
                 }
@@ -843,7 +843,11 @@
                 dataType: 'string',
                 visible: false,
                 lookup: {
-                    dataSource: pricelistLookup,
+                    dataSource: {
+                        store: pricelistLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: "id",
                     displayExpr: "code"
                 }
@@ -857,6 +861,8 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['level', '=', 0] : null,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: "id",
@@ -872,6 +878,8 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['level', '=', 1] : null,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -887,6 +895,8 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['level', '=', 2] : null,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -902,6 +912,8 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['level', '=', 3] : null,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -917,6 +929,8 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['level', '=', 4] : null,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -952,7 +966,11 @@
                 caption: l1("Attribute0Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -962,7 +980,11 @@
                 caption: l1("Attribute1Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -972,7 +994,11 @@
                 caption: l1("Attribute2Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -982,7 +1008,11 @@
                 caption: l1("Attribute3Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -992,7 +1022,11 @@
                 caption: l1("Attribute4Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1002,7 +1036,11 @@
                 caption: l1("Attribute5Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1012,7 +1050,11 @@
                 caption: l1("Attribute6Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1022,7 +1064,11 @@
                 caption: l1("Attribute7Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1032,7 +1078,11 @@
                 caption: l1("Attribute8Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1042,7 +1092,11 @@
                 caption: l1("Attribute9Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1052,7 +1106,11 @@
                 caption: l1("Attribute10Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1062,7 +1120,11 @@
                 caption: l1("Attribute11Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1072,7 +1134,11 @@
                 caption: l1("Attribute12Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1082,7 +1148,11 @@
                 caption: l1("Attribute13Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1092,7 +1162,11 @@
                 caption: l1("Attribute14Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1102,7 +1176,11 @@
                 caption: l1("Attribute15Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1112,7 +1190,11 @@
                 caption: l1("Attribute16Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1122,7 +1204,11 @@
                 caption: l1("Attribute17Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1132,7 +1218,11 @@
                 caption: l1("Attribute18Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }
@@ -1142,7 +1232,11 @@
                 caption: l1("Attribute19Name"),
                 visible: false,
                 lookup: {
-                    dataSource: cusAttrLookup,
+                    dataSource: {
+                        store: cusAttrLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: 'id',
                     displayExpr: 'attrValName',
                 }

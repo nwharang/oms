@@ -28,11 +28,9 @@ $(function () {
         }
     ];
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
     // custom store
     var groupStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -124,16 +122,16 @@ $(function () {
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgItemGroups',
+            storageKey: 'gridItemGroups',
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -287,10 +285,6 @@ $(function () {
     //        }
     //    )
     //});
-
-    function isNotEmpty(value) {
-        return value !== undefined && value !== null && value !== '';
-    }
 });
 
 $(window).focus(function () {

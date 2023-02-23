@@ -1,31 +1,10 @@
 ﻿var assignmentService = window.dMSpro.oMS.mdmService.controllers.companyIdentityUserAssignments.companyIdentityUserAssignment;
 var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
-var userService = window.dMSpro.oMS.identityService.controllers.identityUsers.identityUserCustom
+var userService = window.dMSpro.oMS.identityService.controllers.identityUsers.identityUserCustom;
 
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
 
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
-   
     var assignmentStore = new DevExpress.data.CustomStore({  
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -62,7 +41,7 @@ $(function () {
             
             return assignmentService.update(key.companyIdentityUserAssignment.id,
                 {
-                    companyId: values.companyIdentityUserAssignment.companyId,
+                    companyId: values.company.id,
                     identityUserId: values.companyIdentityUserAssignment.identityUserId
                 }, { contentType: "application/json" });
         },
@@ -155,7 +134,7 @@ $(function () {
             dataSource: new DevExpress.data.DataSource({
                 store: companyStore, 
                 paginate: true,
-                pageSize: 2
+                pageSize: pageSizeForLookup
             }), 
             searchEnabled: true, 
             searchMode: 'contains',
@@ -179,6 +158,9 @@ $(function () {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         }, 
+        onRowUpdating: function (e) {
+            e.newData = Object.assign({}, e.oldData, e.newData);
+        },
         remoteOperations: true,
         //cacheEnabled: true,
         export: {
@@ -239,12 +221,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         }, 
@@ -283,13 +265,13 @@ $(function () {
                 dataField: 'companyIdentityUserAssignment.identityUserId',
                 caption: l("UserName"),
                 validationRules: [{ type: "required" }],
-                //calculateDisplayValue: "companyIdentityUserAssignment.identityUsername",
+                calculateDisplayValue: "companyIdentityUserAssignment.identityUserId",
                 lookup: {
                     dataSource() {
                         return {
                             store: userStore,
                             paginate: true,
-                            pageSize: 2
+                            pageSize: pageSizeForLookup
                         };
                     },
                     displayExpr: 'userName',
@@ -310,7 +292,7 @@ $(function () {
                     dataSource : { 
                         store: companyStore,
                         paginate: true,
-                        pageSize: 2,
+                        pageSize: pageSizeForLookup,
 
                     },
                     displayExpr: 'name',
@@ -331,5 +313,4 @@ $(function () {
         //    }
         //}
     }).dxDataGrid("instance");
-     
 });

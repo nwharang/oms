@@ -2,26 +2,13 @@ $(function () {
     var l = abp.localization.getResource("MdmService");
     var cusAttributesValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
     var cusAttributeService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
 
     var cusAttributes = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
@@ -50,17 +37,7 @@ $(function () {
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            [
-                'skip',
-                'take',
-                'requireTotalCount',
-                'requireGroupCount',
-                'sort',
-                'filter',
-                'totalSummary',
-                'group',
-                'groupSummary',
-            ].forEach((i) => {
+            requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
@@ -124,6 +101,9 @@ $(function () {
                 e.data.parentCusAttributeValueId = null;
             }
         },
+        onRowUpdating: function (e) {
+            e.newData = Object.assign({}, e.oldData, e.newData);
+        },
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
@@ -178,12 +158,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -227,7 +207,12 @@ $(function () {
                 dataField: 'customerAttributeId',
                 caption: l("EntityFieldName:MDMService:CusAttributeValue:AttrNo"),
                 lookup: {
-                    dataSource: cusAttributes,
+                    //dataSource: cusAttributes,
+                    dataSource: {
+                        store: cusAttributes,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: "id",
                     displayExpr: "attrName"
                 }
@@ -240,6 +225,8 @@ $(function () {
                         return {
                             store: customStore,
                             filter: options.data ? ["!", ["attrValName", "=", options.data.attrValName]] : null,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: "id",

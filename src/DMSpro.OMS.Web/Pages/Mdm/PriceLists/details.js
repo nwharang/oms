@@ -6,8 +6,6 @@ var itemGroupAttributeService = window.dMSpro.oMS.mdmService.controllers.itemGro
 var itemListService = window.dMSpro.oMS.mdmService.controllers.itemGroupLists.itemGroupList;
 var itemAttributeService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
 
-const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-
 const status = [
     {
         id: 'OPEN',
@@ -173,12 +171,12 @@ function initItemAttributeTab() {
                 },
                 paging: {
                     enabled: true,
-                    pageSize: 10
+                    pageSize: pageSize
                 },
                 pager: {
                     visible: true,
                     showPageSizeSelector: true,
-                    allowedPageSizes: [10, 20, 50, 100],
+                    allowedPageSizes: allowedPageSizes,
                     showInfo: true,
                     showNavigationButtons: true
                 },
@@ -347,12 +345,12 @@ function initListItemTab() {
                 },
                 paging: {
                     enabled: true,
-                    pageSize: 10
+                    pageSize: pageSize
                 },
                 pager: {
                     visible: true,
                     showPageSizeSelector: true,
-                    allowedPageSizes: [10, 20, 50, 100],
+                    allowedPageSizes: allowedPageSizes,
                     showInfo: true,
                     showNavigationButtons: true
                 },

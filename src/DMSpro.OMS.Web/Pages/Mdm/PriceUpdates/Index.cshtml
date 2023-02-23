@@ -36,14 +36,6 @@
         </div>
         <div class="panel-container show">
             <div class="panel-content jqvmap-bg-ocean p-0" style="min-height: 330px;">
-                <div style="padding-left:12px" class="buttons-header-grid pb-2">
-                    @if (await Authorization.IsGrantedAsync(MdmServicePermissions.PriceUpdates.Create))
-                    {
-                        <button id="NewPriceUpdateButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                            <i class="fa fa-plus"></i> <span>@L["Button.New.PriceUpdate"].Value</span>
-                        </button>
-                    }
-                </div>
                 <div class="dx-viewport">
                     <div id="priceUpdateContainer"></div>
                 </div>

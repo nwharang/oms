@@ -3,11 +3,9 @@ var uomGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDet
 var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
 
     var groupStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -49,7 +47,6 @@ $(function () {
 
     var detailStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -91,7 +88,6 @@ $(function () {
     // get UOMs
     var getUOMs = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -178,12 +174,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -320,12 +316,12 @@ $(function () {
                         },
                         paging: {
                             enabled: true,
-                            pageSize: 10
+                            pageSize: pageSize
                         },
                         pager: {
                             visible: true,
                             showPageSizeSelector: true,
-                            allowedPageSizes: [10, 20, 50, 100],
+                            allowedPageSizes: allowedPageSizes,
                             showInfo: true,
                             showNavigationButtons: true
                         },
@@ -456,8 +452,4 @@ $(function () {
             }
         )
     });
-
-    function isNotEmpty(value) {
-        return value !== undefined && value !== null && value !== '';
-    }
 });

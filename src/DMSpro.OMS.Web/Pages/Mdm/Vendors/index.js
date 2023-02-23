@@ -6,10 +6,7 @@ $(function () {
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
+
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: "id",
         loadMode: 'processed',
@@ -218,12 +215,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -296,7 +293,7 @@ $(function () {
                 width: 70,
                 alignment: 'center',
                 dataType: 'boolean',
-                validationRules: [{ type: "required" }],
+                //validationRules: [{ type: "required" }],
                 cellTemplate(container, options) {
                     $('<div>')
                         .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
@@ -315,14 +312,33 @@ $(function () {
                 dataType: 'date',
             },
             {
-                dataField: 'linkedCompanyId',
-                caption: l("EntityFieldName:MDMService:Vendor:LinkedCompany"),
+                dataField: 'companyId',
+                caption: 'Company',
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource: companiesLookup,
+                    dataSource: {
+                        store: companiesLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: "id",
                     displayExpr: "code"
                 }
+            },
+            {
+                dataField: 'linkedCompany',
+                caption: l("EntityFieldName:MDMService:Vendor:LinkedCompany"),
+                validationRules: [{ type: "required" }],
+                dataType: 'string'
+                //lookup: {
+                //    dataSource: {
+                //        store: companiesLookup,
+                //        paginate: true,
+                //        pageSize: pageSizeForLookup
+                //    },
+                //    valueExpr: "id",
+                //    displayExpr: "code"
+                //}
             },
             //{
             //    dataField: 'warehouseId',
@@ -341,7 +357,11 @@ $(function () {
                 dataType: 'string',
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource: pricelistLookup,
+                    dataSource: {
+                        store: pricelistLookup,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     valueExpr: "id",
                     displayExpr: "code"
                 }
@@ -359,6 +379,8 @@ $(function () {
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['level', '=', 0] : null,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: "id",
@@ -380,6 +402,8 @@ $(function () {
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoMaster0Id] : null,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -400,6 +424,8 @@ $(function () {
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoMaster1Id] : null,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -419,6 +445,8 @@ $(function () {
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoMaster2Id] : null,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
@@ -434,6 +462,8 @@ $(function () {
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoMaster3Id] : null,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',

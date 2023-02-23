@@ -1,32 +1,12 @@
 ﻿var l = abp.localization.getResource("MdmService");
 var MCPHeaderModel;
-
+var mcpDetailData = [];
 $(function () {
 
     DevExpress.config({
         editorStylingMode: 'underlined',
     });
-    const requestOptions = [
-        "filter",
-        "group",
-        "groupSummary",
-        "parentIds",
-        "requireGroupCount",
-        "requireTotalCount",
-        "searchExpr",
-        "searchOperation",
-        "searchValue",
-        "select",
-        "sort",
-        "skip",
-        "take",
-        "totalSummary",
-        "userData"
-    ];
 
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
     var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
     var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
     var companyInZoneService = window.dMSpro.oMS.mdmService.controllers.companyInZones.companyInZone;
@@ -176,6 +156,8 @@ $(function () {
             return d.promise();
         }
     });
+
+
     var mCPDetailsStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
@@ -198,39 +180,43 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-          
+
             mCPDetailsService.getListDevextremes(args)
                 .done(result => {
                     result.data.forEach(x => {
                         x.address = "";
                         x.customerIdExtra = x.customerId;
                     });
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
+                    mcpDetailData = result.data;
+
+                    //deferred.resolve(result.data, {
+                    //    totalCount: result.totalCount,
+                    //    summary: result.summary,
+                    //    groupCount: result.groupCount,
+                    //});
                 });
 
             return deferred.promise();
         },
-        byKey: function (key) {
-            if (key == 0) return null;
+        //byKey: function (key) {
+        //    if (key == 0) return null;
 
-            var d = new $.Deferred();
-            mCPDetailsService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        },
+        //    var d = new $.Deferred();
+        //    mCPDetailsService.get(key)
+        //        .done(data => {
+        //            d.resolve(data);
+        //        });
+        //    return d.promise();
+        //},
         insert(values) {
-            values.mcpHeaderId = MCPHeaderModel.id;
+            values.mcpHeaderId = MCPHeaderModel ? MCPHeaderModel.id : null;
             values.code = "1";//fake value, check api
-            return mCPDetailsService.create(values, { contentType: "application/json" });
+            mcpDetailData.push(values);
+
+            //return mCPDetailsService.create(values, { contentType: "application/json" });
         },
         update(key, values) {
-            values.mcpHeaderId = MCPHeaderModel.id;
+            values.mcpHeaderId = MCPHeaderModel.id; MCPHeaderModel ? MCPHeaderModel.id : null;
             values.code = "1";//fake value, check api
             return mCPDetailsService.update(key, values, { contentType: "application/json" });
         },
@@ -258,7 +244,7 @@ $(function () {
                                 store: salesOrgHierarchyStore,
                                 filter: ["isRoute", "=", true],
                                 paginate: true,
-                                pageSize: 10
+                                pageSize: pageSizeForLookup
                             }),
                             showClearButton: true,
                             placeholder: '',
@@ -279,12 +265,12 @@ $(function () {
                             //    store: companyInZoneStore,
                             //    filter: ["salesOrgHierarchyId", "=", -1],
                             //    paginate: true,
-                            //    pageSize: 2
+                            //    pageSize: pageSize
                             //}),
                             showClearButton: true,
                             placeholder: '',
                             valueExpr: "companyId",
-                            displayExpr: "companyName",
+                            displayExpr: "company.name",
                         }
                     },
                     {
@@ -294,7 +280,7 @@ $(function () {
                             dataSource: new DevExpress.data.DataSource({
                                 store: itemGroupStore,
                                 paginate: true,
-                                pageSize: 10
+                                pageSize: pageSizeForLookup
                             }),
                             showClearButton: true,
                             placeholder: '',
@@ -354,7 +340,20 @@ $(function () {
             }
         ]
     });
-
+    $('#GenerateButton').dxButton({
+        stylingMode: 'contained',
+        type: 'normal',
+        disabled: true
+    });
+    $('#EnddateButton').dxButton({
+        stylingMode: 'contained',
+        type: 'normal',
+        disabled: true
+    });
+    $('#SaveButton').dxButton({
+        stylingMode: 'contained',
+        type: 'normal'
+    });
     $('#resizable').dxResizable({
         minHeight: 120,
         handles: "bottom"
@@ -362,12 +361,21 @@ $(function () {
 
     var dgMCPDetails = $('#dgMCPDetails')
         .dxDataGrid({
-            dataSource: mCPDetailsStore,
+            dataSource: mcpDetailData,
+            onEditingStart: function (e) {
+                $('#SaveButton').data('dxButton').option('disabled', true);
+            },
+            onSaved: function (e) {
+                $('#SaveButton').data('dxButton').option('disabled', false);
+            },
+            onEditCanceled: function (e) {
+                $('#SaveButton').data('dxButton').option('disabled', false);
+            },
             editing: {
                 mode: "row",
                 allowAdding: abp.auth.isGranted('MdmService.MCPHeaders.Create'),
-                allowUpdating: abp.auth.isGranted('MdmService.MCPHeaders.Delete'),
-                allowDeleting: abp.auth.isGranted('MdmService.MCPHeaders.Delete'),
+                allowUpdating: true,
+                allowDeleting: true,
                 useIcons: true,
                 texts: {
                     editRow: l("Edit"),
@@ -428,12 +436,12 @@ $(function () {
             },
             paging: {
                 enabled: true,
-                pageSize: 10
+                pageSize: pageSize
             },
             pager: {
                 visible: true,
                 showPageSizeSelector: true,
-                allowedPageSizes: [10, 20, 50, 100],
+                allowedPageSizes: allowedPageSizes,
                 showInfo: true,
                 showNavigationButtons: true
             },
@@ -442,7 +450,7 @@ $(function () {
                     "groupPanel",
                     {
                         location: 'after',
-                        template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                        template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                         onClick() {
                             dgMCPDetails.addRow();
                         },
@@ -472,7 +480,7 @@ $(function () {
                     }
                 } else if (e.dataField == "effectiveDate" || e.dataField == "endDate") {
                     e.editorOptions.displayFormat = "dd/MM/yyyy";
-                    e.editorOptions.min = new Date(); 
+                    e.editorOptions.min = new Date();
                 }
             },
             onRowUpdating: function (e) {
@@ -498,6 +506,27 @@ $(function () {
                     }
                 }
             },
+            onInitNewRow: function (e) {
+                $('#SaveButton').data('dxButton').option('disabled', true);
+                e.data.code = "1";
+                e.data.effectiveDate = null;
+                e.data.endDate = null;
+                e.data.distance = 0;
+                e.data.visitOrder = 0;
+                e.data.monday = false;
+                e.data.tuesday = false;
+                e.data.wednesday = false;
+                e.data.thursday = false;
+                e.data.friday = false;
+                e.data.saturday = false;
+                e.data.sunday = false;
+                e.data.week1 = false;
+                e.data.week2 = false;
+                e.data.week3 = false;
+                e.data.week4 = false,
+                    e.data.customerId = null;
+                //e.data.mcpHeaderId = MCPHeaderModel ? MCPHeaderModel.id : null;
+            },
             columns: [
                 {
                     type: 'buttons',
@@ -516,7 +545,7 @@ $(function () {
                                 store: customerStore,
                                 /*  filter: ["employeeTypeId", "=", "4623cb59-c099-1615-149f-3a0861252b0d"],//salesman*/
                                 paginate: true,
-                                pageSize: 10
+                                pageSize: pageSizeForLookup
                             };
                         },
                         displayExpr: 'name',
@@ -535,7 +564,7 @@ $(function () {
                                 store: customerStore,
                                 /*  filter: ["employeeTypeId", "=", "4623cb59-c099-1615-149f-3a0861252b0d"],//salesman*/
                                 paginate: true,
-                                pageSize: 10
+                                pageSize: pageSizeForLookup
                             };
                         },
                         displayExpr: 'address',
@@ -708,23 +737,45 @@ $(function () {
             return;
         }
 
-        var params = {
+        var mcpHeaderDto = {
             routeId,
             companyId,
             itemGroupId,
             code,
             name,
-            //isGPSLocked,
             effectiveDate,
             endDate
         };
+        var mcpDetails = [];
 
-        mCPHeaderService.create(params, { contentType: "application/json" })
-            .done(result => {
-                abp.message.success(l('Congratulations'));
-                MCPHeaderModel = result;
-                sessionStorage.setItem("MCPHeaderModel", JSON.stringify(result));
-            }).fail(() => { });
+        dgMCPDetails.getDataSource().items().forEach(u => {
+            mcpDetails.push(u);
+        });
+        var params = {
+            mcpHeaderDto: mcpHeaderDto,
+            mcpDetails: mcpDetails,
+        }
+
+
+        if (!MCPHeaderModel)
+            mCPHeaderService.createMCP(params, { contentType: "application/json" })
+                .done(result => {
+                    abp.message.success(l('Congratulations'));
+                    MCPHeaderModel = {
+                        id: result.mcpHeaderDto.id
+                    };
+                    sessionStorage.setItem("MCPHeaderModel", JSON.stringify(result));
+
+                    $('#GenerateButton').data('dxButton').option('disabled', false);
+                    $('#EnddateButton').data('dxButton').option('disabled', false);
+                }).fail(() => { });
+        //else
+        //    mCPHeaderService.update(MCPHeaderModel.id, params, { contentType: "application/json" })
+        //        .done(result => {
+        //            abp.message.success(l('Congratulations'));
+        //            MCPHeaderModel = result;
+        //            sessionStorage.setItem("MCPHeaderModel", JSON.stringify(result));
+        //        });
     })
 
     $("#CloseButton").click(function (e) {
@@ -771,35 +822,12 @@ $(function () {
     });
     $("#GenerateButton").click(function (e) {
         e.preventDefault();
-        var params = {
-            mcpHeaderId: MCPHeaderModel.id,
-            mcpDetailIds: [
-                "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-            ],
-            dateStart: "2023-02-14T17:45:15.177Z",
-            dateEnd: "2023-02-14T17:45:15.178Z"
-        };
-
-       visitPlanService.generateWithPermission(params, { contentType: "application/json" }).done(result => {
-            abp.message.success(l('Congratulations'));
-        }).fail(() => { });
-
+        $('#popupGenMCP').data('dxPopup').show();
     });
     $("#EnddateButton").click(function (e) {
         e.preventDefault();
-        var params = {
-            mcpHeaderId: MCPHeaderModel.id,
-            mcpDetailIds: [
-                "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-            ],
-            dateStart: "2023-02-14T17:45:15.177Z",
-            dateEnd: "2023-02-14T17:45:15.178Z"
-        };
-
-        visitPlanService.generateWithPermission(params, { contentType: "application/json" }).done(result => {
-            abp.message.success(l('Congratulations'));
-        }).fail(() => { });
-
+        if (MCPHeaderModel)
+            popupEnddateMCP.show();
     });
 
     function LoadData() {
@@ -815,6 +843,9 @@ $(function () {
 
             form.getEditor('EffectiveDate').option('value', MCPHeaderModel.effectiveDate);
             form.getEditor('EndDate').option('value', MCPHeaderModel.endDate);
+
+            $('#GenerateButton').data('dxButton').option('disabled', false);
+            $('#EnddateButton').data('dxButton').option('disabled', false);
         }
     }
     LoadData();
@@ -829,7 +860,7 @@ $(function () {
                 store: companyInZoneStore,
                 filter: ["salesOrgHierarchyId", "=", selectedItem.parentId],
                 paginate: true,
-                pageSize: 10
+                pageSize: pageSize
             }));
 
         } else {
@@ -839,5 +870,134 @@ $(function () {
         }
     }
     $("#top-section").data('dxForm').getEditor('Route').on("valueChanged", routeChangedHandler)
+    function getNextDate(arg) {
+        const today = new Date()
+        let feature = new Date()
+        feature.setDate(today.getDate() + arg)
+        return feature;
+    }
+    $('#StartDate').dxDateBox({
+        type: 'date',
+        showClearButton: true,
+        min: getNextDate(1),
+        displayFormat: 'dd/MM/yyyy',
+    });
+    $('#EndDate').dxDateBox({
+        type: 'date',
+        showClearButton: true,
+        min: getNextDate(2),
+        displayFormat: 'dd/MM/yyyy',
+    });
+    $('#EndDateMCP').dxDateBox({
+        type: 'date',
+        showClearButton: true,
+        min: getNextDate(1),
+        displayFormat: 'dd/MM/yyyy',
+    });
+    const popupGenMCP = $('#popupGenMCP').dxPopup({
+        width: 400,
+        height: 280,
+        container: '.panel-container',
+        showTitle: true,
+        title: 'Generate visit plan',
+        visible: false,
+        dragEnabled: true,
+        hideOnOutsideClick: false,
+        showCloseButton: true,
+        resizeEnabled: true,
+        position: {
+            at: 'center',
+            my: 'center',
+            collision: 'fit',
+        },
+        toolbarItems: [{
+            widget: 'dxButton',
+            toolbar: 'bottom',
+            location: 'before',
+            options: {
+                icon: 'fa fa-check hvr-icon',
+                text: 'Generate',
+                onClick() {
+                    var dxStartDate = $('#StartDate').data('dxDateBox');
+                    var dxEndDate = $('#EndDate').data('dxDateBox');
+                    const dateStart = dxStartDate.option('value');
+                    const dateEnd = dxEndDate.option('value');
+                    //if (!dateStart)
+                    //    dxStartDate.
+                    var params = {
+                        mcpHeaderId: MCPHeaderModel.id,
+                        dateStart: dateStart,
+                        dateEnd: dateEnd
+                    };
 
+                    visitPlanService.generateWithPermission(params, { contentType: "application/json" }).done(result => {
+                        abp.message.success(l('Congratulations'));
+                        popupGenMCP.hide();
+                    }).fail(() => { });
+                },
+            },
+        }, {
+            widget: 'dxButton',
+            toolbar: 'bottom',
+            location: 'after',
+            options: {
+                text: 'Cancel',
+                onClick() {
+                    popupGenMCP.hide();
+                },
+            },
+        }],
+    }).dxPopup('instance');
+
+    const popupEnddateMCP = $('#popupEnddateMCP').dxPopup({
+        width: 400,
+        height: 280,
+        container: '.panel-container',
+        showTitle: true,
+        title: 'Enddate MCP',
+        visible: false,
+        dragEnabled: true,
+        hideOnOutsideClick: false,
+        showCloseButton: true,
+        resizeEnabled: true,
+        position: {
+            at: 'center',
+            my: 'center',
+            collision: 'fit',
+        },
+        toolbarItems: [{
+            widget: 'dxButton',
+            toolbar: 'bottom',
+            location: 'before',
+            options: {
+                icon: 'fa fa-check hvr-icon',
+                text: 'Submit',
+                onClick() {
+                    var dxEndDate = $('#EndDateMCP').data('dxDateBox');
+                    const endDate = dxEndDate.option('value');
+                    //if (!dateStart)
+                    //    dxStartDate.
+                    var params = {
+                        id: MCPHeaderModel.id,
+                        endDate: endDate
+                    };
+
+                    mCPHeaderService.setEndDate(params.id, params.endDate, { contentType: "application/json" }).done(result => {
+                        abp.message.success(l('Congratulations'));
+                        popupEnddateMCP.hide();
+                    }).fail(() => { });
+                },
+            },
+        }, {
+            widget: 'dxButton',
+            toolbar: 'bottom',
+            location: 'after',
+            options: {
+                text: 'Cancel',
+                onClick() {
+                    popupEnddateMCP.hide();
+                },
+            },
+        }],
+    }).dxPopup('instance');
 });

@@ -232,7 +232,7 @@ $.fn.DataTable = function (opts) {
             },
             paging:
             {
-                pageSize: 10,
+                pageSize: pageSize,
             },
             editing: {
                 mode: "row",

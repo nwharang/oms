@@ -65,11 +65,11 @@ $(function () {
         //},
         paging:
         {
-            pageSize: 10,
+            pageSize: pageSize,
         },
         pager: {
             visible: true,
-            allowedPageSizes: [10, 20, 'all'],
+            allowedPageSizes: allowedPageSizes,
             showPageSizeSelector: true,
             showInfo: true,
             showNavigationButtons: true,

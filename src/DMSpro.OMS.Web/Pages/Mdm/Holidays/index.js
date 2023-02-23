@@ -4,7 +4,6 @@ var l1 = abp.localization.getResource("OMS");
 $(() => {
    
     var holidayService = window.dMSpro.oMS.mdmService.controllers.holidays.holiday; 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
      
     var gridHolidays = $('#gridHolidays').dxDataGrid({
         stateStoring: {
@@ -22,7 +21,7 @@ $(() => {
         allowColumnReordering: true,
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         rowAlternationEnabled: true,
         filterRow: {
@@ -39,7 +38,7 @@ $(() => {
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -228,7 +227,7 @@ $(() => {
                         pager: {
                             visible: true,
                             showPageSizeSelector: true,
-                            allowedPageSizes: [10, 20, 50, 100],
+                            allowedPageSizes: allowedPageSizes,
                             showInfo: true,
                             showNavigationButtons: true
                         },

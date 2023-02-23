@@ -7,8 +7,6 @@ $(function () {
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
     var itemMasterService = window.dMSpro.oMS.mdmService.controllers.items.item;
 
-    const requestOptions = ['skip', 'take', 'requireTotalCount', 'requireGroupCount', 'sort', 'filter', 'totalSummary', 'group', 'groupSummary'];
-
     //get data from sessionStorage
     var PriceUpdateModel = JSON.parse(sessionStorage.getItem("PriceUpdate"));
     var stateMode = "home";
@@ -18,11 +16,11 @@ $(function () {
         key: 'id',
         load(loadOptions) {
 
-            //if (loadOptions.filter == undefined) {
-            //    loadOptions.filter = ['priceListId', '=', PriceUpdateModel ? PriceUpdateModel.id : null];
-            //} else {
-            //    loadOptions.filter = [['priceListId', '=', PriceUpdateModel ? PriceUpdateModel.id : null], 'and', loadOptions.filter];
-            //}
+            if (loadOptions.filter == undefined) {
+                loadOptions.filter = ['priceUpdateId', '=', PriceUpdateModel ? PriceUpdateModel.id : null];
+            } else {
+                loadOptions.filter = [['priceUpdateId', '=', PriceUpdateModel ? PriceUpdateModel.id : null], 'and', loadOptions.filter];
+            }
 
             const deferred = $.Deferred();
             const args = {};
@@ -249,7 +247,12 @@ $(function () {
                     text: l('EntityFieldName:MDMService:PriceUpdate:PriceList')
                 },
                 editorOptions: {
-                    dataSource: priceListStore,
+                    //dataSource: priceListStore,
+                    dataSource: {
+                        store: priceListStore,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
                     displayExpr: 'name',
                     valueExpr: 'id'
                 },
@@ -349,12 +352,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize: pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -377,8 +380,9 @@ $(function () {
                     location: 'after',
                     template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                     onClick() {
-                        priceUpdateDetailContainer.addRow();
-                    },
+                        if (PriceUpdateModel != null)
+                            priceUpdateDetailContainer.addRow();
+                    }
                 },
                 'columnChooserButton',
                 "exportButton",
@@ -417,7 +421,13 @@ $(function () {
                 dataField: 'priceListDetailId',
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource: priceListDetailStore,
+                    dataSource() {
+                        return {
+                            store: priceListDetailStore,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
+                        };
+                    },
                     displayExpr(data) {
                         if (data && data.item) {
                             return `${data.item.code} - ${data.item.name}`;
@@ -522,10 +532,6 @@ $(function () {
     });
 
     /****function*****/
-    function isNotEmpty(value) {
-        return value !== undefined && value !== null && value !== '';
-    }
-
     function LoadData() {
         PriceUpdateModel = JSON.parse(sessionStorage.getItem("PriceUpdate"));
         if (PriceUpdateModel == null) {
