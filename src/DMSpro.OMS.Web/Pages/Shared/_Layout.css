@@ -276,3 +276,8 @@ table.companies > tbody > tr{
 .nav-menu li > ul li a > [class*='fa-'], .nav-menu li > ul li a > .ni {
     text-align: left !important;
 }
+
+/*thanhhq*/
+.dx-fileuploader-show-file-list .dx-fileuploader-files-container {
+    padding-top: 0;
+}
