@@ -215,11 +215,11 @@
         //    mode: 'standard'
         //},
 
-        //stateStoring: { //save state in localStorage
-        //    enabled: true,
-        //    type: 'localStorage',
-        //    storageKey: 'dgCompanies',
-        //},
+        stateStoring: { //save state in localStorage
+           enabled: true,
+           type: 'localStorage',
+           storageKey: 'dgCompanies',
+        },
 
         paging: {
             enabled: true,
@@ -260,11 +260,7 @@
                 
                 "groupPanel",
                 "addRowButton",
-                {
-                    name: "columnChooserButton",
-                    locateInMenu: "auto",
-                },
-                'columnChooserButton',
+                "columnChooserButton",
                 "exportButton",
                 {
                     location: 'after',
