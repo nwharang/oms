@@ -363,36 +363,36 @@
                 //calculateCellValue: function (rowData) {
                 //    return rowData.geoLevel0.name;
                 //},
-                setCellValue(rowData, value) {
-                    rowData.geoLevel0Id = value;
-                    rowData.geoLevel1Id = null;
-                    rowData.geoLevel2Id = null;
-                    rowData.geoLevel3Id = null;
-                    rowData.geoLevel4Id = null;
-                },
-                //lookup: {
-                //    valueExpr: "id",
-                //    displayExpr: "name",
-                //    dataSource(options) {
-                //        return {
-                //            store: geoMasterStore,
-                //            filter: ['level', '=', 0],
-                //            paginate: true,
-                //        };
-                //    },
-                //    //lookup: {
-                //    //    valueExpr: 'id',
-                //    //    displayExpr: 'name',
-                //    //    dataSource(options) {
-                //    //        return {
-                //    //            store: geoMasterStore,
-                //    //            filter: ['level', '=', 0],
-                //    //            paginate: true,
-                //    //        };
-                //    //    },
-                //    //},
+                //setCellValue(rowData, value) {
+                //    rowData.geoLevel0Id = value;
+                //    rowData.geoLevel1Id = null;
+                //    rowData.geoLevel2Id = null;
+                //    rowData.geoLevel3Id = null;
+                //    rowData.geoLevel4Id = null;
                 //},
-                editCellTemplate: geoLookupEditorTemplate,
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "name",
+                    dataSource(options) {
+                        return {
+                            store: geoMasterStore,
+                            filter: ['level', '=', 0],
+                            paginate: true,
+                        };
+                    },
+                    //lookup: {
+                    //    valueExpr: 'id',
+                    //    displayExpr: 'name',
+                    //    dataSource(options) {
+                    //        return {
+                    //            store: geoMasterStore,
+                    //            filter: ['level', '=', 0],
+                    //            paginate: true,
+                    //        };
+                    //    },
+                    //},
+                },
+                //editCellTemplate: geoLookupEditorTemplate,
                 dataType: 'string',
             },
             {
@@ -410,18 +410,18 @@
                     valueExpr: 'id',
                     displayExpr: 'name',
 
-                    store: DevExpress.data.AspNet.createStore({
-                        key: "id",
-                        loadUrl: "api/mdm-service/companies/GetListDevextremes"
-                    })
+                    //store: DevExpress.data.AspNet.createStore({
+                    //    key: "id",
+                    //    loadUrl: "api/mdm-service/companies/GetListDevextremes"
+                    //})
 
-                    //dataSource(options) {
-                    //    return {
-                    //        store: geoMasterStore,
-                    //        filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : ['level', '=', 1],
-                    //        paginate: true,
-                    //    };
-                    //},
+                    dataSource(options) {
+                        return {
+                            store: geoMasterStore,
+                            filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : ['level', '=', 1],
+                            paginate: true,
+                        };
+                    },
                     //lookup: {
                     //    valueExpr: 'id',
                     //    displayExpr: 'name',
@@ -447,24 +447,26 @@
                     rowData.geoLevel4Id = null;
                 },
                 lookup: {
-                    //dataSource(options) {
-                    //    return {
-                    //        store: geoMasterStore,
-                    //        filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
-                    //    };
-                    //},
+                    dataSource(options) {
+                        
+                        return {
+                            store: geoMasterStore,
+                            filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
+                            paginate: true,
+                        };
+                    },
                     valueExpr: 'id',
                     displayExpr: 'name',
-                    lookup: {
-                        dataSource(options) {
-                            return {
-                                store: geoMasterStore,
-                                filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
-                            };
-                        },
-                        valueExpr: 'id',
-                        displayExpr: 'name',
-                    },
+                    //lookup: {
+                    //    dataSource(options) {
+                    //        return {
+                    //            store: geoMasterStore,
+                    //            filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
+                    //        };
+                    //    },
+                    //    valueExpr: 'id',
+                    //    displayExpr: 'name',
+                    //},
                 },
                 dataType: 'string',
             },
@@ -482,6 +484,7 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoLevel2Id] : ['level', '=', 3],
+                            paginate: true,
                         };
                     },
                     valueExpr: 'id',
@@ -503,6 +506,7 @@
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : ['level', '=', 4],
+                            paginate: true,
                         };
                     },
                     valueExpr: 'id',
@@ -661,31 +665,31 @@
             //#endregion
         ],
 
-        onEditorPreparing(e) {
-            if (e.parentType === 'dataRow') {
-                e.editorOptions.showClearButton = true;
-                switch (e.dataField) {
-                    //case 'geoLevel0Id':
-                    //    e.editorOptions.onValueChanged = function (args) {
-                    //        e.setValue(args.value);
-                    //    };
-                    //    break;
-                    case 'geoLevel1Id':
-                        e.editorOptions.disabled = (typeof e.row.data.geoLevel0Id !== 'string');
-                        break;
-                    case 'geoLevel2Id':
-                        e.editorOptions.disabled = (typeof e.row.data.geoLevel1Id !== 'string');
-                        break;
-                    case 'geoLevel3Id':
-                        e.editorOptions.disabled = (typeof e.row.data.geoLevel2Id !== 'string');
-                        break;
-                    case 'geoLevel4Id':
-                        e.editorOptions.disabled = (typeof e.row.data.geoLevel3Id !== 'string');
-                        break;
-                    default:
-                }
-            }
-        },
+        //onEditorPreparing(e) {
+        //    if (e.parentType === 'dataRow') {
+        //        e.editorOptions.showClearButton = true;
+        //        switch (e.dataField) {
+        //            //case 'geoLevel0Id':
+        //            //    e.editorOptions.onValueChanged = function (args) {
+        //            //        e.setValue(args.value);
+        //            //    };
+        //            //    break;
+        //            case 'geoLevel1Id':
+        //                e.editorOptions.disabled = (typeof e.row.data.geoLevel0Id !== 'string');
+        //                break;
+        //            case 'geoLevel2Id':
+        //                e.editorOptions.disabled = (typeof e.row.data.geoLevel1Id !== 'string');
+        //                break;
+        //            case 'geoLevel3Id':
+        //                e.editorOptions.disabled = (typeof e.row.data.geoLevel2Id !== 'string');
+        //                break;
+        //            case 'geoLevel4Id':
+        //                e.editorOptions.disabled = (typeof e.row.data.geoLevel3Id !== 'string');
+        //                break;
+        //            default:
+        //        }
+        //    }
+        //},
         //onEditorPreparing(e) {
         //    if (e.dataField === 'parentId' && e.editorOptions.value == 0) {
         //        e.editorOptions.value = '';
