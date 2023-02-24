@@ -55,7 +55,7 @@ $(function () {
     });
 
     var salesOrgEmpAssignmentStore = new DevExpress.data.CustomStore({
-        key: 'id',
+        key: 'employeeProfileId',
         load(loadOptions) {
             const deferred = $.Deferred();
 
