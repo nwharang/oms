@@ -260,6 +260,147 @@
     });
 
 
+    var files = [];
+    var url = `${abp.appPath}api/mdm-service/customers/insert-from-excel`;
+
+    const popupContentTemplate = function () {
+        
+        const content = $('<div />');
+        content.append(
+            $('<div>').dxSelectBox({
+                dataSource: [
+                    { name: l('Insert from Excel'), value: 'I' },
+                    { name: l('Update from Excel'), value: 'U' },
+                ],
+                valueExpr: 'value',
+                displayExpr: 'name',
+                value: 'I',
+                onValueChanged(e) {
+                    if (e.value == 'I') {
+                        url = `${abp.appPath}api/mdm-service/companies/insert-from-excel`;
+                    } else url = `${abp.appPath}api/mdm-service/companies/update-from-excel`
+                },
+            })); 
+        content.append(
+            $('<div>').dxFileUploader({
+                selectButtonText: l('Select a file'),
+                icon: 'import',
+                //labelText: '',
+                multiple: false,
+                uploadMode: 'useForm',
+                allowedFileExtensions: ['.xlsx', '.xls'],
+                onValueChanged(e) {
+                    files = e.value;
+                }
+            })); 
+        return content;
+    };
+
+    const popup_m = $('#popup').dxPopup({
+        width: 400,
+        height: 300,
+        //container: '#import-excel',
+        showTitle: true,
+        title: l('Import Excel'),
+        visible: false,
+        dragEnabled: true,
+        hideOnOutsideClick: true,
+        showCloseButton: true,
+        position: {
+            my: 'top',
+            at: 'center',
+            //collision: 'fit',
+        },
+        toolbarItems: [{
+            widget: 'dxButton',
+            toolbar: 'bottom',
+            location: 'before',
+            options: {
+                icon: 'download',
+                text: l('Download Template'),
+                onClick() {
+                    const url = '/api/mdm-service/companies/get-excel-template';
+                    fetch(url)
+                        // Retrieve its body as ReadableStream
+                    .then((response) => {
+                        console.log(response);
+                        const reader = response.body.getReader();
+                        console.log(reader);
+                        return new ReadableStream({
+                            start(controller) {
+                                return pump();
+                                function pump() {
+                                    return reader.read().then(({ done, value }) => {
+                                        // When no more data needs to be consumed, close the stream
+                                        if (done) {
+                                            controller.close();
+                                            return;
+                                        }
+                                        // Enqueue the next data chunk into our target stream
+                                        controller.enqueue(value);
+                                        return pump();
+                                        });
+                                    }
+                                }
+                                })
+                            })
+                            // Create a new response out of the stream
+                            .then((stream) => new Response(stream))
+                            // Create an object URL for the response
+                            .then((response) => response.blob())
+                            .then((blob) => URL.createObjectURL(blob))
+                            .then((href) => {
+                                const a = document.createElement("a");
+                                document.body.appendChild(a);
+                                a.style = "display: none";
+                                a.href = href;
+                                a.download = 'Customer_Template.xlsx';
+                                a.click();
+
+                            });
+                           
+                                },
+            },
+        }, {
+            widget: 'dxButton',
+            toolbar: 'bottom',
+            location: 'after',
+            options: {
+                icon: 'upload',
+                text: l('Import'),
+                onClick(e) {
+                    if (files.length > 0) {
+                        var formData = new FormData();
+                        formData.append("file", files[0]);
+
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            async: true,
+                            data: formData,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            //timeout: 60000,
+                            success: function (data) {
+                                popup.hide();
+                                gridCompanies.refresh();
+                            },
+                            error: function (msg) {
+                                // handle error
+                                console.log(msg.responseText.error);
+                            },
+                            
+                        });
+                        
+                    }
+                },
+            },
+        }, 
+        ],
+    }).dxPopup('instance');
+    
+
     var cusProfile = {};
 
     var gridCustomers = $('#dgCustomers').dxDataGrid({
@@ -687,20 +828,33 @@
         toolbar: {
             items: [
                 "groupPanel",
-                {
-                    location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        gridCustomers.addRow();
-                    },
-                },
+                // {
+                //     location: 'after',
+                //     template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                //     onClick() {
+                //         gridCustomers.addRow();
+                //     },
+                // },
+                "addRowButton",
                 'columnChooserButton',
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            id: "import-excel",
+                            class: "import-excel",
+                        },
+                        onClick() {
+                            //console.log(popup);
+                            popup_m.option({
+                                contentTemplate: () => popupContentTemplate(),
+                                'position.of': `#import-excel`,
+                            });
+                            popup_m.show();
+                        },
                     },
                 },
                 "searchPanel"
@@ -1258,104 +1412,7 @@
         gridCustomers.addRow();
     });
 
-    //    $("#ExportToExcelButton").click(function (e) {
-    //        e.preventDefault();
+    
 
-    //        customerService.getDownloadToken().then(
-    //            function(result){
-    //                    var input = getFilter();
-    //                    var url =  abp.appPath + 'api/mdm-service/customer-profiles/as-excel-file' + 
-    //                        abp.utils.buildQueryString([
-    //                            { name: 'downloadToken', value: result.token },
-    //                            { name: 'filterText', value: input.filterText }, 
-    //                            { name: 'code', value: input.code }, 
-    //                            { name: 'name', value: input.name }, 
-    //                            { name: 'phone1', value: input.phone1 }, 
-    //                            { name: 'phone2', value: input.phone2 }, 
-    //                            { name: 'erpCode', value: input.erpCode }, 
-    //                            { name: 'license', value: input.license }, 
-    //                            { name: 'taxCode', value: input.taxCode }, 
-    //                            { name: 'vatName', value: input.vatName }, 
-    //                            { name: 'vatAddress', value: input.vatAddress }, 
-    //                            { name: 'active', value: input.active },
-    //                            { name: 'effectiveDateMin', value: input.effectiveDateMin },
-    //                            { name: 'effectiveDateMax', value: input.effectiveDateMax },
-    //                            { name: 'endDateMin', value: input.endDateMin },
-    //                            { name: 'endDateMax', value: input.endDateMax },
-    //                            { name: 'creditLimitMin', value: input.creditLimitMin },
-    //                            { name: 'creditLimitMax', value: input.creditLimitMax }, 
-    //                            { name: 'isCompany', value: input.isCompany }, 
-    //                            { name: 'street', value: input.street }, 
-    //                            { name: 'address', value: input.address }, 
-    //                            { name: 'latitude', value: input.latitude }, 
-    //                            { name: 'longitude', value: input.longitude }, 
-    //                            { name: 'sfaCustomerCode', value: input.sfaCustomerCode },
-    //                            { name: 'lastOrderDateMin', value: input.lastOrderDateMin },
-    //                            { name: 'lastOrderDateMax', value: input.lastOrderDateMax }, 
-    //                            { name: 'warehouseId', value: input.warehouseId }, 
-    //                            { name: 'paymentTermId', value: input.paymentTermId }
-    //, 
-    //                            { name: 'linkedCompanyId', value: input.linkedCompanyId }
-    //, 
-    //                            { name: 'priceListId', value: input.priceListId }
-    //, 
-    //                            { name: 'geoMaster0Id', value: input.geoMaster0Id }
-    //, 
-    //                            { name: 'geoMaster1Id', value: input.geoMaster1Id }
-    //, 
-    //                            { name: 'geoMaster2Id', value: input.geoMaster2Id }
-    //, 
-    //                            { name: 'geoMaste3rId', value: input.geoMaste3rId }
-    //, 
-    //                            { name: 'geoMaster4Id', value: input.geoMaster4Id }
-    //, 
-    //                            { name: 'cusAttributeValue0Id', value: input.cusAttributeValue0Id }
-    //, 
-    //                            { name: 'cusAttributeValue1Id', value: input.cusAttributeValue1Id }
-    //, 
-    //                            { name: 'cusAttributeValue2Id', value: input.cusAttributeValue2Id }
-    //, 
-    //                            { name: 'cusAttributeValue3Id', value: input.cusAttributeValue3Id }
-    //, 
-    //                            { name: 'cusAttributeValue4Id', value: input.cusAttributeValue4Id }
-    //, 
-    //                            { name: 'cusAttributeValue5Id', value: input.cusAttributeValue5Id }
-    //, 
-    //                            { name: 'cusAttributeValue6Id', value: input.cusAttributeValue6Id }
-    //, 
-    //                            { name: 'cusAttributeValue7Id', value: input.cusAttributeValue7Id }
-    //, 
-    //                            { name: 'cusAttributeValue8Id', value: input.cusAttributeValue8Id }
-    //, 
-    //                            { name: 'cusAttributeValue9Id', value: input.cusAttributeValue9Id }
-    //, 
-    //                            { name: 'cusAttributeValue10Id', value: input.cusAttributeValue10Id }
-    //, 
-    //                            { name: 'cusAttributeValue11Id', value: input.cusAttributeValue11Id }
-    //, 
-    //                            { name: 'cusAttributeValue12Id', value: input.cusAttributeValue12Id }
-    //, 
-    //                            { name: 'cusAttributeValue13Id', value: input.cusAttributeValue13Id }
-    //, 
-    //                            { name: 'cusAttributeValue14Id', value: input.cusAttributeValue14Id }
-    //, 
-    //                            { name: 'cusAttributeValue15Id', value: input.cusAttributeValue15Id }
-    //, 
-    //                            { name: 'cusAttributeValue16Id', value: input.cusAttributeValue16Id }
-    //, 
-    //                            { name: 'cusAttributeValue17Id', value: input.cusAttributeValue17Id }
-    //, 
-    //                            { name: 'cusAttributeValue18Id', value: input.cusAttributeValue18Id }
-    //, 
-    //                            { name: 'cusAttributeValue19Id', value: input.cusAttributeValue19Id }
-    //, 
-    //                            { name: 'paymentId', value: input.paymentId }
-    //                            ]);
-
-    //                    var downloadWindow = window.open(url, '_blank');
-    //                    downloadWindow.focus();
-    //            }
-    //        )
-    //    });
-
+    
 });
