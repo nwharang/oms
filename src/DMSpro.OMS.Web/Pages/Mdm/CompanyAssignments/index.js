@@ -100,17 +100,8 @@ $(function () {
         key: 'id',
         load: function (loadOptions) {
             var deferred = $.Deferred(),
-                params = {};
-            [
-                "skip",
-                "take",
-                "sort",
-                "filter",
-                "searchExpr",
-                "searchOperation",
-                "searchValue",
-                "group",
-            ].forEach(function (i) {
+            const params = {};
+            requestOptions.forEach(function (i) {
                 if (i in loadOptions && isNotEmpty(loadOptions[i]))
                     params[i] = JSON.stringify(loadOptions[i]);
             });
