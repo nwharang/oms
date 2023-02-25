@@ -222,15 +222,15 @@
 
     const manageItem = [
         {
-            id: 'NONE',
+            id: 0,
             text: l('EntityFieldValue:MDMService:Item:ManageItemBy:NONE')
         },
         {
-            id: 'LOT',
+            id: 1,
             text: l('EntityFieldValue:MDMService:Item:ManageItemBy:LOT')
         },
         {
-            id: 'SERIAL',
+            id: 2,
             text: l('EntityFieldValue:MDMService:Item:ManageItemBy:SERIAL')
         }
     ];
@@ -442,26 +442,6 @@
                                             {
                                                 dataField: 'manageItemBy',
                                                 cssClass: 'fieldManageItemBy',
-                                                editorOptions: {
-                                                    onValueChanged: function (e) { 
-                                                        if (e.value == 'LOT') {
-                                                            $('div.fieldExpiredType > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
-                                                            $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').removeClass('dx-state-disabled');
-                                                            $('div.fieldExpiredValue > div > div.dx-show-invalid-badge > div.dx-texteditor-container > div.dx-texteditor-input-container > input').removeAttr('disabled');
-                                                            $('div.fieldIssueMethod > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
-                                                        }
-                                                        else if (e.value == 'NONE') {
-                                                            $('div.fieldExpiredType > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', true);
-                                                            $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').addClass('dx-state-disabled');
-                                                            $('div.fieldIssueMethod > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', true);
-                                                        }
-                                                        else {
-                                                            $('div.fieldExpiredType > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', true);
-                                                            $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').addClass('dx-state-disabled');
-                                                            $('div.fieldIssueMethod > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
-                                                        }
-                                                    }
-                                                }
                                             },
                                             {
                                                 dataField: 'expiredType',
@@ -594,6 +574,29 @@
             for (var property in e.oldData) {
                 if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                     e.newData[property] = e.oldData[property];
+                }
+            }
+        },
+        onEditorPreparing: function (e) {
+            if (e.dataField == "manageItemBy" && e.parentType == "dataRow") {
+                e.editorOptions.onValueChanged = function (arg) {
+                    e.setValue(arg.value);
+                    if (arg.value == 1) {
+                        $('div.fieldExpiredType > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
+                        $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').removeClass('dx-state-disabled');
+                        $('div.fieldExpiredValue > div > div.dx-show-invalid-badge > div.dx-texteditor-container > div.dx-texteditor-input-container > input').removeAttr('disabled');
+                        $('div.fieldIssueMethod > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
+                    }
+                    else if (arg.value == 0) {
+                        $('div.fieldExpiredType > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', true);
+                        $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').addClass('dx-state-disabled');
+                        $('div.fieldIssueMethod > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', true);
+                    }
+                    else {
+                        $('div.fieldExpiredType > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', true);
+                        $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').addClass('dx-state-disabled');
+                        $('div.fieldIssueMethod > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
+                    }
                 }
             }
         },
