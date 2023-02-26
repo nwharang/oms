@@ -5,8 +5,10 @@
     /****custom store*****/
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
+        //parentId: 'parentId',
         load(loadOptions) {
             console.log(loadOptions);
+
             const deferred = $.Deferred();
             const args = {};
 
@@ -51,12 +53,18 @@
     /****control*****/
     //TreeList - GeoMaster
     const dataTreeContainer = $('#dataTreeContainer').dxTreeList({
-        dataSource: geoMasterStore,
+        dataSource: {
+            store: geoMasterStore,
+            paginate: true,
+            pageSize: 10,
+        },
         keyExpr: 'id',
-        parentIdExpr: "parentId",
+        parentIdExpr: 'parentId',
         remoteOperations: true,
         showBorders: true,
-        autoExpandAll: true,
+        rootValue: null,
+        //expandedRowKeys: [1, 2],
+        //autoExpandAll: true,
         focusedRowEnabled: true,
         allowColumnReordering: false,
         rowAlternationEnabled: true,
@@ -150,7 +158,7 @@
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:ParentName"),
                 dataField: "parentId",
-                calculateDisplayValue: "name",
+                calculateDisplayValue: "parent.name",
                 lookup: {
                     dataSource(options) {
                         return {

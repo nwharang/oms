@@ -312,7 +312,7 @@
             },
             {
                 dataField: 'id',
-                caption: l("EntityFieldName:MDMService:CompanyProfile:Id"),
+                caption: l("Id"),
                 dataType: 'string',
                 allowEditing: false,
                 visible: false,
