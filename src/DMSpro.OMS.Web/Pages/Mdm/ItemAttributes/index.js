@@ -1,19 +1,12 @@
 ﻿var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
     
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            itemAttrService.getListDevextremes(args)
+            itemAttrService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -85,7 +78,7 @@ $(function () {
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'ItemAttributes.xlsx');
                 });
             });
             e.cancel = true;
@@ -96,7 +89,7 @@ $(function () {
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgSystemDatas',
+            storageKey: 'gridProdAttribute',
         },
         paging: {
             enabled: true,
@@ -111,7 +104,7 @@ $(function () {
         },
         editing: {
             mode: "row",
-            /*allowAdding: abp.auth.isGranted('MdmService.ItemAttributes.Create'),*/
+            allowAdding: false,
             allowUpdating: abp.auth.isGranted('MdmService.ItemAttributes.Edit'),
             allowDeleting: abp.auth.isGranted('MdmService.ItemAttributes.Delete'),
             useIcons: true,
@@ -122,12 +115,13 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['attrNo', 'attrName', 'hierarchyLevel', 'active', 'isProductCategory'];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            e.newData = Object.assign({}, e.oldData, e.newData);
+            //var objectRequire = ['attrNo', 'attrName', 'hierarchyLevel', 'active', 'isProductCategory'];
+            //for (var property in e.oldData) {
+            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+            //        e.newData[property] = e.oldData[property];
+            //    }
+            //}
         },
         toolbar: {
             items: [
@@ -202,27 +196,4 @@ $(function () {
             }
         ]
     }).dxDataGrid('instance');
-
-    //$("#NewProductAttributeButton").click(function () {
-    //    dataGrid.addRow();
-    //});
-
-    //$("input#Search").on("input", function () {
-    //    dataGrid.searchByText($(this).val());
-    //});
-
-    //$("#ExportToExcelButton").click(function (e) {
-    //    e.preventDefault();
-
-    //    itemAttrService.getDownloadToken().then(
-    //        function (result) {
-    //            var url = abp.appPath + 'api/mdm-service/item-attributes/as-excel-file' + abp.utils.buildQueryString([
-    //                { name: 'downloadToken', value: result.token }
-    //            ]);
-
-    //            var downloadWindow = window.open(url, '_blank');
-    //            downloadWindow.focus();
-    //        }
-    //    )
-    //});
 });

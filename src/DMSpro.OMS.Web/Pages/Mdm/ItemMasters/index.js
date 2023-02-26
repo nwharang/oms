@@ -1,5 +1,5 @@
 ﻿$(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
     var itemMasterService = window.dMSpro.oMS.mdmService.controllers.items.item;
     var itemTypeService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
     var uOMGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail;
@@ -8,23 +8,16 @@
     var itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
     var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
+    var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
+    var itemImageService = window.dMSpro.oMS.mdmService.controllers.itemImages.itemImage;
+    var itemAttachmentService = window.dMSpro.oMS.mdmService.controllers.itemAttachments.itemAttachment;
 
     // get item type list
     var getItemTypes = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "processed",
         load(loadOptions) {
-            if (loadOptions.filter == undefined)
-                loadOptions.filter = ['code', '=', 'MD02']
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            itemTypeService.getListDevextremes(args)
+            itemTypeService.getListDevextremes({ filter: JSON.stringify(['code', '=', 'MD02']) })
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -49,17 +42,9 @@
     // get item attribute value
     var getItemAttrValue = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "processed",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            itemAttrValueService.getListDevextremes(args)
+            itemAttrValueService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -83,17 +68,9 @@
     // get UOM group lookup
     var getUOMGroups = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "processed",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            uOMGroupService.getListDevextremes(args)
+            uOMGroupService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -118,17 +95,9 @@
     // get UOMs detail lookup
     var getUOMGroupDetails = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "processed",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            uOMGroupDetailService.getListDevextremes(args)
+            uOMGroupDetailService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -150,20 +119,39 @@
         }
     });
 
+    // get UOMs
+    var getUOMs = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            uomService.getListDevextremes({})
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            uomService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
+
     // get VATs
     var getVATs = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "processed",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            vATService.getListDevextremes(args)
+            vATService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -188,17 +176,9 @@
     // get price list
     var getPriceList = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "processed",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            priceListService.getListDevextremes(args)
+            priceListService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -236,46 +216,38 @@
     ];
     const expiredType = [
         {
-            id: 'DAY',
+            id: 0,
             text: l('EntityFieldValue:MDMService:Item:ExpiredType:DAY')
         },
         {
-            id: 'WEEK',
+            id: 1,
             text: l('EntityFieldValue:MDMService:Item:ExpiredType:WEEK')
         },
         {
-            id: 'MONTH',
+            id: 2,
             text: l('EntityFieldValue:MDMService:Item:ExpiredType:MONTH')
         },
         {
-            id: 'YEAR',
+            id: 3,
             text: l('EntityFieldValue:MDMService:Item:ExpiredType:YEAR')
         }
     ];
     const issueMethod = [
         {
-            id: 'FEFO',
+            id: 0,
             text: l('EntityFieldValue:MDMService:Item:IssueMethod:FEFO')
         },
         {
-            id: 'SERIAL',
+            id: 1,
             text: l('EntityFieldValue:MDMService:Item:IssueMethod:SERIAL')
         }
     ];
 
     var customStore = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "processed",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            itemMasterService.getListDevextremes(args)
+            itemMasterService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -307,25 +279,61 @@
         }
     });
 
+    var itemMaster = {};
+
     var gridItemMasters = $('#dataGridItemMasters').dxDataGrid({
         dataSource: customStore,
-        keyExpr: 'id',
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        autoExpandAll: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: false,
+        cacheEnabled: true,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        errorRowEnabled: false,
         filterRow: {
             visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dataGridItemMasters',
         },
         paging: {
             enabled: true,
@@ -340,9 +348,9 @@
         },
         editing: {
             mode: 'popup',
-            allowAdding: true,
-            allowUpdating: true,
-            allowDeleting: true,
+            allowAdding: abp.auth.isGranted('MdmService.Items.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.Items.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.Items.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -404,28 +412,7 @@
                                     {
                                         dataField: 'uomGroupId',
                                         cssClass: 'uomGroup',
-                                        colSpan: 2,
-                                        editorOptions: {
-                                            onValueChanged: function (e) {
-                                                // filter inventory dataSource by uomGroupId
-                                                var fieldInventoryUOMIdCb = $('div.fieldInventoryUOMId > div > div.dx-selectbox').data('dxSelectBox');
-                                                fieldInventoryUOMIdCb.option('disabled', false);
-                                                fieldInventoryUOMIdCb.getDataSource().filter(['uomGroupId', '=', e.value]);
-                                                fieldInventoryUOMIdCb.getDataSource().load();
-
-                                                // filter PurUnit dataSource by uomGroupId
-                                                var fieldPurUOMIdCb = $('div.fieldPurUOMId > div > div.dx-selectbox').data('dxSelectBox');
-                                                fieldPurUOMIdCb.option('disabled', false);
-                                                fieldPurUOMIdCb.getDataSource().filter(['uomGroupId', '=', e.value]);
-                                                fieldPurUOMIdCb.getDataSource().load();
-
-                                                // filter SaleUnit dataSource by uomGroupId
-                                                var fieldSalesUOMIdCb = $('div.fieldSalesUOMId > div > div.dx-selectbox').data('dxSelectBox');
-                                                fieldSalesUOMIdCb.option('disabled', false);
-                                                fieldSalesUOMIdCb.getDataSource().filter(['uomGroupId', '=', e.value]);
-                                                fieldSalesUOMIdCb.getDataSource().load();
-                                            }
-                                        }
+                                        colSpan: 2
                                     },
                                     {
                                         itemType: 'group',
@@ -493,45 +480,11 @@
                         caption: 'DMS Attribute',
                         colSpan: 2,
                         items: getAttrOptions()
-                        //items: [
-                        //{
-                        //    //itemAttrActiveData.forEach(function (item) {
-                        //    //    debugger
-                        //    //})
-                        //    dataField: 'attr0Id'
-                        //},
-                        //{
-                        //    dataField: 'attr1Id'
-                        //},
-                        //{
-                        //    dataField: 'attr2Id'
-                        //},
-                        //{
-                        //    dataField: 'attr3Id'
-                        //},
-                        //{
-                        //    dataField: 'attr4Id'
-                        //},
-                        //{
-                        //    dataField: 'attr5Id'
-                        //},
-                        //{
-                        //    dataField: 'attr6Id'
-                        //},
-                        //{
-                        //    dataField: 'attr7Id'
-                        //},
-                        //{
-                        //    dataField: 'attr8Id'
-                        //},
-                        //{
-                        //    dataField: 'attr9Id'
-                        //}
-                        //]
-                    }
+                    },
                     //{
                     //    itemType: 'group',
                     //    colSpan: 8,
+                    //    colCount: 1,
                     //    items: [{
                     //        itemType: 'tabbed',
                     //        tabPanelOptions: {
@@ -539,30 +492,43 @@
                     //        },
                     //        tabs: [
                     //            {
-                    //                title: 'Images',
-                    //                icon: "isnotblank",
-                    //                badge: "new",
-                    //                template: function (itemData, itemIndex, element) {
-                    //                    const galleryDiv = $("<div style='padding:10px'>")
-                    //                    galleryDiv.dxGallery({
-                    //                        dataSource: items.Images,
-                    //                        height: 'auto',
-                    //                        selectedItem: items.Images[1],
-                    //                        slideshowDelay: 1500,
-                    //                        loop: true
-                    //                    });
-                    //                    galleryDiv.appendTo(element);
-                    //                }
+                    //                title: l('Menu:MdmService:ItemImages'),
+                    //                icon: "image",
+                    //                template: initItemImagesTab()
+                    //                //title: 'Images',
+                    //                //icon: "isnotblank",
+                    //                //badge: "new",
+                    //                //template: function (itemData, itemIndex, element) {
+                    //                //    const galleryDiv = $("<div style='padding:10px'>")
+                    //                //    galleryDiv.dxGallery({
+                    //                //        dataSource: items.Images,
+                    //                //        height: 'auto',
+                    //                //        selectedItem: items.Images[1],
+                    //                //        slideshowDelay: 1500,
+                    //                //        loop: true
+                    //                //    });
+                    //                //    galleryDiv.appendTo(element);
+                    //                //}
                     //            },
                     //            {
-                    //                title: 'Attachments',
-                    //                items: ['Attachments']
+                    //                title: l('Menu:MdmService:ItemAttachments'),
+                    //                icon: "attach",
+                    //                template: initItemAttachmentTab()
                     //            }
                     //        ]
                     //    }]
-                    //    }
+                    //}
                 ]
             }
+        },
+        onInitNewRow: function (e) {
+            e.data.active = true;
+            e.data.isInventoriable = true;
+            e.data.isPurchasable = true;
+            e.data.isSaleable = true;
+        },
+        onEditingStart(e) {
+            itemMaster = e.data;
         },
         onRowInserting: function (e) {
             if (e.data && e.data.id == 0) {
@@ -570,12 +536,13 @@
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['code', 'name', 'shortName', 'barcode', 'erpCode', 'isInventoriable', 'isPurchasable', 'isSaleable', 'manageItemBy', 'inventoryUOMId', 'purUOMId', 'salesUOMId', 'vatId', 'active', 'itemTypeId', 'expiredType', 'expiredValue', 'issueMethod', 'itemTypeId', 'uomGroupId'];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            e.newData = Object.assign({}, e.oldData, e.newData);
+            //var objectRequire = ['code', 'name', 'shortName', 'barcode', 'erpCode', 'isInventoriable', 'isPurchasable', 'isSaleable', 'manageItemBy', 'inventoryUOMId', 'purUOMId', 'salesUOMId', 'vatId', 'active', 'itemTypeId', 'expiredType', 'expiredValue', 'issueMethod', 'itemTypeId', 'uomGroupId'];
+            //for (var property in e.oldData) {
+            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+            //        e.newData[property] = e.oldData[property];
+            //    }
+            //}
         },
         onEditorPreparing: function (e) {
             if (e.dataField == "manageItemBy" && e.parentType == "dataRow") {
@@ -599,31 +566,73 @@
                     }
                 }
             }
+
+            if (e.dataField == 'expiredType' && e.parentType == 'dataRow') {
+                if (e.row.data.manageItemBy == 1)
+                    e.editorOptions.disabled = false
+            }
+
+            if (e.dataField == 'expiredValue' && e.parentType == 'dataRow') {
+                if (e.row.data.manageItemBy == 1)
+                    e.editorOptions.disabled = false
+            }
+
+            if (e.dataField == 'issueMethod' && e.parentType == 'dataRow') {
+                if (e.row.data.manageItemBy == 1 || e.row.data.manageItemBy == 2)
+                    e.editorOptions.disabled = false
+            }
+
+            //if (e.dataField == 'uomGroupId' && e.parentType == 'dataRow') {
+            //    e.editorOptions.onValueChanged = function (arg) {
+            //        e.setValue(arg.value);
+            //        // filter inventory dataSource by uomGroupId
+            //        var fieldInventoryUOMIdCb = $('div.fieldInventoryUOMId > div > div.dx-selectbox').data('dxSelectBox');
+            //        fieldInventoryUOMIdCb.option('disabled', false);
+            //        fieldInventoryUOMIdCb.getDataSource().filter(['uomGroupId', '=', arg.value]);
+            //        fieldInventoryUOMIdCb.getDataSource().load();
+
+            //        // filter PurUnit dataSource by uomGroupId
+            //        var fieldPurUOMIdCb = $('div.fieldPurUOMId > div > div.dx-selectbox').data('dxSelectBox');
+            //        fieldPurUOMIdCb.option('disabled', false);
+            //        fieldPurUOMIdCb.getDataSource().filter(['uomGroupId', '=', arg.value]);
+            //        fieldPurUOMIdCb.getDataSource().load();
+
+            //        // filter SaleUnit dataSource by uomGroupId
+            //        var fieldSalesUOMIdCb = $('div.fieldSalesUOMId > div > div.dx-selectbox').data('dxSelectBox');
+            //        fieldSalesUOMIdCb.option('disabled', false);
+            //        fieldSalesUOMIdCb.getDataSource().filter(['uomGroupId', '=', arg.value]);
+            //        fieldSalesUOMIdCb.getDataSource().load();
+            //    }
+            //}
         },
         toolbar: {
             items: [
+                "groupPanel",
                 {
-                    name: "searchPanel",
-                    location: 'after'
-                }
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        gridItemMasters.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
             ]
         },
         columns: [
             {
                 type: 'buttons',
                 caption: l('Actions'),
-                buttons: ['edit', 'delete']
-                //buttons: [
-                //    {
-                //        text: 'Edit',
-                //        icon: 'edit',
-                //        hint: 'Edit',
-                //        onclick: function (e) {
-                //            var w = window.open('/Mdm/ItemMasters/Details', '_blank');
-                //            w.sessionStorage.setItem('itemMaster', JSON.stringify(e.row.data));
-                //        }
-                //    },
-                //    'delete'],
+                buttons: ['edit'],
+                fixedPosition: 'left'
             },
             {
                 dataField: 'id',
@@ -682,18 +691,39 @@
                 dataField: 'isInventoriable',
                 caption: l('EntityFieldName:MDMService:Item:IsInventoryItem'),
                 editorType: 'dxCheckBox',
+                alignment: 'center',
+                dataType: 'boolean',
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                        .appendTo(container);
+                },
                 visible: false
             },
             {
                 dataField: 'isPurchasable',
                 caption: l('EntityFieldName:MDMService:Item:IsPurchaseItem'),
                 editorType: 'dxCheckBox',
+                alignment: 'center',
+                dataType: 'boolean',
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                        .appendTo(container);
+                },
                 visible: false
             },
             {
                 dataField: 'isSaleable',
                 caption: l('EntityFieldName:MDMService:Item:IsSalesItem'),
                 editorType: 'dxCheckBox',
+                alignment: 'center',
+                dataType: 'boolean',
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                        .appendTo(container);
+                },
                 visible: false
             },
             {
@@ -750,10 +780,10 @@
                 caption: l('EntityFieldName:MDMService:Item:InventoryUnitName'),
                 editorType: 'dxSelectBox',
                 editorOptions: {
-                    dataSource: getUOMGroupDetails,
-                    valueExpr: 'altUOMId',
-                    displayExpr: 'altUOMId',
-                    disabled: true
+                    dataSource: getUOMs,
+                    valueExpr: 'id',
+                    displayExpr: 'code',
+                    //disabled: true
                 },
                 validationRules: [{ type: "required" }],
                 visible: false
@@ -763,10 +793,10 @@
                 caption: l('EntityFieldName:MDMService:Item:PurUnitName'),
                 editorType: 'dxSelectBox',
                 editorOptions: {
-                    dataSource: getUOMGroupDetails,
-                    valueExpr: 'altUOMId',
-                    displayExpr: 'altUOMId',
-                    disabled: true
+                    dataSource: getUOMs,
+                    valueExpr: 'id',
+                    displayExpr: 'code',
+                    //disabled: true
                 },
                 validationRules: [{ type: "required" }],
                 visible: false
@@ -776,10 +806,10 @@
                 caption: l('EntityFieldName:MDMService:Item:SalesUnitName'),
                 editorType: 'dxSelectBox',
                 editorOptions: {
-                    dataSource: getUOMGroupDetails,
-                    valueExpr: 'altUOMId',
-                    displayExpr: 'altUOMId',
-                    disabled: true
+                    dataSource: getUOMs,
+                    valueExpr: 'id',
+                    displayExpr: 'code',
+                    //disabled: true
                 },
                 validationRules: [{ type: "required" }],
                 visible: false
@@ -812,7 +842,14 @@
                 dataField: 'active',
                 caption: l('EntityFieldName:MDMService:Item:Active'),
                 editorType: 'dxCheckBox',
-                visible: false
+                alignment: 'center',
+                dataType: 'boolean',
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                        .appendTo(container);
+                }
+                //visible: false
             },
             {
                 dataField: 'attr0Id',
@@ -937,31 +974,31 @@
         ]
     }).dxDataGrid('instance');
 
-    $("#NewItemMasterButton").click(function (e) {
-        gridItemMasters.addRow();
-        //var w = window.open('/Mdm/ItemMasters/Details');
-        //w.sessionStorage.setItem('itemMasters', null);
-    });
+    //$("#NewItemMasterButton").click(function (e) {
+    //    gridItemMasters.addRow();
+    //    //var w = window.open('/Mdm/ItemMasters/Details');
+    //    //w.sessionStorage.setItem('itemMasters', null);
+    //});
 
-    $("input#Search").on("input", function () {
-        gridItemMasters.searchByText($(this).val());
-    });
+    //$("input#Search").on("input", function () {
+    //    gridItemMasters.searchByText($(this).val());
+    //});
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
+    //$("#ExportToExcelButton").click(function (e) {
+    //    e.preventDefault();
 
-        itemMasterService.getDownloadToken().then(
-            function (result) {
-                var url = abp.appPath + 'api/mdm-service/items/as-excel-file' +
-                    abp.utils.buildQueryString([
-                        { name: 'downloadToken', value: result.token }
-                    ]);
+    //    itemMasterService.getDownloadToken().then(
+    //        function (result) {
+    //            var url = abp.appPath + 'api/mdm-service/items/as-excel-file' +
+    //                abp.utils.buildQueryString([
+    //                    { name: 'downloadToken', value: result.token }
+    //                ]);
 
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
+    //            var downloadWindow = window.open(url, '_blank');
+    //            downloadWindow.focus();
+    //        }
+    //    )
+    //});
 
     var listAttrValue = [];
 
@@ -1011,5 +1048,365 @@
                 displayExpr: 'attrValName'
             }
         }
+    }
+
+    function initItemImagesTab() {
+        return function () {
+            return $('<div id="gridItemImages">')
+                .dxDataGrid({
+                    dataSource: getDataSourceImagesGrid(itemMaster.id),
+                    remoteOperations: true,
+                    showBorders: true,
+                    focusedRowEnabled: true,
+                    allowColumnReordering: false,
+                    rowAlternationEnabled: true,
+                    columnAutoWidth: true,
+                    filterRow: {
+                        visible: true
+                    },
+                    groupPanel: {
+                        visible: true,
+                    },
+                    searchPanel: {
+                        visible: true
+                    },
+                    columnMinWidth: 50,
+                    columnChooser: {
+                        enabled: true,
+                        mode: "select"
+                    },
+                    columnFixing: {
+                        enabled: true,
+                    },
+                    export: {
+                        enabled: true,
+                    },
+                    onExporting(e) {
+                        const workbook = new ExcelJS.Workbook();
+                        const worksheet = workbook.addWorksheet('Data');
+
+                        DevExpress.excelExporter.exportDataGrid({
+                            component: e.component,
+                            worksheet,
+                            autoFilterEnabled: true,
+                        }).then(() => {
+                            workbook.xlsx.writeBuffer().then((buffer) => {
+                                saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                            });
+                        });
+                        e.cancel = true;
+                    },
+                    headerFilter: {
+                        visible: true,
+                    },
+                    stateStoring: {
+                        enabled: true,
+                        type: 'localStorage',
+                        storageKey: 'gridItemImages',
+                    },
+                    paging: {
+                        enabled: true,
+                        pageSize: pageSize
+                    },
+                    pager: {
+                        visible: true,
+                        showPageSizeSelector: true,
+                        allowedPageSizes: allowedPageSizes,
+                        showInfo: true,
+                        showNavigationButtons: true
+                    },
+                    editing: {
+                        mode: 'row',
+                        allowAdding: true,
+                        allowUpdating: true,
+                        allowDeleting: true,
+                        useIcons: true,
+                        texts: {
+                            editRow: l("Edit"),
+                            deleteRow: l("Delete"),
+                            confirmDeleteMessage: l("DeleteConfirmationMessage")
+                        }
+                    },
+                    onRowInserting: function (e) {
+                        e.data.itemId = itemMaster.id;
+                    },
+                    onRowUpdating: function (e) {
+                        e.newData = Object.assign({}, e.oldData, e.newData);
+                    },
+                    toolbar: {
+                        items: [
+                            {
+                                location: 'after',
+                                template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                                onClick() {
+                                    $('#gridItemImages').data('dxDataGrid').addRow();
+                                },
+                            },
+                            'columnChooserButton',
+                            "exportButton",
+                            {
+                                location: 'after',
+                                template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                                onClick() {
+                                    //todo
+                                },
+                            },
+                            'searchPanel'
+                        ]
+                    },
+                    columns: [
+                        {
+                            type: 'buttons',
+                            caption: l("Actions"),
+                            width: 90,
+                            buttons: ['edit', 'delete'],
+                            fixedPosition: 'left'
+                        },
+                        {
+                            dataField: 'url',
+                            caption: l('EntityFieldName:MDMService:ItemImage:URL'),
+                            dataType: 'string',
+                            validationRules: [{ type: "required" }]
+                        },
+                        {
+                            dataField: 'description',
+                            caption: l('EntityFieldName:MDMService:ItemImage:Description'),
+                            dataType: 'string'
+                        },
+                        {
+                            dataField: 'displayOrder',
+                            caption: l('EntityFieldName:MDMService:ItemImage:DisplayOrder'),
+                            dataType: 'number',
+                            validationRules: [{ type: "required" }]
+                        },
+                        {
+                            dataField: 'active',
+                            caption: l('EntityFieldName:MDMService:ItemImage:Active'),
+                            width: 110,
+                            alignment: 'center',
+                            dataType: 'boolean',
+                            cellTemplate(container, options) {
+                                $('<div>')
+                                    .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                                    .appendTo(container);
+                            }
+                        }
+                    ]
+                })
+        }
+    }
+
+    function initItemAttachmentTab() {
+        return function () {
+            return $('<div id="gridItemAttachment">')
+                .dxDataGrid({
+                    dataSource: getDataSourceAttachmentGrid(itemMaster.id),
+                    remoteOperations: true,
+                    showBorders: true,
+                    focusedRowEnabled: true,
+                    allowColumnReordering: false,
+                    rowAlternationEnabled: true,
+                    columnAutoWidth: true,
+                    filterRow: {
+                        visible: true
+                    },
+                    groupPanel: {
+                        visible: true,
+                    },
+                    searchPanel: {
+                        visible: true
+                    },
+                    columnMinWidth: 50,
+                    columnChooser: {
+                        enabled: true,
+                        mode: "select"
+                    },
+                    columnFixing: {
+                        enabled: true,
+                    },
+                    export: {
+                        enabled: true,
+                    },
+                    onExporting(e) {
+                        const workbook = new ExcelJS.Workbook();
+                        const worksheet = workbook.addWorksheet('Data');
+
+                        DevExpress.excelExporter.exportDataGrid({
+                            component: e.component,
+                            worksheet,
+                            autoFilterEnabled: true,
+                        }).then(() => {
+                            workbook.xlsx.writeBuffer().then((buffer) => {
+                                saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                            });
+                        });
+                        e.cancel = true;
+                    },
+                    headerFilter: {
+                        visible: true,
+                    },
+                    stateStoring: {
+                        enabled: true,
+                        type: 'localStorage',
+                        storageKey: 'gridItemAttachment',
+                    },
+                    paging: {
+                        enabled: true,
+                        pageSize: pageSize
+                    },
+                    pager: {
+                        visible: true,
+                        showPageSizeSelector: true,
+                        allowedPageSizes: allowedPageSizes,
+                        showInfo: true,
+                        showNavigationButtons: true
+                    },
+                    editing: {
+                        mode: 'row',
+                        allowAdding: true,
+                        allowUpdating: true,
+                        allowDeleting: true,
+                        useIcons: true,
+                        texts: {
+                            editRow: l("Edit"),
+                            deleteRow: l("Delete"),
+                            confirmDeleteMessage: l("DeleteConfirmationMessage")
+                        }
+                    },
+                    onRowInserting: function (e) {
+                        e.data.itemId = itemMaster.id;
+                    },
+                    onRowUpdating: function (e) {
+                        e.newData = Object.assign({}, e.oldData, e.newData);
+                    },
+                    toolbar: {
+                        items: [
+                            {
+                                location: 'after',
+                                template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                                onClick() {
+                                    $('#gridItemAttachment').data('dxDataGrid').addRow();
+                                },
+                            },
+                            'columnChooserButton',
+                            "exportButton",
+                            {
+                                location: 'after',
+                                template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                                onClick() {
+                                    //todo
+                                },
+                            },
+                            'searchPanel'
+                        ]
+                    },
+                    columns: [
+                        {
+                            type: 'buttons',
+                            caption: l("Actions"),
+                            width: 90,
+                            buttons: ['edit', 'delete'],
+                            fixedPosition: 'left'
+                        },
+                        {
+                            dataField: 'url',
+                            caption: l('EntityFieldName:MDMService:ItemAttachment:URL'),
+                            dataType: 'string',
+                            validationRules: [{ type: "required" }]
+                        },
+                        {
+                            dataField: 'description',
+                            caption: l('EntityFieldName:MDMService:ItemAttachment:Description'),
+                            dataType: 'string'
+                        },
+                        {
+                            dataField: 'active',
+                            caption: l('EntityFieldName:MDMService:ItemAttachment:Active'),
+                            width: 110,
+                            alignment: 'center',
+                            dataType: 'boolean',
+                            cellTemplate(container, options) {
+                                $('<div>')
+                                    .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                                    .appendTo(container);
+                            }
+                        }
+                    ]
+                })
+        }
+    }
+
+    function getDataSourceImagesGrid(itemId) {
+        return new DevExpress.data.CustomStore({
+            key: "id",
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                itemImageService.getListDevextremes({ filter: JSON.stringify(['itemId', '=', itemId]) })
+                    .done(result => {
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount
+                        });
+                    });
+                return deferred.promise();
+            },
+            byKey: function (key) {
+                if (key == 0) return null;
+
+                var d = new $.Deferred();
+                itemImageService.get(key)
+                    .done(data => {
+                        d.resolve(data);
+                    })
+                return d.promise();
+            },
+            insert(values) {
+                return itemImageService.create(values, { contentType: 'application/json' });
+            },
+            update(key, values) {
+                return itemImageService.update(key, values, { contentType: 'application/json' });
+            },
+            remove(key) {
+                return itemImageService.delete(key);
+            }
+        });
+    }
+
+    function getDataSourceAttachmentGrid(itemId) {
+        return new DevExpress.data.CustomStore({
+            key: "id",
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                itemAttachmentService.getListDevextremes({ filter: JSON.stringify(['itemId', '=', itemId]) })
+                    .done(result => {
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount
+                        });
+                    });
+                return deferred.promise();
+            },
+            byKey: function (key) {
+                if (key == 0) return null;
+
+                var d = new $.Deferred();
+                itemAttachmentService.get(key)
+                    .done(data => {
+                        d.resolve(data);
+                    })
+                return d.promise();
+            },
+            insert(values) {
+                return itemAttachmentService.create(values, { contentType: 'application/json' });
+            },
+            update(key, values) {
+                return itemAttachmentService.update(key, values, { contentType: 'application/json' });
+            },
+            remove(key) {
+                return itemAttachmentService.delete(key);
+            }
+        });
     }
 });

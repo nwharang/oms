@@ -3,19 +3,13 @@ var priceListDetailsService = window.dMSpro.oMS.mdmService.controllers.priceList
 var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            priceListService.getListDevextremes(args)
+            priceListService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -51,13 +45,7 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            priceListDetailsService.getListDevextremes(args)
+            priceListDetailsService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -83,14 +71,7 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            priceListService.getListDevextremes(args)
+            priceListService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -117,13 +98,7 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            uomService.getListDevextremes(args)
+            uomService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -149,13 +124,7 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            itemService.getListDevextremes(args)
+            itemService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -169,30 +138,30 @@ $(function () {
 
     const arithmeticOperation = [
         {
-            id: 'ADD',
+            id: 0,
             text: l('EntityFieldValue:MDMService:PriceList:ArithmeticOperation:ADD')
         },
         {
-            id: 'SUBTRACT',
+            id: 1,
             text: l('EntityFieldValue:MDMService:PriceList:ArithmeticOperation:SUBTRACT')
         },
         {
-            id: 'MULTIPLICATION',
+            id: 2,
             text: l('EntityFieldValue:MDMService:PriceList:ArithmeticOperation:MULTIPLICATION')
         },
         {
-            id: 'DIVISION',
+            id: 3,
             text: l('EntityFieldValue:MDMService:PriceList:ArithmeticOperation:DIVISION')
         }
     ];
 
     const arithmeticFactorType = [
         {
-            id: 'WHOLE_NUMBER',
+            id: 0,
             text: l('EntityFieldValue:MDMService:PriceList:ArithmeticFactorType:WHOLE_NUMBER')
         },
         {
-            id: 'PERCENTAGE',
+            id: 1,
             text: l('EntityFieldValue:MDMService:PriceList:ArithmeticFactorType:PERCENTAGE')
         }
     ];
@@ -238,7 +207,7 @@ $(function () {
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PriceLists.xlsx');
                 });
             });
             e.cancel = true;
@@ -249,7 +218,7 @@ $(function () {
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgPriceLists',
+            storageKey: 'gridPriceLists',
         },
         paging: {
             enabled: true,
@@ -275,12 +244,13 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['code', 'name', 'active', 'basePriceListId', 'arithmeticOperation', 'arithmeticFactor', 'arithmeticFactorType'];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            e.newData = Object.assign({}, e.oldData, e.newData);
+            //var objectRequire = ['code', 'name', 'active', 'basePriceListId', 'arithmeticOperation', 'arithmeticFactor', 'arithmeticFactorType'];
+            //for (var property in e.oldData) {
+            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+            //        e.newData[property] = e.oldData[property];
+            //    }
+            //}
         },
         onEditorPrepared: function (e) {
             if (e.dataField == 'basePriceListId' && e.parentType == 'dataRow' && e.row.isNewRow) {
@@ -349,6 +319,7 @@ $(function () {
                     dataField: "basePriceListId",
                     cssClass: 'fieldBasePrice',
                     editorType: 'dxSelectBox',
+                    calculateDisplayValue: 'basePriceList.code',
                     lookup: {
                         //dataSource: getPriceList,
                         dataSource: {
@@ -371,7 +342,9 @@ $(function () {
                         dataSource: arithmeticOperation,
                         searchPanel: true,
                         valueExpr: 'id',
-                        displayExpr: 'text'
+                        displayExpr: 'text',
+                        paginate: true,
+                        pageSize: pageSizeForLookup
                     },
                     width: 180
                 },
@@ -391,7 +364,9 @@ $(function () {
                         dataSource: arithmeticFactorType,
                         searchEnabled: true,
                         valueExpr: 'id',
-                        displayExpr: 'text'
+                        displayExpr: 'text',
+                        paginate: true,
+                        pageSize: pageSizeForLookup
                     },
                     width: 200
                 }

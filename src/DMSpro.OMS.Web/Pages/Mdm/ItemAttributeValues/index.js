@@ -1,6 +1,6 @@
 $(function () {
     // language
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
     // load mdmService
     var itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
     var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
@@ -10,13 +10,7 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            itemAttrValueService.getListDevextremes(args)
+            itemAttrValueService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -52,13 +46,7 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            itemAttrService.getListDevextremes(args)
+            itemAttrService.getListDevextremes({ filter: JSON.stringify(['active', '=', true]) })
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -169,11 +157,6 @@ $(function () {
         },
         onInitNewRow(e) {
             var row = e.component.getNodeByKey(e.data.parentId) ? e.component.getNodeByKey(e.data.parentId).data : null;
-            if (row) {
-                e.data.level = row.level + 1;
-            } else if (e.data.parentId == 0) {
-                e.data.level = 0;
-            }
         },
         onRowInserting: function (e) {
             if (e.data && e.data.parentId == 0) {
@@ -181,12 +164,13 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['id', 'attrValName', 'itemAttributeId', 'parentId'];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            e.newData = Object.assign({}, e.oldData, e.newData);
+            //var objectRequire = ['id', 'attrValName', 'itemAttributeId', 'parentId'];
+            //for (var property in e.oldData) {
+            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+            //        e.newData[property] = e.oldData[property];
+            //    }
+            //}
         },
         toolbar: {
             items: [
@@ -220,14 +204,20 @@ $(function () {
             },
             {
                 dataField: 'attrValName',
-                caption: l("EntityFieldName:MDMService:ItemAttributeValue:AttrValName")
+                caption: l("EntityFieldName:MDMService:ItemAttributeValue:AttrValName"),
+                validationRules: [
+                    {
+                        type: "required",
+                        message: 'Attribute value name is required'
+                    }
+                ]
             },
             {
                 dataField: 'itemAttributeId',
                 caption: l("EntityFieldName:MDMService:ItemAttributeValue:ItemAttributeName"),
                 editorType: 'dxSelectBox',
+                calculateDisplayValue: 'itemAttribute.attrName',
                 lookup: {
-                    //dataSource: getItemAttr,
                     valueExpr: 'id',
                     displayExpr: 'attrName',
                     dataSource: {
@@ -235,7 +225,13 @@ $(function () {
                         paginate: true,
                         pageSize: pageSizeForLookup
                     }
-                }
+                },
+                validationRules: [
+                    {
+                        type: "required",
+                        message: 'Attribute is required'
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:ProdAttributeValue:ParentProdAttributeValueId"),
@@ -243,40 +239,18 @@ $(function () {
                 editorType: 'dxSelectBox',
                 visible: false,
                 lookup: {
-                    //dataSource: customStore,
                     valueExpr: 'id',
                     displayExpr: 'name',
-                    dataSource: {
-                        store: customStore,
-                        paginate: true,
-                        pageSize: pageSizeForLookup
+                    dataSource(options) {
+                        return {
+                            store: customStore,
+                            filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
+                        };
                     }
                 }
             }
         ]
     }).dxTreeList("instance");
-
-    //$("#NewProductAttrValueButton").click(function () {
-    //    dataTreeContainer.addRow();
-    //});
-
-    //$("input#Search").on("input", function () {
-    //    dataTreeContainer.searchByText($(this).val());
-    //});
-
-    //$("#ExportToExcelButton").click(function (e) {
-    //    e.preventDefault();
-
-    //    itemAttrValueService.getDownloadToken().then(
-    //        function (result) {
-    //            var url = abp.appPath + 'api/mdm-service/item-attribute-values/as-excel-file' +
-    //                abp.utils.buildQueryString([
-    //                    { name: 'downloadToken', value: result.token }
-    //                ]);
-
-    //            var downloadWindow = window.open(url, '_blank');
-    //            downloadWindow.focus();
-    //        }
-    //    )
-    //});
 });

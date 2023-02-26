@@ -4,26 +4,26 @@ $(function () {
 
     const status = [
         {
-            id: 'OPEN',
+            id: 0,
             text: l('EntityFieldValue:MDMService:ItemGroup:Status:OPEN')
         },
         {
-            id: 'RELEASED',
+            id: 1,
             text: l('EntityFieldValue:MDMService:ItemGroup:Status:RELEASED')
         },
         {
-            id: 'CANCELLED',
+            id: 2,
             text: l('EntityFieldValue:MDMService:ItemGroup:Status:CANCELLED')
         }
     ];
 
     const types = [
         {
-            id: 'ATTRIBUTE',
+            id: 0,
             text: l('EntityFieldValue:MDMService:ItemGroup:Type:ATTRIBUTE')
         },
         {
-            id: 'LIST',
+            id: 1,
             text: l('EntityFieldValue:MDMService:ItemGroup:Type:LIST')
         }
     ];
@@ -33,13 +33,7 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            itemGroupService.getListDevextremes(args)
+            itemGroupService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -111,7 +105,7 @@ $(function () {
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'ItemGroups.xlsx');
                 });
             });
             e.cancel = true;
@@ -170,26 +164,29 @@ $(function () {
             ],
         },
         onEditorPreparing: function (e) {
-            if (e.dataField == "type" && e.parentType == "dataRow" && e.row.data.status != 'OPEN') {
-                e.editorOptions.disabled = !e.row.inserted;
+            if (e.dataField == "type" && e.parentType == "dataRow") {
+                if (e.row.data.status != 0)
+                    e.editorOptions.disabled = false;
+                    //e.editorOptions.disabled = !e.row.inserted;
             }
         },
         //onEditingStart: function (e) {
         //    e.component.option('column[4].allowEditing', false);
         //},
         onRowInserting: function (e) {
-            e.data.status = 'OPEN';
+            e.data.status = 0;
             if (e.data && e.data.id == 0) {
                 e.data.id = null;
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['code', 'name', 'type', 'description', 'status'];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            e.newData = Object.assign({}, e.oldData, e.newData);
+            //var objectRequire = ['code', 'name', 'type', 'description', 'status'];
+            //for (var property in e.oldData) {
+            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+            //        e.newData[property] = e.oldData[property];
+            //    }
+            //}
         },
         columns: [
             {
@@ -238,7 +235,9 @@ $(function () {
                 lookup: {
                     dataSource: types,
                     displayExpr: 'text',
-                    valueExpr: 'id'
+                    valueExpr: 'id',
+                    paginate: true,
+                    pageSize: pageSizeForLookup
                 }
             },
             {
@@ -248,43 +247,13 @@ $(function () {
                 lookup: {
                     dataSource: status,
                     displayExpr: 'text',
-                    valueExpr: 'id'
+                    valueExpr: 'id',
+                    paginate: true,
+                    pageSize: pageSizeForLookup
                 }
-            },
-            //{
-            //    caption: l('EntityFieldName:MDMService:ItemAttachment:Active'),
-            //    dataField: 'active',
-            //    alignment: 'center',
-            //    dataType: 'boolean',
-            //    cellTemplate(container, options) {
-            //        $('<div>')
-            //            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-            //            .appendTo(container);
-            //    }
-            //}
+            }
         ]
     }).dxDataGrid('instance');
-
-    //$("#NewItemGroupButton").click(function () {
-    //    dataGrid.addRow()
-    //});
-
-    //$("input#Search").on("input", function () {
-    //    dataGrid.searchByText($(this).val());
-    //});
-
-    //$("#ExportToExcelButton").click(function (e) {
-    //    e.preventDefault();
-    //    itemGroupService.getDownloadToken().then(
-    //        function (result) {
-    //            var url = abp.appPath + 'api/mdm-service/item-groups/as-excel-file' + abp.utils.buildQueryString([
-    //                { name: 'downloadToken', value: result.token }
-    //            ]);
-    //            var downloadWindow = window.open(url, '_blank');
-    //            downloadWindow.focus();
-    //        }
-    //    )
-    //});
 });
 
 $(window).focus(function () {

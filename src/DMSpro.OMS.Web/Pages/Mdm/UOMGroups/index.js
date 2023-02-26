@@ -2,19 +2,13 @@ var uomGroupService = window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGrou
 var uomGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail;
 var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 
     var groupStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            uomGroupService.getListDevextremes(args)
+            uomGroupService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -49,13 +43,7 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            uomGroupDetailService.getListDevextremes(args)
+            uomGroupDetailService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -90,13 +78,7 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            uomService.getListDevextremes(args)
+            uomService.getListDevextremes({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -196,12 +178,13 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['code', 'name'];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            e.newData = Object.assign({}, e.oldData, e.newData);
+            //var objectRequire = ['code', 'name'];
+            //for (var property in e.oldData) {
+            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+            //        e.newData[property] = e.oldData[property];
+            //    }
+            //}
         },
         items: [
             "groupPanel",
@@ -337,16 +320,20 @@ $(function () {
                                 confirmDeleteMessage: l("DeleteConfirmationMessage")
                             }
                         },
+                        onInitNewRow: function (e) {
+                            e.data.active = true;
+                        },
                         onRowInserting: function (e) {
                             e.data.uomGroupId = options.key
                         },
                         onRowUpdating: function (e) {
-                            var objectRequire = ['uomGroupId', 'altQty', 'altUOMId', 'baseQty', 'baseUOMId', 'active'];
-                            for (var property in e.oldData) {
-                                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                                    e.newData[property] = e.oldData[property];
-                                }
-                            }
+                            e.newData = Object.assign({}, e.oldData, e.newData);
+                            //var objectRequire = ['uomGroupId', 'altQty', 'altUOMId', 'baseQty', 'baseUOMId', 'active'];
+                            //for (var property in e.oldData) {
+                            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+                            //        e.newData[property] = e.oldData[property];
+                            //    }
+                            //}
                         },
                         columns: [
                             {
@@ -376,10 +363,13 @@ $(function () {
                                     }
                                 ],
                                 editorType: 'dxSelectBox',
+                                calculateDisplayValue: 'altUOM.code',
                                 lookup: {
                                     dataSource: getUOMs,
                                     valueExpr: 'id',
-                                    displayExpr: 'code'
+                                    displayExpr: 'code',
+                                    paginate: true,
+                                    pageSize: pageSizeForLookup
                                 }
                             },
                             {
@@ -406,10 +396,13 @@ $(function () {
                                 dataField: "baseUOMId",
                                 validationRules: [{ type: "required" }],
                                 editorType: 'dxSelectBox',
+                                calculateDisplayValue: 'baseUOM.code',
                                 lookup: {
                                     dataSource: getUOMs,
                                     valueExpr: 'id',
-                                    displayExpr: 'code'
+                                    displayExpr: 'code',
+                                    paginate: true,
+                                    pageSize: pageSizeForLookup
                                 }
                             },
                             {
@@ -430,26 +423,26 @@ $(function () {
         }
     }).dxDataGrid('instance');
 
-    $("#NewUOMGroup").click(function () {
-        dataGrid.addRow();
-    });
+    //$("#NewUOMGroup").click(function () {
+    //    dataGrid.addRow();
+    //});
 
-    $("input#Search").on("input", function () {
-        dataGrid.searchByText($(this).val());
-    });
+    //$("input#Search").on("input", function () {
+    //    dataGrid.searchByText($(this).val());
+    //});
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
+    //$("#ExportToExcelButton").click(function (e) {
+    //    e.preventDefault();
 
-        uomGroupService.getDownloadToken().then(
-            function (result) {
-                var url = abp.appPath + 'api/mdm-service/u-oMGroups/as-excel-file' + abp.utils.buildQueryString([
-                    { name: 'downloadToken', value: result.token }
-                ]);
+    //    uomGroupService.getDownloadToken().then(
+    //        function (result) {
+    //            var url = abp.appPath + 'api/mdm-service/u-oMGroups/as-excel-file' + abp.utils.buildQueryString([
+    //                { name: 'downloadToken', value: result.token }
+    //            ]);
 
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
+    //            var downloadWindow = window.open(url, '_blank');
+    //            downloadWindow.focus();
+    //        }
+    //    )
+    //});
 });
