@@ -501,10 +501,10 @@ $(function () {
                 e.data.friday = false;
                 e.data.saturday = false;
                 e.data.sunday = false;
-                e.data.week1 = false;
-                e.data.week2 = false;
-                e.data.week3 = false;
-                e.data.week4 = false,
+                e.data.week1 = true;
+                e.data.week2 = true;
+                e.data.week3 = true;
+                e.data.week4 = true,
                     e.data.customerId = null;
                 //e.data.mcpHeaderId = MCPModel ? MCPModel.id : null;
             },
@@ -874,7 +874,7 @@ $(function () {
             LoadDataGrid();
         }
 
-        sessionStorage.removeItem('MCPModel');
+        //sessionStorage.removeItem('MCPModel');
     }
     function LoadDataGrid() {
 
