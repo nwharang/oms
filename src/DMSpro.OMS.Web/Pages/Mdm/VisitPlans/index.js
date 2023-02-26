@@ -9,31 +9,31 @@ $(function () {
 
     const dayOfWeek = [
         {
-            id: 0,
+            id: 'MONDAY',
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:MONDAY')
         },
         {
-            id: 1,
+            id: 'TUESDAY',
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:TUESDAY')
         },
         {
-            id: 2,
+            id: 'WEDNESDAY',
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:WEDNESDAY')
         },
         {
-            id: 3,
+            id: 'THURSDAY',
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:THURSDAY')
         },
         {
-            id: 4,
+            id: 'FRIDAY',
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:FRIDAY')
         },
         {
-            id: 5,
+            id: 'SATURDAY',
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:SATURDAY')
         },
         {
-            id: 6,
+            id: 'SUNDAY',
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:SUNDAY')
         }
     ]
@@ -298,9 +298,21 @@ $(function () {
                 fixedPosition: 'left'
             },
             {
-                dataField: 'routeId',
+                dataField: 'route.name',
                 caption: l("EntityFieldName:MDMService:VisitPlan:RouteCode"),
                 dataType: 'string',
+                //lookup: {
+                //    valueExpr: "id",
+                //    displayExpr: "attrName"
+                //    dataSource: {
+                //        store: cusAttributes,
+                //        paginate: true,
+                //        pageSize: pageSizeForLookup,
+                //        filter: ["active", "=", "true"],
+                //    },
+
+                //},
+                allowEditing: false,
                 validationRules: [
                     {
                         type: 'required',
@@ -309,7 +321,7 @@ $(function () {
                 ]
             },
             {
-                dataField: 'customerId',
+                dataField: 'customer.name',
                 caption: l("EntityFieldName:MDMService:VisitPlan:CustomerCode"),
                 validationRules: [
                     {
@@ -318,13 +330,14 @@ $(function () {
                     }
                 ],
                 editorType: 'dxSelectBox',
-                lookup: {
-                    dataSource: getCustomer,
-                    valueExpr: 'id',
-                    displayExpr: function (e) {
-                        return e.code + ' - ' + e.name
-                    }
-                }
+                //lookup: {
+                //    dataSource: getCustomer,
+                //    valueExpr: 'id',
+                //    displayExpr: function (e) {
+                //        return e.code + ' - ' + e.name
+                //    }
+                //}
+                allowEditing: false,
             },
             {
                 dataField: 'dateVisit',
@@ -338,7 +351,7 @@ $(function () {
                 ]
             },
             {
-                dataField: 'companyId',
+                dataField: 'company.name',
                 caption: l("EntityFieldName:MDMService:VisitPlan:CompanyCode"),
                 validationRules: [
                     {
@@ -346,6 +359,7 @@ $(function () {
                         message: 'Company is required'
                     }
                 ],
+                allowEditing: false,
                 //editorType: 'dxSelectBox',
                 //lookup: {
                 //    dataSource: getMCPHeaders,
@@ -365,7 +379,8 @@ $(function () {
                     displayExpr: function (e) {
                         return e.code + ' - ' + e.name
                     }
-                }
+                },
+                allowEditing: false,
             },
             {
                 dataField: 'distance',
@@ -376,7 +391,8 @@ $(function () {
                         type: 'required',
                         message: ''
                     }
-                ]
+                ],
+                allowEditing: false,
             },
             {
                 dataField: 'visitOrder',
@@ -388,11 +404,9 @@ $(function () {
                         message: ''
                     }
                 ],
-                value: 0
             },
             {
-                dataField: 'dateVisit',
-                name: 'VisitPlan:Week',
+                dataField: 'week',
                 caption: l('EntityFieldName:MDMService:VisitPlan:Week'),
                 dataType: 'number',
                 validationRules: [
@@ -400,11 +414,11 @@ $(function () {
                         type: 'required',
                         message: ''
                     }
-                ]
+                ],
+                allowEditing: false,
             },
             {
-                dataField: 'dateVisit',
-                name: 'VisitPlan:Month',
+                dataField: 'month',
                 caption: l('EntityFieldName:MDMService:VisitPlan:Month'),
                 dataType: 'number',
                 validationRules: [
@@ -412,11 +426,11 @@ $(function () {
                         type: 'required',
                         message: ''
                     }
-                ]
+                ],
+                allowEditing: false,
             },
             {
-                dataField: 'dateVisit',
-                name: 'VisitPlan:Year',
+                dataField: 'year',
                 caption: l('EntityFieldName:MDMService:VisitPlan:Year'),
                 dataType: 'number',
                 validationRules: [
@@ -424,17 +438,19 @@ $(function () {
                         type: 'required',
                         message: ''
                     }
-                ]
+                ],
+                allowEditing: false,
             },
             {
                 dataField: 'dayOfWeek',
                 caption: l('EntityFieldName:MDMService:VisitPlan:DayOfWeek'),
-                editorType: 'dxSelectBox',
+                //editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: dayOfWeek,
                     valueExpr: 'id',
                     displayExpr: 'text'
-                }
+                },
+                allowEditing: false,
             },
             {
                 dataField: 'mcpDetailId',
@@ -444,7 +460,9 @@ $(function () {
                     //dataSource: getMCPDetails,
                     valueExpr: 'id',
                     displayExpr: 'code'
-                }
+                },
+                allowEditing: false,
+                visible: false,
             }
         ]
     }).dxDataGrid('instance');

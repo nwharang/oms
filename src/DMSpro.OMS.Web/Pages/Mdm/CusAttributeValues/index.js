@@ -211,7 +211,8 @@ $(function () {
                     dataSource: {
                         store: cusAttributes,
                         paginate: true,
-                        pageSize: pageSizeForLookup
+                        pageSize: pageSizeForLookup,
+                        filter: ["active", "=", "true"],
                     },
                     valueExpr: "id",
                     displayExpr: "attrName"

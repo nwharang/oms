@@ -318,11 +318,11 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'salesOrgEmpAssignment',
-        },
+        //stateStoring: {
+        //    enabled: true,
+        //    type: 'localStorage',
+        //    storageKey: 'salesOrgEmpAssignment',
+        //},
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -367,8 +367,8 @@ $(function () {
                     },
                 },
                 "addRowButton",
-                "exportButton",
-                "searchPanel"
+                //"exportButton",
+                //"searchPanel"
             ],
         },
         columns: [

@@ -419,7 +419,7 @@ $(function () {
                 }
             },
             {
-                caption: l1("EntityFieldName:MDMService:CompanyInZone:IsBase"),
+                caption: l("EntityFieldName:MDMService:CompanyInZone:IsBase"),
                 dataField: "isBase",
                 dataType: "boolean"
             }
