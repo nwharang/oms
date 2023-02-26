@@ -8,13 +8,15 @@
 }
 
 @section scripts {
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/Inventories/GoodsIssue/index.js" />
 }
 
 @section breadcrumb {
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">Inventory</a></li>
-        <li class="breadcrumb-item active">Good Issue</li>
+        <li class="breadcrumb-item active">Good Issues</li>
     </ol>
 }
 
@@ -22,10 +24,17 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fa fa-thumbs-o-up"></i> Good Issue
+                <i class="subheader-icon fa fa-thumbs-o-up"></i> Good Issues
             </h2>
         </div>
-        <div class="panel-container show">
+        <div class="panel-container show" style="padding: 10px">
+            <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
+                <div class="dx-viewport" style="overflow: auto">
+                    <div id="dataGridContainer"></div>
+                </div>
+            </div>
+        </div>
+        @*<div class="panel-container show">
             <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
                 <abp-card>
                     <abp-card-body>
@@ -69,6 +78,6 @@
                     </abp-card-body>
                 </abp-card>
             </div>
-        </div>
+        </div>*@
     </div>
 </div>

@@ -8,6 +8,8 @@
 }
 
 @section scripts {
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/Inventories/Inventories/index.js" />
 }
 
@@ -29,14 +31,14 @@
             <div class="panel-content jqvmap-bg-ocean p-0" style="height: 330px;">
                 <abp-card>
                     <abp-card-body>
-                        <abp-row>
+                        @*<abp-row>
                             <div style="padding-left:12px" class="buttons-header-grid">
                                 <button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
                                     <i class="fa fa-upload"></i> <span>Import from Excel</span>
                                 </button>
                             </div>
-                        </abp-row>
-                        <div class="dx-viewport">
+                        </abp-row>*@
+                        <div class="dx-viewport" style="overflow: auto">
                             <div id="dataGridContainer"></div>
                         </div>
                     </abp-card-body>

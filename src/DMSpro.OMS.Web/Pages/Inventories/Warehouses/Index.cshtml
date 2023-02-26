@@ -8,6 +8,8 @@
 }
 
 @section scripts {
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/Inventories/Warehouses/index.js" />
 }
 
@@ -30,14 +32,14 @@
                 <abp-card>
                     <abp-card-body>
                         <abp-row>
-                            <div style="padding-left:12px" class="buttons-header-grid">
+                            @*<div style="padding-left:12px" class="buttons-header-grid">
                                 <button id="NewWareHouseButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
                                     <i class="fa fa-plus"></i> <span>New Warehouse</span>
                                 </button>
                                 <button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
                                     <i class="fa fa-upload"></i> <span>Import from Excel</span>
                                 </button>
-                            </div>
+                            </div>*@
                         </abp-row>
                         <div class="dx-viewport">
                             <div id="dataGridContainer"></div>

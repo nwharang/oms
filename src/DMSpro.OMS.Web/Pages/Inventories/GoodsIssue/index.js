@@ -1,58 +1,76 @@
 ﻿$(function () {
     var l = abp.localization.getResource("MdmService");
 
-    $("#form").dxForm({
-        formData: {
-            Docdate: currentDate(),
-            PostingDate: currentDate()
-        },
-        colCount: 4,
-        items: [
-            {
-                itemType: "group",
-                items: ["DocNbr", "Status"]
-            },
-            {
-                itemType: "group",
-                items: ["LinkedNbr",
-                    {
-                        dataField: 'Docdate',
-                        editorType: 'dxDateBox'
-                    }
-                ]
-            },
-            {
-                itemType: "group",
-                items: ["Desc",
-                    {
-                        dataField: 'PostingDate',
-                        editorType: 'dxDateBox'
-                    }
-                ]
-            },
-            {
-                itemType: "group",
-                items: ["Reason"]
-            }
-        ]
-    });
+    //$("#form").dxForm({
+    //    formData: {
+    //        Docdate: currentDate(),
+    //        PostingDate: currentDate()
+    //    },
+    //    colCount: 4,
+    //    items: [
+    //        {
+    //            itemType: "group",
+    //            items: ["DocNbr", "Status"]
+    //        },
+    //        {
+    //            itemType: "group",
+    //            items: ["LinkedNbr",
+    //                {
+    //                    dataField: 'Docdate',
+    //                    editorType: 'dxDateBox'
+    //                }
+    //            ]
+    //        },
+    //        {
+    //            itemType: "group",
+    //            items: ["Desc",
+    //                {
+    //                    dataField: 'PostingDate',
+    //                    editorType: 'dxDateBox'
+    //                }
+    //            ]
+    //        },
+    //        {
+    //            itemType: "group",
+    //            items: ["Reason"]
+    //        }
+    //    ]
+    //});
 
     const dataGridContainer = $('#dataGridContainer').dxDataGrid({
         dataSource: inventoryDatas,
-        keyExpr: "id",
+        keyExpr: "Id",
+        // keyExpr: "id",
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'storage',
+        },
         showBorders: true,
-        focusedRowEnabled: true,
+        columnAutoWidth: true,
+        scrolling: {
+            columnRenderingMode: 'virtual',
+        },
         searchPanel: {
             visible: true
         },
-        allowColumnReordering: false,
-        rowAlternationEnabled: true,
-        scrolling: {
-            mode: 'standard'
-        },
+        allowColumnResizing: true,
+        allowColumnReordering: true,
         paging: {
             enabled: true,
             pageSize: pageSize
+        },
+        rowAlternationEnabled: true,
+        filterRow: {
+            visible: true,
+            applyFilter: 'auto',
+        },
+        headerFilter: {
+            visible: false,
+        },
+        columnChooser: {
+            enabled: true,
+            mode: "select"
         },
         pager: {
             visible: true,
@@ -63,209 +81,252 @@
         },
         toolbar: {
             items: [
+                "groupPanel",
+
                 {
-                    name: "searchPanel",
-                    location: 'after'
-                }
-            ]
+                    location: 'after',
+                    template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick(e) {
+                        e.element.closest('div.dx-datagrid.dx-gridbase-container').parent().data('dxDataGrid').addRow();
+                    },
+                },
+                {
+                    location: 'after',
+                    template: '<div><button type="button" class="btn btn-light btn-sm dropdown-toggle waves-effect waves-themed hvr-icon-pop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height:36px"> <i class="fa fa-gear hvr-icon"></i> <span class="">Action</span>  </button><div class="dropdown-menu fadeindown"> <button class="dropdown-item" type="button">Confirm</button> <button class="dropdown-item" type="button">Reject</button></div></div>'
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
+        export: {
+            enabled: true,
+            // formats: ['excel','pdf'],
+            allowExportSelectedData: true,
+        },
+        groupPanel: {
+            visible: true,
+        },
+        selection: {
+            mode: 'multiple',
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('GoodsReceipt');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'GoodsReceipt.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        editing: {
+            mode: "row",
+            allowAdding: true,
+            allowUpdating: true,
+            allowDeleting: true,
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            }
+        },
+        onEditorPreparing: function (e) {
+            if (e.dataField == "code" && e.parentType == "dataRow") {
+                e.editorName = "dxDropDownBox";
+                e.editorOptions.dropDownOptions = {
+                    //height: 500
+                };
+                e.editorOptions.contentTemplate = function (args, container) {
+                    var value = args.component.option("value"),
+                        $dataGrid = $("<div>").dxDataGrid({
+                            width: '100%',
+                            dataSource: args.component.option("dataSource"),
+                            keyExpr: "ID",
+                            columns: [{
+                                caption: "Item Code",
+                                dataField: "Name"
+                            }, "BarCode"],
+                            hoverStateEnabled: true,
+                            paging: { enabled: true, pageSize: pageSize },
+                            filterRow: { visible: true },
+                            scrolling: { mode: "infinite" },
+                            height: '90%',
+                            showRowLines: true,
+                            showBorders: true,
+                            selection: { mode: "single" },
+                            selectedRowKeys: value,
+                            onSelectionChanged: function (selectedItems) {
+                                var keys = selectedItems.selectedRowKeys;
+                                args.component.option("value", keys);
+                            }
+                        });
+
+                    var dataGrid = $dataGrid.dxDataGrid("instance");
+
+                    args.component.on("valueChanged", function (args) {
+                        var value = args.value;
+
+                        dataGrid.selectRows(value, false);
+                    });
+                    container.append($dataGrid);
+                    return container;
+                };
+            }
         },
         columns: [
             {
-                caption: "Item Code",
-                dataField: "code"
+                width: 100,
+                type: 'buttons',
+                caption: l('Actions'),
+                buttons: [
+                    {
+                        text: "View Details",
+                        icon: "fieldchooser",
+                        hint: "View Details",
+                        onClick: function (e) {
+                            var w = window.open('/Inventories/GoodsIssue/Details', '_blank');
+                            w.sessionStorage.setItem("model", JSON.stringify(e.row.data));
+                        }
+                    },
+                    'edit', 'delete']
             },
             {
-                caption: "Warehouse",
-                dataField: "warehouse"
+                caption: "Vendor",
+                dataField: "Vendor",
+                cellTemplate: function (element, info) {
+                    element.append(`<a href="javascript:showDetails()">${info.text}</a>`);
+                },
+                alignment: "center",
+                cssClass: "increaseFontWeight"
             },
             {
-                caption: "WHLocation",
-                dataField: "whlocation"
+                caption: "DocNbr",
+                dataField: "DocNbr",
             },
             {
-                caption: "InStock",
-                dataField: "instock"
+                caption: "Created User",
+                dataField: "CreatedUser",
             },
             {
-                caption: "Committed",
-                dataField: "committed"
+                caption: "DocDate",
+                dataField: "DocDate",
             },
             {
-                caption: "Ordered",
-                dataField: "ordered"
+                caption: "Delivery Date",
+                dataField: "DeliveryDate",
             },
             {
-                caption: "Available",
-                dataField: "available"
-            }
+                caption: "Posting Date",
+                dataField: "PostingDate",
+                allowFiltering: false
+            },
+            {
+                caption: "Status",
+                dataField: "Status",
+            },
+            {
+                caption: "Remark",
+                dataField: "Remark",
+                allowFiltering: false
+            },
+            {
+                caption: "Doc Total Amt",
+                dataField: "DocTotalAmt",
+                customizeText: function (cellInfo) {
+                    return cellInfo.valueText + "đ";
+                },
+                allowFiltering: false,
+                alignment: 'right',
+                format: ",##0.###",
+                summaryType: "sum",
+            },
+            {
+                caption: "Doc Total Amt After Tax",
+                dataField: "DocTotalAmtAfterTax",
+                customizeText: function (cellInfo) {
+                    return cellInfo.valueText + "đ";
+                },
+                allowFiltering: false,
+                format: ",##0.###",
+                summaryType: "sum",
+                alignment: 'right',
+            },
         ],
+        summary: {
+            totalItems: [{
+                column: 'DocTotalAmt',
+                summaryType: 'sum',
+                valueFormat: ",##0.###",
+                customizeText: function (data) {
+                    return data.valueText + "đ";
+                },
+            }, {
+                column: 'DocTotalAmtAfterTax',
+                summaryType: 'sum',
+                valueFormat: ",##0.###",
+                customizeText: function (data) {
+                    return data.valueText + "đ";
+                },
+            }],
+        },
     }).dxDataGrid("instance");
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
-
-        console.log("ExportToExcelButton is called.");
-    });
-
-    function currentDate() {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
-
-        return mm + '/' + dd + '/' + yyyy;
-    }
+    
+   
 });
 
 var inventoryDatas = [
     {
-        id: 1,
-        code: "Item 1",
-        warehouse: "Main",
-        whlocation: "Kho Chính",
-        instock: 20000,
-        committed: 2000,
-        ordered: 1000,
-        available: 19000
+        Id: 1,
+        Vendor: "IDP",
+        DocNbr: "RP000",
+        CreatedUser: "Trần Văn B",
+        DocDate: "02/03/2023",
+        DeliveryDate: "01/03/2023",
+        PostingDate: "07/01/2023",
+        Status: "Open",
+        Remark: "Giao sau 14h",
+        DocTotalAmt: 112456000,
+        DocTotalAmtAfterTax: 112456000
     },
     {
-        id: 2,
-        code: "Item 2",
-        warehouse: "Main2",
-        whlocation: "Kho Phụ",
-        instock: 10000,
-        committed: 1000,
-        ordered: 1000,
-        available: 10000
+        Id: 2,
+        Vendor: "IDP",
+        DocNbr: "RP002",
+        CreatedUser: "Nguyễn Văn A",
+        DocDate: "01/03/2023",
+        DeliveryDate: "05/06/2023",
+        PostingDate: "05/01/2023",
+        Status: "Approved",
+        Remark: "Ok, cho đi ngay",
+        DocTotalAmt: 66321000,
+        DocTotalAmtAfterTax: 66000000
     },
     {
-        id: 3,
-        code: "Item 3",
-        warehouse: "Main",
-        whlocation: "Kho Chính",
-        instock: 50000,
-        committed: 1000,
-        ordered: 1000,
-        available: 50000
+        Id: 3,
+        Vendor: "IDP",
+        DocNbr: "RP003",
+        CreatedUser: "Nguyễn Hiệp",
+        DocDate: "01/03/2023",
+        DeliveryDate: "07/08/2023",
+        PostingDate: "10/09/2023",
+        Status: "Rejected",
+        Remark: "Không giao đi",
+        DocTotalAmt: 56789000,
+        DocTotalAmtAfterTax: 56111000
     },
-    {
-        id: 4,
-        code: "Item 4",
-        warehouse: "Main3",
-        whlocation: "Kho Phụ",
-        instock: 90000,
-        committed: 1000,
-        ordered: 1000,
-        available: 90000
-    },
-    {
-        id: 5,
-        code: "Item 5",
-        warehouse: "Main3",
-        whlocation: "Kho Chính",
-        instock: 80000,
-        committed: 1000,
-        ordered: 1000,
-        available: 8000
-    },
-    {
-        id: 6,
-        code: "Item 6",
-        warehouse: "Main",
-        whlocation: "Kho Chính",
-        instock: 20000,
-        committed: 2000,
-        ordered: 1000,
-        available: 19000
-    },
-    {
-        id: 7,
-        code: "Item 7",
-        warehouse: "Main2",
-        whlocation: "Kho Phụ",
-        instock: 10000,
-        committed: 1000,
-        ordered: 1000,
-        available: 10000
-    },
-    {
-        id: 8,
-        code: "Item 8",
-        warehouse: "Main",
-        whlocation: "Kho Chính",
-        instock: 50000,
-        committed: 1000,
-        ordered: 1000,
-        available: 50000
-    },
-    {
-        id: 9,
-        code: "Item 9",
-        warehouse: "Main3",
-        whlocation: "Kho Phụ",
-        instock: 90000,
-        committed: 1000,
-        ordered: 1000,
-        available: 90000
-    },
-    {
-        id: 10,
-        code: "Item 10",
-        warehouse: "Main3",
-        whlocation: "Kho Chính",
-        instock: 80000,
-        committed: 1000,
-        ordered: 1000,
-        available: 8000
-    },
-    {
-        id: 11,
-        code: "Item 11",
-        warehouse: "Main",
-        whlocation: "Kho Chính",
-        instock: 20000,
-        committed: 2000,
-        ordered: 1000,
-        available: 19000
-    },
-    {
-        id: 12,
-        code: "Item 12",
-        warehouse: "Main2",
-        whlocation: "Kho Phụ",
-        instock: 10000,
-        committed: 1000,
-        ordered: 1000,
-        available: 10000
-    },
-    {
-        id: 13,
-        code: "Item 13",
-        warehouse: "Main",
-        whlocation: "Kho Chính",
-        instock: 50000,
-        committed: 1000,
-        ordered: 1000,
-        available: 50000
-    },
-    {
-        id: 14,
-        code: "Item 14",
-        warehouse: "Main3",
-        whlocation: "Kho Phụ",
-        instock: 90000,
-        committed: 1000,
-        ordered: 1000,
-        available: 90000
-    },
-    {
-        id: 15,
-        code: "Item 15",
-        warehouse: "Main3",
-        whlocation: "Kho Chính",
-        instock: 80000,
-        committed: 1000,
-        ordered: 1000,
-        available: 8000
-    }
 ];
