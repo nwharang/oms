@@ -1,5 +1,5 @@
 ﻿var l = abp.localization.getResource("MdmService");
-var MCPHeaderModel;
+var MCPModel;
 var mcpDetailData = [];
 $(function () {
 
@@ -63,15 +63,14 @@ $(function () {
             const deferred = $.Deferred();
             companyInZoneService.getListDevextremes(args)
                 .done(result => {
-                    const d = $.Deferred();
-                    result.data.forEach(u => {
-                        companyService.get(u.companyId)
-                            .done(data => {
-                                u.companyName = data.name;
-                                d.resolve(data);
-                            });
+                    var data = [];
+                    result.data.forEach(x => {
+                        data.push({
+                            id: x.company.id,
+                            name: x.company.name
+                        }) 
                     })
-                    deferred.resolve(result.data, {
+                    deferred.resolve(data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
                         groupCount: result.groupCount,
@@ -84,7 +83,7 @@ $(function () {
             if (key == 0) return null;
 
             var d = new $.Deferred();
-            companyInZoneService.get(key)
+            companyService.get(key)
                 .done(data => {
                     d.resolve(data);
                 });
@@ -158,72 +157,72 @@ $(function () {
     });
 
 
-    var mCPDetailsStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            if (!MCPHeaderModel)
-                return deferred.resolve([], {
-                    totalCount: -1,
-                    groupCount: -1,
-                    summary: null,
-                }).promise();
+    //var mCPDetailsStore = new DevExpress.data.CustomStore({
+    //    key: 'id',
+    //    load(loadOptions) {
+    //        const deferred = $.Deferred();
+    //        if (!MCPModel)
+    //            return deferred.resolve([], {
+    //                totalCount: -1,
+    //                groupCount: -1,
+    //                summary: null,
+    //            }).promise();
 
-            if (loadOptions.filter == null) {
-                loadOptions.filter = ["mcpHeaderId", "=", MCPHeaderModel.id];
-            } else {
-                loadOptions.filter = [loadOptions.filter, "and", ["mcpHeaderId", "=", MCPHeaderModel.id]];
-            }
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
+    //        if (loadOptions.filter == null) {
+    //            loadOptions.filter = ["mcpHeaderId", "=", MCPModel.mcpHeaderDto.id];
+    //        } else {
+    //            loadOptions.filter = [loadOptions.filter, "and", ["mcpHeaderId", "=", MCPModel.mcpHeaderDto.id]];
+    //        }
+    //        const args = {};
+    //        requestOptions.forEach((i) => {
+    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+    //                args[i] = JSON.stringify(loadOptions[i]);
+    //            }
+    //        });
 
-            mCPDetailsService.getListDevextremes(args)
-                .done(result => {
-                    result.data.forEach(x => {
-                        x.address = "";
-                        x.customerIdExtra = x.customerId;
-                    });
-                    mcpDetailData = result.data;
+    //        mCPDetailsService.getListDevextremes(args)
+    //            .done(result => {
+    //                result.data.forEach(x => {
+    //                    x.address = "";
+    //                    x.customerIdExtra = x.customerId;
+    //                });
+    //                mcpDetailData = result.data;
 
-                    //deferred.resolve(result.data, {
-                    //    totalCount: result.totalCount,
-                    //    summary: result.summary,
-                    //    groupCount: result.groupCount,
-                    //});
-                });
+    //                //deferred.resolve(result.data, {
+    //                //    totalCount: result.totalCount,
+    //                //    summary: result.summary,
+    //                //    groupCount: result.groupCount,
+    //                //});
+    //            });
 
-            return deferred.promise();
-        },
-        //byKey: function (key) {
-        //    if (key == 0) return null;
+    //        return deferred.promise();
+    //    },
+    //    //byKey: function (key) {
+    //    //    if (key == 0) return null;
 
-        //    var d = new $.Deferred();
-        //    mCPDetailsService.get(key)
-        //        .done(data => {
-        //            d.resolve(data);
-        //        });
-        //    return d.promise();
-        //},
-        insert(values) {
-            values.mcpHeaderId = MCPHeaderModel ? MCPHeaderModel.id : null;
-            values.code = "1";//fake value, check api
-            mcpDetailData.push(values);
+    //    //    var d = new $.Deferred();
+    //    //    mCPDetailsService.get(key)
+    //    //        .done(data => {
+    //    //            d.resolve(data);
+    //    //        });
+    //    //    return d.promise();
+    //    //},
+    //    insert(values) {
+    //        values.mcpHeaderId = MCPModel ? MCPModel.mcpHeaderDto.id : null;
+    //        values.code = "1";//fake value, check api
+    //        mcpDetailData.push(values);
 
-            //return mCPDetailsService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            values.mcpHeaderId = MCPHeaderModel.id; MCPHeaderModel ? MCPHeaderModel.id : null;
-            values.code = "1";//fake value, check api
-            return mCPDetailsService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return mCPDetailsService.delete(key);
-        }
-    });
+    //        //return mCPDetailsService.create(values, { contentType: "application/json" });
+    //    },
+    //    update(key, values) {
+    //        values.mcpHeaderId = MCPModel.mcpHeaderDto.id; MCPModel ? MCPModel.mcpHeaderDto.id : null;
+    //        values.code = "1";//fake value, check api
+    //        return mCPDetailsService.update(key, values, { contentType: "application/json" });
+    //    },
+    //    remove(key) {
+    //        return mCPDetailsService.delete(key);
+    //    }
+    //});
 
     $("#top-section").dxForm({
         labelMode: 'floating',
@@ -269,8 +268,8 @@ $(function () {
                             //}),
                             showClearButton: true,
                             placeholder: '',
-                            valueExpr: "companyId",
-                            displayExpr: "company.name",
+                            valueExpr: "id",
+                            displayExpr: "name",
                         }
                     },
                     {
@@ -525,7 +524,7 @@ $(function () {
                 e.data.week3 = false;
                 e.data.week4 = false,
                     e.data.customerId = null;
-                //e.data.mcpHeaderId = MCPHeaderModel ? MCPHeaderModel.id : null;
+                //e.data.mcpHeaderId = MCPModel ? MCPModel.id : null;
             },
             columns: [
                 {
@@ -557,6 +556,7 @@ $(function () {
                 {
                     caption: "Address",
                     dataField: "customerIdExtra",
+                    width: 150,
                     allowEditing: false,
                     lookup: {
                         dataSource() {
@@ -756,26 +756,29 @@ $(function () {
             mcpDetails: mcpDetails,
         }
 
-
-        if (!MCPHeaderModel)
+        if (!MCPModel)
             mCPHeaderService.createMCP(params, { contentType: "application/json" })
                 .done(result => {
                     abp.message.success(l('Congratulations'));
-                    MCPHeaderModel = {
-                        id: result.mcpHeaderDto.id
-                    };
-                    sessionStorage.setItem("MCPHeaderModel", JSON.stringify(result));
+                    MCPModel = result;
+                    sessionStorage.setItem("MCPModel", JSON.stringify(result));
 
                     $('#GenerateButton').data('dxButton').option('disabled', false);
                     $('#EnddateButton').data('dxButton').option('disabled', false);
                 }).fail(() => { });
-        //else
-        //    mCPHeaderService.update(MCPHeaderModel.id, params, { contentType: "application/json" })
-        //        .done(result => {
-        //            abp.message.success(l('Congratulations'));
-        //            MCPHeaderModel = result;
-        //            sessionStorage.setItem("MCPHeaderModel", JSON.stringify(result));
-        //        });
+        else
+            mCPHeaderService.updateMCP(MCPModel.mcpHeaderDto.id, params, { contentType: "application/json" })
+                .done(result => {
+                    abp.message.success(l('Congratulations'));
+                    MCPModel = result;
+                    sessionStorage.setItem("MCPModel", JSON.stringify(result));
+
+                    abp.message.confirm("Want to generate visit plan again?", "Congratulations").then(function (answer) {
+                        if (answer) {
+                            $('#GenerateButton').click();
+                        }
+                    });
+                });
     })
 
     $("#CloseButton").click(function (e) {
@@ -793,14 +796,14 @@ $(function () {
         var currentEndDate = form.getEditor('EndDate').option('value');
 
 
-        var previousRouteId = MCPHeaderModel.routeId;
-        var previousCompanyId = MCPHeaderModel.companyId;
-        var previousItemGroupId = MCPHeaderModel.itemGroupId;
-        var previousCode = MCPHeaderModel.code;
-        var previousName = MCPHeaderModel.name;
-        // var previousIsGPSLocked = MCPHeaderModel.isGPSLocked;
-        var previousEffectiveDate = MCPHeaderModel.effectiveDate;
-        var previousEndDate = MCPHeaderModel.endDate;
+        var previousRouteId = MCPModel.routeId;
+        var previousCompanyId = MCPModel.companyId;
+        var previousItemGroupId = MCPModel.itemGroupId;
+        var previousCode = MCPModel.code;
+        var previousName = MCPModel.name;
+        // var previousIsGPSLocked = MCPModel.isGPSLocked;
+        var previousEffectiveDate = MCPModel.effectiveDate;
+        var previousEndDate = MCPModel.endDate;
 
         if (currentRouteId != previousRouteId
             || currentCompanyId != previousCompanyId
@@ -826,26 +829,43 @@ $(function () {
     });
     $("#EnddateButton").click(function (e) {
         e.preventDefault();
-        if (MCPHeaderModel)
+        if (MCPModel)
             popupEnddateMCP.show();
     });
 
     function LoadData() {
-        var jsonData = sessionStorage.getItem("MCPHeaderModel");
+        var jsonData = sessionStorage.getItem("MCPModel");
         if (jsonData) {
-            MCPHeaderModel = JSON.parse(jsonData);
+            MCPModel = JSON.parse(jsonData);
             var form = $("#top-section").data('dxForm');
-            form.getEditor('Route').option('value', MCPHeaderModel.routeId);
-            form.getEditor('Company').option('value', MCPHeaderModel.companyId);
-            form.getEditor('ItemGroup').option('value', MCPHeaderModel.itemGroupId);
-            form.getEditor('Code').option('value', MCPHeaderModel.code);
-            form.getEditor('Name').option('value', MCPHeaderModel.name);
+            form.getEditor('Route').option('value', MCPModel.mcpHeaderDto.routeId);
+            form.getEditor('Company').option('value', MCPModel.mcpHeaderDto.companyId);
+            form.getEditor('ItemGroup').option('value', MCPModel.mcpHeaderDto.itemGroupId);
+            form.getEditor('Code').option('value', MCPModel.mcpHeaderDto.code);
+            form.getEditor('Name').option('value', MCPModel.mcpHeaderDto.name);
 
-            form.getEditor('EffectiveDate').option('value', MCPHeaderModel.effectiveDate);
-            form.getEditor('EndDate').option('value', MCPHeaderModel.endDate);
+            form.getEditor('EffectiveDate').option('value', MCPModel.mcpHeaderDto.effectiveDate);
+            form.getEditor('EndDate').option('value', MCPModel.mcpHeaderDto.endDate);
 
             $('#GenerateButton').data('dxButton').option('disabled', false);
             $('#EnddateButton').data('dxButton').option('disabled', false);
+
+            salesOrgHierarchyService.get(MCPModel.mcpHeaderDto.routeId).done(u => {
+                var dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
+                dxCompany.option('readOnly', false);
+                dxCompany.option('dataSource', new DevExpress.data.DataSource({
+                    store: companyInZoneStore,
+                    filter: ["salesOrgHierarchyId", "=", u.parentId],
+                    paginate: true,
+                    pageSize: pageSize
+                }));
+                dxCompany.option('value', MCPModel.mcpHeaderDto.companyId);
+            });
+
+            mcpDetailData = MCPModel.mcpDetails;
+            mcpDetailData.forEach(x => x.customerIdExtra = x.customerId);
+
+            dgMCPDetails.option('dataSource', mcpDetailData);
         }
     }
     LoadData();
@@ -865,11 +885,15 @@ $(function () {
 
         } else {
             var dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
+            if (!dxCompany.editorOptions)
+                dxCompany.editorOptions = [];
             dxCompany.editorOptions.readOnly = true;
             dxCompany.editorOptions.dataSource = null;
+            dxCompany.option('value', null);
         }
     }
-    $("#top-section").data('dxForm').getEditor('Route').on("valueChanged", routeChangedHandler)
+    $("#top-section").data('dxForm').getEditor('Route').on("valueChanged", routeChangedHandler);
+
     function getNextDate(arg) {
         const today = new Date()
         let feature = new Date()
@@ -925,7 +949,7 @@ $(function () {
                     //if (!dateStart)
                     //    dxStartDate.
                     var params = {
-                        mcpHeaderId: MCPHeaderModel.id,
+                        mcpHeaderId: MCPModel.mcpHeaderDto.id,
                         dateStart: dateStart,
                         dateEnd: dateEnd
                     };
@@ -978,7 +1002,7 @@ $(function () {
                     //if (!dateStart)
                     //    dxStartDate.
                     var params = {
-                        id: MCPHeaderModel.id,
+                        id: MCPModel.mcpHeaderDto.id,
                         endDate: endDate
                     };
 

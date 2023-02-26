@@ -8,16 +8,13 @@ div.dx-datagrid .dx-toolbar-items-container, div.dx-treelist-container div.dx-to
 .dx-button-has-text .dx-button-content {
     padding: 6px 8px 6px;
 }
-
+ 
 .dx-toolbar .dx-button .dx-icon{
     margin-right:0;
 } 
  div.dx-toolbar-before > div:nth-child(2) > div > div{
-     /*margin-left:10px;*/
-}
-#btnActions {
-    border-radius: 0;
-}
+     margin-left:10px;
+} 
 div.dx-toolbar-items-container
 div.dx-button-content {
     font-size:12px;
@@ -36,7 +33,7 @@ i.dx-icon.fa {
 
 #resizable {
     padding: 10px;
-    height: 300px;
+    height: 260px;
 } 
 
 .dx-resizable-handle-bottom {
@@ -65,7 +62,4 @@ i.dx-icon.fa {
 }
 div.close-popup div[role=button] {
     border: none;
-}
-.increaseFontWeight > a {
-    font-weight: 500;
 }

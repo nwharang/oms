@@ -11,11 +11,7 @@ div.dx-datagrid .dx-toolbar-items-container, div.dx-treelist-container div.dx-to
  
 .dx-toolbar .dx-button .dx-icon{
     margin-right:0;
-}
-.dx-toolbar-text-auto-hide .dx-button .dx-button-content,
-div.dx-toolbar-after  div.dx-button-content {
-    padding: 6px;
-}
+} 
  div.dx-toolbar-before > div:nth-child(2) > div > div{
      margin-left:10px;
 } 

@@ -4,22 +4,19 @@
 @inject IPageLayout PageLayout
 @{
     PageLayout.Content.Title = "PO";
-    PageLayout.Content.MenuItemName = "PO.PurchaseRequests";
+    PageLayout.Content.MenuItemName = "PO.GoodsReturnRequests";
 }
-
 @section styles {
-    <abp-style src="/Pages/POs/PurchaseRequests/Details.css" />
+    <abp-style src="/Pages/POs/GoodsReturnRequests/Details.css" />
 }
 @section scripts {
-    <script src="/js/devextreme/exceljs.min.js"></script>
-    <script src="/js/devextreme/filesaver.min.js"></script>
-    <abp-script src="/Pages/POs/PurchaseRequests/Details.js" />
+    <abp-script src="/Pages/POs/GoodsReturnRequests/Details.js" />
 }
 
 @section breadcrumb {
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">PO</a></li>
-        <li class="breadcrumb-item">Purchase Requests</li>
+        <li class="breadcrumb-item active">Goods Return Requests</li> 
         <li class="breadcrumb-item active">Details</li>
     </ol>
 }
@@ -28,7 +25,7 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fa fa-file-alt"></i>
+                <i class="subheader-icon fa fa-file-alt"></i> Goods Return Requests
             </h2>
         </div>
         <div class="panel-container show" style="padding-top:10px">
@@ -49,21 +46,10 @@
                 </div>
                 <div class="dx-viewport">
                     <div class="py-3" id="resizable">
-                        <div id="top-section"></div>
-                        <div id="bottom-remark"></div>
+                        <div id="form"></div>
                     </div>
                     <div class=" py-2">
-                        <div id="MDMtabpanel">
-                            <div id="tabpanel-container"> </div>
-                            <div class="options">
-                                <div class="option">
-                                    <div id="animation-enabled"></div>
-                                </div>
-                                <div class="option">
-                                    <div id="animation-enabled"></div>
-                                </div>
-
-                            </div>
+                        <div id="gridGoodsReturnRequestDetails">
                         </div>
                     </div>
                 </div>

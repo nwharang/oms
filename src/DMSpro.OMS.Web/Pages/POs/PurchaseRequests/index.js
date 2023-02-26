@@ -105,22 +105,24 @@ $(function () {
         },
         toolbar: {
             items: [
+                "groupPanel",
+              
                 {
-                    location: 'before',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>New Purchase Request</span></button>',
-                    onClick() {
-                        gridPurchaseRequests.addRow();
+                    location: 'after',
+                    template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick(e) {
+                        e.element.closest('div.dx-datagrid.dx-gridbase-container').parent().data('dxDataGrid').addRow();
                     },
                 },
                 {
-                    location: 'before',
-                    template: '<div><button type="button" class="btn btn-light btn-sm dropdown-toggle waves-effect waves-themed" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="fa fa-gear"></i> <span class="">Action</span>  </button><div class="dropdown-menu fadeindown"> <button class="dropdown-item" type="button">Confirmed</button> <button class="dropdown-item" type="button">Rejected</button></div></div>'
+                    location: 'after',
+                    template: '<div><button type="button" class="btn btn-light btn-sm dropdown-toggle waves-effect waves-themed hvr-icon-pop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height:36px"> <i class="fa fa-gear hvr-icon"></i> <span class="">Action</span>  </button><div class="dropdown-menu fadeindown"> <button class="dropdown-item" type="button">Confirmed</button> <button class="dropdown-item" type="button">Rejected</button></div></div>'
                 }, 
                 'columnChooserButton',
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
                     onClick() {
                         //todo
                     },
@@ -315,7 +317,7 @@ $(function () {
         height: 400,
         showTitle: true,
         container: '.page-content',
-        title: 'Information',
+        title: 'Vendor Information',
         visible: false,
         dragEnabled: false,
         hideOnOutsideClick: true,

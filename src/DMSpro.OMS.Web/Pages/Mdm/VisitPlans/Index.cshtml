@@ -43,16 +43,23 @@
         </div>
         <div class="panel-container show" style="padding-top:10px">
             <div class="panel-content jqvmap-bg-ocean p-0" style="">
-                <div style="padding-left:12px" class="buttons-header-grid"> 
-                    <button type="button" class="btn btn-light btn-sm hvr-icon-pop">
-                        <i class="fa fa-random hvr-icon" style="padding-right: 2px"></i>
-                        <span class="">Change Visit Plans</span>
-                    </button>
-                </div>
+               @* <div style="padding-left:12px" class="buttons-header-grid"> 
+                   
+                </div>*@
 
                 <div class="dx-viewport">
                     <div class="py-2">
                         <div id="dgVisitPlans"> </div>
+                    </div>
+                </div>
+            </div>
+            <div id="popupChangeVisitPlan" style="display:none">
+                <div class="dx-fieldset">
+                    <div class="dx-field">
+                        <div class="dx-field-label">Date</div>
+                        <div class="dx-field-value">
+                            <div id="date"></div>
+                        </div>
                     </div>
                 </div>
             </div>
