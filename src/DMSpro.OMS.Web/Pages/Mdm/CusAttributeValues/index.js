@@ -7,7 +7,7 @@ $(function () {
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = {};
+            const args = { filter: JSON.stringify(['active', '=', true]) };
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
@@ -16,7 +16,7 @@ $(function () {
 
             cusAttributeService.getListDevextremes(args)
                 .done(result => {
-                    console.log('data:', result)
+                    //console.log('data:', result)
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -45,7 +45,7 @@ $(function () {
 
             cusAttributesValueService.getListDevextremes(args)
                 .done(result => {
-                    console.log('data:', result)
+                    //console.log('data:', result)
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -206,6 +206,7 @@ $(function () {
             {
                 dataField: 'customerAttributeId',
                 caption: l("EntityFieldName:MDMService:CusAttributeValue:AttrNo"),
+                calculateDisplayValue: 'customerAttribute.attrName',
                 lookup: {
                     //dataSource: cusAttributes,
                     dataSource: {
@@ -216,7 +217,8 @@ $(function () {
                     },
                     valueExpr: "id",
                     displayExpr: "attrName"
-                }
+                },
+                validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'parentCusAttributeValueId',

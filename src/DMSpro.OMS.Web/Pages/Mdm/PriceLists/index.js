@@ -9,7 +9,13 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            priceListService.getListDevextremes({})
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            priceListService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -46,7 +52,6 @@ $(function () {
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
@@ -78,7 +83,13 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            priceListService.getListDevextremes({})
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            priceListService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -105,7 +116,13 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            uomService.getListDevextremes({})
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            uomService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -131,7 +148,13 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            itemService.getListDevextremes({})
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            itemService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,

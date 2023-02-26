@@ -14,7 +14,6 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-
             itemAttrService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
