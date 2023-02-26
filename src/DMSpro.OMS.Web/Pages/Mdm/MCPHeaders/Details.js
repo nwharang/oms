@@ -169,7 +169,8 @@ $(function () {
             return deferred.promise();
         },
         byKey: function (key) {
-            if (key == 0) return null;
+            console.log(key);
+            if (key == undefined) return null;
             var d = new $.Deferred();
             salesOrgHierarchyService.get(key)
                 .done(data => {
@@ -304,7 +305,7 @@ $(function () {
                             message: '',
                         }],
                         editorOptions: {
-                            min: new Date(),
+                            //min: new Date(),
                             displayFormat: 'dd/MM/yyyy',
                             showClearButton: true
                         }
@@ -312,7 +313,7 @@ $(function () {
                         dataField: 'EndDate',
                         editorType: 'dxDateBox',
                         editorOptions: {
-                            min: new Date(),
+                            //min: new Date(),
                             displayFormat: 'dd/MM/yyyy',
                             showClearButton: true
                         }
@@ -518,6 +519,7 @@ $(function () {
                 {
                     caption: "Customer",
                     dataField: "customerId",
+                    calculateDisplayValue: "customer.name",
                     validationRules: [{ type: "required", message: '' }],
                     lookup: {
                         dataSource() {
@@ -534,26 +536,12 @@ $(function () {
                         searchMode: 'contains'
                     }
                 },
-                {
-                    caption: "Address",
-                    dataField: "customerIdExtra",
-                    width: 150,
-                    allowEditing: false,
-                    lookup: {
-                        dataSource() {
-                            return {
-                                store: customerStore,
-                                /*  filter: ["employeeTypeId", "=", "4623cb59-c099-1615-149f-3a0861252b0d"],//salesman*/
-                                paginate: true,
-                                pageSize: pageSizeForLookup
-                            };
-                        },
-                        displayExpr: 'address',
-                        valueExpr: 'id',
-                        searchEnabled: true,
-                        searchMode: 'contains'
-                    }
-                },
+                //{
+                //    caption: "Address",
+                //    dataField: "customer.address",
+                //    width: 150,
+                //    allowEditing: false,
+                //},
                 {
                     caption: "Effective Date",
                     dataField: "effectiveDate",
@@ -854,8 +842,8 @@ $(function () {
     });
 
     function LoadData() {
-        debugger
         var jsonData = sessionStorage.getItem("MCPModel");
+        //console.log(jsonData);
         if (jsonData) {
             MCPModel = JSON.parse(jsonData);
             var form = $("#top-section").data('dxForm');
@@ -885,6 +873,8 @@ $(function () {
 
             LoadDataGrid();
         }
+
+        sessionStorage.removeItem('MCPModel');
     }
     function LoadDataGrid() {
 
@@ -901,7 +891,6 @@ $(function () {
 
         mCPDetailsService.getListDevextremes(args)
             .done(result => {
-                debugger
                 var data = result.data;
                 mcpDetailData = data;
                 mcpDetailData.forEach(x => x.customerIdExtra = x.customerId);
