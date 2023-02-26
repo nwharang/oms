@@ -180,6 +180,7 @@ $(function () {
     });
 
     var dgVisitPlans = $('#dgVisitPlans').dxDataGrid({
+        key: 'id',
         dataSource: visitPlansStore,
         remoteOperations: true,
         showRowLines: true,
@@ -343,6 +344,7 @@ $(function () {
                 dataField: 'dateVisit',
                 caption: l('EntityFieldName:MDMService:VisitPlan:DateVisit'),
                 dataType: 'date',
+                format: 'dd/MM/yyyy',
                 validationRules: [
                     {
                         type: 'required',
@@ -455,13 +457,7 @@ $(function () {
             {
                 dataField: 'mcpDetailId',
                 caption: l('MCP Detail'),
-                editorType: 'dxSelectBox',
-                lookup: {
-                    //dataSource: getMCPDetails,
-                    valueExpr: 'id',
-                    displayExpr: 'code'
-                },
-                allowEditing: false,
+                //allowEditing: false,
                 visible: false,
             }
         ]
