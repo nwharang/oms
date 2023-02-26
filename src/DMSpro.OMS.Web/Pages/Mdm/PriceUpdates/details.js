@@ -64,9 +64,8 @@ $(function () {
 
     var priceListDetailStore = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: 'raw',
         load(loadOptions) {
-            loadOptions.filter = ['priceListDetail.priceListId', '=', PriceUpdateModel ? PriceUpdateModel.priceListId : null];
+            //loadOptions.filter = ['priceListDetail.priceListId', '=', PriceUpdateModel ? PriceUpdateModel.priceListId : null];
             const deferred = $.Deferred();
             const args = {};
             requestOptions.forEach((i) => {
@@ -247,7 +246,6 @@ $(function () {
                     text: l('EntityFieldName:MDMService:PriceUpdate:PriceList')
                 },
                 editorOptions: {
-                    //dataSource: priceListStore,
                     dataSource: {
                         store: priceListStore,
                         paginate: true,
@@ -419,6 +417,7 @@ $(function () {
             {
                 caption: l('EntityFieldName:MDMService:PriceListDetail:PriceList'),
                 dataField: 'priceListDetailId',
+                calculateDisplayValue: "priceListDetail.itemId",
                 validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource() {
