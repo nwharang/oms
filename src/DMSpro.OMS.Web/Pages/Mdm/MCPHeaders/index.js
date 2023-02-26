@@ -155,75 +155,7 @@ $(function () {
             return d.promise();
         }
     });
-
-
-    //var mCPDetailsStore = new DevExpress.data.CustomStore({
-    //    key: 'id',
-    //    load(loadOptions) {
-    //        const deferred = $.Deferred();
-    //        if (!MCPModel)
-    //            return deferred.resolve([], {
-    //                totalCount: -1,
-    //                groupCount: -1,
-    //                summary: null,
-    //            }).promise();
-
-    //        if (loadOptions.filter == null) {
-    //            loadOptions.filter = ["mcpHeaderId", "=", MCPModel.mcpHeaderDto.id];
-    //        } else {
-    //            loadOptions.filter = [loadOptions.filter, "and", ["mcpHeaderId", "=", MCPModel.mcpHeaderDto.id]];
-    //        }
-    //        const args = {};
-    //        requestOptions.forEach((i) => {
-    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-    //                args[i] = JSON.stringify(loadOptions[i]);
-    //            }
-    //        });
-
-    //        mCPDetailsService.getListDevextremes(args)
-    //            .done(result => {
-    //                result.data.forEach(x => {
-    //                    x.address = "";
-    //                    x.customerIdExtra = x.customerId;
-    //                });
-    //                mcpDetailData = result.data;
-
-    //                //deferred.resolve(result.data, {
-    //                //    totalCount: result.totalCount,
-    //                //    summary: result.summary,
-    //                //    groupCount: result.groupCount,
-    //                //});
-    //            });
-
-    //        return deferred.promise();
-    //    },
-    //    //byKey: function (key) {
-    //    //    if (key == 0) return null;
-
-    //    //    var d = new $.Deferred();
-    //    //    mCPDetailsService.get(key)
-    //    //        .done(data => {
-    //    //            d.resolve(data);
-    //    //        });
-    //    //    return d.promise();
-    //    //},
-    //    insert(values) {
-    //        values.mcpHeaderId = MCPModel ? MCPModel.mcpHeaderDto.id : null;
-    //        values.code = "1";//fake value, check api
-    //        mcpDetailData.push(values);
-
-    //        //return mCPDetailsService.create(values, { contentType: "application/json" });
-    //    },
-    //    update(key, values) {
-    //        values.mcpHeaderId = MCPModel.mcpHeaderDto.id; MCPModel ? MCPModel.mcpHeaderDto.id : null;
-    //        values.code = "1";//fake value, check api
-    //        return mCPDetailsService.update(key, values, { contentType: "application/json" });
-    //    },
-    //    remove(key) {
-    //        return mCPDetailsService.delete(key);
-    //    }
-    //});
-
+     
     $("#top-section").dxForm({
         labelMode: 'floating',
         colCount: 4,
@@ -259,13 +191,7 @@ $(function () {
                             message: 'Company is required',
                         }],
                         editorOptions: {
-                            readOnly: true,
-                            //dataSource: new DevExpress.data.DataSource({
-                            //    store: companyInZoneStore,
-                            //    filter: ["salesOrgHierarchyId", "=", -1],
-                            //    paginate: true,
-                            //    pageSize: pageSize
-                            //}),
+                            readOnly: true, 
                             showClearButton: true,
                             placeholder: '',
                             valueExpr: "id",
@@ -296,14 +222,14 @@ $(function () {
                         dataField: 'Code',
                         validationRules: [{
                             type: 'required',
-                            message: 'Code is required',
+                            message: '',
                         }],
                     },
                     {
                         dataField: 'Name',
                         validationRules: [{
                             type: 'required',
-                            message: 'Name is required',
+                            message: '',
                         }],
                     }
                     //, {
@@ -320,7 +246,7 @@ $(function () {
                         editorType: 'dxDateBox',
                         validationRules: [{
                             type: 'required',
-                            message: 'EffectiveDate is required',
+                            message: '',
                         }],
                         editorOptions: {
                             min: new Date(),
@@ -721,12 +647,12 @@ $(function () {
             form.getEditor('Company').focus();
             return;
         }
-        if (code == null) {
+        if (!code || code.trim() == "") {
             form.getEditor('Code').option('isValid', false);
             form.getEditor('Code').focus();
             return;
         }
-        if (name == null) {
+        if (!name || name.trim() == "") {
             form.getEditor('Name').option('isValid', false);
             form.getEditor('Name').focus();
             return;
