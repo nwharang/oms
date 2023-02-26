@@ -123,7 +123,7 @@ $(function () {
                 "groupPanel",
                 {
                     location: 'after',
-                    template: ` <button disabled id="ChangeVisitPlanButton" style="height: 36px;" type="button" class="btn btn-light btn-sm hvr-icon-pop">
+                    template: ` <button disabled id="ChangeVisitPlanButton" style="display:none;height: 36px;" type="button" class="btn btn-light btn-sm hvr-icon-pop">
                         <i class="fa fa-random hvr-icon" style="padding-right: 2px"></i>
                         <span class="">Change Visit Plans</span>
                     </button>`,

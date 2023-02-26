@@ -416,7 +416,7 @@
 
   </ItemGroup>
   <ItemGroup>
-    <Content Update="Pages\Mdm\MCPHeaders\Index.cshtml">
+    <Content Update="Pages\Mdm\MCPHeaders\Details.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
@@ -426,10 +426,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Update="Pages\Mdm\MCPHeaders\index.css">
+    <None Update="Pages\Mdm\MCPHeaders\Details.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Pages\Mdm\MCPHeaders\index.js">
+    <None Update="Pages\Mdm\MCPHeaders\Details.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Pages\Mdm\Routes\index.css">
