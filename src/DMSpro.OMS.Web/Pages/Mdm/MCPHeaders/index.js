@@ -90,7 +90,7 @@ $(function () {
                 mode: "row",
                 allowAdding: true,
                 allowUpdating: true,
-                allowDeleting: true,
+                //allowDeleting: true,
                 useIcons: true,
                 texts: {
                     editRow: l("Edit"),
