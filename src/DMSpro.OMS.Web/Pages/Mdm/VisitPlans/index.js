@@ -1,10 +1,11 @@
-﻿var visitPlansService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
-var mcpHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
-var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
-var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
-var mcpDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
+﻿
 $(function () {
     var l = abp.localization.getResource("MdmService");
+    var visitPlansService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
+    var mcpHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
+    var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
+    var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
+    var mcpDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
 
     const dayOfWeek = [
         {
@@ -37,15 +38,9 @@ $(function () {
         }
     ]
 
-    var _lookupModal = new abp.ModalManager({
-        viewUrl: abp.appPath + "Shared/LookupModal",
-        scriptUrl: "/Pages/Shared/lookupModal.js",
-        modalClass: "navigationPropertyLookup"
-    });
 
     const visitPlansStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -85,38 +80,38 @@ $(function () {
         }
     });
 
-    const getMCPHeaders = new DevExpress.data.CustomStore({
-        key: "id",
-        loadMode: 'processed',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            mcpHeaderService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
+    //const getMCPHeaders = new DevExpress.data.CustomStore({
+    //    key: "id",
+    //    loadMode: 'processed',
+    //    load(loadOptions) {
+    //        const deferred = $.Deferred();
+    //        const args = {};
+    //        requestOptions.forEach((i) => {
+    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+    //                args[i] = JSON.stringify(loadOptions[i]);
+    //            }
+    //        });
+    //        mcpHeaderService.getListDevextremes(args)
+    //            .done(result => {
+    //                deferred.resolve(result.data, {
+    //                    totalCount: result.totalCount,
+    //                    summary: result.summary,
+    //                    groupCount: result.groupCount
+    //                });
+    //            });
+    //        return deferred.promise();
+    //    },
+    //    byKey: function (key) {
+    //        if (key == 0) return null;
 
-            var d = new $.Deferred();
-            mcpHeaderService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                })
-            return d.promise();
-        }
-    });
+    //        var d = new $.Deferred();
+    //        mcpHeaderService.get(key)
+    //            .done(data => {
+    //                d.resolve(data);
+    //            })
+    //        return d.promise();
+    //    }
+    //});
 
     const getItemGroup = new DevExpress.data.CustomStore({
         key: "id",
@@ -184,45 +179,11 @@ $(function () {
         }
     });
 
-    const getMCPDetails = new DevExpress.data.CustomStore({
-        key: "id",
-        loadMode: 'processed',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            mcpDetailsService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            mcpDetailsService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                })
-            return d.promise();
-        }
-    });
-
     var dgVisitPlans = $('#dgVisitPlans').dxDataGrid({
         dataSource: visitPlansStore,
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
-        cacheEnabled: true,
         allowColumnReordering: true,
         rowAlternationEnabled: true,
         allowColumnResizing: true,
@@ -250,6 +211,8 @@ $(function () {
         },
         export: {
             enabled: true,
+            // formats: ['excel','pdf'],
+            allowExportSelectedData: true,
         },
         onExporting(e) {
             const workbook = new ExcelJS.Workbook();
@@ -303,6 +266,17 @@ $(function () {
         toolbar: {
             items: [
                 "groupPanel",
+                {
+                    location: 'after',
+                    template: ` <button id="ChangeVisitPlanButton" style="height: 36px;" type="button" class="btn btn-light btn-sm hvr-icon-pop">
+                        <i class="fa fa-random hvr-icon" style="padding-right: 2px"></i>
+                        <span class="">Change Visit Plans</span>
+                    </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+
                 'columnChooserButton',
                 "exportButton",
                 {
@@ -340,7 +314,7 @@ $(function () {
                 validationRules: [
                     {
                         type: 'required',
-                        message: 'Customer is required'
+                        message: ''
                     }
                 ],
                 editorType: 'dxSelectBox',
@@ -359,7 +333,7 @@ $(function () {
                 validationRules: [
                     {
                         type: 'required',
-                        message: 'Date visit is required'
+                        message: ''
                     }
                 ]
             },
@@ -400,7 +374,7 @@ $(function () {
                 validationRules: [
                     {
                         type: 'required',
-                        message: 'Distance is required'
+                        message: ''
                     }
                 ]
             },
@@ -411,7 +385,7 @@ $(function () {
                 validationRules: [
                     {
                         type: 'required',
-                        message: 'Visit Order is required'
+                        message: ''
                     }
                 ],
                 value: 0
@@ -424,7 +398,7 @@ $(function () {
                 validationRules: [
                     {
                         type: 'required',
-                        message: 'Week is required'
+                        message: ''
                     }
                 ]
             },
@@ -436,7 +410,7 @@ $(function () {
                 validationRules: [
                     {
                         type: 'required',
-                        message: 'Month is required'
+                        message: ''
                     }
                 ]
             },
@@ -448,7 +422,7 @@ $(function () {
                 validationRules: [
                     {
                         type: 'required',
-                        message: 'Year is required'
+                        message: ''
                     }
                 ]
             },
@@ -467,11 +441,77 @@ $(function () {
                 caption: l('MCP Detail'),
                 editorType: 'dxSelectBox',
                 lookup: {
-                    dataSource: getMCPDetails,
+                    //dataSource: getMCPDetails,
                     valueExpr: 'id',
                     displayExpr: 'code'
                 }
             }
         ]
     }).dxDataGrid('instance');
+
+    function getNextDate(arg) {
+        const today = new Date()
+        let feature = new Date()
+        feature.setDate(today.getDate() + arg)
+        return feature;
+    }
+
+    $('#date').dxDateBox({
+        type: 'date',
+        showClearButton: true,
+        min: getNextDate(1),
+        displayFormat: 'dd/MM/yyyy',
+    });
+
+    const popupChangeVisitPlan = $('#popupChangeVisitPlan').dxPopup({
+        width: 400,
+        height: 280,
+        container: '.panel-container',
+        showTitle: true,
+        title: 'Change visit plan',
+        visible: false,
+        dragEnabled: true,
+        hideOnOutsideClick: false,
+        showCloseButton: true,
+        resizeEnabled: true,
+        position: {
+            at: 'center',
+            my: 'center',
+            collision: 'fit',
+        },
+        toolbarItems: [{
+            widget: 'dxButton',
+            toolbar: 'bottom',
+            location: 'before',
+            options: {
+                icon: 'fa fa-check hvr-icon',
+                text: 'Submit',
+                onClick() {
+                    var dxEndDate = $('#date').data('dxDateBox');
+                    var params = {
+                        //id: MCPModel.mcpHeaderDto.id,
+                        //endDate: endDate
+                    };
+                    abp.message.success(l('Congratulations'));
+                    popupChangeVisitPlan.hide();
+                    //mCPHeaderService.setEndDate(params.id, params.endDate, { contentType: "application/json" }).done(result => {
+                    //    abp.message.success(l('Congratulations'));
+                    //    popupEnddateMCP.hide();
+                    //}).fail(() => { });
+                },
+            },
+        }, {
+            widget: 'dxButton',
+            toolbar: 'bottom',
+            location: 'after',
+            options: {
+                text: 'Cancel',
+                onClick() {
+                    popupChangeVisitPlan.hide();
+                },
+            },
+        }],
+    }).dxPopup('instance');
+
+    $('#ChangeVisitPlanButton').click(function () { $('#popupChangeVisitPlan').data('dxPopup').show(); });
 });

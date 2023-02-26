@@ -2,38 +2,64 @@
 var l = abp.localization.getResource("MdmService");
 var l1 = abp.localization.getResource("OMS");
 $(() => {
-   
-    var holidayService = window.dMSpro.oMS.mdmService.controllers.holidays.holiday; 
-     
+
+    var holidayService = window.dMSpro.oMS.mdmService.controllers.holidays.holiday;
+
     var gridHolidays = $('#gridHolidays').dxDataGrid({
-        stateStoring: {
+        remoteOperations: true,
+        export: {
             enabled: true,
-            type: 'localStorage',
-            storageKey: 'storage',
         },
-        scrolling: {
-            columnRenderingMode: 'virtual',
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
         },
-        searchPanel: {
-            visible: true
-        },
-        allowColumnResizing: true,
+        showRowLines: true,
+        showBorders: true,
         allowColumnReordering: true,
-        paging: {
-            enabled: true,
-            pageSize: pageSize
-        },
-        rowAlternationEnabled: true,
-        filterRow: {
-            visible: true,
-            applyFilter: 'auto',
-        },
-        headerFilter: {
-            visible: false,
-        },
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
+        columnMinWidth: 50,
+        columnAutoWidth: true,
         columnChooser: {
             enabled: true,
             mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        filterRow: {
+            visible: true,
+        },
+        groupPanel: {
+            visible: true,
+        },
+        headerFilter: {
+            visible: true,
+        },
+        rowAlternationEnabled: true,
+        searchPanel: {
+            visible: true
+        },
+        stateStoring: { //save state in localStorage
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgMCPDetails',
+        },
+        paging: {
+            enabled: true,
+            pageSize: pageSize
         },
         pager: {
             visible: true,
@@ -44,69 +70,32 @@ $(() => {
         },
         toolbar: {
             items: [
+                "groupPanel",
                 {
-                    location: 'before',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>${l("Button.New.Holiday")}</span></button>`,
+                    location: 'after',
+                    template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                     onClick() {
                         gridHolidays.addRow();
                     },
                 },
-               
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'refresh',
-                        onClick() {
-                            gridHolidays.refresh();
-                        },
-                    },
-                },
+
                 'columnChooserButton',
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-upload"></i> <span>${l("ImportFromExcel")}</span> </button>`,
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
                     onClick() {
                         //todo
                     },
                 },
+                "searchPanel"
             ],
-        },
-        export: {
-            enabled: true,
-            // formats: ['excel','pdf'],
-            allowExportSelectedData: true,
-        },
-        groupPanel: {
-            visible: true,
-        },
-        selection: {
-            mode: 'single',
-        },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('PurchaseRequests');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PurchaseRequests.xlsx');
-                });
-            });
-            e.cancel = true;
         },
         editing: {
             mode: "row",
-            //allowAdding: abp.auth.isGranted('MdmService.u-oMs.Create'),
-            //allowUpdating: abp.auth.isGranted('MdmService.u-oMs.Edit'),
-            //allowDeleting: abp.auth.isGranted('MdmService.u-oMs.Delete'),
-            allowAdding: true,
-            allowUpdating: true,
-            allowDeleting: true,
+            allowAdding: abp.auth.isGranted('MdmService.Holidays.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.Holidays.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.Holidays.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -124,7 +113,6 @@ $(() => {
         },
         dataSource: new DevExpress.data.CustomStore({
             key: 'id',
-            
             load(loadOptions) {
                 const deferred = $.Deferred();
                 const args = {};
@@ -158,15 +146,15 @@ $(() => {
 
             }
         }),
-       // keyExpr: 'Id', 
+        // keyExpr: 'Id', 
         errorRowEnabled: false,
         columns: [
             {
-                width: 100,
                 type: 'buttons',
-                caption: l('Actions'),
-                buttons: [ 
-                    'edit', 'delete']
+                caption: l("Actions"),
+                width: 110,
+                buttons: ['edit', 'delete'],
+                fixedPosition: "left",
             },
             {
                 dataField: 'year',
@@ -182,14 +170,14 @@ $(() => {
         ],
         masterDetail: {
             enabled: true,
-            template(container, options) { 
+            template(container, options) {
                 $('<div class="grid-master-detail">')
                     .dxDataGrid({
                         dataSource: new DevExpress.data.CustomStore({
                             key: 'id',
-                            
+
                             load(loadOptions) {
-                                const deferred = $.Deferred(); 
+                                const deferred = $.Deferred();
                                 var args = {};
                                 requestOptions.forEach((i) => {
                                     if (i in loadOptions && isNotEmpty(loadOptions[i])) {
@@ -211,19 +199,69 @@ $(() => {
                             },
                             insert(values) {
                                 return holidayDetail.create(values, { contentType: "application/json" });
-                            }, 
+                            },
                             update(key, values) {
                                 return holidayDetail.update(key, values, { contentType: "application/json" });
                             },
                             remove(key) {
                                 return holidayDetail.delete(key);
-                            }, 
+                            },
                         }),
-                        selection: {
-                            mode: 'single',
+                        remoteOperations: true,
+                        export: {
+                            enabled: true,
                         },
-                        columnAutoWidth: true,
+                        onExporting(e) {
+                            const workbook = new ExcelJS.Workbook();
+                            const worksheet = workbook.addWorksheet('Data');
+
+                            DevExpress.excelExporter.exportDataGrid({
+                                component: e.component,
+                                worksheet,
+                                autoFilterEnabled: true,
+                            }).then(() => {
+                                workbook.xlsx.writeBuffer().then((buffer) => {
+                                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                                });
+                            });
+                            e.cancel = true;
+                        },
+                        showRowLines: true,
                         showBorders: true,
+                        allowColumnReordering: true,
+                        allowColumnResizing: true,
+                        columnResizingMode: 'widget',
+                        columnMinWidth: 50,
+                        columnAutoWidth: true,
+                        columnChooser: {
+                            enabled: true,
+                            mode: "select"
+                        },
+                        columnFixing: {
+                            enabled: true,
+                        },
+                        filterRow: {
+                            visible: true,
+                        },
+                        groupPanel: {
+                            visible: true,
+                        },
+                        headerFilter: {
+                            visible: true,
+                        },
+                        rowAlternationEnabled: true,
+                        searchPanel: {
+                            visible: true
+                        },
+                        stateStoring: { //save state in localStorage
+                            enabled: true,
+                            type: 'localStorage',
+                            storageKey: 'dgMCPDetails',
+                        },
+                        paging: {
+                            enabled: true,
+                            pageSize: pageSize
+                        },
                         pager: {
                             visible: true,
                             showPageSizeSelector: true,
@@ -233,24 +271,25 @@ $(() => {
                         },
                         toolbar: {
                             items: [
-                                {
-                                    location: 'before',
-                                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed"> <i class="fa fa-plus"></i> <span>${l("Button.New.HolidayDetail")}</span></button>`,
-                                    onClick(e) {
-                                        e.element.closest('div.grid-master-detail').data('dxDataGrid').addRow(); 
-                                    },
-                                }, 
+                                "groupPanel",
                                 {
                                     location: 'after',
-                                    widget: 'dxButton',
-                                    options: {
-                                        icon: 'refresh',
-                                        onClick(e) {
-                                            e.element.closest('div.grid-master-detail').data('dxDataGrid').refresh();
-                                        },
+                                    template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                                    onClick(e) {
+                                        e.element.closest('div.grid-master-detail').data('dxDataGrid').addRow();
                                     },
                                 },
-                                'columnChooserButton', 
+
+                                'columnChooserButton',
+                                "exportButton",
+                                {
+                                    location: 'after',
+                                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                                    onClick() {
+                                        //todo
+                                    },
+                                },
+                                "searchPanel"
                             ],
                         },
                         editing: {
@@ -268,20 +307,21 @@ $(() => {
                                 confirmDeleteMessage: l("DeleteConfirmationMessage")
                             }
                         },
-                        onInitNewRow: function (e) { 
-                            e.data.holidayId = options.data.id; 
+                        onInitNewRow: function (e) {
+                            e.data.holidayId = options.data.id;
                         },
-                        columns: [ 
+                        columns: [
                             {
                                 dataField: 'holidayId',
                                 visible: false, width: 120,
                             },
                             {
-                                width: 100,
                                 type: 'buttons',
-                                caption: l('Actions'),
-                                buttons: ['edit', 'delete']
-                            },  
+                                caption: l("Actions"),
+                                width: 110,
+                                buttons: ['edit', 'delete'],
+                                fixedPosition: "left",
+                            },
                             {
                                 dataField: 'startDate',
                                 caption: l("EntityFieldName:MDMService:HolidayDetail:StartDate"),
@@ -294,7 +334,7 @@ $(() => {
                                 caption: l("EntityFieldName:MDMService:HolidayDetail:EndDate"),
                                 width: 130,
                                 dataType: "date",
-                                format: "dd/MM/yyyy", 
+                                format: "dd/MM/yyyy",
                                 alignment: "right"
                             }, {
                                 allowEditing: false,
@@ -311,7 +351,7 @@ $(() => {
                             {
                                 dataField: 'description',
                                 caption: l("EntityFieldName:MDMService:HolidayDetail:Description"),
-                            }], 
+                            }],
                     }).appendTo(container);
             },
         },

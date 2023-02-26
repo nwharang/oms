@@ -123,41 +123,73 @@ function initDetailsTab() {
         return $('<div id="gridDetails">')
             .dxDataGrid({
                 dataSource: inventoryDatas,
-                // keyExpr: "id",
-                stateStoring: {
+                remoteOperations: true,
+                export: {
                     enabled: true,
-                    type: 'localStorage',
-                    storageKey: 'storage',
                 },
+                onExporting(e) {
+                    const workbook = new ExcelJS.Workbook();
+                    const worksheet = workbook.addWorksheet('Data');
+
+                    DevExpress.excelExporter.exportDataGrid({
+                        component: e.component,
+                        worksheet,
+                        autoFilterEnabled: true,
+                    }).then(() => {
+                        workbook.xlsx.writeBuffer().then((buffer) => {
+                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                        });
+                    });
+                    e.cancel = true;
+                },
+                editing: {
+                    mode: "row",
+                    allowAdding: true,//abp.auth.isGranted('OrderService.PurchaseRequests.Create'),
+                    allowUpdating: true,// abp.auth.isGranted('OrderService.PurchaseRequests.Edit'),
+                    allowDeleting: true,//abp.auth.isGranted('OrderService.PurchaseRequests.Delete'), 
+                    useIcons: true,
+                    texts: {
+                        editRow: l("Edit"),
+                        deleteRow: l("Delete"),
+                        confirmDeleteMessage: l("DeleteConfirmationMessage")
+                    }
+                },
+                showRowLines: true,
                 showBorders: true,
+                allowColumnReordering: true,
+                allowColumnResizing: true,
+                columnResizingMode: 'widget',
+                columnMinWidth: 50,
                 columnAutoWidth: true,
-                scrolling: {
-                    columnRenderingMode: 'virtual',
+                columnChooser: {
+                    enabled: true,
+                    mode: "select"
                 },
+                columnFixing: {
+                    enabled: true,
+                },
+                filterRow: {
+                    visible: true,
+                },
+                groupPanel: {
+                    visible: true,
+                },
+                headerFilter: {
+                    visible: true,
+                },
+                rowAlternationEnabled: true,
                 searchPanel: {
                     visible: true
                 },
-                allowColumnResizing: true,
-                allowColumnReordering: true,
+                stateStoring: { //save state in localStorage
+                    enabled: true,
+                    type: 'localStorage',
+                    storageKey: 'gridPurchaseRequests',
+                },
                 paging: {
                     enabled: true,
                     pageSize: pageSize
                 },
-                rowAlternationEnabled: true,
-                filterRow: {
-                    visible: true,
-                    applyFilter: 'auto',
-                },
-                headerFilter: {
-                    visible: false,
-                },
-                columnChooser: {
-                    enabled: true,
-                    mode: "select" // or "select"
-                },
-                //columnFixing: {
-                //    enabled: true
-                //},
                 pager: {
                     visible: true,
                     showPageSizeSelector: true,
@@ -166,55 +198,35 @@ function initDetailsTab() {
                     showNavigationButtons: true
                 },
                 toolbar: {
-                    items: [{
-                        location: 'before',
-                        widget: 'dxButton',
-                        options: {
-                            icon: 'fa fa-plus',
-                            text: 'Add Row',
-                            onClick() {
-                                gridDetails.addRow();
+                    items: [
+                        //"groupPanel",
+                       
+                        {
+                            location: 'before',
+                            template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                            onClick(e) {
+                                e.element.closest('div.dx-datagrid.dx-gridbase-container').parent().data('dxDataGrid').addRow();
                             },
                         },
-                    }, {
-                        location: 'before',
-                        widget: 'dxTextBox',
-                        options: {
-                            // text: 'Add Row',
-                            placeholder: "Type barcode..."
+                        {
+                            location: 'before',
+                            widget: 'dxTextBox',
+                            options: {
+                                // text: 'Add Row',
+                                placeholder: "Type barcode..."
+                            },
                         },
-                    },
-                    'columnChooserButton',
-                    'exportButton',
-                    {
-                        location: 'after',
-                        template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                        onClick() {
-                            //todo
+                        'columnChooserButton',
+                        "exportButton",
+                        {
+                            location: 'after',
+                            template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                            onClick() {
+                                //todo
+                            },
                         },
-                    },
                         "searchPanel"
                     ],
-                },
-                export: {
-                    enabled: true,
-                    // formats: ['excel','pdf'],
-                    allowExportSelectedData: true,
-                },
-                editing: {
-                    mode: "row",
-                    //allowAdding: abp.auth.isGranted('MdmService.u-oMs.Create'),
-                    //allowUpdating: abp.auth.isGranted('MdmService.u-oMs.Edit'),
-                    //allowDeleting: abp.auth.isGranted('MdmService.u-oMs.Delete'),
-                    allowAdding: true,
-                    allowUpdating: true,
-                    allowDeleting: true,
-                    useIcons: true,
-                    texts: {
-                        editRow: l("Edit"),
-                        deleteRow: l("Delete"),
-                        confirmDeleteMessage: l("DeleteConfirmationMessage")
-                    }
                 },
                 onEditorPreparing: function (e) {
                     if (e.dataField == "code" && e.parentType == "dataRow") {
@@ -265,7 +277,7 @@ function initDetailsTab() {
                         type: 'buttons',
                         caption: l('Actions'),
                         buttons: ['edit', 'delete'],
-                        //fixed: true,
+                        fixedPosition: "left",
                     },
                     {
                         width: 300,
