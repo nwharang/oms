@@ -224,23 +224,24 @@ $(function () {
         searchEnabled: true,
         showClearButton: true,
         onSelectionChanged(data) {
+            const checkStatus = data.selectedItem != undefined && data.selectedItem.id != null;
+
             //set salesOrgHierarchyId value
-            salesOrgHierarchyId = (data.selectedItem != undefined && data.selectedItem.id != null) ? data.selectedItem.id : null;
-            companyAssginContainer.refresh();
-            customerAssginContainer.refresh();
+            salesOrgHierarchyId = checkStatus ? data.selectedItem.id : null;
+
+            companyAssginContainer.option('dataSource', companyInZoneStore);
+            customerAssginContainer.option('dataSource', customerInZoneStore);
 
             //update button status
-            if (data.selectedItem != undefined && data.selectedItem.id != null) {
-                $("#NewCompanyAssginButton,#NewCustomerButton").prop('disabled', false);
-            } else {
-                $("#NewCompanyAssginButton,#NewCustomerButton").prop('disabled', true);
-            }
+            companyAssginContainer.option("editing.allowAdding", checkStatus);
+            customerAssginContainer.option("editing.allowAdding", checkStatus);
         }
     }).dxSelectBox("instance");
 
     //DataGrid - Company Assgin
     var companyAssginContainer = $('#companyAssgin').dxDataGrid({
-        dataSource: companyInZoneStore,
+        //dataSource: companyInZoneStore,
+        //keyExpr: "id",
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
@@ -306,7 +307,7 @@ $(function () {
         },
         editing: {
             mode: 'popup',
-            allowAdding: abp.auth.isGranted('MdmService.CompanyInZones.Create'),
+            allowAdding: salesOrgHierarchyId != null && abp.auth.isGranted('MdmService.CompanyInZones.Create'),
             allowUpdating: abp.auth.isGranted('MdmService.CompanyInZones.Edit'),
             allowDeleting: abp.auth.isGranted('MdmService.CompanyInZones.Delete'),
             useIcons: true,
@@ -346,13 +347,7 @@ $(function () {
         toolbar: {
             items: [
                 "groupPanel",
-                {
-                    location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        companyAssginContainer.addRow();
-                    },
-                },
+                "addRowButton",
                 'columnChooserButton',
                 "exportButton",
                 {
@@ -376,6 +371,7 @@ $(function () {
             {
                 caption: l1("CompanyInZone.Company"),
                 dataField: "companyId",
+                calculateDisplayValue: "company.name",
                 visible: false,
                 validationRules: [{ type: "required" }],
                 lookup: {
@@ -394,36 +390,16 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:CompanyInZone:CompanyCode"),
                 dataField: "companyId",
+                calculateDisplayValue: "company.code",
                 name: "companycode",
-                allowEditing: false,
-                lookup: {
-                    dataSource() {
-                        return {
-                            store: companyStore,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    displayExpr: 'code',
-                    valueExpr: 'id'
-                }
+                allowEditing: false
             },
             {
                 caption: l("EntityFieldName:MDMService:CompanyInZone:CompanyName"),
                 dataField: "companyId",
+                calculateDisplayValue: "company.name",
                 name: "companyname",
-                allowEditing: false,
-                lookup: {
-                    dataSource() {
-                        return {
-                            store: companyStore,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    displayExpr: 'name',
-                    valueExpr: 'id'
-                }
+                allowEditing: false
             },
             {
                 caption: l("EntityFieldName:MDMService:CompanyInZone:EffectiveDate"),
@@ -452,7 +428,8 @@ $(function () {
 
     //DataGrid - Customer Assgin
     var customerAssginContainer = $('#customerAssgin').dxDataGrid({
-        dataSource: customerInZoneStore,
+        //dataSource: customerInZoneStore,
+        //keyExpr: "id",
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
@@ -518,7 +495,7 @@ $(function () {
         },
         editing: {
             mode: 'popup',
-            allowAdding: abp.auth.isGranted('MdmService.CustomerInZones.Create'),
+            allowAdding: salesOrgHierarchyId != null && abp.auth.isGranted('MdmService.CustomerInZones.Create'),
             allowUpdating: abp.auth.isGranted('MdmService.CustomerInZones.Edit'),
             allowDeleting: abp.auth.isGranted('MdmService.CustomerInZones.Delete'),
             useIcons: true,
@@ -559,13 +536,7 @@ $(function () {
         toolbar: {
             items: [
                 "groupPanel",
-                {
-                    location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        customerAssginContainer.addRow();
-                    },
-                },
+                "addRowButton",
                 'columnChooserButton',
                 "exportButton",
                 {
@@ -589,6 +560,7 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:CustomerInZone:Customer"),
                 dataField: "customerId",
+                calculateDisplayValue: "customer.name",
                 visible: false,
                 validationRules: [{ type: "required" }],
                 lookup: {
@@ -607,36 +579,16 @@ $(function () {
             {
                 caption: l1("CustomerInZone.CustomerCode"),
                 dataField: "customerId",
+                calculateDisplayValue: "customer.code",
                 name: "customercode",
-                allowEditing: false,
-                lookup: {
-                    dataSource() {
-                        return {
-                            store: customerStore,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    displayExpr: 'code',
-                    valueExpr: 'id'
-                }
+                allowEditing: false
             },
             {
                 caption: l1("CustomerInZone.CustomerName"),
                 dataField: "customerId",
+                calculateDisplayValue: "customer.name",
                 name: "customername",
-                allowEditing: false,
-                lookup: {
-                    dataSource() {
-                        return {
-                            store: customerStore,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    displayExpr: 'name',
-                    valueExpr: 'id'
-                }
+                allowEditing: false
             },
             {
                 caption: l("EntityFieldName:MDMService:CustomerInZone:EffectiveDate"),
@@ -664,20 +616,13 @@ $(function () {
     }).dxDataGrid("instance");
 
     /****button*****/
-    //$("#NewCompanyAssginButton").click(function () {
-    //    companyAssginContainer.addRow();
-    //});
-
-    //$("#NewCustomerButton").click(function () {
-    //    customerAssginContainer.addRow();
-    //});
 
     $("#tab1").click(function () {
-        companyAssginContainer.refresh();
+        setTimeout(() => { companyAssginContainer.refresh(); }, 100);
     });
 
     $("#tab2").click(function () {
-        customerAssginContainer.refresh();
+        setTimeout(() => { customerAssginContainer.refresh(); }, 100);
     });
 
     /****function*****/
