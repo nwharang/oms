@@ -55,7 +55,7 @@ $(function () {
     });
 
     var salesOrgEmpAssignmentStore = new DevExpress.data.CustomStore({
-        key: 'employeeProfileId',
+        key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
 
@@ -375,13 +375,12 @@ $(function () {
                 caption: l('EntityFieldName:MDMService:SalesOrgEmpAssignment:EmployeeFullName'),
                 dataField: "employeeProfileId",
                 validationRules: [{ type: "required" }],
+                calculateDisplayValue: "employeeProfile.firstName",
                 lookup: {
-                    dataSource(options) {
-                        return {
-                            store: employeeProfileStore,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
+                    dataSource: {
+                        store: employeeProfileStore,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
                     },
                     displayExpr: 'firstName',
                     valueExpr: 'id',
@@ -415,16 +414,6 @@ $(function () {
                 validationRules: [{ type: "required" }],
                 visible: false,
                 allowEditing: false,
-                lookup: {
-                    dataSource() {
-                        return {
-                            store: salesOrgHierarchyStore,
-                            filter: ["id", "=", dataTreeContainer.option("focusedRowKey")]
-                        };
-                    },
-                    displayExpr: 'name',
-                    valueExpr: 'id',
-                }
             }
         ]
     }).dxDataGrid("instance");
@@ -610,10 +599,10 @@ $(function () {
 
     function UpdateButton() {
         if ($('#dataTreeContainer span[class="dx-treelist-nodata"]').length == 0) {
-            $("#NewSalesOrgHierarchyButton").prop('disabled', true);
+            //$("#NewSalesOrgHierarchyButton").prop('disabled', true);
             $("#NewSalesOrgEmpAssignmentButton").prop('disabled', false);
         } else {
-            $("#NewSalesOrgHierarchyButton").prop('disabled', false);
+            //$("#NewSalesOrgHierarchyButton").prop('disabled', false);
             $("#NewSalesOrgEmpAssignmentButton").prop('disabled', true);
         }
 

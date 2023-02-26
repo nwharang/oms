@@ -7,7 +7,6 @@ $(function () {
     /****custom store*****/
     var employeeProfileStore = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "raw",
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -41,9 +40,7 @@ $(function () {
 
     var workingPositionStore = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "raw",
         load(loadOptions) {
-            loadOptions.filter = ["active", "=", "true"];
             const deferred = $.Deferred();
             const args = {};
             requestOptions.forEach((i) => {
@@ -77,9 +74,7 @@ $(function () {
 
     var employeeTypeStore = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "raw",
         load(loadOptions) {
-            loadOptions.filter = [["code", "=", "MD03"]];
             const deferred = $.Deferred();
             const args = {};
             requestOptions.forEach((i) => {
@@ -267,14 +262,7 @@ $(function () {
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:EmployeeProfile:Phone"),
-                                dataField: "phone",
-                                //validationRules: [
-                                //    {
-                                //        type: 'pattern',
-                                //        message: 'Your phone must have "0912345678" format!',
-                                //        pattern: /(84|0[3|5|7|8|9])+([0-9]{8})\b/g,
-                                //    }
-                                //]
+                                dataField: "phone"
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:EmployeeProfile:Email"),
@@ -306,9 +294,6 @@ $(function () {
                     }
                 ],
             }
-        },
-        onInitNewRow(e) {
-
         },
         onRowUpdating: function (e) {
             var objectRequire = ["code", "erpCode", "firstName", "lastName", "dateOfBirth", "idCardNumber", "email", "phone", "address", "active", "effectiveDate", "endDate", "workingPositionId", "employeeTypeId"];
@@ -386,11 +371,13 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:JobTittle"),
                 dataField: "workingPositionId",
+                calculateDisplayValue: "workingPosition.name",
                 dataType: 'string',
                 lookup: {
                     dataSource() {
                         return {
                             store: workingPositionStore,
+                            filer: ["active", "=", "true"],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
@@ -402,11 +389,13 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:EmployeeTypeName"),
                 dataField: "employeeTypeId",
+                calculateDisplayValue: "employeeType.valueName",
                 dataType: 'string',
                 lookup: {
                     dataSource() {
                         return {
                             store: employeeTypeStore,
+                            filter: ["code", "=", "MD03"],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
@@ -434,12 +423,4 @@ $(function () {
             }
         ]
     }).dxDataGrid("instance");
-
-    /****button*****/
-    //$("#NewEmployeeProfileButton").click(function () {
-    //    dataGridContainer.addRow();
-    //});
-
-    /****function*****/
-
 });
