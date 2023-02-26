@@ -327,7 +327,7 @@ $(function () {
                         itemType: 'group',
                         colCount: 1,
                         colSpan: 2,
-                        items: ["companyId", "effectiveDate", "endDate", "active"],
+                        items: ["companyId", "effectiveDate", "endDate", "isBase"],
                     }
                 ],
             }
@@ -336,7 +336,7 @@ $(function () {
             e.data.salesOrgHierarchyId = salesOrgHierarchyId;
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['companyId', 'effectiveDate', 'endDate'];
+            var objectRequire = ['companyId', 'effectiveDate', 'endDate', 'isBase'];
             for (var property in e.oldData) {
                 if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                     e.newData[property] = e.oldData[property];
@@ -419,8 +419,8 @@ $(function () {
                 }
             },
             {
-                caption: l1("Active"),
-                dataField: "active",
+                caption: l1("EntityFieldName:MDMService:CompanyInZone:IsBase"),
+                dataField: "isBase",
                 dataType: "boolean"
             }
         ]
@@ -515,7 +515,7 @@ $(function () {
                         itemType: 'group',
                         colCount: 1,
                         colSpan: 2,
-                        items: ["customerId", "effectiveDate", "endDate", "active"],
+                        items: ["customerId", "effectiveDate", "endDate"/*, "active"*/],
                     }
                 ],
             }
@@ -607,11 +607,11 @@ $(function () {
                     min: new Date()
                 }
             },
-            {
-                caption: l1("Active"),
-                dataField: "active",
-                dataType: "boolean"
-            }
+            //{
+            //    caption: l1("Active"),
+            //    dataField: "active",
+            //    dataType: "boolean"
+            //}
         ]
     }).dxDataGrid("instance");
 

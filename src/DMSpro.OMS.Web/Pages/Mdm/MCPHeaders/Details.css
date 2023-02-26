@@ -10,13 +10,13 @@ div.dx-datagrid .dx-toolbar-items-container, div.dx-treelist-container div.dx-to
 .dx-button-has-text .dx-button-content {
     padding: 6px 8px 6px;
 }
- 
+
 
 .dx-toolbar .dx-button .dx-icon {
     margin-right: 0;
 }
 
- 
+
 
 div.dx-toolbar-before > div:nth-child(2) > div > div {
     margin-left: 10px;
@@ -42,7 +42,7 @@ i.dx-icon.fa {
 
 #resizable {
     padding: 10px;
-    height: 140px;
+    height: 110px;
 }
 
 .dx-resizable-handle-bottom {

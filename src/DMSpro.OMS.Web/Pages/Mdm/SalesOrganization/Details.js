@@ -254,6 +254,15 @@ $(function () {
             {
                 caption: 'Name',
                 dataField: "name",
+                cellTemplate: function (element, info) {
+                    if (info.data.isRoute) {
+                        element.append("<div class='isRoute'><span class='px-1'>" + info.text + "</span></div>");
+                    } else if (info.data.isSellingZone) {
+                        element.append("<div class='isSellingZone'><span class='px-1'>" + info.text + "</span></div>");
+                    } else {
+                        element.append("<div>" + info.text + "</div>");
+                    }
+                },
                 validationRules: [{ type: "required" }]
             }
         ]
@@ -327,7 +336,7 @@ $(function () {
         },
         editing: {
             mode: 'row',
-            allowAdding: true,
+            allowAdding: false,
             allowUpdating: true,
             allowDeleting: true,
             useIcons: true,
@@ -339,6 +348,7 @@ $(function () {
         },
         onInitNewRow(e) {
             e.data.salesOrgHierarchyId = dataTreeContainer.option("focusedRowKey");
+            e.data.effectiveDate = new Date();
         },
         onRowUpdating: function (e) {
             var objectRequire = ['salesOrgHierarchyId', 'employeeProfileId', 'isBase', 'effectiveDate', 'endDate'];
@@ -350,15 +360,13 @@ $(function () {
         },
         toolbar: {
             items: [
-                "groupPanel",
                 {
-                    location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        if (salesOrgHierarchyIdFilter != null)
-                            dataGridContainer.addRow();
+                    location: 'before',
+                    template() {
+                        return $('<div>').addClass('dx-fieldset-header').append('Employee Assignment');
                     },
                 },
+                "addRowButton",
                 "exportButton",
                 "searchPanel"
             ],
@@ -509,14 +517,9 @@ $(function () {
         }
     });
 
-    $("#NewSalesOrgHierarchyButton").click(function (e) {
+    $("#NewRootButton").click(function (e) {
         e.preventDefault();
         dataTreeContainer.addRow();
-    });
-
-    $("#NewSalesOrgEmpAssignmentButton").click(function (e) {
-        e.preventDefault();
-        dataGridContainer.addRow();
     });
 
     $("#btnSalesOrgHeaderActive").click(function (e) {
@@ -583,6 +586,7 @@ $(function () {
         SalesOrgHeaderModel = JSON.parse(sessionStorage.getItem("SalesOrg"));
         if (SalesOrgHeaderModel == null) {
             stateMode = 'add';
+            $("#btnRelease").prop('disabled', true);
         } else {
             stateMode = 'edit';
             salesOrgHeaderIdFilter = SalesOrgHeaderModel.id;
@@ -598,20 +602,11 @@ $(function () {
     }
 
     function UpdateButton() {
-        if ($('#dataTreeContainer span[class="dx-treelist-nodata"]').length == 0) {
-            //$("#NewSalesOrgHierarchyButton").prop('disabled', true);
-            $("#NewSalesOrgEmpAssignmentButton").prop('disabled', false);
-        } else {
-            //$("#NewSalesOrgHierarchyButton").prop('disabled', false);
-            $("#NewSalesOrgEmpAssignmentButton").prop('disabled', true);
-        }
+        const checkDataTree = $('#dataTreeContainer span[class="dx-treelist-nodata"]').length == 0;
+        dataGridContainer.option("editing.allowAdding", checkDataTree);
 
-        if (salesOrgHeaderIdFilter == null) {
-            $("#NewSalesOrgHierarchyButton").prop('disabled', true);
-            $("#btnSalesOrgHeaderActive").prop('disabled', true);
-        } else {
-            $("#btnSalesOrgHeaderActive").prop('disabled', false);
-        }
+        const checkSalesOrgHeaderId = salesOrgHeaderIdFilter == null;
+        $("#btnSalesOrgHeaderActive, #NewRootButton, #btnRelease").prop('disabled', checkSalesOrgHeaderId);
     }
 
     LoadData();

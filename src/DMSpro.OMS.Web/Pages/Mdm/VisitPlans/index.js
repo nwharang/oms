@@ -1,49 +1,19 @@
 ﻿
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
     var visitPlansService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
-    var mcpHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
-    var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
-    var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
-    var mcpDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
-
-    const dayOfWeek = [
-        {
-            id: 0,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:MONDAY')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:TUESDAY')
-        },
-        {
-            id: 2,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:WEDNESDAY')
-        },
-        {
-            id: 3,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:THURSDAY')
-        },
-        {
-            id: 4,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:FRIDAY')
-        },
-        {
-            id: 5,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:SATURDAY')
-        },
-        {
-            id: 6,
-            text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:SUNDAY')
-        }
-    ]
-
 
     const visitPlansStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
+            if (loadOptions.filter == null) {
+                loadOptions.filter = ['dateVisit', '>=', getCurrentDateFormat()];
+            } else {
+                loadOptions.filter = [loadOptions.filter, "and", ['dateVisit', '>=', getCurrentDateFormat()]];
+            }
+
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
@@ -79,107 +49,7 @@ $(function () {
             return visitPlansService.delete(key);
         }
     });
-
-    //const getMCPHeaders = new DevExpress.data.CustomStore({
-    //    key: "id",
-    //    loadMode: 'processed',
-    //    load(loadOptions) {
-    //        const deferred = $.Deferred();
-    //        const args = {};
-    //        requestOptions.forEach((i) => {
-    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-    //                args[i] = JSON.stringify(loadOptions[i]);
-    //            }
-    //        });
-    //        mcpHeaderService.getListDevextremes(args)
-    //            .done(result => {
-    //                deferred.resolve(result.data, {
-    //                    totalCount: result.totalCount,
-    //                    summary: result.summary,
-    //                    groupCount: result.groupCount
-    //                });
-    //            });
-    //        return deferred.promise();
-    //    },
-    //    byKey: function (key) {
-    //        if (key == 0) return null;
-
-    //        var d = new $.Deferred();
-    //        mcpHeaderService.get(key)
-    //            .done(data => {
-    //                d.resolve(data);
-    //            })
-    //        return d.promise();
-    //    }
-    //});
-
-    const getItemGroup = new DevExpress.data.CustomStore({
-        key: "id",
-        loadMode: 'processed',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            itemGroupService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            itemGroupService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                })
-            return d.promise();
-        }
-    });
-
-    const getCustomer = new DevExpress.data.CustomStore({
-        key: "id",
-        loadMode: 'processed',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            customerService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            customerService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                })
-            return d.promise();
-        }
-    });
-
-    var dgVisitPlans = $('#dgVisitPlans').dxDataGrid({
+    $('#dgVisitPlans').dxDataGrid({
         dataSource: visitPlansStore,
         remoteOperations: true,
         showRowLines: true,
@@ -206,9 +76,9 @@ $(function () {
             enabled: true,
             mode: "select"
         },
-        columnFixing: {
-            enabled: true,
-        },
+        //columnFixing: {
+        //    enabled: true,
+        //},
         export: {
             enabled: true,
             // formats: ['excel','pdf'],
@@ -248,27 +118,12 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
-        editing: {
-            mode: "row",
-            allowAdding: false,
-            allowUpdating: abp.auth.isGranted('MdmService.VisitPlans.Edit'),
-            allowDeleting: false,
-            useIcons: true
-        },
-        onRowUpdating: function (e) {
-            var objectRequire = ['code', 'name'];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
-        },
         toolbar: {
             items: [
                 "groupPanel",
                 {
                     location: 'after',
-                    template: ` <button id="ChangeVisitPlanButton" style="height: 36px;" type="button" class="btn btn-light btn-sm hvr-icon-pop">
+                    template: ` <button disabled id="ChangeVisitPlanButton" style="display:none;height: 36px;" type="button" class="btn btn-light btn-sm hvr-icon-pop">
                         <i class="fa fa-random hvr-icon" style="padding-right: 2px"></i>
                         <span class="">Change Visit Plans</span>
                     </button>`,
@@ -291,164 +146,76 @@ $(function () {
         },
         columns: [
             {
-                type: 'buttons',
-                caption: l('Actions'),
-                buttons: ['edit'],
-                width: 110,
-                fixedPosition: 'left'
+                dataField: 'route.name',
+                caption: l("EntityFieldName:MDMService:VisitPlan:RouteName"),
+                dataType: 'string'
             },
             {
-                dataField: 'routeId',
-                caption: l("EntityFieldName:MDMService:VisitPlan:RouteCode"),
-                dataType: 'string',
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: 'Route code is required'
-                    }
-                ]
-            },
-            {
-                dataField: 'customerId',
-                caption: l("EntityFieldName:MDMService:VisitPlan:CustomerCode"),
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: ''
-                    }
-                ],
-                editorType: 'dxSelectBox',
-                lookup: {
-                    dataSource: getCustomer,
-                    valueExpr: 'id',
-                    displayExpr: function (e) {
-                        return e.code + ' - ' + e.name
-                    }
-                }
+                dataField: 'customer.name',
+                caption: l("EntityFieldName:MDMService:VisitPlan:CustomerName"),
+
+            }, {
+                dataField: 'customer.address',
+                caption: l("EntityFieldName:MDMService:VisitPlan:CustomerAddress"),
             },
             {
                 dataField: 'dateVisit',
                 caption: l('EntityFieldName:MDMService:VisitPlan:DateVisit'),
                 dataType: 'date',
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: ''
-                    }
-                ]
+                format: 'dd/MM/yyyy'
             },
             {
-                dataField: 'companyId',
-                caption: l("EntityFieldName:MDMService:VisitPlan:CompanyCode"),
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: 'Company is required'
-                    }
-                ],
-                //editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getMCPHeaders,
-                //    valueExpr: 'id',
-                //    displayExpr: function (e) {
-                //        return e.code + ' - ' + e.name
-                //    }
-                //}
+                dataField: 'company.name',
+                caption: l("EntityFieldName:MDMService:VisitPlan:CompanyName"),
+
             },
             {
-                dataField: 'itemGroupId',
+                dataField: 'itemGroup.description',
                 caption: l('EntityFieldName:MDMService:VisitPlan:ItemGroup'),
-                editorType: 'dxSelectBox',
-                lookup: {
-                    dataSource: getItemGroup,
-                    valueExpr: 'id',
-                    displayExpr: function (e) {
-                        return e.code + ' - ' + e.name
-                    }
-                }
+
             },
             {
                 dataField: 'distance',
                 caption: l('EntityFieldName:MDMService:VisitPlan:Distance'),
                 dataType: 'number',
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: ''
-                    }
-                ]
             },
             {
                 dataField: 'visitOrder',
                 caption: l('EntityFieldName:MDMService:VisitPlan:VisitOrder'),
                 dataType: 'number',
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: ''
-                    }
-                ],
-                value: 0
             },
             {
-                dataField: 'dateVisit',
-                name: 'VisitPlan:Week',
+                dataField: 'week',
                 caption: l('EntityFieldName:MDMService:VisitPlan:Week'),
                 dataType: 'number',
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: ''
-                    }
-                ]
+
             },
             {
-                dataField: 'dateVisit',
-                name: 'VisitPlan:Month',
+                dataField: 'month',
                 caption: l('EntityFieldName:MDMService:VisitPlan:Month'),
                 dataType: 'number',
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: ''
-                    }
-                ]
+
             },
             {
-                dataField: 'dateVisit',
-                name: 'VisitPlan:Year',
+                dataField: 'year',
                 caption: l('EntityFieldName:MDMService:VisitPlan:Year'),
                 dataType: 'number',
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: ''
-                    }
-                ]
-            },
-            {
-                dataField: 'dayOfWeek',
-                caption: l('EntityFieldName:MDMService:VisitPlan:DayOfWeek'),
-                editorType: 'dxSelectBox',
-                lookup: {
-                    dataSource: dayOfWeek,
-                    valueExpr: 'id',
-                    displayExpr: 'text'
-                }
-            },
-            {
-                dataField: 'mcpDetailId',
-                caption: l('MCP Detail'),
-                editorType: 'dxSelectBox',
-                lookup: {
-                    //dataSource: getMCPDetails,
-                    valueExpr: 'id',
-                    displayExpr: 'code'
-                }
             }
-        ]
+        ],
+        onSelectionChanged: function (e) {
+            var selectedRowsData = e.component.getSelectedRowsData();
+            if (selectedRowsData.length > 0) {
+                $('#ChangeVisitPlanButton').removeAttr('disabled');
+            } else {
+                $('#ChangeVisitPlanButton').prop('disabled', true);
+            }
+        }
     }).dxDataGrid('instance');
 
+    function getCurrentDateFormat() {
+        var currentDate = new Date();
+        return currentDate.getFullYear() + "-" + (currentDate.getMonth() + 1) + "-" + currentDate.getDate() + "T00:00:00";
+    }
     function getNextDate(arg) {
         const today = new Date()
         let feature = new Date()
