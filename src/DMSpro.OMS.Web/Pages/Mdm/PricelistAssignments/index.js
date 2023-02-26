@@ -2,7 +2,7 @@ var pricelistAssignmentService = window.dMSpro.oMS.mdmService.controllers.pricel
 var pricelistService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
 var customerService = window.dMSpro.oMS.mdmService.controllers.customerGroups.customerGroup;
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 
     // custom store
     var priceListStore = new DevExpress.data.CustomStore({
@@ -189,7 +189,7 @@ $(function () {
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgPriceListAssignment',
+            storageKey: 'gridPriceListAssignment',
         },
         paging: {
             enabled: true,

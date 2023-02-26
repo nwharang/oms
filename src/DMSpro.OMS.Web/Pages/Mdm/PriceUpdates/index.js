@@ -249,9 +249,9 @@ $(function () {
             {
                 caption: l('EntityFieldName:MDMService:PriceUpdate:PriceList'),
                 dataField: 'priceListId',
+                calculateDisplayValue: "priceList.name",
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    //dataSource: priceListStore,
                     dataSource: {
                         store: priceListStore,
                         paginate: true,

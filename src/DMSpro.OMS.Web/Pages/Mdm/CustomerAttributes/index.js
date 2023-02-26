@@ -18,7 +18,7 @@ $(function () {
 
             customerAttributeService.getListDevextremes(args)
                 .done(result => {
-                    console.log('data res:', result.data)
+                    //console.log('data res:', result.data)
                     dataCusAttributes = result.data;
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -48,7 +48,7 @@ $(function () {
         keyExpr: "id",
         editing: {
             mode: "row",
-            allowAdding: false,
+            allowAdding: true,
             allowUpdating: abp.auth.isGranted('MdmService.CustomerAttributes.Edit'),
             allowDeleting: false,
             useIcons: true,
@@ -135,6 +135,13 @@ $(function () {
         toolbar: {
             items: [
                 "groupPanel",
+                //{
+                //    location: 'after',
+                //    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                //    onClick() {
+                //        gridCusAttribute.addRow();
+                //    },
+                //},
                 'columnChooserButton',
                 "exportButton",
                 {

@@ -6,7 +6,13 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            itemAttrService.getListDevextremes({})
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            itemAttrService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,

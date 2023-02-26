@@ -10,7 +10,13 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            itemAttrValueService.getListDevextremes({})
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            itemAttrValueService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -46,7 +52,13 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            itemAttrService.getListDevextremes({ filter: JSON.stringify(['active', '=', true]) })
+            const args = { filter: JSON.stringify(['active', '=', true]) };
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            itemAttrService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
