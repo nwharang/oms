@@ -1,310 +1,331 @@
-﻿$(function () {
-    // language texts
+﻿var popupVenderInformation;
+function showDetails() {
+    popupVenderInformation.show();
+}
+
+var products = [{
+    "ID": 1,
+    "Name": "Item 1",
+    "BarCode": "ABC-abc-1234"
+}, {
+    "ID": 2,
+    "Name": "Item 2",
+    "BarCode": "A-0010-Z"
+}, {
+    "ID": 3,
+    "Name": "Item 3",
+    "BarCode": "A-0050-Z"
+}, {
+    "ID": 4,
+    "Name": "Item 4",
+    "BarCode": "A-0060-Z"
+}, {
+    "ID": 5,
+    "Name": "Item 35",
+    "BarCode": "45-0060-Z"
+}];
+
+$(function () {
     var l = abp.localization.getResource("MdmService");
-
-    var dataSales = [
-        {
-            id: 1,
-            itemCode: "item1",
-            itemName: "John Heart",
-            UOM: "Thung",
-            qty: 3,
-            issueQty: 0,
-            price: 100000,
-            lineAmountNoTax: 400000,
-            discount: 0,
-            discountLineAmount: 0,
-            taxRate: "10",
-            taxRateAmount: 40000,
-            lineAmt: 440000,
-            baseQty: 40,
-            baseUOM: "Chai",
-            warehourse: "Main",
-            WHLocation: "ABC bcx",
-            taxCode: "VAT10",
-            tranType: "Selling",
+    var gridPurchaseOrders = $('#gridPurchaseOrders').dxDataGrid({
+        dataSource: [{
+            Vendor: "IDP",
+            DocNbr: "RP001",
+            CreatedUser: "Phượng Nguyễn",
+            DocDate: "02/03/2023",
+            DeliveryDate: "01/01/2023",
+            PostingDate: "07/01/2023",
+            Status: "Open",
+            Remark: "Giao sau 14h",
+            DocTotalAmt: 122456000,
+            DocTotalAmtAfterTax: 112155000
         },
         {
-            id: 2,
-            itemCode: "item2",
-            itemName: "San pham 2",
-            UOM: "Thung",
-            qty: 3,
-            issueQty: 0,
-            price: 100000,
-            lineAmountNoTax: 300000,
-            discount: 20,
-            discountLineAmount: 60,
-            taxRate: "10",
-            taxRateAmount: 50000,
-            lineAmt: 240000,
-            baseQty: 30,
-            baseUOM: "Chai",
-            warehourse: "Main",
-            WHLocation: "ABC bcx",
-            taxCode: "VAT10",
-            tranType: "Selling",
+            Vendor: "IDP",
+            DocNbr: "RP002",
+            CreatedUser: "Minh Lien",
+            DocDate: "01/03/2023",
+            DeliveryDate: "12/02/2023",
+            PostingDate: "05/01/2023",
+            Status: "Approved",
+            Remark: "Ok, cho đi ngay",
+            DocTotalAmt: 63371000,
+            DocTotalAmtAfterTax: 68700000
         },
         {
-            id: 3,
-            itemCode: "item3",
-            itemName: "San pham 3",
-            UOM: "Lon",
-            qty: 4,
-            issueQty: 0,
-            price: 100000,
-            lineAmountNoTax: 300000,
-            discount: 0,
-            discountLineAmount: 0,
-            taxRate: "10",
-            taxRateAmount: 33000,
-            lineAmt: 530000,
-            baseQty: 30,
-            baseUOM: "Chai",
-            warehourse: "Main",
-            WHLocation: "ABC bcx",
-            taxCode: "VAT10",
-            tranType: "Sampling",
-        }
-    ];
-
-    $("#frmSalesOrders").dxForm({
-        formData: {
-            customerCode: "cus01",
-            customerName: "Cus name 1",
-            company: "CEO Company",
-            SRNbr: "hsdjsd939239j23",
-            orderType: "JHeart",
-            docDate: new Date(),
-            deliveryDate: new Date(2022, 4, 13),
-            postingDate: new Date(),
-            remark: "",
-            outletID: "01234567890",
-            isActive: true,
-            routeID: "1",
-            route: "Route 1",
-            employeeID: "JS13343JDD3",
-            salesman: "Jay ne",
-            status: "Open",
-            linkedNbr: "JB893",
-            SFAlinkedNbr: "AH2002",
-            totalAmtNoTax: 400,
-            totalAmtDiscount: 35,
-            totalTaxAmt: 20,
-            totalAmt: 420,
-            docSource: "Đơn Manual",
-        }, 
-        labelMode: 'floating',
-        colCount: 2,
-        items: [
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: "SRNbr",
-                        cssClass: "pr-5"
-                    },
-                    {
-                        dataField: "status",
-                        cssClass: "pr-5"
-                    },
-                    {
-                        dataField: "docDate",
-                        cssClass: "pr-5"
-                    },
-                    {
-                        dataField: "deliveryDate",
-                        cssClass: "pr-5"
-                    },
-                    {
-                        dataField: "postingDate",
-                        cssClass: "pr-5"
-                    },
-                    {
-                        dataField: "orderType",
-                        cssClass: "pr-5"
-                    },
-                    {
-                        dataField: "remark",
-                        cssClass: "pr-5"
-                    }
-                ]
-            },
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: "customerCode",
-                        cssClass: "pl-5"
-                    },
-                    {
-                        dataField: "customerName",
-                        cssClass: "pl-5"
-                    },
-                    {
-                        dataField: "route",
-                        cssClass: "pl-5"
-                    },
-                    {
-                        dataField: "salesman",
-                        cssClass: "pl-5"
-                    },
-                    {
-                        dataField: "linkedNbr",
-                        cssClass: "pl-5"
-                    },
-                    {
-                        dataField: "SFAlinkedNbr",
-                        cssClass: "pl-5"
-                    }
-                ]
-            }
-        ]
-    }); 
-
-    var gridSales = $('#dgSalesOrders').dxDataGrid({
-        dataSource: dataSales,
-        keyExpr: "id",
+            Vendor: "IDP",
+            DocNbr: "RP003",
+            CreatedUser: "Nguyễn Hiệp",
+            DocDate: "01/03/2023",
+            DeliveryDate: "01/06/2023",
+            PostingDate: "10/01/2023",
+            Status: "Rejected",
+            Remark: "Không giao đi",
+            DocTotalAmt: 5689000,
+            DocTotalAmtAfterTax: 56011000
+        }],
+        // keyExpr: "id",
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'gridPurchaseOrders',
+        },
         showBorders: true,
-        //filterRow: {
-        //    visible: true
-        //},
+        columnAutoWidth: true,
+        scrolling: {
+            columnRenderingMode: 'virtual',
+        },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        allowColumnResizing: true,
+        allowColumnReordering: true,
+        paging: {
+            enabled: true,
+            pageSize: pageSize
         },
-        allowColumnReordering: false,
         rowAlternationEnabled: true,
-        //headerFilter: {
-        //    visible: true,
-        //},
-        paging:
-        {
-            pageSize: pageSize,
+        filterRow: {
+            visible: true,
+            applyFilter: 'auto',
+        },
+        headerFilter: {
+            visible: false,
+        },
+        columnChooser: {
+            enabled: true,
+            mode: "select"
         },
         pager: {
             visible: true,
-            allowedPageSizes: [10, 20, 'all'],
             showPageSizeSelector: true,
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
-            showNavigationButtons: true,
+            showNavigationButtons: true
+        },
+        toolbar: {
+            items: [
+                "groupPanel",
+
+                {
+                    location: 'after',
+                    template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick(e) {
+                        e.element.closest('div.dx-datagrid.dx-gridbase-container').parent().data('dxDataGrid').addRow();
+                    },
+                },
+                {
+                    location: 'after',
+                    template: '<div><button type="button" class="btn btn-light btn-sm dropdown-toggle waves-effect waves-themed hvr-icon-pop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height:36px"> <i class="fa fa-gear hvr-icon"></i> <span class="">Action</span>  </button><div class="dropdown-menu fadeindown"> <button class="dropdown-item" type="button">Confirmed</button> <button class="dropdown-item" type="button">Rejected</button></div></div>'
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
+        export: {
+            enabled: true,
+            // formats: ['excel','pdf'],
+            allowExportSelectedData: true,
+        },
+        groupPanel: {
+            visible: true,
+        },
+        selection: {
+            mode: 'multiple',
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Data.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        editing: {
+            mode: "row",
+            //allowAdding: abp.auth.isGranted('MdmService.u-oMs.Create'),
+            //allowUpdating: abp.auth.isGranted('MdmService.u-oMs.Edit'),
+            //allowDeleting: abp.auth.isGranted('MdmService.u-oMs.Delete'),
+            allowAdding: true,
+            allowUpdating: true,
+            allowDeleting: true,
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            }
+        },
+        onEditorPreparing: function (e) {
+            if (e.dataField == "code" && e.parentType == "dataRow") {
+                e.editorName = "dxDropDownBox";
+                e.editorOptions.dropDownOptions = {
+                    //height: 500
+                };
+                e.editorOptions.contentTemplate = function (args, container) {
+                    var value = args.component.option("value"),
+                        $dataGrid = $("<div>").dxDataGrid({
+                            width: '100%',
+                            dataSource: args.component.option("dataSource"),
+                            keyExpr: "ID",
+                            columns: [{
+                                caption: "Item Code",
+                                dataField: "Name"
+                            }, "BarCode"],
+                            hoverStateEnabled: true,
+                            paging: { enabled: true, pageSize: pageSize },
+                            filterRow: { visible: true },
+                            scrolling: { mode: "infinite" },
+                            height: '90%',
+                            showRowLines: true,
+                            showBorders: true,
+                            selection: { mode: "single" },
+                            selectedRowKeys: value,
+                            onSelectionChanged: function (selectedItems) {
+                                var keys = selectedItems.selectedRowKeys;
+                                args.component.option("value", keys);
+                            }
+                        });
+
+                    var dataGrid = $dataGrid.dxDataGrid("instance");
+
+                    args.component.on("valueChanged", function (args) {
+                        var value = args.value;
+
+                        dataGrid.selectRows(value, false);
+                    });
+                    container.append($dataGrid);
+                    return container;
+                };
+            }
         },
         columns: [
             {
-                dataField: 'itemCode',
-                caption: l("Item Code"),
-                width: 110,
-                dataType: 'string',
+                width: 100,
+                type: 'buttons',
+                caption: l('Actions'),
+                buttons: [
+                    {
+                        text: "View Details",
+                        icon: "fieldchooser",
+                        hint: "View Details",
+                        onClick: function (e) {
+                            var w = window.open('/SO/ARInvoice/Details', '_blank');
+                            w.sessionStorage.setItem("model", JSON.stringify(e.row.data));
+                        }
+                    },
+                    'edit', 'delete']
             },
             {
-                dataField: 'itemName',
-                caption: l("Item Name"),
-                width: 200,
-                dataType: 'string',
+                caption: "Vendor",
+                dataField: "Vendor",
+                cellTemplate: function (element, info) {
+                    element.append(`<a href="javascript:showDetails()">${info.text}</a>`);
+                },
+                alignment: "center",
+                cssClass: "increaseFontWeight"
             },
             {
-                dataField: 'UOM',
-                caption: l("UOM"),
-                width: 90,
-                dataType: 'string',
+                caption: "DocNbr",
+                dataField: "DocNbr",
             },
             {
-                dataField: 'qty',
-                caption: l("Qty"),
-                width: 70,
-                dataType: 'number',
+                caption: "Created User",
+                dataField: "CreatedUser",
             },
             {
-                dataField: 'issueQty',
-                caption: l("Issue Qty"),
-                width: 90,
-                dataType: 'number',
+                caption: "DocDate",
+                dataField: "DocDate",
             },
             {
-                dataField: 'price',
-                caption: l("Price"),
-                width: 110,
-                dataType: 'number',
-                format: 'currency',
+                caption: "Delivery Date",
+                dataField: "DeliveryDate",
             },
             {
-                dataField: 'lineAmountNoTax',
-                caption: l("LineAmtNoTax"),
-                width: 110,
-                dataType: 'number',
-                format: 'currency',
+                caption: "Posting Date",
+                dataField: "PostingDate",
+                allowFiltering: false
             },
             {
-                dataField: 'discount',
-                caption: l("Discount %"),
-                width: 110,
-                dataType: 'number',
+                caption: "Status",
+                dataField: "Status",
             },
             {
-                dataField: 'discountLineAmount',
-                caption: l("DiscountLineAmount"),
-                width: 200,
-                dataType: 'number',
-                format: 'currency',
+                caption: "Remark",
+                dataField: "Remark",
+                allowFiltering: false
             },
             {
-                dataField: 'taxRate',
-                caption: l("TaxRate"),
-                width: 110,
-                dataType: 'number',
+                caption: "Doc Total Amt",
+                dataField: "DocTotalAmt",
+                customizeText: function (cellInfo) {
+                    return cellInfo.valueText + "đ";
+                },
+                allowFiltering: false,
+                alignment: 'right',
+                format: ",##0.###",
+                summaryType: "sum",
             },
             {
-                dataField: 'taxRateAmount',
-                caption: l("TaxRateAmount"),
-                width: 110,
-                dataType: 'number',
-                format: 'currency',
-            },
-            {
-                dataField: 'lineAmt',
-                caption: l("LineAmt"),
-                width: 70,
-                dataType: 'number',
-            },
-            {
-                dataField: 'baseQty',
-                caption: l("BaseQty"),
-                width: 110,
-                dataType: 'number',
-            },
-            {
-                dataField: 'baseUOM',
-                caption: l("BaseUOM"),
-                width: 110,
-                dataType: 'number',
-            },
-            {
-                dataField: 'warehourse',
-                caption: l("Warehourse"),
-                width: 110,
-                dataType: 'string',
-            },
-            {
-                dataField: 'WHLocation',
-                caption: l("WHLocationn"),
-                width: 110,
-                dataType: 'string',
-            },
-            {
-                dataField: 'taxCode',
-                caption: l("TaxCode"),
-                width: 90,
-                dataType: 'string',
-            },
-            {
-                dataField: 'tranType',
-                caption: l("TranType"),
-                width: 110,
-                dataType: 'string',
+                caption: "Doc Total Amt After Tax",
+                dataField: "DocTotalAmtAfterTax",
+                customizeText: function (cellInfo) {
+                    return cellInfo.valueText + "đ";
+                },
+                allowFiltering: false,
+                format: ",##0.###",
+                summaryType: "sum",
+                alignment: 'right',
             },
         ],
+        summary: {
+            totalItems: [{
+                column: 'DocTotalAmt',
+                summaryType: 'sum',
+                valueFormat: ",##0.###",
+                customizeText: function (data) {
+                    return data.valueText + "đ";
+                },
+            }, {
+                column: 'DocTotalAmtAfterTax',
+                summaryType: 'sum',
+                valueFormat: ",##0.###",
+                customizeText: function (data) {
+                    return data.valueText + "đ";
+                },
+            }],
+        },
     }).dxDataGrid("instance");
 
+    popupVenderInformation = $("#popupVenderInformation").dxPopup({
+        width: 600,
+        height: 400,
+        showTitle: true,
+        container: '.page-content',
+        title: 'Vendor Information',
+        visible: false,
+        dragEnabled: false,
+        hideOnOutsideClick: true,
+        showCloseButton: true,
+        position: {
+            at: 'center',
+            my: 'center',
+            collision: 'fit',
+        },
+    }).dxPopup('instance');
 });
