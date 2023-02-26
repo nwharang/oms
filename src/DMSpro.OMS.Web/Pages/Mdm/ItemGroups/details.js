@@ -20,33 +20,33 @@ $(function () {
         editorStylingMode: 'underlined',
     });
 
-    if (itemGroup.status != 'OPEN') {
+    if (itemGroup.status != 0) {
         $('#btnReleased').attr("disabled", true);
         $('#btnCancelled').attr("disabled", true);
     }
 
     var status = [
         {
-            id: 'OPEN',
+            id: 0,
             text: l('EntityFieldValue:MDMService:ItemGroup:Status:OPEN')
         },
         {
-            id: 'RELEASED',
+            id: 1,
             text: l('EntityFieldValue:MDMService:ItemGroup:Status:RELEASED')
         },
         {
-            id: 'CANCELLED',
+            id: 2,
             text: l('EntityFieldValue:MDMService:ItemGroup:Status:CANCELLED')
         }
     ];
 
     var types = [
         {
-            id: 'ATTRIBUTE',
+            id: 0,
             text: l('EntityFieldValue:MDMService:ItemGroup:Type:ATTRIBUTE')
         },
         {
-            id: 'LIST',
+            id: 1,
             text: l('EntityFieldValue:MDMService:ItemGroup:Type:LIST')
         }
     ];
@@ -65,7 +65,7 @@ $(function () {
             }
         ],
         onInitialized: function (e) {
-            if (itemGroup.type == 'ATTRIBUTE') {
+            if (itemGroup.type == 0) {
                 e.component.option('items[0].disabled', false);
                 e.component.option('items[1].disabled', true);
                 e.component.option('selectedIndex', 0);
@@ -125,7 +125,7 @@ $(function () {
                             onValueChanged: function (e) {
                                 var value = e.value;
                                 var dxTabPanel = $('#tabpanel-container').data('dxTabPanel');
-                                if (value == 'ATTRIBUTE') {
+                                if (value == 0) {
                                     dxTabPanel.option('items[0].disabled', false);
                                     dxTabPanel.option('items[1].disabled', true);
                                     dxTabPanel.option('selectedIndex', 0);
@@ -170,7 +170,7 @@ $(function () {
             }
         ],
         customizeItem: function (e) {
-            if (itemGroup.status != 'OPEN') {
+            if (itemGroup.status != 0) {
                 if (e.dataField === 'code') {
                     e.editorOptions = {
                         readOnly: true
@@ -327,7 +327,7 @@ function initItemAttributeTab() {
                     getItemAttributeColumns(e.component);
                 },
                 onContentReady: function (e) {
-                    if (itemGroup.status != 'OPEN') {
+                    if (itemGroup.status != 0) {
                         e.component.option('toolbar.items[0].visible', false);
                         e.component.option('columns[0].visible', false);
                     }
@@ -509,7 +509,7 @@ function initListItemTab() {
                     }
                 ],
                 onContentReady: function (e) {
-                    if (itemGroup.status != 'OPEN') {
+                    if (itemGroup.status != 0) {
                         e.component.option('toolbar.items[0].visible', false);
                         e.component.option('columns[0].visible', false);
                     }
@@ -816,7 +816,7 @@ function action(e) {
         type: dataForm.type
     }
     var key = dataForm.id;
-    if (itemGroup.status == 'OPEN') {
+    if (itemGroup.status == 0) {
         if (typeButton == 'released') {
             values.status = 'RELEASED';
             dataForm.status = 'RELEASED';
