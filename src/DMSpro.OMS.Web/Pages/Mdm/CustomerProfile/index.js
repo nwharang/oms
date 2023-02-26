@@ -1402,7 +1402,7 @@
                         pageSize: pageSizeForLookup
                     },
                     valueExpr: "id",
-                    displayExpr: "code"
+                    displayExpr: "name"
                 }
             },
             {
@@ -1755,6 +1755,11 @@
                 }
             },
         ],
+        onInitNewRow: function (e) {
+            e.data.sfaCustomerCode = "sfaCode";
+            e.data.effectiveDate = Date.now();
+            e.data.active = true;
+        },
     }).dxDataGrid("instance");
 
     var genderStore = [
