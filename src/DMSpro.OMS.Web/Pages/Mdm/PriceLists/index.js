@@ -387,7 +387,9 @@ $(function () {
                     .dxDataGrid({
                         dataSource: {
                             store: detailStore,
-                            filter: ['priceListId', '=', options.key]
+                            filter: ['priceListId', '=', options.key],
+                            paginate: true,
+                            pageSize: pageSize,
                         },
                         remoteOperations: true,
                         showRowLines: true,
