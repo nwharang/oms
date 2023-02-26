@@ -220,11 +220,30 @@ $(function () {
                 itemType: "group",
                 items: [
                     {
+                        dataField: 'Code',
+                        validationRules: [{
+                            type: 'required',
+                            message: '',
+                        }],
+                    },
+                    {
+                        dataField: 'Name',
+                        validationRules: [{
+                            type: 'required',
+                            message: '',
+                        }],
+                    }
+                ]
+            },
+            {
+                itemType: "group",
+                items: [
+                    {
                         dataField: 'Route',
                         editorType: 'dxSelectBox',
                         validationRules: [{
                             type: 'required',
-                            message: 'Route is required',
+                            message: '',
                         }],
                         editorOptions: {
                             dataSource: new DevExpress.data.DataSource({
@@ -244,7 +263,7 @@ $(function () {
                         editorType: 'dxSelectBox',
                         validationRules: [{
                             type: 'required',
-                            message: 'Company is required',
+                            message: '',
                         }],
                         editorOptions: {
                             readOnly: true,
@@ -253,45 +272,7 @@ $(function () {
                             valueExpr: "id",
                             displayExpr: "name",
                         }
-                    },
-                    {
-                        dataField: 'ItemGroup',
-                        editorType: 'dxSelectBox',
-                        editorOptions: {
-                            dataSource: new DevExpress.data.DataSource({
-                                store: itemGroupStore,
-                                paginate: true,
-                                pageSize: pageSizeForLookup
-                            }),
-                            showClearButton: true,
-                            placeholder: '',
-                            valueExpr: "id",
-                            displayExpr: "name",
-                        }
                     }
-                ]
-            },
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'Code',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        }],
-                    },
-                    {
-                        dataField: 'Name',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        }],
-                    }
-                    //, {
-                    //    dataField: 'IsGPSLocked',
-                    //    editorType: 'dxCheckBox'
-                    //}
                 ]
             },
             {
@@ -316,6 +297,25 @@ $(function () {
                             //min: new Date(),
                             displayFormat: 'dd/MM/yyyy',
                             showClearButton: true
+                        }
+                    }]
+            },
+            {
+                itemType: "group",
+                items: [
+                    {
+                        dataField: 'ItemGroup',
+                        editorType: 'dxSelectBox',
+                        editorOptions: {
+                            dataSource: new DevExpress.data.DataSource({
+                                store: itemGroupStore,
+                                paginate: true,
+                                pageSize: pageSizeForLookup
+                            }),
+                            showClearButton: true,
+                            placeholder: '',
+                            valueExpr: "id",
+                            displayExpr: "name",
                         }
                     }]
             }
@@ -677,7 +677,7 @@ $(function () {
     function getNormalDate(currentDate) {
         if (!currentDate || (typeof currentDate == "string")) return currentDate;
 
-        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad( currentDate.getDate(), 2) + "T00:00:00";
+        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2) + "T00:00:00";
         return date;
     }
 
@@ -712,16 +712,6 @@ $(function () {
         var effectiveDate = form.getEditor('EffectiveDate').option('value');
         var endDate = form.getEditor('EndDate').option('value');
 
-        if (routeId == null) {
-            form.getEditor('Route').option('isValid', false);
-            form.getEditor('Route').focus();
-            return;
-        }
-        if (companyId == null) {
-            form.getEditor('Company').option('isValid', false);
-            form.getEditor('Company').focus();
-            return;
-        }
         if (!code || code.trim() == "") {
             form.getEditor('Code').option('isValid', false);
             form.getEditor('Code').focus();
@@ -732,6 +722,17 @@ $(function () {
             form.getEditor('Name').focus();
             return;
         }
+        if (routeId == null) {
+            form.getEditor('Route').option('isValid', false);
+            form.getEditor('Route').focus();
+            return;
+        }
+        if (companyId == null) {
+            form.getEditor('Company').option('isValid', false);
+            form.getEditor('Company').focus();
+            return;
+        }
+       
         if (effectiveDate == null) {
             form.getEditor('EffectiveDate').option('isValid', false);
             form.getEditor('EffectiveDate').focus();
@@ -750,7 +751,7 @@ $(function () {
         var mcpDetails = [];
 
         dgMCPDetails.getDataSource().items().forEach(u => {
-            mcpDetails.push(u); 
+            mcpDetails.push(u);
         });
         var params = {
             mcpHeaderDto: mcpHeaderDto,
@@ -761,7 +762,7 @@ $(function () {
 
         params.mcpDetails.forEach(u => {
             u.effectiveDate = getNormalDate(u.effectiveDate);
-            u.endDate = getNormalDate(u.endDate); 
+            u.endDate = getNormalDate(u.endDate);
         })
 
         if (!MCPModel)
@@ -1056,3 +1057,7 @@ $(function () {
         }],
     }).dxPopup('instance');
 });
+
+//$(window).on("beforeunload", function () {
+//    sessionStorage.removeItem('MCPModel');
+//});
