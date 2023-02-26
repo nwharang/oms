@@ -878,7 +878,8 @@ public class OMSMenuContributor : IMenuContributor
 	{
 		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
 			   MdmServiceMenus.Items,
-			   context.GetLocalizer<OMSResource>()["Menu:MdmService:Product"],
+			   //context.GetLocalizer<OMSResource>()["Menu:MdmService:Product"],
+			   context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:Item"],
 			   null,
 			   icon: "fa fa-product-hunt"
            )
