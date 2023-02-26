@@ -1,99 +1,12 @@
 ﻿var l = abp.localization.getResource("MdmService");
-var MCPModel;
-var mcpDetailData = [];
 $(function () {
-
-    DevExpress.config({
-        editorStylingMode: 'underlined',
-    });
-
-    var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
-    var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
-    var companyInZoneService = window.dMSpro.oMS.mdmService.controllers.companyInZones.companyInZone;
-    var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
     var mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
-    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
-    var mCPDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
-    var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
-    var visitPlanService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
-
-    var customerStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            customerService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            customerService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
-
-    var companyInZoneStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            const deferred = $.Deferred();
-            companyInZoneService.getListDevextremes(args)
-                .done(result => {
-                    var data = [];
-                    result.data.forEach(x => {
-                        data.push({
-                            id: x.company.id,
-                            name: x.company.name
-                        }) 
-                    })
-                    deferred.resolve(data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            companyService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
+     
+    var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
 
     var salesOrgHierarchyStore = new DevExpress.data.CustomStore({
         key: 'id',
-        load(loadOptions) {
+        load(loadOptions) { 
             const deferred = $.Deferred();
             const args = {};
             requestOptions.forEach((i) => {
@@ -101,7 +14,7 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-
+             
             salesOrgHierarchyService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -115,190 +28,67 @@ $(function () {
         },
         byKey: function (key) {
             if (key == 0) return null;
+
             var d = new $.Deferred();
             salesOrgHierarchyService.get(key)
                 .done(data => {
                     d.resolve(data);
                 });
             return d.promise();
+        },
+        insert(values) {
+            return salesOrgHierarchyService.create(values, { contentType: "application/json" });
+        },
+        update(key, values) {
+            return salesOrgHierarchyService.update(key, values, { contentType: "application/json" });
+        },
+        remove(key) {
+            return salesOrgHierarchyService.delete(key);
         }
     });
-
-    var itemGroupStore = new DevExpress.data.CustomStore({
-        key: "id",
-        load(loadOptions) {
-            const deferred = $.Deferred();
+    var mCPHeaderStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) { 
+            const deferred = $.Deferred(); 
             const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            itemGroupService.getListDevextremes(args)
+
+            mCPHeaderService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
-                        groupCount: result.groupCount
+                        groupCount: result.groupCount,
                     });
                 });
+
             return deferred.promise();
         },
         byKey: function (key) {
             if (key == 0) return null;
 
             var d = new $.Deferred();
-            itemGroupService.get(key)
+            mCPHeaderService.get(key)
                 .done(data => {
                     d.resolve(data);
-                })
+                });
             return d.promise();
+        }, 
+        remove(key) {
+            return mCPHeaderService.delete(key);
         }
     });
-     
-    $("#top-section").dxForm({
-        labelMode: 'floating',
-        colCount: 4,
-        items: [
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'Route',
-                        editorType: 'dxSelectBox',
-                        validationRules: [{
-                            type: 'required',
-                            message: 'Route is required',
-                        }],
-                        editorOptions: {
-                            dataSource: new DevExpress.data.DataSource({
-                                store: salesOrgHierarchyStore,
-                                filter: ["isRoute", "=", true],
-                                paginate: true,
-                                pageSize: pageSizeForLookup
-                            }),
-                            showClearButton: true,
-                            placeholder: '',
-                            valueExpr: "id",
-                            displayExpr: "name"
-                        }
-                    },
-                    {
-                        dataField: 'Company',
-                        editorType: 'dxSelectBox',
-                        validationRules: [{
-                            type: 'required',
-                            message: 'Company is required',
-                        }],
-                        editorOptions: {
-                            readOnly: true, 
-                            showClearButton: true,
-                            placeholder: '',
-                            valueExpr: "id",
-                            displayExpr: "name",
-                        }
-                    },
-                    {
-                        dataField: 'ItemGroup',
-                        editorType: 'dxSelectBox',
-                        editorOptions: {
-                            dataSource: new DevExpress.data.DataSource({
-                                store: itemGroupStore,
-                                paginate: true,
-                                pageSize: pageSizeForLookup
-                            }),
-                            showClearButton: true,
-                            placeholder: '',
-                            valueExpr: "id",
-                            displayExpr: "name",
-                        }
-                    }
-                ]
-            },
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'Code',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        }],
-                    },
-                    {
-                        dataField: 'Name',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        }],
-                    }
-                    //, {
-                    //    dataField: 'IsGPSLocked',
-                    //    editorType: 'dxCheckBox'
-                    //}
-                ]
-            },
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'EffectiveDate',
-                        editorType: 'dxDateBox',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        }],
-                        editorOptions: {
-                            min: new Date(),
-                            displayFormat: 'dd/MM/yyyy',
-                            showClearButton: true
-                        }
-                    }, {
-                        dataField: 'EndDate',
-                        editorType: 'dxDateBox',
-                        editorOptions: {
-                            min: new Date(),
-                            displayFormat: 'dd/MM/yyyy',
-                            showClearButton: true
-                        }
-                    }]
-            }
-        ]
-    });
-    $('#GenerateButton').dxButton({
-        stylingMode: 'contained',
-        type: 'normal',
-        disabled: true
-    });
-    $('#EnddateButton').dxButton({
-        stylingMode: 'contained',
-        type: 'normal',
-        disabled: true
-    });
-    $('#SaveButton').dxButton({
-        stylingMode: 'contained',
-        type: 'normal'
-    });
-    $('#resizable').dxResizable({
-        minHeight: 120,
-        handles: "bottom"
-    }).dxResizable('instance');
 
-    var dgMCPDetails = $('#dgMCPDetails')
+    var dgMCPHeaders = $('#dgMCPHeaders')
         .dxDataGrid({
-            dataSource: mcpDetailData,
-            onEditingStart: function (e) {
-                $('#SaveButton').data('dxButton').option('disabled', true);
-            },
-            onSaved: function (e) {
-                $('#SaveButton').data('dxButton').option('disabled', false);
-            },
-            onEditCanceled: function (e) {
-                $('#SaveButton').data('dxButton').option('disabled', false);
-            },
+            dataSource: mCPHeaderStore,
             editing: {
                 mode: "row",
-                allowAdding: abp.auth.isGranted('MdmService.MCPHeaders.Create'),
+                allowAdding: true,
                 allowUpdating: true,
                 allowDeleting: true,
                 useIcons: true,
@@ -357,7 +147,7 @@ $(function () {
             stateStoring: { //save state in localStorage
                 enabled: true,
                 type: 'localStorage',
-                storageKey: 'dgMCPDetails',
+                storageKey: 'dgMCPHeaders',
             },
             paging: {
                 enabled: true,
@@ -377,7 +167,8 @@ $(function () {
                         location: 'after',
                         template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                         onClick() {
-                            dgMCPDetails.addRow();
+                            var w = window.open('/Mdm/MCPHeaders/Details', '_blank');
+                            //w.sessionStorage.setItem("MCPModel", null);
                         },
                     },
 
@@ -393,82 +184,29 @@ $(function () {
                     "searchPanel"
                 ],
             },
-            onEditorPreparing: function (e) {
-                var component = e.component,
-                    rowIndex = e.row && e.row.rowIndex;
-                if (e.dataField === "customerId") {
-                    e.editorOptions.placeholder = '';
-                    var onValueChanged = e.editorOptions.onValueChanged;
-                    e.editorOptions.onValueChanged = function (e) {
-                        onValueChanged.call(this, e);
-                        component.cellValue(rowIndex, "customerIdExtra", e.component.option('selectedItem').id);
-                    }
-                } else if (e.dataField == "effectiveDate" || e.dataField == "endDate") {
-                    e.editorOptions.displayFormat = "dd/MM/yyyy";
-                    e.editorOptions.min = new Date();
-                }
-            },
-            onRowUpdating: function (e) {
-                var objectRequire = ['customerId',
-                    'effectiveDate',
-                    'endDate',
-                    'distance',
-                    'visitOrder',
-                    'monday',
-                    "tuesday",
-                    "wednesday",
-                    "thursday",
-                    "friday",
-                    "saturday",
-                    "sunday",
-                    "week1",
-                    "week2",
-                    "week3",
-                    "week4"];
-                for (var property in e.oldData) {
-                    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                        e.newData[property] = e.oldData[property];
-                    }
-                }
-            },
-            onInitNewRow: function (e) {
-                $('#SaveButton').data('dxButton').option('disabled', true);
-                e.data.code = "1";
-                e.data.effectiveDate = null;
-                e.data.endDate = null;
-                e.data.distance = 0;
-                e.data.visitOrder = 0;
-                e.data.monday = false;
-                e.data.tuesday = false;
-                e.data.wednesday = false;
-                e.data.thursday = false;
-                e.data.friday = false;
-                e.data.saturday = false;
-                e.data.sunday = false;
-                e.data.week1 = false;
-                e.data.week2 = false;
-                e.data.week3 = false;
-                e.data.week4 = false,
-                    e.data.customerId = null;
-                //e.data.mcpHeaderId = MCPModel ? MCPModel.id : null;
-            },
             columns: [
                 {
                     type: 'buttons',
                     caption: l("Actions"),
                     width: 110,
-                    buttons: ['edit', 'delete'],
+                    buttons: [{
+                        text: "Edit",
+                        icon: "edit",
+                        hint: "Edit",
+                        onClick: function (e) {
+                            var w = window.open('/Mdm/MCPHeaders/Details', '_blank');
+                            w.sessionStorage.setItem("MCPModel", JSON.stringify(e.row.data));
+                        }
+                    }, 'delete'],
                     fixedPosition: "left",
                 },
                 {
-                    caption: "Customer",
-                    dataField: "customerId",
-                    validationRules: [{ type: "required", message: '' }],
+                    caption: "Route",
+                    dataField: "routeId",
                     lookup: {
                         dataSource() {
                             return {
-                                store: customerStore,
-                                /*  filter: ["employeeTypeId", "=", "4623cb59-c099-1615-149f-3a0861252b0d"],//salesman*/
+                                store: salesOrgHierarchyStore,
                                 paginate: true,
                                 pageSize: pageSizeForLookup
                             };
@@ -476,478 +214,99 @@ $(function () {
                         displayExpr: 'name',
                         valueExpr: 'id',
                         searchEnabled: true,
-                        searchMode: 'contains'
+                        searchMode: 'contains',
+                        minSearchLength: 2,
+                        showDataBeforeSearch: true
                     }
                 },
                 {
-                    caption: "Address",
-                    dataField: "customerIdExtra",
-                    width: 150,
-                    allowEditing: false,
-                    lookup: {
-                        dataSource() {
-                            return {
-                                store: customerStore,
-                                /*  filter: ["employeeTypeId", "=", "4623cb59-c099-1615-149f-3a0861252b0d"],//salesman*/
-                                paginate: true,
-                                pageSize: pageSizeForLookup
-                            };
-                        },
-                        displayExpr: 'address',
-                        valueExpr: 'id',
-                        searchEnabled: true,
-                        searchMode: 'contains'
-                    }
+                    caption: "Company",
+                    dataField: "company.name",
                 },
                 {
+                    caption: "Item Group",
+                    dataField: "itemGroup.description",
+                },
+                {
+                    caption: "Code",
+                    dataField: "code"
+                }, {
+                    caption: "Name",
+                    dataField: "name"
+                }, {
                     caption: "Effective Date",
                     dataField: "effectiveDate",
-                    dataType: "date",
-                    format: 'dd/MM/yyyy',
-                    validationRules: [{ type: "required", message: '' }],
+                    format: "dd/MM/yyyy",
+                    dataType: "date"
                 }, {
-                    caption: "EndDate",
+                    caption: "End Date",
                     dataField: "endDate",
-                    dataType: "date",
-                    format: 'dd/MM/yyyy',
-                    validationRules: [{ type: "required", message: '' }],
-                }, {
-
-                    caption: "Distance",
-                    dataField: "distance",
-                    dataType: "number",
-                }, {
-
-                    caption: "Visit Order",
-                    dataField: "visitOrder",
-                    dataType: "number",
-                }, {
-
-                    caption: "Monday",
-                    dataField: "monday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: "Tuesday",
-                    dataField: "tuesday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: "Wednesday",
-                    dataField: "wednesday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: "Thursday",
-                    dataField: "thursday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: "Friday",
-                    dataField: "friday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: "Saturday",
-                    dataField: "saturday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: "Sunday",
-                    dataField: "sunday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: "Week1",
-                    dataField: "week1",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: "Week2",
-                    dataField: "week2",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: "Week3",
-                    dataField: "week3",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: "Week4",
-                    dataField: "week4",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }
+                    format: "dd/MM/yyyy",
+                    dataType: "date"
+                } 
             ],
-        }).dxDataGrid("instance");
-
-    $('#SaveButton').click(function (e) {
-        e.preventDefault();
-        var form = $("#top-section").data('dxForm');
-        var routeId = form.getEditor('Route').option('value');
-        var companyId = form.getEditor('Company').option('value');
-        var itemGroupId = form.getEditor('ItemGroup').option('value');
-        var code = form.getEditor('Code').option('value');
-        var name = form.getEditor('Name').option('value');
-        //var isGPSLocked = form.getEditor('IsGPSLocked').option('value');
-        var effectiveDate = form.getEditor('EffectiveDate').option('value');
-        var endDate = form.getEditor('EndDate').option('value');
-
-        if (routeId == null) {
-            form.getEditor('Route').option('isValid', false);
-            form.getEditor('Route').focus();
-            return;
-        }
-        if (companyId == null) {
-            form.getEditor('Company').option('isValid', false);
-            form.getEditor('Company').focus();
-            return;
-        }
-        if (!code || code.trim() == "") {
-            form.getEditor('Code').option('isValid', false);
-            form.getEditor('Code').focus();
-            return;
-        }
-        if (!name || name.trim() == "") {
-            form.getEditor('Name').option('isValid', false);
-            form.getEditor('Name').focus();
-            return;
-        }
-        if (effectiveDate == null) {
-            form.getEditor('EffectiveDate').option('isValid', false);
-            form.getEditor('EffectiveDate').focus();
-            return;
-        }
-
-        var mcpHeaderDto = {
-            routeId,
-            companyId,
-            itemGroupId,
-            code,
-            name,
-            effectiveDate,
-            endDate
-        };
-        var mcpDetails = [];
-
-        dgMCPDetails.getDataSource().items().forEach(u => {
-            mcpDetails.push(u);
-        });
-        var params = {
-            mcpHeaderDto: mcpHeaderDto,
-            mcpDetails: mcpDetails,
-        }
-
-        if (!MCPModel)
-            mCPHeaderService.createMCP(params, { contentType: "application/json" })
-                .done(result => {
-                    abp.message.success(l('Congratulations'));
-                    MCPModel = result;
-                    sessionStorage.setItem("MCPModel", JSON.stringify(result));
-
-                    $('#GenerateButton').data('dxButton').option('disabled', false);
-                    $('#EnddateButton').data('dxButton').option('disabled', false);
-                }).fail(() => { });
-        else
-            mCPHeaderService.updateMCP(MCPModel.mcpHeaderDto.id, params, { contentType: "application/json" })
-                .done(result => {
-                    abp.message.success(l('Congratulations'));
-                    MCPModel = result;
-                    sessionStorage.setItem("MCPModel", JSON.stringify(result));
-
-                    abp.message.confirm("Want to generate visit plan again?", "Congratulations").then(function (answer) {
-                        if (answer) {
-                            $('#GenerateButton').click();
-                        }
-                    });
-                });
-    })
-
-    $("#CloseButton").click(function (e) {
-        e.preventDefault();
-
-        var form = $("#top-section").data('dxForm');
-
-        var currentRouteId = form.getEditor('Route').option('value');
-        var currentCompanyId = form.getEditor('Company').option('value');
-        var currentItemGroupId = form.getEditor('ItemGroup').option('value');
-        var currentCode = form.getEditor('Code').option('value');
-        var currentName = form.getEditor('Name').option('value');
-        // var currentIsGPSLocked = form.getEditor('IsGPSLocked').option('value');
-        var currentEffectiveDate = form.getEditor('EffectiveDate').option('value');
-        var currentEndDate = form.getEditor('EndDate').option('value');
-
-
-        var previousRouteId = MCPModel.routeId;
-        var previousCompanyId = MCPModel.companyId;
-        var previousItemGroupId = MCPModel.itemGroupId;
-        var previousCode = MCPModel.code;
-        var previousName = MCPModel.name;
-        // var previousIsGPSLocked = MCPModel.isGPSLocked;
-        var previousEffectiveDate = MCPModel.effectiveDate;
-        var previousEndDate = MCPModel.endDate;
-
-        if (currentRouteId != previousRouteId
-            || currentCompanyId != previousCompanyId
-            || currentItemGroupId != previousItemGroupId
-            || currentCode != previousCode
-            || currentName != previousName
-            // || currentIsGPSLocked != previousIsGPSLocked
-            || currentEffectiveDate != previousEffectiveDate
-            || currentEndDate != previousEndDate
-        ) {
-            abp.message.confirm(l1('ConfirmationMessage.UnSavedAndLeave'), l1('ConfirmationMessage.UnSavedAndLeaveTitle')).then(function (confirmed) {
-                if (confirmed) {
-                    window.close();
-                }
-            });
-        } else {
-            window.close();
-        }
-    });
-    $("#GenerateButton").click(function (e) {
-        e.preventDefault();
-        $('#popupGenMCP').data('dxPopup').show();
-    });
-    $("#EnddateButton").click(function (e) {
-        e.preventDefault();
-        if (MCPModel)
-            popupEnddateMCP.show();
-    });
-
-    function LoadData() {
-        var jsonData = sessionStorage.getItem("MCPModel");
-        if (jsonData) {
-            MCPModel = JSON.parse(jsonData);
-            var form = $("#top-section").data('dxForm');
-            form.getEditor('Route').option('value', MCPModel.mcpHeaderDto.routeId);
-            form.getEditor('Company').option('value', MCPModel.mcpHeaderDto.companyId);
-            form.getEditor('ItemGroup').option('value', MCPModel.mcpHeaderDto.itemGroupId);
-            form.getEditor('Code').option('value', MCPModel.mcpHeaderDto.code);
-            form.getEditor('Name').option('value', MCPModel.mcpHeaderDto.name);
-
-            form.getEditor('EffectiveDate').option('value', MCPModel.mcpHeaderDto.effectiveDate);
-            form.getEditor('EndDate').option('value', MCPModel.mcpHeaderDto.endDate);
-
-            $('#GenerateButton').data('dxButton').option('disabled', false);
-            $('#EnddateButton').data('dxButton').option('disabled', false);
-
-            salesOrgHierarchyService.get(MCPModel.mcpHeaderDto.routeId).done(u => {
-                var dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
-                dxCompany.option('readOnly', false);
-                dxCompany.option('dataSource', new DevExpress.data.DataSource({
-                    store: companyInZoneStore,
-                    filter: ["salesOrgHierarchyId", "=", u.parentId],
-                    paginate: true,
-                    pageSize: pageSize
-                }));
-                dxCompany.option('value', MCPModel.mcpHeaderDto.companyId);
-            });
-
-            mcpDetailData = MCPModel.mcpDetails;
-            mcpDetailData.forEach(x => x.customerIdExtra = x.customerId);
-
-            dgMCPDetails.option('dataSource', mcpDetailData);
-        }
-    }
-    LoadData();
-
-    function routeChangedHandler(data) {
-        if (data.value !== null) {
-            const selectedItem = data.component.option('selectedItem');
-
-            var dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
-            dxCompany.option('readOnly', false);
-            dxCompany.option('dataSource', new DevExpress.data.DataSource({
-                store: companyInZoneStore,
-                filter: ["salesOrgHierarchyId", "=", selectedItem.parentId],
-                paginate: true,
-                pageSize: pageSize
-            }));
-
-        } else {
-            var dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
-            if (!dxCompany.editorOptions)
-                dxCompany.editorOptions = [];
-            dxCompany.editorOptions.readOnly = true;
-            dxCompany.editorOptions.dataSource = null;
-            dxCompany.option('value', null);
-        }
-    }
-    $("#top-section").data('dxForm').getEditor('Route').on("valueChanged", routeChangedHandler);
-
-    function getNextDate(arg) {
-        const today = new Date()
-        let feature = new Date()
-        feature.setDate(today.getDate() + arg)
-        return feature;
-    }
-    $('#StartDate').dxDateBox({
-        type: 'date',
-        showClearButton: true,
-        min: getNextDate(1),
-        displayFormat: 'dd/MM/yyyy',
-    });
-    $('#EndDate').dxDateBox({
-        type: 'date',
-        showClearButton: true,
-        min: getNextDate(2),
-        displayFormat: 'dd/MM/yyyy',
-    });
-    $('#EndDateMCP').dxDateBox({
-        type: 'date',
-        showClearButton: true,
-        min: getNextDate(1),
-        displayFormat: 'dd/MM/yyyy',
-    });
-    const popupGenMCP = $('#popupGenMCP').dxPopup({
-        width: 400,
-        height: 280,
-        container: '.panel-container',
-        showTitle: true,
-        title: 'Generate visit plan',
-        visible: false,
-        dragEnabled: true,
-        hideOnOutsideClick: false,
-        showCloseButton: true,
-        resizeEnabled: true,
-        position: {
-            at: 'center',
-            my: 'center',
-            collision: 'fit',
-        },
-        toolbarItems: [{
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'before',
-            options: {
-                icon: 'fa fa-check hvr-icon',
-                text: 'Generate',
-                onClick() {
-                    var dxStartDate = $('#StartDate').data('dxDateBox');
-                    var dxEndDate = $('#EndDate').data('dxDateBox');
-                    const dateStart = dxStartDate.option('value');
-                    const dateEnd = dxEndDate.option('value');
-                    //if (!dateStart)
-                    //    dxStartDate.
-                    var params = {
-                        mcpHeaderId: MCPModel.mcpHeaderDto.id,
-                        dateStart: dateStart,
-                        dateEnd: dateEnd
-                    };
-
-                    visitPlanService.generateWithPermission(params, { contentType: "application/json" }).done(result => {
-                        abp.message.success(l('Congratulations'));
-                        popupGenMCP.hide();
-                    }).fail(() => { });
-                },
-            },
-        }, {
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'after',
-            options: {
-                text: 'Cancel',
-                onClick() {
-                    popupGenMCP.hide();
-                },
-            },
-        }],
-    }).dxPopup('instance');
-
-    const popupEnddateMCP = $('#popupEnddateMCP').dxPopup({
-        width: 400,
-        height: 280,
-        container: '.panel-container',
-        showTitle: true,
-        title: 'Enddate MCP',
-        visible: false,
-        dragEnabled: true,
-        hideOnOutsideClick: false,
-        showCloseButton: true,
-        resizeEnabled: true,
-        position: {
-            at: 'center',
-            my: 'center',
-            collision: 'fit',
-        },
-        toolbarItems: [{
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'before',
-            options: {
-                icon: 'fa fa-check hvr-icon',
-                text: 'Submit',
-                onClick() {
-                    var dxEndDate = $('#EndDateMCP').data('dxDateBox');
-                    const endDate = dxEndDate.option('value');
-                    //if (!dateStart)
-                    //    dxStartDate.
-                    var params = {
-                        id: MCPModel.mcpHeaderDto.id,
-                        endDate: endDate
-                    };
-
-                    mCPHeaderService.setEndDate(params.id, params.endDate, { contentType: "application/json" }).done(result => {
-                        abp.message.success(l('Congratulations'));
-                        popupEnddateMCP.hide();
-                    }).fail(() => { });
-                },
-            },
-        }, {
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'after',
-            options: {
-                text: 'Cancel',
-                onClick() {
-                    popupEnddateMCP.hide();
-                },
-            },
-        }],
-    }).dxPopup('instance');
+        })
 });
+
+var dataSource = [
+    {
+        id: 1,
+        outletId: "C001",
+        outletName: "Cửa hàng A2",
+        address: "Quận 2, Hồ Chí Minh",
+        effectiveDate: "01/01/2023",
+        endDate: "02/11/2023",
+        distance: 100,
+        Monday: true,
+        Tuesday: true,
+        Wednesday: true,
+        Thursday: true,
+        Friday: true,
+        Saturday: true,
+        Sunday: true,
+        Week1: true,
+        Week2: true,
+        Week3: true,
+        Week4: true,
+    },
+    {
+        id: 2,
+        outletId: "C002",
+        outletName: "Cửa hàng A2",
+        address: "Quận 2, Hồ Chí Minh",
+        effectiveDate: "10/01/2023",
+        endDate: "12/11/2023",
+        distance: 100,
+        Monday: true,
+        Tuesday: true,
+        Wednesday: false,
+        Thursday: false,
+        Friday: true,
+        Saturday: true,
+        Sunday: true,
+        Week1: true,
+        Week2: false,
+        Week3: false,
+        Week4: true,
+    },
+    {
+        id: 3,
+        outletId: "C003",
+        outletName: "Cửa hàng A3",
+        address: "Quận 4, Hồ Chí Minh",
+        effectiveDate: "15/01/2023",
+        endDate: "15/11/2023",
+        distance: 400,
+        Monday: false,
+        Tuesday: false,
+        Wednesday: true,
+        Thursday: true,
+        Friday: false,
+        Saturday: false,
+        Sunday: false,
+        Week1: true,
+        Week2: false,
+        Week3: false,
+        Week4: false,
+    }
+];
