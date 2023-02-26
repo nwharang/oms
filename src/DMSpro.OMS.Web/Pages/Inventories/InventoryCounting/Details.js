@@ -10,39 +10,38 @@
         items: [
             {
                 itemType: "group",
-                items: ["DocNbr", "Status",
-                    {
-                        dataField: 'Docdate',
-                        editorType: 'dxDateBox'
-                    }
-                ]
+                items: ["DocNbr", "Status", "Desc"]
             },
             {
                 itemType: "group",
-                items: ["LinkedNbr", "Desc",
+                items: ["Reason", "LinkedNbr"]
+            },
+            {
+                itemType: "group",
+                items: ["User Counting", "User Confirm"]
+            },
+            {
+                itemType: "group",
+                items: [
+                    {
+                        dataField: 'Docdate',
+                        editorType: 'dxDateBox'
+                    },
                     {
                         dataField: 'PostingDate',
                         editorType: 'dxDateBox'
                     }
                 ]
-            },
-            {
-                itemType: "group",
-                items: ["ReasonId", "FromWHLocId", "ToWHLocId"]
-            },
-            {
-                itemType: "group",
-                items: ["ToCpnyId", "ToWHId", "FromWHLocId"]
             }
         ]
     });
 
-    const gridInventoryTransfersDetails = $('#gridInventoryTransfersDetails').dxDataGrid({
+    const gridInventoryCountingDetails = $('#gridInventoryCountingDetails').dxDataGrid({
         dataSource: inventoryDatas,
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'gridInventoryTransfersDetails',
+            storageKey: 'gridInventoryCountingDetails',
         },
         showBorders: true,
         columnAutoWidth: true,
@@ -130,7 +129,7 @@
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'InventoryInventoryTransfersDetail.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'InventoryCountingDetail.xlsx');
                 });
             });
             e.cancel = true;
@@ -157,10 +156,6 @@
                 fixedPosition: "left",
             },
             {
-                caption: "Item Code",
-                dataField: "code"
-            },
-            {
                 caption: "Item Name",
                 dataField: "name"
             },
@@ -173,20 +168,28 @@
                 dataField: "whlocation"
             },
             {
+                caption: "InStock",
+                dataField: "instock"
+            },
+            {
                 caption: "Qty",
                 dataField: "qty"
             },
             {
+                caption: "DiffQty",
+                dataField: "diffqty"
+            },
+            {
+                caption: "ConfirmDiffQty",
+                dataField: "confirmdiffqty"
+            },
+            {
+                caption: "AbsDiffQty",
+                dataField: "absdiffqty"
+            },
+            {
                 caption: "UMO",
                 dataField: "umo"
-            },
-            {
-                caption: "BaseQty",
-                dataField: "baseqty"
-            },
-            {
-                caption: "BaseUMO",
-                dataField: "baseumo"
             }
         ],
     }).dxDataGrid("instance");
@@ -206,68 +209,54 @@
 var inventoryDatas = [
     {
         id: 1,
-        code: "Item 1",
+        code: "item 1",
         name: "item 1",
         warehouse: "Main",
-        whlocation: "Kho Chính",
-        qty: 4,
-        umo: "Thung",
-        baseqty: 96,
-        baseumo: "Chai"
+        whlocation: "Main",
+        instock: 50,
+        qty: 60,
+        diffqty: 10,
+        confirmdiffqty: 56,
+        absdiffqty: 4,
+        umo: "Lon",
     },
     {
         id: 2,
-        code: "Item 2",
+        code: "item 2",
         name: "item 2",
         warehouse: "Main",
-        whlocation: "Kho Chính",
-        qty: 4,
-        umo: "Thung",
-        baseqty: 96,
-        baseumo: "Chai"
+        whlocation: "Main",
+        instock: 50,
+        qty: 60,
+        diffqty: 10,
+        confirmdiffqty: 56,
+        absdiffqty: 4,
+        umo: "Lon",
     },
     {
         id: 3,
-        code: "Item 3",
+        code: "item 3",
         name: "item 3",
         warehouse: "Main",
-        whlocation: "Kho Chính",
-        qty: 23,
-        umo: "Thung",
-        baseqty: 1123,
-        baseumo: "Chai"
+        whlocation: "Main",
+        instock: 5,
+        qty: 4,
+        diffqty: -1,
+        confirmdiffqty: 4,
+        absdiffqty: -1,
+        umo: "Cai",
     },
     {
         id: 4,
-        code: "Item 4",
+        code: "item 4",
         name: "item 4",
         warehouse: "Main",
-        whlocation: "Kho Chính",
-        qty: 6,
-        umo: "Thung",
-        baseqty: 234,
-        baseumo: "Chai"
-    },
-    {
-        id: 5,
-        code: "Item 5",
-        name: "item 5",
-        warehouse: "Main",
-        whlocation: "Kho Phụ",
-        qty: 4,
-        umo: "Thung",
-        baseqty: 96,
-        baseumo: "Chai"
-    },
-    {
-        id: 6,
-        code: "Item 6",
-        name: "item 6",
-        warehouse: "Main1",
-        whlocation: "Kho Chính 1",
-        qty: 7,
-        umo: "Thung",
-        baseqty: 200,
-        baseumo: "Chai"
+        whlocation: "Main",
+        instock: 5,
+        qty: 5,
+        diffqty: 0,
+        confirmdiffqty: 5,
+        absdiffqty: 0,
+        umo: "Cai",
     }
 ];

@@ -10,39 +10,40 @@
         items: [
             {
                 itemType: "group",
-                items: ["DocNbr", "Status",
+                items: ["DocNbr", "Status"]
+            },
+            {
+                itemType: "group",
+                items: ["Desc", "LinkedNbr"]
+            },
+            {
+                itemType: "group",
+                items: [
                     {
                         dataField: 'Docdate',
                         editorType: 'dxDateBox'
-                    }
+                    },
+                    "Reason"
                 ]
             },
             {
                 itemType: "group",
-                items: ["LinkedNbr", "Desc",
+                items: [
                     {
                         dataField: 'PostingDate',
                         editorType: 'dxDateBox'
                     }
                 ]
-            },
-            {
-                itemType: "group",
-                items: ["ReasonId", "FromWHLocId", "ToWHLocId"]
-            },
-            {
-                itemType: "group",
-                items: ["ToCpnyId", "ToWHId", "FromWHLocId"]
             }
         ]
     });
 
-    const gridInventoryTransfersDetails = $('#gridInventoryTransfersDetails').dxDataGrid({
+    const gridInventoryAdjustmentDetails = $('#gridInventoryAdjustmentDetails').dxDataGrid({
         dataSource: inventoryDatas,
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'gridInventoryTransfersDetails',
+            storageKey: 'gridInventoryAdjustmentDetails',
         },
         showBorders: true,
         columnAutoWidth: true,
@@ -130,7 +131,7 @@
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'InventoryInventoryTransfersDetail.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'InventoryCountingDetail.xlsx');
                 });
             });
             e.cancel = true;
@@ -181,11 +182,11 @@
                 dataField: "umo"
             },
             {
-                caption: "BaseQty",
+                caption: "Base Qty",
                 dataField: "baseqty"
             },
             {
-                caption: "BaseUMO",
+                caption: "Base UMO",
                 dataField: "baseumo"
             }
         ],
@@ -206,68 +207,50 @@
 var inventoryDatas = [
     {
         id: 1,
-        code: "Item 1",
+        code: "item 1",
         name: "item 1",
         warehouse: "Main",
-        whlocation: "Kho Chính",
-        qty: 4,
-        umo: "Thung",
-        baseqty: 96,
-        baseumo: "Chai"
+        whlocation: "Main",
+        instock: 50,
+        qty: 60,
+        umo: "Lon",
+        baseqty: 3,
+        baseumo: "Thung"
     },
     {
         id: 2,
-        code: "Item 2",
+        code: "item 2",
         name: "item 2",
         warehouse: "Main",
-        whlocation: "Kho Chính",
-        qty: 4,
-        umo: "Thung",
-        baseqty: 96,
-        baseumo: "Chai"
+        whlocation: "Main",
+        instock: 50,
+        qty: 60,
+        umo: "Lon",
+        baseqty: 3,
+        baseumo: "Thung"
     },
     {
         id: 3,
-        code: "Item 3",
+        code: "item 3",
         name: "item 3",
         warehouse: "Main",
-        whlocation: "Kho Chính",
-        qty: 23,
-        umo: "Thung",
-        baseqty: 1123,
-        baseumo: "Chai"
+        whlocation: "Main",
+        instock: 5,
+        qty: 4,
+        umo: "Cai",
+        baseqty: 1,
+        baseumo: "Hop"
     },
     {
         id: 4,
-        code: "Item 4",
+        code: "item 4",
         name: "item 4",
         warehouse: "Main",
-        whlocation: "Kho Chính",
-        qty: 6,
-        umo: "Thung",
-        baseqty: 234,
-        baseumo: "Chai"
-    },
-    {
-        id: 5,
-        code: "Item 5",
-        name: "item 5",
-        warehouse: "Main",
-        whlocation: "Kho Phụ",
-        qty: 4,
-        umo: "Thung",
-        baseqty: 96,
-        baseumo: "Chai"
-    },
-    {
-        id: 6,
-        code: "Item 6",
-        name: "item 6",
-        warehouse: "Main1",
-        whlocation: "Kho Chính 1",
-        qty: 7,
-        umo: "Thung",
-        baseqty: 200,
-        baseumo: "Chai"
+        whlocation: "Main",
+        instock: 24,
+        qty: 24,
+        umo: "Cai",
+        baseqty: 6,
+        baseumo: "Hop"
     }
 ];

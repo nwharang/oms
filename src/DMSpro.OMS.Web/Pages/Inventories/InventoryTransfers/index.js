@@ -162,11 +162,13 @@
                             w.sessionStorage.setItem("model", JSON.stringify(e.row.data));
                         }
                     },
-                    'edit', 'delete']
+                    'edit', 'delete'],
+                visibleIndex:0,
             },
             {
                 caption: "DocNbr",
                 dataField: "DocNbr",
+                visibleIndex: 1,
             },
             {
                 caption: "Status",
@@ -179,14 +181,20 @@
             {
                 caption: "Posting Date",
                 dataField: "PostingDate",
-                allowFiltering: false
+                allowFiltering: false,
             },
             {
                 caption: "Desc",
                 dataField: "Desc",
-                allowFiltering: false
+                allowFiltering: false,
             },
+           
         ],
+        customizeColumns: function (columns) {
+            for (var i = 0; i < columns.length; i++) {
+                columns[i].visibleIndex = i;
+            }
+        }
     }).dxDataGrid("instance");
 });
 
