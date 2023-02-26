@@ -11,6 +11,8 @@
     "Button.Close": "Close",
     "Button.Cancel": "Cancel",
     "Button.ViewDetail": "View Details",
+    "Button.Release": "Release",
+    "Button.NewRoot": "New Root",
     "Active": "Active",
     "ConfirmationMessage.UnSavedAndLeave": "Changes you made may not be saved.",
     "ConfirmationMessage.UnSavedAndLeaveTitle": "Do you want to leave this site?",
@@ -91,6 +93,7 @@
     "CompanyInZone.Company": "Company",
     "CustomerInZone.CustomerCode": "Customer Code",
     "CustomerInZone.CustomerName": "Customer Name",
-    "EntityFieldName:MDMService:PriceListDetail:PriceBeforeUpdate": "Price Before Update"
+    "EntityFieldName:MDMService:PriceListDetail:PriceBeforeUpdate": "Price Before Update",
+    "EntityFieldName:MDMService:CompanyInZone:IsBase": "IsBase"
   }
 }
