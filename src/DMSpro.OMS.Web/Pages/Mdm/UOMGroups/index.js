@@ -8,7 +8,13 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            uomGroupService.getListDevextremes({})
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            uomGroupService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -43,7 +49,13 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            uomGroupDetailService.getListDevextremes({})
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            uomGroupDetailService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -78,7 +90,13 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            uomService.getListDevextremes({})
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            uomService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -422,27 +440,4 @@ $(function () {
             }
         }
     }).dxDataGrid('instance');
-
-    //$("#NewUOMGroup").click(function () {
-    //    dataGrid.addRow();
-    //});
-
-    //$("input#Search").on("input", function () {
-    //    dataGrid.searchByText($(this).val());
-    //});
-
-    //$("#ExportToExcelButton").click(function (e) {
-    //    e.preventDefault();
-
-    //    uomGroupService.getDownloadToken().then(
-    //        function (result) {
-    //            var url = abp.appPath + 'api/mdm-service/u-oMGroups/as-excel-file' + abp.utils.buildQueryString([
-    //                { name: 'downloadToken', value: result.token }
-    //            ]);
-
-    //            var downloadWindow = window.open(url, '_blank');
-    //            downloadWindow.focus();
-    //        }
-    //    )
-    //});
 });

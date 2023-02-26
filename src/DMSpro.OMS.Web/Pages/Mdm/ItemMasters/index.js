@@ -15,6 +15,8 @@
     // get item type list
     var getItemTypes = new DevExpress.data.CustomStore({
         key: 'id',
+        loadMode: 'raw',
+        cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             itemTypeService.getListDevextremes({ filter: JSON.stringify(['code', '=', 'MD02']) })
@@ -27,21 +29,23 @@
                 });
             return deferred.promise();
         },
-        byKey: function (key) {
-            if (key == 0) return null;
+        //byKey: function (key) {
+        //    if (key == 0) return null;
 
-            var d = new $.Deferred();
-            itemTypeService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
+        //    var d = new $.Deferred();
+        //    itemTypeService.get(key)
+        //        .done(data => {
+        //            d.resolve(data);
+        //        });
+        //    return d.promise();
+        //}
     });
 
     // get item attribute value
     var getItemAttrValue = new DevExpress.data.CustomStore({
         key: 'id',
+        loadMode: 'raw',
+        cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             itemAttrValueService.getListDevextremes({})
@@ -52,22 +56,27 @@
                         groupCount: result.groupCount,
                     });
                 });
+            deferred.promise().then(attrVal => {
+                listAttrValue = attrVal;
+            })
             return deferred.promise();
         },
-        byKey: function (key) {
-            if (key == 0) return null;
+        //byKey: function (key) {
+        //    if (key == 0) return null;
 
-            var d = new $.Deferred();
-            itemAttrValueService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
+        //    var d = new $.Deferred();
+        //    itemAttrValueService.get(key)
+        //        .done(data => {
+        //            d.resolve(data);
+        //        });
+        //    return d.promise();
+        //}
     });
     // get UOM group lookup
     var getUOMGroups = new DevExpress.data.CustomStore({
         key: 'id',
+        loadMode: 'raw',
+        cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             uOMGroupService.getListDevextremes({})
@@ -80,21 +89,23 @@
                 });
             return deferred.promise();
         },
-        byKey: function (key) {
-            if (key == 0) return null;
+        //byKey: function (key) {
+        //    if (key == 0) return null;
 
-            var d = new $.Deferred();
-            uOMGroupService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
+        //    var d = new $.Deferred();
+        //    uOMGroupService.get(key)
+        //        .done(data => {
+        //            d.resolve(data);
+        //        });
+        //    return d.promise();
+        //}
     });
 
     // get UOMs detail lookup
     var getUOMGroupDetails = new DevExpress.data.CustomStore({
         key: 'id',
+        loadMode: 'raw',
+        cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             uOMGroupDetailService.getListDevextremes({})
@@ -107,21 +118,23 @@
                 });
             return deferred.promise();
         },
-        byKey: function (key) {
-            if (key == 0) return null;
+        //byKey: function (key) {
+        //    if (key == 0) return null;
 
-            var d = new $.Deferred();
-            uOMGroupDetailService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
+        //    var d = new $.Deferred();
+        //    uOMGroupDetailService.get(key)
+        //        .done(data => {
+        //            d.resolve(data);
+        //        });
+        //    return d.promise();
+        //}
     });
 
     // get UOMs
     var getUOMs = new DevExpress.data.CustomStore({
         key: 'id',
+        loadMode: 'raw',
+        cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             uomService.getListDevextremes({})
@@ -134,21 +147,23 @@
                 });
             return deferred.promise();
         },
-        byKey: function (key) {
-            if (key == 0) return null;
+        //byKey: function (key) {
+        //    if (key == 0) return null;
 
-            var d = new $.Deferred();
-            uomService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
+        //    var d = new $.Deferred();
+        //    uomService.get(key)
+        //        .done(data => {
+        //            d.resolve(data);
+        //        });
+        //    return d.promise();
+        //}
     });
 
     // get VATs
     var getVATs = new DevExpress.data.CustomStore({
         key: 'id',
+        loadMode: 'raw',
+        cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             vATService.getListDevextremes({})
@@ -161,21 +176,23 @@
                 });
             return deferred.promise();
         },
-        byKey: function (key) {
-            if (key == 0) return null;
+        //byKey: function (key) {
+        //    if (key == 0) return null;
 
-            var d = new $.Deferred();
-            vATService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
+        //    var d = new $.Deferred();
+        //    vATService.get(key)
+        //        .done(data => {
+        //            d.resolve(data);
+        //        });
+        //    return d.promise();
+        //}
     });
 
     // get price list
     var getPriceList = new DevExpress.data.CustomStore({
         key: 'id',
+        loadMode: 'raw',
+        cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             priceListService.getListDevextremes({})
@@ -188,16 +205,16 @@
                 });
             return deferred.promise();
         },
-        byKey: function (key) {
-            if (key == 0) return null;
+        //byKey: function (key) {
+        //    if (key == 0) return null;
 
-            var d = new $.Deferred();
-            priceListService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
+        //    var d = new $.Deferred();
+        //    priceListService.get(key)
+        //        .done(data => {
+        //            d.resolve(data);
+        //        });
+        //    return d.promise();
+        //}
     });
 
     const manageItem = [
@@ -247,7 +264,14 @@
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
-            itemMasterService.getListDevextremes({})
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            itemMasterService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -544,6 +568,67 @@
             //    }
             //}
         },
+        //onEditorPreparing: function (e) {
+        //    if (e.dataField == "manageItemBy" && e.parentType == "dataRow") {
+        //        e.editorOptions.onValueChanged = function (arg) {
+        //            e.setValue(arg.value);
+        //            if (arg.value == 1) {
+        //                $('div.fieldExpiredType > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
+        //                $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').removeClass('dx-state-disabled');
+        //                $('div.fieldExpiredValue > div > div.dx-show-invalid-badge > div.dx-texteditor-container > div.dx-texteditor-input-container > input').removeAttr('disabled');
+        //                $('div.fieldIssueMethod > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
+        //            }
+        //            else if (arg.value == 0) {
+        //                $('div.fieldExpiredType > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', true);
+        //                $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').addClass('dx-state-disabled');
+        //                $('div.fieldIssueMethod > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', true);
+        //            }
+        //            else {
+        //                $('div.fieldExpiredType > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', true);
+        //                $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').addClass('dx-state-disabled');
+        //                $('div.fieldIssueMethod > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
+        //            }
+        //        }
+        //    }
+
+        //    if (e.dataField == 'expiredType' && e.parentType == 'dataRow') {
+        //        if (e.row.data.manageItemBy == 1)
+        //            e.editorOptions.disabled = false
+        //    }
+
+        //    if (e.dataField == 'expiredValue' && e.parentType == 'dataRow') {
+        //        if (e.row.data.manageItemBy == 1)
+        //            e.editorOptions.disabled = false
+        //    }
+
+        //    if (e.dataField == 'issueMethod' && e.parentType == 'dataRow') {
+        //        if (e.row.data.manageItemBy == 1 || e.row.data.manageItemBy == 2)
+        //            e.editorOptions.disabled = false
+        //    }
+
+        //    //if (e.dataField == 'uomGroupId' && e.parentType == 'dataRow') {
+        //    //    e.editorOptions.onValueChanged = function (arg) {
+        //    //        e.setValue(arg.value);
+        //    //        // filter inventory dataSource by uomGroupId
+        //    //        var fieldInventoryUOMIdCb = $('div.fieldInventoryUOMId > div > div.dx-selectbox').data('dxSelectBox');
+        //    //        fieldInventoryUOMIdCb.option('disabled', false);
+        //    //        fieldInventoryUOMIdCb.getDataSource().filter(['uomGroupId', '=', arg.value]);
+        //    //        fieldInventoryUOMIdCb.getDataSource().load();
+
+        //    //        // filter PurUnit dataSource by uomGroupId
+        //    //        var fieldPurUOMIdCb = $('div.fieldPurUOMId > div > div.dx-selectbox').data('dxSelectBox');
+        //    //        fieldPurUOMIdCb.option('disabled', false);
+        //    //        fieldPurUOMIdCb.getDataSource().filter(['uomGroupId', '=', arg.value]);
+        //    //        fieldPurUOMIdCb.getDataSource().load();
+
+        //    //        // filter SaleUnit dataSource by uomGroupId
+        //    //        var fieldSalesUOMIdCb = $('div.fieldSalesUOMId > div > div.dx-selectbox').data('dxSelectBox');
+        //    //        fieldSalesUOMIdCb.option('disabled', false);
+        //    //        fieldSalesUOMIdCb.getDataSource().filter(['uomGroupId', '=', arg.value]);
+        //    //        fieldSalesUOMIdCb.getDataSource().load();
+        //    //    }
+        //    //}
+        //},
         onEditorPreparing: function (e) {
             if (e.dataField == "manageItemBy" && e.parentType == "dataRow") {
                 e.editorOptions.onValueChanged = function (arg) {
@@ -566,44 +651,6 @@
                     }
                 }
             }
-
-            if (e.dataField == 'expiredType' && e.parentType == 'dataRow') {
-                if (e.row.data.manageItemBy == 1)
-                    e.editorOptions.disabled = false
-            }
-
-            if (e.dataField == 'expiredValue' && e.parentType == 'dataRow') {
-                if (e.row.data.manageItemBy == 1)
-                    e.editorOptions.disabled = false
-            }
-
-            if (e.dataField == 'issueMethod' && e.parentType == 'dataRow') {
-                if (e.row.data.manageItemBy == 1 || e.row.data.manageItemBy == 2)
-                    e.editorOptions.disabled = false
-            }
-
-            //if (e.dataField == 'uomGroupId' && e.parentType == 'dataRow') {
-            //    e.editorOptions.onValueChanged = function (arg) {
-            //        e.setValue(arg.value);
-            //        // filter inventory dataSource by uomGroupId
-            //        var fieldInventoryUOMIdCb = $('div.fieldInventoryUOMId > div > div.dx-selectbox').data('dxSelectBox');
-            //        fieldInventoryUOMIdCb.option('disabled', false);
-            //        fieldInventoryUOMIdCb.getDataSource().filter(['uomGroupId', '=', arg.value]);
-            //        fieldInventoryUOMIdCb.getDataSource().load();
-
-            //        // filter PurUnit dataSource by uomGroupId
-            //        var fieldPurUOMIdCb = $('div.fieldPurUOMId > div > div.dx-selectbox').data('dxSelectBox');
-            //        fieldPurUOMIdCb.option('disabled', false);
-            //        fieldPurUOMIdCb.getDataSource().filter(['uomGroupId', '=', arg.value]);
-            //        fieldPurUOMIdCb.getDataSource().load();
-
-            //        // filter SaleUnit dataSource by uomGroupId
-            //        var fieldSalesUOMIdCb = $('div.fieldSalesUOMId > div > div.dx-selectbox').data('dxSelectBox');
-            //        fieldSalesUOMIdCb.option('disabled', false);
-            //        fieldSalesUOMIdCb.getDataSource().filter(['uomGroupId', '=', arg.value]);
-            //        fieldSalesUOMIdCb.getDataSource().load();
-            //    }
-            //}
         },
         toolbar: {
             items: [
@@ -665,12 +712,12 @@
                     displayExpr: 'valueName'
                 }
             },
-            {
-                dataField: 'barcode',
-                caption: l("EntityFieldName:MDMService:Item:Barcode"),
-                dataType: 'string',
-                validationRules: [{ type: "required" }]
-            },
+            //{
+            //    dataField: 'barcode',
+            //    caption: l("EntityFieldName:MDMService:Item:Barcode"),
+            //    dataType: 'string',
+            //    validationRules: [{ type: "required" }]
+            //},
             {
                 dataField: 'erpCode',
                 caption: l("EntityFieldName:MDMService:Item:ERPCode"),
@@ -854,169 +901,253 @@
             {
                 dataField: 'attr0Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr0Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(0)
+                    },
+                },
             },
             {
                 dataField: 'attr1Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr1Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(1)
+                    },
+                },
             },
             {
                 dataField: 'attr2Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr2Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(2)
+                    },
+                },
             },
             {
                 dataField: 'attr3Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr3Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(3)
+                    },
+                },
             },
             {
                 dataField: 'attr4Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr4Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(4)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr5Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr5Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(5)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr6Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr6Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(6)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr7Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr7Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(7)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr8Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr8Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(8)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr9Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr9Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(9)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr10Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr10Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(10)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr11Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr11Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(11)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr12Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr12Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(12)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr13Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr13Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(13)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr14Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr14Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(14)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr15Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr15Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(15)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr16Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr16Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(16)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr17Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr17Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(17)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr18Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr18Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(18)
+                    },
+                },
+                visible: false,
             },
             {
                 dataField: 'attr19Id',
                 caption: l('EntityFieldName:MDMService:Item:Attr19Name'),
-                editorType: 'dxSelectBox',
-                visible: false
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource(options) {
+                        return dsAttrValue(19)
+                    },
+                },
+                visible: false,
             }
         ]
     }).dxDataGrid('instance');
 
-    //$("#NewItemMasterButton").click(function (e) {
-    //    gridItemMasters.addRow();
-    //    //var w = window.open('/Mdm/ItemMasters/Details');
-    //    //w.sessionStorage.setItem('itemMasters', null);
-    //});
+    const dsAttrValue = function (n) {
+        return {
+            store: getItemAttrValue,
+            filter: ['itemAttribute.attrNo', '=', n],
+        };
+    }
 
-    //$("input#Search").on("input", function () {
-    //    gridItemMasters.searchByText($(this).val());
-    //});
-
-    //$("#ExportToExcelButton").click(function (e) {
-    //    e.preventDefault();
-
-    //    itemMasterService.getDownloadToken().then(
-    //        function (result) {
-    //            var url = abp.appPath + 'api/mdm-service/items/as-excel-file' +
-    //                abp.utils.buildQueryString([
-    //                    { name: 'downloadToken', value: result.token }
-    //                ]);
-
-    //            var downloadWindow = window.open(url, '_blank');
-    //            downloadWindow.focus();
-    //        }
-    //    )
-    //});
-
-    var listAttrValue = [];
+    //var listAttrValue = [];
 
     function getAttrOptions() {
         const options = [];
-
-        const def = $.Deferred();
-        itemAttrValueService.getListDevextremes({})
-            .done(r => {
-                def.resolve(r.data, {
-                    totalCount: r.totalCount,
-                    summary: r.summary,
-                    groupCount: r.groupCount
-                })
-            })
-        def.promise().then(attrVal => {
-            listAttrValue = attrVal;
-        })
 
         const deferred = $.Deferred();
         itemAttrService.getListDevextremes({})
@@ -1029,9 +1160,9 @@
             });
         deferred.promise().then(u => {
             var listAttrActive = u.filter(x => x.active == true);
-            for (let i = 0; i < listAttrActive.length; i++) {
-                options.push(generateAttrOptions(listAttrActive[i]))
-            }
+            listAttrActive.forEach((i) => {
+                options.push(generateAttrOptions(i))
+            });
         });
         return options;
     }
@@ -1043,7 +1174,7 @@
                 text: attr.attrName
             },
             editorOptions: {
-                dataSource: listAttrValue.filter(x => x.itemAttributeId == attr.id),
+                dataSource: dsAttrValue(attr.attrNo), //listAttrValue.filter(x => x.itemAttributeId == attr.id),
                 valueExpr: 'id',
                 displayExpr: 'attrValName'
             }
