@@ -339,7 +339,6 @@
                 items: [
                     {
                         itemType: 'group',
-                        cssClass: 'first-group',
                         colCount: 2,
                         colSpan: 8,
                         items: [
@@ -436,7 +435,6 @@
                     },
                     {
                         itemType: 'group',
-                        cssClass: 'second-group',
                         caption: 'DMS Attribute',
                         colSpan: 2,
                         items: getAttrOptions()
@@ -444,7 +442,6 @@
                     //{
                     //    itemType: 'group',
                     //    caption: '',
-                    //    colSpan: 2,
                     //    items: [{
                     //        itemType: 'tabbed',
                     //        tabPanelOptions: {
@@ -510,12 +507,14 @@
                     //                        }
                     //                    }]
                     //                }],
-                    //        }, {
-                    //            title: 'ATTRIBUTE',
-                    //            colCount: 4,
-                    //            items: ["attribute0Id", "attribute1Id", "attribute2Id", "attribute3Id", "attribute4Id", "attribute5Id", "attribute6Id", "attribute7Id", "attribute8Id", "attribute9Id",
-                    //                "attribute10Id", "attribute11Id", "attribute12Id", "attribute13Id", "attribute14Id", "attribute15Id", "attribute16Id", "attribute17Id", "attribute18Id", "attribute19Id"]
-                    //        }, {
+                    //        },
+                    //        //{
+                    //        //    title: 'ATTRIBUTE',
+                    //        //    colCount: 4,
+                    //        //    items: ["attribute0Id", "attribute1Id", "attribute2Id", "attribute3Id", "attribute4Id", "attribute5Id", "attribute6Id", "attribute7Id", "attribute8Id", "attribute9Id",
+                    //        //        "attribute10Id", "attribute11Id", "attribute12Id", "attribute13Id", "attribute14Id", "attribute15Id", "attribute16Id", "attribute17Id", "attribute18Id", "attribute19Id"]
+                    //        //},
+                    //        {
                     //            title: 'CONTACT',
                     //            template: function (itemData, itemIndex, element) {
                     //                const gridDiv = $("<div style='padding:15px; min-height: 320px;'>")
@@ -1562,6 +1561,7 @@
                 dataField: 'sfaCustomerCode',
                 caption: l("SfaCustomerCode"),
                 dataType: 'string',
+                validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'active',
