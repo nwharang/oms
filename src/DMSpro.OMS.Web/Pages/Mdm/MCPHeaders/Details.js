@@ -1,4 +1,5 @@
 ﻿var l = abp.localization.getResource("MdmService");
+var l1 = abp.localization.getResource("OMS");
 var MCPModel;
 var mcpDetailData = [];
 $(function () {
@@ -332,7 +333,7 @@ $(function () {
     });
     $('#SaveButton').dxButton({
         stylingMode: 'contained',
-        type: 'normal'
+        type: 'normal', 
     });
     $('#resizable').dxResizable({
         minHeight: 120,
@@ -353,9 +354,9 @@ $(function () {
             },
             editing: {
                 mode: "row",
-                allowAdding: abp.auth.isGranted('MdmService.MCPHeaders.Create'),
-                allowUpdating: true,
-                allowDeleting: true,
+                allowAdding: abp.auth.isGranted('MdmService.MCPs.Create'),
+                allowUpdating: abp.auth.isGranted('MdmService.MCPs.Edit'),
+                allowDeleting: abp.auth.isGranted('MdmService.MCPs.Delete'),
                 useIcons: true,
                 texts: {
                     editRow: l("Edit"),
@@ -516,7 +517,7 @@ $(function () {
                     fixedPosition: "left",
                 },
                 {
-                    caption: "Customer",
+                    caption: l1("EntityFieldName:MDMService:MCPDetail:Customer"),  
                     dataField: "customerId",
                     calculateDisplayValue: "customer.name",
                     validationRules: [{ type: "required", message: '' }],
@@ -536,30 +537,30 @@ $(function () {
                     }
                 },
                 {
-                    caption: "Effective Date",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:EffectiveDate"),  
                     dataField: "effectiveDate",
                     dataType: "date",
                     format: 'dd/MM/yyyy',
                     validationRules: [{ type: "required", message: '' }],
                 }, {
-                    caption: "EndDate",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:EndDate"),  
                     dataField: "endDate",
                     dataType: "date",
                     format: 'dd/MM/yyyy',
                     validationRules: [{ type: "required", message: '' }],
                 }, {
 
-                    caption: "Distance",
+                    caption: l1("EntityFieldName:MDMService:MCPDetail:Distance"),  
                     dataField: "distance",
                     dataType: "number",
                 }, {
 
-                    caption: "Visit Order",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:VisitOrder"),  
                     dataField: "visitOrder",
                     dataType: "number",
                 }, {
 
-                    caption: "Monday",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Monday"),  
                     dataField: "monday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -568,7 +569,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: "Tuesday",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Tuesday"),  
                     dataField: "tuesday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -577,7 +578,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: "Wednesday",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Wednesday"),  
                     dataField: "wednesday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -586,7 +587,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: "Thursday",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Thursday"),  
                     dataField: "thursday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -595,7 +596,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: "Friday",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Friday"),  
                     dataField: "friday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -604,7 +605,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: "Saturday",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Saturday"),  
                     dataField: "saturday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -613,7 +614,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: "Sunday",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Sunday"),  
                     dataField: "sunday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -622,7 +623,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: "Week1",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Week1"),  
                     dataField: "week1",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -631,7 +632,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: "Week2",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Week2"),  
                     dataField: "week2",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -640,7 +641,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: "Week3",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Week3"),  
                     dataField: "week3",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -649,7 +650,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: "Week4",
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Week4"),  
                     dataField: "week4",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -775,7 +776,7 @@ $(function () {
                     MCPModel = result.mcpHeaderDto;
                     sessionStorage.setItem("MCPModel", JSON.stringify(result.mcpHeaderDto));
 
-                    abp.message.confirm("Want to generate visit plan again?", "Congratulations").then(function (answer) {
+                    abp.message.confirm(l('GenerateVisitPlan'), l('Congratulations')).then(function (answer) {
                         if (answer) {
                             $('#GenerateButton').click();
                         }

@@ -1,7 +1,6 @@
 ﻿var l = abp.localization.getResource("MdmService");
 $(function () {
-    var mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
-     
+    var mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader; 
     var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
 
     var salesOrgHierarchyStore = new DevExpress.data.CustomStore({
@@ -88,9 +87,9 @@ $(function () {
             dataSource: mCPHeaderStore,
             editing: {
                 mode: "row",
-                allowAdding: true,
-                allowUpdating: true,
-                //allowDeleting: true,
+                allowAdding: abp.auth.isGranted('MdmService.MCPs.Create'),
+               // allowUpdating: abp.auth.isGranted('MdmService.MCPs.Edit'),
+                allowDeleting: abp.auth.isGranted('MdmService.MCPs.Delete'),
                 useIcons: true,
                 texts: {
                     editRow: l("Edit"),
@@ -220,26 +219,26 @@ $(function () {
                     }
                 },
                 {
-                    caption: "Company",
+                    caption: l("EntityFieldName:MDMService:MCPHeader:CompanyName"),  
                     dataField: "company.name",
                 },
                 {
-                    caption: "Item Group",
+                    caption: l("EntityFieldName:MDMService:MCPHeader:ItemGroup"),
                     dataField: "itemGroup.description",
                 },
                 {
-                    caption: "Code",
+                    caption: l("EntityFieldName:MDMService:MCPHeader:Code"),
                     dataField: "code"
                 }, {
-                    caption: "Name",
+                    caption: l("EntityFieldName:MDMService:MCPHeader:Name"),
                     dataField: "name"
                 }, {
-                    caption: "Effective Date",
+                    caption: l("EntityFieldName:MDMService:MCPHeader:EffectiveDate"),
                     dataField: "effectiveDate",
                     format: "dd/MM/yyyy",
                     dataType: "date"
                 }, {
-                    caption: "End Date",
+                    caption: l("EntityFieldName:MDMService:MCPHeader:EndDate"),
                     dataField: "endDate",
                     format: "dd/MM/yyyy",
                     dataType: "date"
@@ -247,66 +246,4 @@ $(function () {
             ],
         })
 });
-
-var dataSource = [
-    {
-        id: 1,
-        outletId: "C001",
-        outletName: "Cửa hàng A2",
-        address: "Quận 2, Hồ Chí Minh",
-        effectiveDate: "01/01/2023",
-        endDate: "02/11/2023",
-        distance: 100,
-        Monday: true,
-        Tuesday: true,
-        Wednesday: true,
-        Thursday: true,
-        Friday: true,
-        Saturday: true,
-        Sunday: true,
-        Week1: true,
-        Week2: true,
-        Week3: true,
-        Week4: true,
-    },
-    {
-        id: 2,
-        outletId: "C002",
-        outletName: "Cửa hàng A2",
-        address: "Quận 2, Hồ Chí Minh",
-        effectiveDate: "10/01/2023",
-        endDate: "12/11/2023",
-        distance: 100,
-        Monday: true,
-        Tuesday: true,
-        Wednesday: false,
-        Thursday: false,
-        Friday: true,
-        Saturday: true,
-        Sunday: true,
-        Week1: true,
-        Week2: false,
-        Week3: false,
-        Week4: true,
-    },
-    {
-        id: 3,
-        outletId: "C003",
-        outletName: "Cửa hàng A3",
-        address: "Quận 4, Hồ Chí Minh",
-        effectiveDate: "15/01/2023",
-        endDate: "15/11/2023",
-        distance: 400,
-        Monday: false,
-        Tuesday: false,
-        Wednesday: true,
-        Thursday: true,
-        Friday: false,
-        Saturday: false,
-        Sunday: false,
-        Week1: true,
-        Week2: false,
-        Week3: false,
-        Week4: false,
-    }
-];
+ 
