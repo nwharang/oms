@@ -776,7 +776,7 @@ $(function () {
                     MCPModel = result.mcpHeaderDto;
                     sessionStorage.setItem("MCPModel", JSON.stringify(result.mcpHeaderDto));
 
-                    abp.message.confirm(l('GenerateVisitPlan'), l('Congratulations')).then(function (answer) {
+                    abp.message.confirm(l1('ConfirmationMessage.GenerateVisitPlan'), l('Congratulations')).then(function (answer) {
                         if (answer) {
                             $('#GenerateButton').click();
                         }
