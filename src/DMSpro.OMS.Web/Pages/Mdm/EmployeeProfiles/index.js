@@ -214,83 +214,14 @@ $(function () {
                         colCount: 1,
                         colSpan: 2,
                         items:
-                            [
-                                {
-                                    caption: l("EntityFieldName:MDMService:EmployeeProfile:Code"),
-                                    dataField: "code"
-                                },
-                                {
-                                    caption: l("EntityFieldName:MDMService:EmployeeProfile:ERPCode"),
-                                    dataField: "erpCode"
-                                },
-                                {
-                                    caption: l("EntityFieldName:MDMService:EmployeeProfile:FirstName"),
-                                    dataField: "firstName",
-                                    validationRules: [{ type: "required" }]
-                                },
-                                {
-                                    caption: l("EntityFieldName:MDMService:EmployeeProfile:LastName"),
-                                    dataField: "lastName"
-                                },
-                                {
-                                    caption: l("EntityFieldName:MDMService:EmployeeProfile:JobTittle"),
-                                    dataField: "workingPositionId"
-                                }
-                            ]
+                            ['code', 'erpCode', 'firstName', 'lastName', 'workingPositionId']
                     },
                     {
                         itemType: 'group',
                         colCount: 2,
                         colSpan: 2,
                         caption: '',
-                        items: [
-                            {
-                                caption: l("EntityFieldName:MDMService:EmployeeProfile:DateOfBirth"),
-                                dataField: "dateOfBirth"
-                            },
-                            {
-                                caption: l("EntityFieldName:MDMService:EmployeeProfile:EmployeeTypeName"),
-                                dataField: "employeeTypeId"
-                            },
-                            {
-                                caption: l("EntityFieldName:MDMService:EmployeeProfile:IdCardNumber"),
-                                dataField: "idCardNumber"
-                            },
-                            {
-                                caption: l("EntityFieldName:MDMService:EmployeeProfile:Address"),
-                                dataField: "address"
-                            },
-                            {
-                                caption: l("EntityFieldName:MDMService:EmployeeProfile:Phone"),
-                                dataField: "phone"
-                            },
-                            {
-                                caption: l("EntityFieldName:MDMService:EmployeeProfile:Email"),
-                                dataField: "email",
-                                validationRules: [
-                                    {
-                                        type: 'email',
-                                    }
-                                ]
-                            },
-                            {
-                                caption: l("EntityFieldName:MDMService:EmployeeProfile:EffectiveDate"),
-                                dataField: "effectiveDate"
-                            },
-                            {
-                                caption: l("EntityFieldName:MDMService:EmployeeProfile:EndDate"),
-                                dataField: "endDate"
-                            },
-                            {
-                                caption: l("EntityFieldName:MDMService:EmployeeProfile:Active"),
-                                dataField: "active",
-                                width: 120,
-                                alignment: 'center',
-                                cellTemplate(container, options) {
-                                    $('<div>').append($(options.value ? '<i class="fa fa-check"></i>' : '<i class= "fa fa-times"></i>')).appendTo(container);
-                                }
-                            }
-                        ]
+                        items: ['dateOfBirth', 'employeeTypeId', 'idCardNumber', 'address', 'phone', 'email', 'effectiveDate', 'endDate', 'active']
                     }
                 ],
             }
@@ -354,6 +285,11 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:Email"),
                 dataField: "email",
                 dataType: 'string',
+                validationRules: [
+                    {
+                        type: 'email',
+                    }
+                ],
                 visible: false
             },
             {
@@ -419,7 +355,11 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:Active"),
                 dataField: "active",
-                dataType: 'boolean'
+                dataType: 'boolean',
+                alignment: 'center',
+                cellTemplate(container, options) {
+                    $('<div>').append($(options.value ? '<i class="fa fa-check"></i>' : '<i class= "fa fa-times"></i>')).appendTo(container);
+                }
             }
         ]
     }).dxDataGrid("instance");
