@@ -1,74 +1,10 @@
-﻿$(function () {
-    // language texts
-    var l = abp.localization.getResource("MdmService");
+﻿var DeliveryModel;
+var DeliveryDetailData = [];
 
-    var dataSales = [
-        {
-            id: 1,
-            itemCode: "item1",
-            itemName: "John Heart",
-            UOM: "Thung",
-            qty: 3,
-            issueQty: 0,
-            price: 100000,
-            lineAmountNoTax: 400000,
-            discount: 0,
-            discountLineAmount: 0,
-            taxRate: "10",
-            taxRateAmount: 40000,
-            lineAmt: 440000,
-            baseQty: 40,
-            baseUOM: "Chai",
-            warehourse: "Main",
-            WHLocation: "ABC bcx",
-            taxCode: "VAT10",
-            tranType: "Selling",
-        },
-        {
-            id: 2,
-            itemCode: "item2",
-            itemName: "San pham 2",
-            UOM: "Thung",
-            qty: 3,
-            issueQty: 0,
-            price: 100000,
-            lineAmountNoTax: 300000,
-            discount: 20,
-            discountLineAmount: 60,
-            taxRate: "10",
-            taxRateAmount: 50000,
-            lineAmt: 240000,
-            baseQty: 30,
-            baseUOM: "Chai",
-            warehourse: "Main",
-            WHLocation: "ABC bcx",
-            taxCode: "VAT10",
-            tranType: "Selling",
-        },
-        {
-            id: 3,
-            itemCode: "item3",
-            itemName: "San pham 3",
-            UOM: "Lon",
-            qty: 4,
-            issueQty: 0,
-            price: 100000,
-            lineAmountNoTax: 300000,
-            discount: 0,
-            discountLineAmount: 0,
-            taxRate: "10",
-            taxRateAmount: 33000,
-            lineAmt: 530000,
-            baseQty: 30,
-            baseUOM: "Chai",
-            warehourse: "Main",
-            WHLocation: "ABC bcx",
-            taxCode: "VAT10",
-            tranType: "Sampling",
-        }
-    ];
-
-    $("#frmSalesOrders").dxForm({
+$(function () {
+   
+    var l = abp.localization.getResource("MdmService"); 
+    $("#frmDeliveryHeader").dxForm({
         formData: {
             company: "CEO Company",
             SRNbr: "hsdjsd939239j23",
@@ -108,36 +44,120 @@
                 items: ["totalAmtNoTax", "totalAmtDiscount", "totalTaxAmt", "totalAmt"]
             }
         ]
-    }); 
-
-    var gridSales = $('#dgSalesOrders').dxDataGrid({
-        dataSource: dataSales,
-        keyExpr: "id",
-        showBorders: true,
-        //filterRow: {
-        //    visible: true
-        //},
+    });  
+    var dgDeliveries = $('#dgDeliveries').dxDataGrid({
+        dataSource: DeliveryDetailData, 
+        remoteOperations: true, 
+        showColumnLines: true,
+        showRowLines: false,
+        rowAlternationEnabled: true,
+        showBorders: false, 
+        export: {
+            enabled: true, 
+        },
+        onExporting: function (e) {
+            if (e.format === 'xlsx') {
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('Deliveries');
+                DevExpress.excelExporter.exportDataGrid({
+                    component: e.component,
+                    worksheet,
+                    autoFilterEnabled: true,
+                }).then(() => {
+                    workbook.xlsx.writeBuffer().then((buffer) => {
+                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Deliveries.xlsx');
+                    });
+                });
+                e.cancel = true;
+            }
+            else if (e.format === 'pdf') {
+                const doc = new jsPDF();
+                DevExpress.pdfExporter.exportDataGrid({
+                    jsPDFDocument: doc,
+                    component: e.component,
+                }).then(() => {
+                    doc.save('Deliveries.pdf');
+                });
+            }
+        },  
+        allowColumnReordering: true, 
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
+        columnMinWidth: 50,
+        columnAutoWidth: true,
+        columnChooser: {
+            enabled: true,
+            allowSearch: true,
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        filterRow: {
+            visible: true,
+        },
+        groupPanel: {
+            visible: true,
+        },
+        headerFilter: {
+            visible: true,
+        }, 
         searchPanel: {
             visible: true
+        }, 
+        stateStoring: { //save state in localStorage
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgDeliveries',
         },
-        scrolling: {
-            mode: 'standard'
-        },
-        allowColumnReordering: false,
-        rowAlternationEnabled: true,
-        //headerFilter: {
-        //    visible: true,
-        //},
-        paging:
-        {
-            pageSize: pageSize,
+
+        paging: {
+            enabled: true,
+            pageSize: pageSize
         },
         pager: {
             visible: true,
-            allowedPageSizes: [10, 20, 'all'],
             showPageSizeSelector: true,
+            allowedPageSizes: allowedPageSizes,
             showInfo: true,
-            showNavigationButtons: true,
+            showNavigationButtons: true
+        }, 
+        editing: { 
+            mode: "row",
+            allowAdding: abp.auth.isGranted('OrderService.Deliveries.Create'),
+            allowUpdating: abp.auth.isGranted('OrderService.Deliveries.Edit'),
+            allowDeleting: true,//missing permission
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            },
+        },
+        toolbar: {
+            items: [
+                "groupPanel",
+                "addRowButton",
+                "columnChooserButton",
+                "exportButton",
+                {
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            //id: "import-excel",
+                            class: "import-excel",
+                        },
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
+                        },
+                    },
+                },
+                "searchPanel",
+            ],
         },
         columns: [
             {
@@ -255,4 +275,10 @@
         ],
     }).dxDataGrid("instance");
 
+    $('#resizable').dxResizable({
+        minHeight: 120,
+        handles: "bottom"
+    }).dxResizable('instance');
+
+    initImportPopup('api/mdm-service/companies', 'Deliveries_Template', 'dgDeliveries');  
 });

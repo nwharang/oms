@@ -9,9 +9,9 @@ $(function () {
             const deferred = $.Deferred();
             const args = {};
             if (loadOptions.filter == null) {
-                loadOptions.filter = ['dateVisit', '>=', getCurrentDateFormat()];
+                loadOptions.filter = ['dateVisit', '>', getCurrentDateFormat()];
             } else {
-                loadOptions.filter = [loadOptions.filter, "and", ['dateVisit', '>=', getCurrentDateFormat()]];
+                loadOptions.filter = [loadOptions.filter, "and", ['dateVisit', '>', getCurrentDateFormat()]];
             }
 
             requestOptions.forEach((i) => {
@@ -123,25 +123,31 @@ $(function () {
                 "groupPanel",
                 {
                     location: 'after',
-                    template: ` <button disabled id="ChangeVisitPlanButton" style="display:none;height: 36px;" type="button" class="btn btn-light btn-sm hvr-icon-pop">
+                    template: ` <button disabled id="ChangeVisitPlanButton" style="height: 35px;" type="button" class="btn btn-light btn-sm hvr-icon-pop">
                         <i class="fa fa-random hvr-icon" style="padding-right: 2px"></i>
                         <span class="">Change Visit Plans</span>
-                    </button>`,
-                    onClick() {
-                        //todo
-                    },
+                    </button>`
                 },
-
-                'columnChooserButton',
+                "columnChooserButton",
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            //id: "import-excel",
+                            class: "import-excel",
+                        },
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
+                        },
                     },
                 },
-                "searchPanel"
+                "searchPanel",
             ],
         },
         columns: [
@@ -223,13 +229,23 @@ $(function () {
         return feature;
     }
 
-    $('#date').dxDateBox({
+    $('#NewDate').dxDateBox({
         type: 'date',
         showClearButton: true,
-        min: getNextDate(1),
+        min: getNextDate(2),
         displayFormat: 'dd/MM/yyyy',
+    }).dxValidator({
+        validationRules: [{
+            type: 'required',
+            message: '',
+        }],
     });
+    function getNormalDate(currentDate) {
+        if (!currentDate || (typeof currentDate == "string")) return currentDate;
 
+        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2) + " 23:59:59";//a Ben và a kalick confirmed
+        return date;
+    }
     const popupChangeVisitPlan = $('#popupChangeVisitPlan').dxPopup({
         width: 400,
         height: 280,
@@ -254,17 +270,26 @@ $(function () {
                 icon: 'fa fa-check hvr-icon',
                 text: 'Submit',
                 onClick() {
-                    var dxEndDate = $('#date').data('dxDateBox');
-                    var params = {
-                        //id: MCPModel.mcpHeaderDto.id,
-                        //endDate: endDate
-                    };
-                    abp.message.success(l('Congratulations'));
-                    popupChangeVisitPlan.hide();
-                    //mCPHeaderService.setEndDate(params.id, params.endDate, { contentType: "application/json" }).done(result => {
-                    //    abp.message.success(l('Congratulations'));
-                    //    popupEnddateMCP.hide();
-                    //}).fail(() => { });
+                    var newDate = $('#NewDate').data('dxDateBox');
+                    var val = newDate.option('value');
+                    if(!val) {
+                        newDate.option('isValid', false);
+                        newDate.focus();
+                        return;
+                    }
+
+                    var ids = [];
+                    var grid = $('#dgVisitPlans').data('dxDataGrid');
+                    var selected = grid.getSelectedRowsData();
+                    selected.forEach(u => {
+                        ids.push(u.id)
+                    });
+
+                    visitPlansService.updateMultiple(ids, getNormalDate(val), { contentType: "application/json" }).done(result => {
+                        abp.message.success(l('Congratulations'));
+                        popupChangeVisitPlan.hide();
+                        //grid.refresh();
+                    }).fail(() => { });
                 },
             },
         }, {
@@ -281,4 +306,6 @@ $(function () {
     }).dxPopup('instance');
 
     $('#ChangeVisitPlanButton').click(function () { $('#popupChangeVisitPlan').data('dxPopup').show(); });
+
+    initImportPopup('api/mdm-service/visit-plans', 'VisitPlans_Template', 'dgVisitPlans');
 });

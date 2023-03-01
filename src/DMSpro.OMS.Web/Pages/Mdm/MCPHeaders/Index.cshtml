@@ -3,15 +3,14 @@
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using DMSpro.OMS.MdmService.Permissions
-@using DMSpro.OMS.MdmService.Web.Pages.Companies
 @using DMSpro.OMS.MdmService.Web.Menus
 @using DMSpro.OMS.MdmService.Companies;
 @using Microsoft.AspNetCore.Mvc.Localization
 @using DMSpro.OMS.MdmService.Localization
 @inject IHtmlLocalizer<MdmServiceResource> L
-@inject IHtmlLocalizer<OMSWebResource> L1
+@inject IHtmlLocalizer<OMSResource> L1
 @inject IAuthorizationService Authorization
-@model IndexModel
+
 @inject IPageLayout PageLayout
 @{
     PageLayout.Content.Title = "MCP";
@@ -43,6 +42,8 @@
         </div>
         <div class="panel-container show">
             <div class="panel-content jqvmap-bg-ocean p-0" style="">
+                <div id="importPanel"></div>
+                <div id="popupImport"></div>
                 <div class="dx-viewport">
                     <div class=" py-2">
                         <div id="dgMCPHeaders"> </div>

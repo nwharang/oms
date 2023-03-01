@@ -2,16 +2,15 @@
 @using DMSpro.OMS.Localization;
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
-@using DMSpro.OMS.MdmService.Permissions
-@using DMSpro.OMS.MdmService.Web.Pages.Companies
+@using DMSpro.OMS.MdmService.Permissions 
 @using DMSpro.OMS.MdmService.Web.Menus
 @using DMSpro.OMS.MdmService.Companies;
 @using Microsoft.AspNetCore.Mvc.Localization
 @using DMSpro.OMS.MdmService.Localization
 @inject IHtmlLocalizer<MdmServiceResource> L
-@inject IHtmlLocalizer<OMSWebResource> L1
+@inject IHtmlLocalizer<OMSResource> L1
 @inject IAuthorizationService Authorization
-@model IndexModel
+
 @inject IPageLayout PageLayout
 @{
     PageLayout.Content.Title = L["Page:Title:CompanyProfiles"].Value;
@@ -26,7 +25,7 @@
 }
 
 @section breadcrumb
-    {
+{
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
         <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:Company"].Value</li>
@@ -45,8 +44,7 @@
         <div class="panel-container show">
             <div class="panel-content jqvmap-bg-ocean p-0" >
                 <div class="dx-viewport" style="overflow: auto;">
-                    <div id="dgCompanies"></div>
-                    <div id="popup"></div>
+                    <div id="dgCompanies"></div> 
                 </div> 
             </div>
         </div>

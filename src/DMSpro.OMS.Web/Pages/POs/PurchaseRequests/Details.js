@@ -14,11 +14,13 @@ $(function () {
             title: "Details",
             icon: "detailslayout",
             template: initDetailsTab()
-        }, {
-            title: "Promotional Information",
-            icon: "money",
-            template: initPromotionalTab()
-        }]
+        }
+            //, {
+            //title: "Promotional Information",
+            //icon: "money",
+            //template: initPromotionalTab()
+            //}
+        ]
     }).dxTabPanel('instance');
 
     $("#top-section").dxForm({
@@ -34,22 +36,17 @@ $(function () {
                 items: [
                     {
                         dataField: 'RPONbr',
-                        editorType: 'dxSelectBox',
-                        editorOptions: {
-                            // items: positions,
-                            searchEnabled: true,
-                            value: '',
-                        },
+                        //editorType: 'string',
+                        //editorOptions: {
+                        //    // items: positions,
+                        //    searchEnabled: true,
+                        //    value: '',
+                        //},
                         validationRules: [{
                             type: 'required',
-                            message: 'RPONbr is required',
+                            message: '',
                         }],
-                        message: "xx",
-                        label: {
-                            template: function () {
-                                return (data) => $(`<div>ffff</div>`);
-                            },
-                        }
+                          
                     },
                     {
                         dataField: 'Status',
@@ -63,24 +60,40 @@ $(function () {
                 itemType: "group",
                 items: [
                     {
-                        dataField: 'DocDate',
+                        dataField: 'RequestDate',
                         editorType: 'dxDateBox',
+                        validationRules: [{
+                            type: 'required',
+                            message: '',
+                        }],
                     },
                     {
-                        dataField: 'RequiredDate',
-                        editorType: 'dxDateBox'
-                    }, {
-                        dataField: 'PostingDate',
-                        editorType: 'dxDateBox'
+                        dataField: 'DocDate',
+                        editorType: 'dxDateBox',
+                        editorOptions: {
+                            readOnly: true,
+                        }
+                    }
+                ]
+            },
+            {
+                itemType: "group",
+                items: [
+                    {
+                        dataField: 'Vendor',
+                        editorType: 'dxSelectBox',
+                        editorOptions: {
+                            placeholder: ' ',
+                        },
+                        validationRules: [{
+                            type: 'required',
+                            message: '',
+                        }]
                     }]
             },
             {
                 itemType: "group",
-                items: ["Vendor", "LinkedNbr", "Warehouse"]
-            },
-            {
-                itemType: "group",
-                items: ["TotalLineAmtNoTax", "TotalTaxAmt", "TotalLineAmt"]
+                items: ["TotalTaxAmt", "TotalLineAmt"]
             }
         ]
     });

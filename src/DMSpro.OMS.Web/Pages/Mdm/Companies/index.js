@@ -1,6 +1,7 @@
-﻿$(function () {
-    var l = abp.localization.getResource("MdmService");
-    var l1 = abp.localization.getResource("OMSWeb");
+﻿var l = abp.localization.getResource("MdmService");
+var l1 = abp.localization.getResource("OMS");
+$(function () {
+    
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
 
@@ -185,10 +186,7 @@
         allowColumnResizing: true,
         columnResizingMode: 'widget',
         columnMinWidth: 50,
-        columnAutoWidth: true,
-
-        columnMinWidth: 50,
-
+        columnAutoWidth: true, 
         columnChooser: {
             enabled: true,
             allowSearch: true,
@@ -252,12 +250,7 @@
             }, 
         },
         toolbar: {
-            items: [
-                //{
-                //    location: 'before',
-                //    name: 'addRowButton',
-                //},
-                
+            items: [ 
                 "groupPanel",
                 "addRowButton",
                 "columnChooserButton",
@@ -268,35 +261,17 @@
                     options: {
                         icon: "import",
                         elementAttr: {
-                            id: "import-excel",
+                            //id: "import-excel",
                             class: "import-excel",
                         },
-                        onClick() {
-                            //console.log(popup);
-                            popup.option({
-                                contentTemplate: () => popupContentTemplate(),
-                                'position.of': `#import-excel`,
-                            });
-                            popup.show();
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup'); 
+                            if (popup) popup.show();
                         },
                     },
-                },
-                //{
-                //    location: 'center',
-                //    template() {
-                //        return $('<div>')
-                //            .css({ 'margin-top': '-15px', 'width': '150px', 'height': '60px'})
-                //            .dxFileUploader({
-                //                selectButtonText: 'Import Excel',
-                //                icon: 'import',
-                //                labelText: '',
-                //                multiple: false,
-                //                uploadMode: 'useButtons',
-                //                uploadUrl: 'https://js.devexpress.com/Demos/NetCore/FileUploader/Upload',
-                //                allowedFileExtensions: ['.jpg', '.jpeg', '.gif', '.png'],
-                //            });
-                //    },
-                //},
+                }, 
                 "searchPanel",
             ],
         },
@@ -723,145 +698,145 @@
     }).dxDataGrid("instance");
 
     /*thanhhq*/
-    var files = [];
-    var url = `${abp.appPath}api/mdm-service/companies/insert-from-excel`;
+    //var files = [];
+    //var url = `${abp.appPath}api/mdm-service/companies/insert-from-excel`;
 
-    const popupContentTemplate = function () {
+    //const popupContentTemplate = function () {
         
-        const content = $('<div />');
-        content.append(
-            $('<div>').dxSelectBox({
-                dataSource: [
-                    { name: l('Insert from Excel'), value: 'I' },
-                    { name: l('Update from Excel'), value: 'U' },
-                ],
-                valueExpr: 'value',
-                displayExpr: 'name',
-                value: 'I',
-                onValueChanged(e) {
-                    if (e.value == 'I') {
-                        url = `${abp.appPath}api/mdm-service/companies/insert-from-excel`;
-                    } else url = `${abp.appPath}api/mdm-service/companies/update-from-excel`
-                },
-            })); 
-        content.append(
-            $('<div>').dxFileUploader({
-                selectButtonText: l('Select a file'),
-                icon: 'import',
-                //labelText: '',
-                multiple: false,
-                uploadMode: 'useForm',
-                allowedFileExtensions: ['.xlsx', '.xls'],
-                onValueChanged(e) {
-                    files = e.value;
-                }
-            })); 
-        return content;
-    };
+    //    const content = $('<div />');
+    //    content.append(
+    //        $('<div>').dxSelectBox({
+    //            dataSource: [
+    //                { name: l('Insert from Excel'), value: 'I' },
+    //                { name: l('Update from Excel'), value: 'U' },
+    //            ],
+    //            valueExpr: 'value',
+    //            displayExpr: 'name',
+    //            value: 'I',
+    //            onValueChanged(e) {
+    //                if (e.value == 'I') {
+    //                    url = `${abp.appPath}api/mdm-service/companies/insert-from-excel`;
+    //                } else url = `${abp.appPath}api/mdm-service/companies/update-from-excel`
+    //            },
+    //        })); 
+    //    content.append(
+    //        $('<div>').dxFileUploader({
+    //            selectButtonText: l('Select a file'),
+    //            icon: 'import',
+    //            //labelText: '',
+    //            multiple: false,
+    //            uploadMode: 'useForm',
+    //            allowedFileExtensions: ['.xlsx', '.xls'],
+    //            onValueChanged(e) {
+    //                files = e.value;
+    //            }
+    //        })); 
+    //    return content;
+    //};
 
-    const popup = $('#popup').dxPopup({
-        width: 400,
-        height: 300,
-        //container: '#import-excel',
-        showTitle: true,
-        title: l('Import Excel'),
-        visible: false,
-        dragEnabled: true,
-        hideOnOutsideClick: true,
-        showCloseButton: true,
-        position: {
-            my: 'top',
-            at: 'center',
-            //collision: 'fit',
-        },
-        toolbarItems: [{
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'before',
-            options: {
-                icon: 'download',
-                text: l('Download Template'),
-                onClick() {
-                    const url = '/api/mdm-service/companies/get-excel-template';
-                    fetch(url)
-                        // Retrieve its body as ReadableStream
-                    .then((response) => {
-                        console.log(response);
-                        const reader = response.body.getReader();
-                        console.log(reader);
-                        return new ReadableStream({
-                            start(controller) {
-                                return pump();
-                                function pump() {
-                                    return reader.read().then(({ done, value }) => {
-                                        // When no more data needs to be consumed, close the stream
-                                        if (done) {
-                                            controller.close();
-                                            return;
-                                        }
-                                        // Enqueue the next data chunk into our target stream
-                                        controller.enqueue(value);
-                                        return pump();
-                                        });
-                                    }
-                                }
-                                })
-                            })
-                            // Create a new response out of the stream
-                            .then((stream) => new Response(stream))
-                            // Create an object URL for the response
-                            .then((response) => response.blob())
-                            .then((blob) => URL.createObjectURL(blob))
-                            .then((href) => {
-                                const a = document.createElement("a");
-                                document.body.appendChild(a);
-                                a.style = "display: none";
-                                a.href = href;
-                                a.download = 'Company_Template.xlsx';
-                                a.click();
+    //const popup = $('#popup').dxPopup({
+    //    width: 400,
+    //    height: 300,
+    //    //container: '#import-excel',
+    //    showTitle: true,
+    //    title: l('Import Excel'),
+    //    visible: false,
+    //    dragEnabled: true,
+    //    hideOnOutsideClick: true,
+    //    showCloseButton: true,
+    //    position: {
+    //        my: 'top',
+    //        at: 'center',
+    //        //collision: 'fit',
+    //    },
+    //    toolbarItems: [{
+    //        widget: 'dxButton',
+    //        toolbar: 'bottom',
+    //        location: 'before',
+    //        options: {
+    //            icon: 'download',
+    //            text: l('Download Template'),
+    //            onClick() {
+    //                const url = '/api/mdm-service/companies/get-excel-template';
+    //                fetch(url)
+    //                    // Retrieve its body as ReadableStream
+    //                .then((response) => {
+    //                    console.log(response);
+    //                    const reader = response.body.getReader();
+    //                    console.log(reader);
+    //                    return new ReadableStream({
+    //                        start(controller) {
+    //                            return pump();
+    //                            function pump() {
+    //                                return reader.read().then(({ done, value }) => {
+    //                                    // When no more data needs to be consumed, close the stream
+    //                                    if (done) {
+    //                                        controller.close();
+    //                                        return;
+    //                                    }
+    //                                    // Enqueue the next data chunk into our target stream
+    //                                    controller.enqueue(value);
+    //                                    return pump();
+    //                                    });
+    //                                }
+    //                            }
+    //                            })
+    //                        })
+    //                        // Create a new response out of the stream
+    //                        .then((stream) => new Response(stream))
+    //                        // Create an object URL for the response
+    //                        .then((response) => response.blob())
+    //                        .then((blob) => URL.createObjectURL(blob))
+    //                        .then((href) => {
+    //                            const a = document.createElement("a");
+    //                            document.body.appendChild(a);
+    //                            a.style = "display: none";
+    //                            a.href = href;
+    //                            a.download = 'Company_Template.xlsx';
+    //                            a.click();
 
-                            });
+    //                        });
                            
-                                },
-            },
-        }, {
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'after',
-            options: {
-                icon: 'upload',
-                text: l('Import'),
-                onClick(e) {
-                    if (files.length > 0) {
-                        var formData = new FormData();
-                        formData.append("file", files[0]);
+    //                            },
+    //        },
+    //    }, {
+    //        widget: 'dxButton',
+    //        toolbar: 'bottom',
+    //        location: 'after',
+    //        options: {
+    //            icon: 'upload',
+    //            text: l('Import'),
+    //            onClick(e) {
+    //                if (files.length > 0) {
+    //                    var formData = new FormData();
+    //                    formData.append("file", files[0]);
 
-                        $.ajax({
-                            type: "POST",
-                            url: url,
-                            async: true,
-                            data: formData,
-                            cache: false,
-                            contentType: false,
-                            processData: false,
-                            //timeout: 60000,
-                            success: function (data) {
-                                popup.hide();
-                                gridCompanies.refresh();
-                            },
-                            error: function (msg) {
-                                // handle error
-                                console.log(msg.responseText.error);
-                            },
+    //                    $.ajax({
+    //                        type: "POST",
+    //                        url: url,
+    //                        async: true,
+    //                        data: formData,
+    //                        cache: false,
+    //                        contentType: false,
+    //                        processData: false,
+    //                        //timeout: 60000,
+    //                        success: function (data) {
+    //                            popup.hide();
+    //                            gridCompanies.refresh();
+    //                        },
+    //                        error: function (msg) {
+    //                            // handle error
+    //                            console.log(msg.responseText.error);
+    //                        },
                             
-                        });
+    //                    });
                         
-                    }
-                },
-            },
-        }, 
-        ],
-    }).dxPopup('instance');
+    //                }
+    //            },
+    //        },
+    //    }, 
+    //    ],
+    //}).dxPopup('instance');
     /*thanhhq*/
-
+    initImportPopup('api/mdm-service/companies', 'Company_Template', 'dgCompanies'); 
 });
