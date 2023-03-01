@@ -99,7 +99,7 @@ $(function () {
     var userStore = new DevExpress.data.CustomStore({ 
         key: 'id',
         load: function (loadOptions) {
-            var deferred = $.Deferred(),
+            var deferred = $.Deferred();
             const params = {};
             requestOptions.forEach(function (i) {
                 if (i in loadOptions && isNotEmpty(loadOptions[i]))
