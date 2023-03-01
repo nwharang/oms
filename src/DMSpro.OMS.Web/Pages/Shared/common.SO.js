@@ -1,0 +1,3 @@
+DevExpress.config({
+    editorStylingMode: 'underlined',
+});
