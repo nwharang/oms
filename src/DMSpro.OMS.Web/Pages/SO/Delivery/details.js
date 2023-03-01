@@ -2,10 +2,7 @@
 var DeliveryDetailData = [];
 
 $(function () {
-    DevExpress.config({
-        editorStylingMode: 'underlined',
-    });
-
+   
     var l = abp.localization.getResource("MdmService"); 
     $("#frmDeliveryHeader").dxForm({
         formData: {
