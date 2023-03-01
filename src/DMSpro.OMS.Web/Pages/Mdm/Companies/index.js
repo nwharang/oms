@@ -1,5 +1,5 @@
 ﻿var l = abp.localization.getResource("MdmService");
-var l1 = abp.localization.getResource("OMSWeb");
+var l1 = abp.localization.getResource("OMS");
 $(function () {
     
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;

@@ -1,5 +1,5 @@
 ﻿$(function () {
-    var l = abp.localization.getResource("OMSWeb");
+    var l = abp.localization.getResource("OMS");
     var salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
 
     /****custom store*****/

@@ -1,6 +1,6 @@
 ﻿$(function () {
     var l = abp.localization.getResource("MdmService");
-    var l1 = abp.localization.getResource("OMSWeb");
+    var l1 = abp.localization.getResource("OMS");
 
     var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;

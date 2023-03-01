@@ -1,6 +1,6 @@
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    var l1 = abp.localization.getResource("OMSWeb");
+    var l1 = abp.localization.getResource("OMS");
     var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
     var companyInZoneService = window.dMSpro.oMS.mdmService.controllers.companyInZones.companyInZone;
     var customerInZoneService = window.dMSpro.oMS.mdmService.controllers.customerInZones.customerInZone;

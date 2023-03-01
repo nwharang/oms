@@ -1,6 +1,6 @@
 $(function () {
     var l = abp.localization.getResource("MdmService");
-    var l1 = abp.localization.getResource("OMSWeb");
+    var l1 = abp.localization.getResource("OMS");
     var priceUpdateService = window.dMSpro.oMS.mdmService.controllers.priceUpdates.priceUpdate;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
 

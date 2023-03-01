@@ -1,5 +1,5 @@
 ﻿$(function () {
-    var l = abp.localization.getResource("OMSWeb");
+    var l = abp.localization.getResource("OMS");
     var salesRequestService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var customerAssignmentService = window.dMSpro.oMS.mdmService.controllers.customerAssignments.customerAssignment;
