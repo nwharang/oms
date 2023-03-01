@@ -243,7 +243,7 @@ $(function () {
     function getNormalDate(currentDate) {
         if (!currentDate || (typeof currentDate == "string")) return currentDate;
 
-        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2) + "T00:00:00";
+        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2) + " 23:59:59";//a Ben và a kalick confirmed
         return date;
     }
     const popupChangeVisitPlan = $('#popupChangeVisitPlan').dxPopup({
