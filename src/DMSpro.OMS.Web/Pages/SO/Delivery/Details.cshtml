@@ -13,9 +13,15 @@
     PageLayout.Content.Title = L["Delivery"].Value;
     PageLayout.Content.MenuItemName = "SO";
 }
+
 @section styles {
-    <abp-style src="/Pages/SO/Delivery/Details.css" />
+    <style>
+        #resizable { 
+            height: 300px;
+        }
+    </style>
 }
+
 @section scripts
     {
     <abp-script src="/pages/shared/common.SO.js" /> 
