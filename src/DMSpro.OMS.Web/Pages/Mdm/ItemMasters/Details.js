@@ -11,6 +11,8 @@ var itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttribut
 var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
 var itemImageService = window.dMSpro.oMS.mdmService.controllers.itemImages.itemImage;
 var itemAttachService = window.dMSpro.oMS.mdmService.controllers.itemAttachments.itemAttachment;
+var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
+var vATService = window.dMSpro.oMS.mdmService.controllers.vATs.vAT;
 
 $(function () {
     DevExpress.config({
@@ -194,7 +196,25 @@ $(function () {
                                                 editorOptions: {
                                                     items: manageItem,
                                                     valueExpr: 'id',
-                                                    displayExpr: 'text'
+                                                    displayExpr: 'text',
+                                                    onValueChanged: function (arg) {
+                                                        if (arg.value == 1) {
+                                                            $('div.fieldExpiredType > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
+                                                            $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').removeClass('dx-state-disabled');
+                                                            $('div.fieldExpiredValue > div > div.dx-show-invalid-badge > div.dx-texteditor-container > div.dx-texteditor-input-container > input').removeAttr('disabled');
+                                                            $('div.fieldIssueMethod > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
+                                                        }
+                                                        else if (arg.value == 0) {
+                                                            $('div.fieldExpiredType > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', true);
+                                                            $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').addClass('dx-state-disabled');
+                                                            $('div.fieldIssueMethod > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', true);
+                                                        }
+                                                        else {
+                                                            $('div.fieldExpiredType > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', true);
+                                                            $('div.fieldExpiredValue > div > div.dx-show-invalid-badge').addClass('dx-state-disabled');
+                                                            $('div.fieldIssueMethod > div > div.dx-show-invalid-badge').data('dxSelectBox').option('disabled', false);
+                                                        }
+                                                    }
                                                 }
                                             },
                                             {
@@ -281,7 +301,17 @@ $(function () {
                                             },
                                             {
                                                 dataField: 'vatId',
-                                                validationRules: [{ type: 'required' }]
+                                                validationRules: [{ type: 'required' }],
+                                                editorType: 'dxSelectBox',
+                                                editorOptions: {
+                                                    dataSource: {
+                                                        store: getVATs,
+                                                        paginate: true,
+                                                        pageSize: pageSizeForLookup
+                                                    },
+                                                    valueExpr: 'id',
+                                                    displayExpr: 'code'
+                                                }
                                             },
                                             {
                                                 dataField: 'basePrice',
@@ -599,6 +629,24 @@ var getUOMs = new DevExpress.data.CustomStore({
     }
 });
 
+var getVATs = new DevExpress.data.CustomStore({
+    key: 'id',
+    loadMode: 'raw',
+    cacheRawData: true,
+    load(loadOptions) {
+        const deferred = $.Deferred();
+        vATService.getListDevextremes({})
+            .done(result => {
+                deferred.resolve(result.data, {
+                    totalCount: result.totalCount,
+                    summary: result.summary,
+                    groupCount: result.groupCount,
+                });
+            });
+        return deferred.promise();
+    }
+});
+
 var getItemAttrValue = new DevExpress.data.CustomStore({
     key: 'id',
     loadMode: 'raw',
@@ -817,3 +865,37 @@ const imageStore = new DevExpress.data.CustomStore({
         return itemImageService.delete(key);
     }
 });
+
+function action(e) {
+    var typeButton = e.getAttribute('data-type');
+    if (typeButton == 'save') {
+        var form = $('#top-section').data('dxForm');
+        if (!form.validate().isValid) {
+            abp.message.warn(l1('WarnMessage.RequiredField'));
+            return;
+        }
+
+        var data = form.option('formData');
+        if (item != null) {
+            itemService.update(item.id, data, { contentType: 'application/json' })
+                .done(result => {
+                    abp.message.success(l('Congratulations'));
+                    sessionStorage.setItem("item", JSON.stringify(result));
+                    //LoadData();
+                })
+        } else {
+            itemService.create(data, { contentType: "application/json" })
+                .done(result => {
+                    abp.message.success(l('Congratulations'));
+                    sessionStorage.setItem("item", JSON.stringify(result));
+                    //LoadData();
+                })
+        }
+    } else {
+        abp.message.confirm(l('ConfirmationMessage.UnSavedAndLeave'), l('ConfirmationMessage.UnSavedAndLeaveTitle')).then(function (confirmed) {
+            if (confirmed) {
+                window.close();
+            }
+        });
+    }
+}
