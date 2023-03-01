@@ -292,7 +292,6 @@
             return d.promise();
         },
         insert(values) {
-            debugger
             return itemMasterService.create(values, { contentType: "application/json" });
         },
         update(key, values) {

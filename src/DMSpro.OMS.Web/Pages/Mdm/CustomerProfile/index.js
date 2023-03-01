@@ -302,7 +302,6 @@
                         groupCount: result.groupCount,
                     });
                 });
-
             return deferred.promise();
         }
     });
@@ -1483,7 +1482,9 @@
                     location: 'after',
                     template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                     onClick() {
-                        gridCustomers.addRow();
+                        //gridCustomers.addRow();
+                        var w = window.open('/Mdm/CustomerProfile/Details', '_blank');
+                        w.sessionStorage.setItem("customerProfile", null);
                     },
                 },
                 'columnChooserButton',
