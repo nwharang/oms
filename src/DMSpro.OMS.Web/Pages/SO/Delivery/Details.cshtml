@@ -16,22 +16,21 @@
 
 @section styles {
     <style>
-        #resizable { 
+        #resizable {
             height: 300px;
         }
     </style>
 }
 
-@section scripts
-    {
-    <abp-script src="/pages/shared/common.SO.js" /> 
-     <script src="/js/devextreme/exceljs.min.js"></script>
+@section scripts {
+    <script src="/js/devextreme/exceljs.min.js"></script>
     <script src="/js/devextreme/filesaver.min.js"></script>
+    <abp-script src="/pages/shared/common.SO.js" />
     <abp-script src="/Pages/SO/Delivery/details.js" />
 }
 
 @section breadcrumb
-{
+    {
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["SO"].Value</a></li>
         <li class="breadcrumb-item">@L["Delivery"].Value</li>
@@ -46,8 +45,8 @@
             </h2>
         </div>
         <div class="panel-container show">
-            <div class="panel-content jqvmap-bg-ocean p-0"  >
-                 <div style="padding-left:12px" class="buttons-header-grid">
+            <div class="panel-content jqvmap-bg-ocean p-0">
+                <div style="padding-left:12px" class="buttons-header-grid">
                     <div class="btn-group">
                         <button id="btnActions" type="button" class="btn btn-light btn-sm dropdown-toggle hvr-icon-pop"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -61,14 +60,14 @@
                         </div>
                     </div>
                 </div>
-                 <div class="dx-viewport">
+                <div class="dx-viewport">
                     <div class="py-3" id="resizable">
                         <div id="frmDeliveryHeader"></div>
                     </div>
                     <div class="py-2">
                         <div id="dgDeliveries"> </div>
                     </div>
-                </div> 
+                </div>
             </div>
         </div>
     </div>
