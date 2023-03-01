@@ -134,11 +134,13 @@ $(function () {
                     options: {
                         icon: "import",
                         elementAttr: {
-                            id: "import-excel",
+                            //id: "import-excel",
                             class: "import-excel",
                         },
-                        onClick() {
-                            var popup = $('#popupImport').data('dxPopup');
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
                             if (popup) popup.show();
                         },
                     },

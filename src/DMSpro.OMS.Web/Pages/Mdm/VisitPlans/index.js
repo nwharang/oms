@@ -120,7 +120,8 @@ $(function () {
         },
         toolbar: {
             items: [
-                "groupPanel", 
+                "groupPanel",
+                "addRowButton",
                 "columnChooserButton",
                 "exportButton",
                 {
@@ -129,11 +130,13 @@ $(function () {
                     options: {
                         icon: "import",
                         elementAttr: {
-                            id: "import-excel",
+                            //id: "import-excel",
                             class: "import-excel",
                         },
-                        onClick() {
-                            var popup = $('#popupImport').data('dxPopup');
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
                             if (popup) popup.show();
                         },
                     },
@@ -258,10 +261,10 @@ $(function () {
                     };
                     abp.message.success(l('Congratulations'));
                     popupChangeVisitPlan.hide();
-                    //mCPHeaderService.setEndDate(params.id, params.endDate, { contentType: "application/json" }).done(result => {
-                    //    abp.message.success(l('Congratulations'));
-                    //    popupEnddateMCP.hide();
-                    //}).fail(() => { });
+                    mCPHeaderService.setEndDate(params.id, params.endDate, { contentType: "application/json" }).done(result => {
+                        abp.message.success(l('Congratulations'));
+                        popupEnddateMCP.hide();
+                    }).fail(() => { });
                 },
             },
         }, {

@@ -7,11 +7,12 @@ function isNotEmpty(value) {
     return value !== undefined && value !== null && value !== '';
 }
 
-const popupImportContentTemplate = function () {
+const popupImportContentTemplate = function (e) {
+    var controlName = e.closest('div.popupImport').attr('data-target');
     var l = abp.localization.getResource("MdmService");
     const content = $('<div />');
     content.append(
-        $('<div name="sbImportTypes">').dxSelectBox({
+        $(`<div class="${controlName}" name="sbImportTypes">`).dxSelectBox({
             dataSource: [
                 { name: l('Insert from Excel'), value: 'I' },
                 { name: l('Update from Excel'), value: 'U' },
@@ -21,7 +22,7 @@ const popupImportContentTemplate = function () {
             value: 'I'
         }));
     content.append(
-        $('<div name="excelUploader">').dxFileUploader({
+        $(`<div class="${controlName}" name="excelUploader">`).dxFileUploader({
             selectButtonText: l('Select a file'),
             icon: 'import',
             //labelText: '',
@@ -32,10 +33,13 @@ const popupImportContentTemplate = function () {
     return content;
 };
 function initImportPopup(url, templateName, controlName) {
-    if ($('#importPanel').length > 0) {
-        $('#importPanel').dxLoadPanel({
+    $(`#${controlName}`).parent().append(`<div class="${controlName} importPanel"></div>`);
+    $(`#${controlName}`).parent().append(`<div data-target="${controlName}" class="${controlName} popupImport"></div>`);
+
+    if ($(`div.${controlName}.importPanel`).length > 0) {
+        $(`div.${controlName}.importPanel`).dxLoadPanel({
             //shadingColor: 'rgba(0,0,0,0.4)',
-            position: { of: `#${controlName}  div.dx-datagrid-rowsview.dx-datagrid-nowrap` },
+            position: { of: `#${controlName} div.dx-datagrid-rowsview.dx-datagrid-nowrap` },
             visible: false,
             showIndicator: true,
             showPane: true,
@@ -43,10 +47,9 @@ function initImportPopup(url, templateName, controlName) {
             hideOnOutsideClick: false 
         });
     }
-    if ($('#popupImport').length > 0) {
-
+    if ($(`div.${controlName}.popupImport`).length > 0) { 
         var l = abp.localization.getResource("MdmService");
-        $('#popupImport').dxPopup({
+        var popupImport =  $(`div.${controlName}.popupImport`).dxPopup({
             width: 400,
             height: 300,
             //container: '#import-excel',
@@ -59,7 +62,7 @@ function initImportPopup(url, templateName, controlName) {
             position: {
                 my: 'top',
                 at: 'center',
-                of: '#import-excel'
+                of: `#${controlName} div.dx-toolbar-button .import-excel`
             },
             contentTemplate: popupImportContentTemplate,
             toolbarItems: [{
@@ -117,19 +120,24 @@ function initImportPopup(url, templateName, controlName) {
                     icon: 'upload',
                     text: l('Import'),
                     onClick(e) {
-                        var uploader = $('div[name=excelUploader]').data('dxFileUploader');
+                        var uploader = $(`div.${controlName}[name=excelUploader]`).data('dxFileUploader');
                         var files = uploader.option('value');
                         if (files.length > 0) {
                             abp.message.confirm(abp.localization.getResource("OMS")('ConfirmationMessage.UploadExcelFile').replace('{0}', `"${files[0].name}"`), ' ').then(function (answer) {
                                 if (answer) {
                                     var requestUrl = '';
-                                    var importType = $('div[name=sbImportTypes]').data('dxSelectBox').option('value');
+                                     
+                                    var importType = $(`div.${controlName}[name=sbImportTypes]`).data('dxSelectBox').option('value');
                                     if (importType == 'I') {
                                         requestUrl = `${abp.appPath + url}/insert-from-excel`;
                                     } else requestUrl = `${abp.appPath + url}/update-from-excel`;
+
                                     var formData = new FormData();
                                     formData.append("file", files[0]);
-                                    $('#importPanel').data('dxLoadPanel').show();
+                                    
+                                    var panel = $(`div.${controlName}.importPanel`).data('dxLoadPanel');
+                                    panel.show();
+
                                     $.ajax({
                                         type: "POST",
                                         url: requestUrl,
@@ -139,9 +147,10 @@ function initImportPopup(url, templateName, controlName) {
                                         contentType: false,
                                         processData: false,
                                         success: function (data) {
-                                            uploader.reset();
-                                            $('#popupImport').data('dxPopup').hide(); 
-                                            $('#importPanel').data('dxLoadPanel').hide();
+                                            uploader.reset(); 
+                                            popupImport.hide(); 
+                                            panel.hide();
+
                                             if ($(`#${controlName}`).data('dxDataGrid'))
                                                 $(`#${controlName}`).data('dxDataGrid').refresh(); 
                                             else if ($(`#${controlName}`).data('dxTreeList'))
@@ -149,7 +158,7 @@ function initImportPopup(url, templateName, controlName) {
                                         },
                                         error: function (msg) {
                                             uploader.reset();
-                                            $('#importPanel').data('dxLoadPanel').hide();
+                                            panel.hide();
                                             console.log(msg.responseText);
                                         },
                                     });
@@ -160,6 +169,6 @@ function initImportPopup(url, templateName, controlName) {
                 },
             },
             ],
-        });
+        }).dxPopup("instance");;
     }
 }
