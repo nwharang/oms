@@ -1,11 +1,11 @@
 ﻿var l = abp.localization.getResource("MdmService");
 $(function () {
-    var mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader; 
+    var mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
     var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
 
     var salesOrgHierarchyStore = new DevExpress.data.CustomStore({
         key: 'id',
-        load(loadOptions) { 
+        load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
             requestOptions.forEach((i) => {
@@ -13,7 +13,7 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-             
+
             salesOrgHierarchyService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -47,8 +47,8 @@ $(function () {
     });
     var mCPHeaderStore = new DevExpress.data.CustomStore({
         key: 'id',
-        load(loadOptions) { 
-            const deferred = $.Deferred(); 
+        load(loadOptions) {
+            const deferred = $.Deferred();
             const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
@@ -76,7 +76,7 @@ $(function () {
                     d.resolve(data);
                 });
             return d.promise();
-        }, 
+        },
         remove(key) {
             return mCPHeaderService.delete(key);
         }
@@ -88,7 +88,7 @@ $(function () {
             editing: {
                 mode: "row",
                 allowAdding: abp.auth.isGranted('MdmService.MCPs.Create'),
-               // allowUpdating: abp.auth.isGranted('MdmService.MCPs.Edit'),
+                // allowUpdating: abp.auth.isGranted('MdmService.MCPs.Edit'),
                 allowDeleting: abp.auth.isGranted('MdmService.MCPs.Delete'),
                 useIcons: true,
                 texts: {
@@ -162,22 +162,22 @@ $(function () {
             toolbar: {
                 items: [
                     "groupPanel",
-                    {
-                        location: 'after',
-                        template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                        onClick() {
-                            var w = window.open('/Mdm/MCPHeaders/Details', '_blank');
-                            //w.sessionStorage.setItem("MCPModel", null);
-                        },
-                    },
-
-                    'columnChooserButton',
+                    "addRowButton",
+                    "columnChooserButton",
                     "exportButton",
                     {
                         location: 'after',
-                        template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                        onClick() {
-                            //todo
+                        widget: 'dxButton',
+                        options: {
+                            icon: "import",
+                            elementAttr: {
+                                id: "import-excel",
+                                class: "import-excel",
+                            },
+                            onClick() {
+                                var popup = $('#popupImport').data('dxPopup');
+                                if (popup) popup.show();
+                            },
                         },
                     },
                     "searchPanel"
@@ -219,7 +219,7 @@ $(function () {
                     }
                 },
                 {
-                    caption: l("EntityFieldName:MDMService:MCPHeader:CompanyName"),  
+                    caption: l("EntityFieldName:MDMService:MCPHeader:CompanyName"),
                     dataField: "company.name",
                 },
                 {
@@ -242,8 +242,10 @@ $(function () {
                     dataField: "endDate",
                     format: "dd/MM/yyyy",
                     dataType: "date"
-                } 
+                }
             ],
         })
+
+    initImportPopup('api/mdm-service/m-cPHeaders', 'MCPHeaders_Template', 'dgMCPHeaders'); 
+
 });
- 

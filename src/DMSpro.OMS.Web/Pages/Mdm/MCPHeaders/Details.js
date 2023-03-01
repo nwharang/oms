@@ -370,7 +370,7 @@ $(function () {
             },
             onExporting(e) {
                 const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Data');
+                const worksheet = workbook.addWorksheet('MCPDetails');
 
                 DevExpress.excelExporter.exportDataGrid({
                     component: e.component,
@@ -378,7 +378,7 @@ $(function () {
                     autoFilterEnabled: true,
                 }).then(() => {
                     workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'MCPDetails.xlsx');
                     });
                 });
                 e.cancel = true;
@@ -429,24 +429,25 @@ $(function () {
             toolbar: {
                 items: [
                     "groupPanel",
-                    {
-                        location: 'after',
-                        template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                        onClick() {
-                            dgMCPDetails.addRow();
-                        },
-                    },
-
-                    'columnChooserButton',
+                    "addRowButton",
+                    "columnChooserButton",
                     "exportButton",
                     {
                         location: 'after',
-                        template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                        onClick() {
-                            //todo
+                        widget: 'dxButton',
+                        options: {
+                            icon: "import",
+                            elementAttr: {
+                                id: "import-excel",
+                                class: "import-excel",
+                            },
+                            onClick() {
+                                var popup = $('#popupImport').data('dxPopup');
+                                if (popup) popup.show();
+                            },
                         },
                     },
-                    "searchPanel"
+                    "searchPanel",
                 ],
             },
             onEditorPreparing: function (e) {
@@ -1048,6 +1049,8 @@ $(function () {
             },
         }],
     }).dxPopup('instance');
+
+    initImportPopup('api/mdm-service/m-cPDetails', 'MCPDetails_Template', 'dgMCPDetails');
 });
 
 //$(window).on("beforeunload", function () {

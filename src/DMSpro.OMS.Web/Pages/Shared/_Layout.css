@@ -44,10 +44,10 @@ div.panel-container.show > div.panel-content button.buttons-print {
 }
 
 /*div.dx-datagrid .dx-toolbar-items-container,*/
-div.dx-treelist-container div.dx-toolbar-items-container {
+/*div.dx-treelist-container div.dx-toolbar-items-container {
     display: none;
 }
-
+*/
 div.buttons-header-grid {
     width: 100%;
     padding-right: 12px;

@@ -2,13 +2,12 @@
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using DMSpro.OMS.MdmService.Permissions
-@using DMSpro.OMS.MdmService.Web.Pages.NumberingConfigs
 @using DMSpro.OMS.MdmService.Web.Menus
 @using Microsoft.AspNetCore.Mvc.Localization
 @using DMSpro.OMS.MdmService.Localization
 @inject IHtmlLocalizer<MdmServiceResource> L
 @inject IAuthorizationService Authorization
-@model IndexModel
+
 @inject IPageLayout PageLayout
 @{
     PageLayout.Content.Title = L["Page.Title.NumberingConfigs"].Value;
@@ -40,6 +39,8 @@
         <div class="panel-container show">
             <div class="panel-content jqvmap-bg-ocean p-0">
                 <div id="popupVenderInformation"></div>
+                <div id="importPanel"></div>
+                <div id="popupImport"></div>
                 <div class="dx-viewport">
                     <div class="py-2">
                         <div id="gridNumberingConfigs"></div>

@@ -3,7 +3,6 @@
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using DMSpro.OMS.MdmService.Permissions
-@using DMSpro.OMS.MdmService.Web.Pages.Companies
 @using DMSpro.OMS.MdmService.Web.Menus
 @using DMSpro.OMS.MdmService.Companies;
 @using Microsoft.AspNetCore.Mvc.Localization
@@ -11,7 +10,7 @@
 @inject IHtmlLocalizer<MdmServiceResource> L
 @inject IHtmlLocalizer<OMSResource> L1
 @inject IAuthorizationService Authorization
-@model IndexModel
+
 @inject IPageLayout PageLayout
 @{
     PageLayout.Content.Title = @L1["Page.Title.MCP"].Value;
@@ -69,7 +68,8 @@
                         <span>Close</span>
                     </button>
                 </div>
-
+                <div id="importPanel"></div>
+                <div id="popupImport"></div>
                 <div class="dx-viewport">
                     <div class="py-3" id="resizable">
                         <div id="top-section"></div>

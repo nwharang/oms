@@ -125,23 +125,25 @@ $(function () {
         toolbar: {
             items: [
                 "groupPanel",
-                {
-                    location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        gridSalesChannels.addRow();
-                    },
-                },
-                'columnChooserButton',
+                "addRowButton",
+                "columnChooserButton",
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            id: "import-excel",
+                            class: "import-excel",
+                        },
+                        onClick() {
+                            var popup = $('#popupImport').data('dxPopup');
+                            if (popup) popup.show();
+                        },
                     },
                 },
-                "searchPanel"
+                "searchPanel",
             ],
         },
         columns: [
@@ -199,17 +201,18 @@ $(function () {
     //    salesChannelService.getDownloadToken().then(
     //        function(result){
     //                var input = getFilter();
-    //                var url =  abp.appPath + 'api/mdm-service/sales-channels/as-excel-file' + 
+    //                var url =  abp.appPath + 'api/mdm-service/sales-channels/as-excel-file' +
     //                    abp.utils.buildQueryString([
     //                        { name: 'downloadToken', value: result.token },
-    //                        { name: 'filterText', value: input.filterText }, 
-    //                        { name: 'code', value: input.code }, 
+    //                        { name: 'filterText', value: input.filterText },
+    //                        { name: 'code', value: input.code },
     //                        { name: 'name', value: input.name }
     //                        ]);
-                            
+
     //                var downloadWindow = window.open(url, '_blank');
     //                downloadWindow.focus();
     //        }
     //    )
     //});
+    initImportPopup('api/mdm-service/sales-channels', 'SalesChannels_Template', 'dgSalesChannels');
 });

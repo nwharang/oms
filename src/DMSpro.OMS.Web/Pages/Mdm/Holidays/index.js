@@ -71,24 +71,25 @@ $(() => {
         toolbar: {
             items: [
                 "groupPanel",
-                {
-                    location: 'after',
-                    template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        gridHolidays.addRow();
-                    },
-                },
-
-                'columnChooserButton',
+                "addRowButton",
+                "columnChooserButton",
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            id: "import-excel",
+                            class: "import-excel",
+                        },
+                        onClick() {
+                            var popup = $('#popupImport').data('dxPopup');
+                            if (popup) popup.show();
+                        },
                     },
                 },
-                "searchPanel"
+                "searchPanel",
             ],
         },
         editing: {
@@ -356,4 +357,7 @@ $(() => {
             },
         },
     }).dxDataGrid("instance");
+
+    initImportPopup('api/mdm-service/holidays', 'Holidays_Template', 'gridHolidays'); 
+
 });
