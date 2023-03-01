@@ -7,6 +7,12 @@ function isNotEmpty(value) {
     return value !== undefined && value !== null && value !== '';
 }
 
+function pad(num, size) {
+    num = num.toString();
+    while (num.length < size) num = "0" + num;
+    return num;
+}
+
 const popupImportContentTemplate = function (e) {
     var controlName = e.closest('div.popupImport').attr('data-target');
     var l = abp.localization.getResource("MdmService");

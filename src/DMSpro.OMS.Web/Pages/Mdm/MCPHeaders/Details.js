@@ -286,7 +286,7 @@ $(function () {
                             message: '',
                         }],
                         editorOptions: {
-                            min: new Date(),
+                            //min: new Date(),
                             displayFormat: 'dd/MM/yyyy',
                             showClearButton: true
                         }
@@ -294,7 +294,7 @@ $(function () {
                         dataField: 'EndDate',
                         editorType: 'dxDateBox',
                         editorOptions: {
-                            min: new Date(),
+                            //min: new Date(),
                             displayFormat: 'dd/MM/yyyy',
                             showClearButton: true
                         }
@@ -663,12 +663,7 @@ $(function () {
             ],
         }).dxDataGrid("instance");
 
-    function pad(num, size) {
-        num = num.toString();
-        while (num.length < size) num = "0" + num;
-        return num;
-    }
-
+   
     function getNormalDate(currentDate) {
         if (!currentDate || (typeof currentDate == "string")) return currentDate;
 

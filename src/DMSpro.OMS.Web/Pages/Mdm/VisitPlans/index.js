@@ -9,9 +9,9 @@ $(function () {
             const deferred = $.Deferred();
             const args = {};
             if (loadOptions.filter == null) {
-                loadOptions.filter = ['dateVisit', '>=', getCurrentDateFormat()];
+                loadOptions.filter = ['dateVisit', '>', getCurrentDateFormat()];
             } else {
-                loadOptions.filter = [loadOptions.filter, "and", ['dateVisit', '>=', getCurrentDateFormat()]];
+                loadOptions.filter = [loadOptions.filter, "and", ['dateVisit', '>', getCurrentDateFormat()]];
             }
 
             requestOptions.forEach((i) => {
@@ -121,7 +121,13 @@ $(function () {
         toolbar: {
             items: [
                 "groupPanel",
-                "addRowButton",
+                {
+                    location: 'after',
+                    template: ` <button disabled id="ChangeVisitPlanButton" style="height: 35px;" type="button" class="btn btn-light btn-sm hvr-icon-pop">
+                        <i class="fa fa-random hvr-icon" style="padding-right: 2px"></i>
+                        <span class="">Change Visit Plans</span>
+                    </button>`
+                },
                 "columnChooserButton",
                 "exportButton",
                 {
@@ -223,13 +229,23 @@ $(function () {
         return feature;
     }
 
-    $('#date').dxDateBox({
+    $('#NewDate').dxDateBox({
         type: 'date',
         showClearButton: true,
-        min: getNextDate(1),
+        min: getNextDate(2),
         displayFormat: 'dd/MM/yyyy',
+    }).dxValidator({
+        validationRules: [{
+            type: 'required',
+            message: '',
+        }],
     });
+    function getNormalDate(currentDate) {
+        if (!currentDate || (typeof currentDate == "string")) return currentDate;
 
+        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2) + "T00:00:00";
+        return date;
+    }
     const popupChangeVisitPlan = $('#popupChangeVisitPlan').dxPopup({
         width: 400,
         height: 280,
@@ -254,16 +270,25 @@ $(function () {
                 icon: 'fa fa-check hvr-icon',
                 text: 'Submit',
                 onClick() {
-                    var dxEndDate = $('#date').data('dxDateBox');
-                    var params = {
-                        //id: MCPModel.mcpHeaderDto.id,
-                        //endDate: endDate
-                    };
-                    abp.message.success(l('Congratulations'));
-                    popupChangeVisitPlan.hide();
-                    mCPHeaderService.setEndDate(params.id, params.endDate, { contentType: "application/json" }).done(result => {
+                    var newDate = $('#NewDate').data('dxDateBox');
+                    var val = newDate.option('value');
+                    if(!val) {
+                        newDate.option('isValid', false);
+                        newDate.focus();
+                        return;
+                    }
+
+                    var ids = [];
+                    var grid = $('#dgVisitPlans').data('dxDataGrid');
+                    var selected = grid.getSelectedRowsData();
+                    selected.forEach(u => {
+                        ids.push(u.id)
+                    });
+
+                    visitPlansService.updateMultiple(ids, getNormalDate(val), { contentType: "application/json" }).done(result => {
                         abp.message.success(l('Congratulations'));
-                        popupEnddateMCP.hide();
+                        popupChangeVisitPlan.hide();
+                        //grid.refresh();
                     }).fail(() => { });
                 },
             },
