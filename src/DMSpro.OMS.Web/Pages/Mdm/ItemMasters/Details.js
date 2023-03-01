@@ -75,7 +75,18 @@ $(function () {
                 icon: "attach",
                 template: iniAttachmentTab()
             }
-        ]
+        ],
+        onInitialized: function (e) {
+            if (item == null) {
+                e.component.option('items[0].disabled', true);
+                e.component.option('items[1].disabled', true);
+                e.component.option('selectedIndex', 0);
+            } else {
+                e.component.option('items[0].disabled', false);
+                e.component.option('items[1].disabled', false);
+                e.component.option('selectedIndex', 0);
+            }
+        }
     }).dxTabPanel('instance');
 
     $("#top-section").dxForm({
@@ -881,14 +892,12 @@ function action(e) {
                 .done(result => {
                     abp.message.success(l('Congratulations'));
                     sessionStorage.setItem("item", JSON.stringify(result));
-                    //LoadData();
                 })
         } else {
             itemService.create(data, { contentType: "application/json" })
                 .done(result => {
                     abp.message.success(l('Congratulations'));
                     sessionStorage.setItem("item", JSON.stringify(result));
-                    //LoadData();
                 })
         }
     } else {

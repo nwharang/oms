@@ -1504,7 +1504,18 @@
                 type: 'buttons',
                 caption: l("Actions"),
                 width: 90,
-                buttons: ['edit'],
+                buttons: [{
+                    text: "Edit",
+                    icon: "edit",
+                    hint: "Edit",
+                    visible: function (e) {
+                        return !e.row.isNewRow;
+                    },
+                    onClick: function (e) {
+                        var w = window.open('/Mdm/CustomerProfile/Details', '_blank');
+                        w.sessionStorage.setItem("customerProfile", JSON.stringify(e.row.data));
+                    }
+                }],
                 fixedPosition: 'left'
             },
             {

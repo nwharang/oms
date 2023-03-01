@@ -12,6 +12,7 @@ var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.cusAttri
 var cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
 var cusContactService = window.dMSpro.oMS.mdmService.controllers.customerContacts.customerContact;
 var cusAttachService = window.dMSpro.oMS.mdmService.controllers.customerAttachments.customerAttachment;
+var cusProfileService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
 
 $(function () {
     DevExpress.config({
@@ -101,7 +102,7 @@ $(function () {
                                 itemType: 'group',
                                 items: [
                                     {
-                                        dataField: 'priceList.id',
+                                        dataField: 'priceListId',
                                         editorType: 'dxSelectBox',
                                         editorOptions: {
                                             dataSource: {
@@ -235,6 +236,16 @@ var pricelistLookup = new DevExpress.data.CustomStore({
                 });
             });
         return deferred.promise();
+    },
+    byKey: function (key) {
+        if (key == 0) return null;
+
+        var d = new $.Deferred();
+        priceListService.get(key)
+            .done(data => {
+                d.resolve(data);
+            });
+        return d.promise();
     }
 });
 
@@ -258,6 +269,16 @@ var systemDataLookup = new DevExpress.data.CustomStore({
                 });
             });
         return deferred.promise();
+    },
+    byKey: function (key) {
+        if (key == 0) return null;
+
+        var d = new $.Deferred();
+        systemDataService.get(key)
+            .done(data => {
+                d.resolve(data);
+            });
+        return d.promise();
     }
 });
 
@@ -282,6 +303,16 @@ var companyData = new DevExpress.data.CustomStore({
                 });
             });
         return deferred.promise();
+    },
+    byKey: function (key) {
+        if (key == 0) return null;
+
+        var d = new $.Deferred();
+        companyService.get(key)
+            .done(data => {
+                d.resolve(data);
+            });
+        return d.promise();
     }
 });
 
@@ -324,14 +355,7 @@ function initAddressTab() {
                                 dataField: 'geoMaster0Id',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
-                                    dataSource(options) {
-                                        return {
-                                            store: geoMasterStore,
-                                            filter: options.data ? ['level', '=', 0] : null,
-                                            paginate: true,
-                                            pageSize: pageSizeForLookup
-                                        };
-                                    },
+                                    dataSource: dsAddressValue(0),
                                     valueExpr: "id",
                                     displayExpr: "name"
                                 }
@@ -340,14 +364,7 @@ function initAddressTab() {
                                 dataField: 'geoMaster1Id',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
-                                    dataSource(options) {
-                                        return {
-                                            store: geoMasterStore,
-                                            filter: options.data ? ['level', '=', 1] : null,
-                                            paginate: true,
-                                            pageSize: pageSizeForLookup
-                                        };
-                                    },
+                                    dataSource: dsAddressValue(1),
                                     valueExpr: "id",
                                     displayExpr: "name"
                                 }
@@ -356,14 +373,7 @@ function initAddressTab() {
                                 dataField: 'geoMaster2Id',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
-                                    dataSource(options) {
-                                        return {
-                                            store: geoMasterStore,
-                                            filter: options.data ? ['level', '=', 2] : null,
-                                            paginate: true,
-                                            pageSize: pageSizeForLookup
-                                        };
-                                    },
+                                    dataSource: dsAddressValue(2),
                                     valueExpr: "id",
                                     displayExpr: "name"
                                 }
@@ -372,14 +382,7 @@ function initAddressTab() {
                                 dataField: 'geoMaster3Id',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
-                                    dataSource(options) {
-                                        return {
-                                            store: geoMasterStore,
-                                            filter: options.data ? ['level', '=', 3] : null,
-                                            paginate: true,
-                                            pageSize: pageSizeForLookup
-                                        };
-                                    },
+                                    dataSource: dsAddressValue(3),
                                     valueExpr: "id",
                                     displayExpr: "name"
                                 }
@@ -388,14 +391,7 @@ function initAddressTab() {
                                 dataField: 'geoMaster4Id',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
-                                    dataSource(options) {
-                                        return {
-                                            store: geoMasterStore,
-                                            filter: options.data ? ['level', '=', 4] : null,
-                                            paginate: true,
-                                            pageSize: pageSizeForLookup
-                                        };
-                                    },
+                                    dataSource: dsAddressValue(4),
                                     valueExpr: "id",
                                     displayExpr: "name"
                                 }
@@ -545,6 +541,15 @@ function generateAttrOptions(attr) {
             displayExpr: 'attrValName'
         }
     }
+}
+
+const dsAddressValue = function (n) {
+    return {
+        store: geoMasterStore,
+        filter: ['level', '=', n],
+        paginate: true,
+        pageSize: pageSizeForLookup
+    };
 }
 
 var cusContactStore = new DevExpress.data.CustomStore({
@@ -950,5 +955,37 @@ function iniAttachmentTab() {
                     }
                 ],
             })
+    }
+}
+
+function action(e) {
+    var typeButton = e.getAttribute('data-type');
+    if (typeButton == 'save') {
+        var form = $('#top-section').data('dxForm');
+        if (!form.validate().isValid) {
+            abp.message.warn(l1('WarnMessage.RequiredField'));
+            return;
+        }
+
+        var data = form.option('formData');
+        if (cusProfile != null) {
+            cusProfileService.update(cusProfile.id, data, { contentType: 'application/json' })
+                .done(result => {
+                    abp.message.success(l('Congratulations'));
+                    sessionStorage.setItem("customerProfile", JSON.stringify(result));
+                })
+        } else {
+            cusProfileService.create(data, { contentType: "application/json" })
+                .done(result => {
+                    abp.message.success(l('Congratulations'));
+                    sessionStorage.setItem("customerProfile", JSON.stringify(result));
+                })
+        }
+    } else {
+        abp.message.confirm(l('ConfirmationMessage.UnSavedAndLeave'), l('ConfirmationMessage.UnSavedAndLeaveTitle')).then(function (confirmed) {
+            if (confirmed) {
+                window.close();
+            }
+        });
     }
 }
