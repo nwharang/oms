@@ -281,3 +281,8 @@ table.companies > tbody > tr{
 .dx-fileuploader-show-file-list .dx-fileuploader-files-container {
     padding-top: 0;
 }
+
+.dx-widget.dx-datagrid-drag-action {
+    margin-left: -280px;
+    margin-top: -130px;
+}

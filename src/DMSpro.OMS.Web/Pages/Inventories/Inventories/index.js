@@ -5,14 +5,57 @@
         dataSource: inventoryDatas,
         keyExpr: "id",
         showBorders: true,
-        focusedRowEnabled: true,
+        remoteOperations: true,
+        showRowLines: true,
+        showBorders: true,
+        cacheEnabled: true,
+        allowColumnReordering: true,
+        rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
+        columnAutoWidth: true,
+        filterRow: {
+            visible: true
+        },
+        groupPanel: {
+            visible: true,
+        },
         searchPanel: {
             visible: true
         },
-        allowColumnReordering: false,
-        rowAlternationEnabled: true,
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'gridInventories',
         },
         paging: {
             enabled: true,
@@ -25,13 +68,30 @@
             showInfo: true,
             showNavigationButtons: true
         },
+        onRowUpdating: function (e) {
+            e.newData = Object.assign({}, e.oldData, e.newData);
+        },
         toolbar: {
             items: [
+                "groupPanel",
                 {
-                    name: "searchPanel",
-                    location: 'after'
-                }
-            ]
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        dataGridContainer.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
         },
         columns: [
             {

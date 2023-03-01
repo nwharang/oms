@@ -1,57 +1,39 @@
 ﻿$(function () {
     var l = abp.localization.getResource("MdmService");
-
-    $("#form").dxForm({
-        formData: {
-            Docdate: currentDate(),
-            PostingDate: currentDate()
-        },
-        colCount: 4,
-        items: [
-            {
-                itemType: "group",
-                items: ["DocNbr", "Status", "Desc"]
-            },
-            {
-                itemType: "group",
-                items: ["Reason", "LinkedNbr"]
-            },
-            {
-                itemType: "group",
-                items: ["User Counting", "User Confirm"]
-            },
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'Docdate',
-                        editorType: 'dxDateBox'
-                    },
-                    {
-                        dataField: 'PostingDate',
-                        editorType: 'dxDateBox'
-                    }
-                ]
-            }
-        ]
-    });
-
-    const dataGridContainer = $('#dataGridContainer').dxDataGrid({
+    const dataGridInventoryCounting = $('#dataGridInventoryCounting').dxDataGrid({
         dataSource: inventoryDatas,
-        keyExpr: "id",
+        keyExpr: "Id",
+        // keyExpr: "id",
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'storage',
+        },
         showBorders: true,
-        focusedRowEnabled: true,
+        columnAutoWidth: true,
+        scrolling: {
+            columnRenderingMode: 'virtual',
+        },
         searchPanel: {
             visible: true
         },
-        allowColumnReordering: false,
-        rowAlternationEnabled: true,
-        scrolling: {
-            mode: 'standard'
-        },
+        allowColumnResizing: true,
+        allowColumnReordering: true,
         paging: {
             enabled: true,
             pageSize: pageSize
+        },
+        rowAlternationEnabled: true,
+        filterRow: {
+            visible: true,
+            applyFilter: 'auto',
+        },
+        headerFilter: {
+            visible: false,
+        },
+        columnChooser: {
+            enabled: true,
+            mode: "select"
         },
         pager: {
             visible: true,
@@ -62,62 +44,157 @@
         },
         toolbar: {
             items: [
+                "groupPanel",
                 {
-                    name: "searchPanel",
-                    location: 'after'
-                }
-            ]
+                    location: 'after',
+                    template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick(e) {
+                        e.element.closest('div.dx-datagrid.dx-gridbase-container').parent().data('dxDataGrid').addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                    onClick() {
+                        //todo
+                    },
+                },
+                "searchPanel"
+            ],
+        },
+        export: {
+            enabled: true,
+            // formats: ['excel','pdf'],
+            allowExportSelectedData: true,
+        },
+        groupPanel: {
+            visible: true,
+        },
+        selection: {
+            mode: 'single',
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('InventoryCounting');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'InventoryCounting.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        editing: {
+            mode: "row",
+            allowAdding: true,
+            allowUpdating: true,
+            allowDeleting: true,
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            }
+        },
+        onEditorPreparing: function (e) {
+            if (e.dataField == "code" && e.parentType == "dataRow") {
+                e.editorName = "dxDropDownBox";
+                e.editorOptions.dropDownOptions = {
+                    //height: 500
+                };
+                e.editorOptions.contentTemplate = function (args, container) {
+                    var value = args.component.option("value"),
+                        $dataGrid = $("<div>").dxDataGrid({
+                            width: '100%',
+                            dataSource: args.component.option("dataSource"),
+                            keyExpr: "ID",
+                            columns: [{
+                                caption: "Item Code",
+                                dataField: "Name"
+                            }, "BarCode"],
+                            hoverStateEnabled: true,
+                            paging: { enabled: true, pageSize: pageSize },
+                            filterRow: { visible: true },
+                            scrolling: { mode: "infinite" },
+                            height: '90%',
+                            showRowLines: true,
+                            showBorders: true,
+                            selection: { mode: "single" },
+                            selectedRowKeys: value,
+                            onSelectionChanged: function (selectedItems) {
+                                var keys = selectedItems.selectedRowKeys;
+                                args.component.option("value", keys);
+                            }
+                        });
+
+                    var dataGrid = $dataGrid.dxDataGrid("instance");
+
+                    args.component.on("valueChanged", function (args) {
+                        var value = args.value;
+
+                        dataGrid.selectRows(value, false);
+                    });
+                    container.append($dataGrid);
+                    return container;
+                };
+            }
         },
         columns: [
             {
-                caption: "Item Code",
-                dataField: "code"
+                width: 100,
+                type: 'buttons',
+                caption: l('Actions'),
+                buttons: [
+                    {
+                        text: "View Details",
+                        icon: "fieldchooser",
+                        hint: "View Details",
+                        onClick: function (e) {
+                            var w = window.open('/Inventories/InventoryCounting/Details', '_blank');
+                            w.sessionStorage.setItem("model", JSON.stringify(e.row.data));
+                        }
+                    },
+                    'edit', 'delete'],
+                visibleIndex: 0,
             },
             {
-                caption: "Item Name",
-                dataField: "name"
+                caption: "DocNbr",
+                dataField: "DocNbr",
+                visibleIndex: 1,
             },
             {
-                caption: "Warehouse",
-                dataField: "warehouse"
+                caption: "Status",
+                dataField: "Status",
             },
             {
-                caption: "WHLocation",
-                dataField: "whlocation"
+                caption: "Desc",
+                dataField: "Desc",
+                allowFiltering: false,
             },
             {
-                caption: "InStock",
-                dataField: "instock"
+                caption: "DocDate",
+                dataField: "DocDate",
             },
             {
-                caption: "Qty",
-                dataField: "qty"
+                caption: "Posting Date",
+                dataField: "PostingDate",
+                allowFiltering: false,
             },
-            {
-                caption: "DiffQty",
-                dataField: "diffqty"
-            },
-            {
-                caption: "ConfirmDiffQty",
-                dataField: "confirmdiffqty"
-            },
-            {
-                caption: "AbsDiffQty",
-                dataField: "absdiffqty"
-            },
-            {
-                caption: "UMO",
-                dataField: "umo"
-            }
         ],
+        customizeColumns: function (columns) {
+            for (var i = 0; i < columns.length; i++) {
+                columns[i].visibleIndex = i;
+            }
+        }
     }).dxDataGrid("instance");
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
-
-        console.log("ExportToExcelButton is called.");
-    });
-
+    
     function currentDate() {
         var today = new Date();
         var dd = String(today.getDate()).padStart(2, '0');
@@ -130,55 +207,45 @@
 
 var inventoryDatas = [
     {
-        id: 1,
-        code: "item 1",
-        name: "item 1",
-        warehouse: "Main",
-        whlocation: "Main",
-        instock: 50,
-        qty: 60,
-        diffqty: 10,
-        confirmdiffqty: 56,
-        absdiffqty: 4,
-        umo: "Lon",
+        Id: 1,
+        Vendor: "IDP",
+        DocNbr: "RP000",
+        Desc: "",
+        CreatedUser: "Trần Văn B",
+        DocDate: "02/03/2023",
+        DeliveryDate: "01/03/2023",
+        PostingDate: "07/01/2023",
+        Status: "Open",
+        Remark: "Giao sau 14h",
+        DocTotalAmt: 112456000,
+        DocTotalAmtAfterTax: 112456000
     },
     {
-        id: 2,
-        code: "item 2",
-        name: "item 2",
-        warehouse: "Main",
-        whlocation: "Main",
-        instock: 50,
-        qty: 60,
-        diffqty: 10,
-        confirmdiffqty: 56,
-        absdiffqty: 4,
-        umo: "Lon",
+        Id: 2,
+        Vendor: "IDP",
+        DocNbr: "RP002",
+        Desc: "",
+        CreatedUser: "Nguyễn Văn A",
+        DocDate: "01/03/2023",
+        DeliveryDate: "05/06/2023",
+        PostingDate: "05/01/2023",
+        Status: "Approved",
+        Remark: "Ok, cho đi ngay",
+        DocTotalAmt: 66321000,
+        DocTotalAmtAfterTax: 66000000
     },
     {
-        id: 3,
-        code: "item 3",
-        name: "item 3",
-        warehouse: "Main",
-        whlocation: "Main",
-        instock: 5,
-        qty: 4,
-        diffqty: -1,
-        confirmdiffqty: 4,
-        absdiffqty: -1,
-        umo: "Cai",
+        Id: 3,
+        Vendor: "IDP",
+        DocNbr: "RP003",
+        Desc: "",
+        CreatedUser: "Nguyễn Hiệp",
+        DocDate: "01/03/2023",
+        DeliveryDate: "07/08/2023",
+        PostingDate: "10/09/2023",
+        Status: "Rejected",
+        Remark: "Không giao đi",
+        DocTotalAmt: 56789000,
+        DocTotalAmtAfterTax: 56111000
     },
-    {
-        id: 4,
-        code: "item 4",
-        name: "item 4",
-        warehouse: "Main",
-        whlocation: "Main",
-        instock: 5,
-        qty: 5,
-        diffqty: 0,
-        confirmdiffqty: 5,
-        absdiffqty: 0,
-        umo: "Cai",
-    }
 ];
