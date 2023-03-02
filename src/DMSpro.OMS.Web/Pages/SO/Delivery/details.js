@@ -450,9 +450,9 @@ $(function () {
         },
         toolbar: {
             items: [
-                "groupPanel",
+                //"groupPanel",
                 "columnChooserButton",
-                "exportButton",
+                //"exportButton",
                 {
                     location: 'after',
                     widget: 'dxButton',
