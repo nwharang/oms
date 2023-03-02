@@ -14,10 +14,31 @@ var cusContactService = window.dMSpro.oMS.mdmService.controllers.customerContact
 var cusAttachService = window.dMSpro.oMS.mdmService.controllers.customerAttachments.customerAttachment;
 var cusProfileService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
 
+var urlUploadFileAttachment = `${abp.appPath}api/mdm-service/item-attachments`;
+var urlGetFileAttachment = `${abp.appPath}api/mdm-service/item-attachments/get-file`;
+var itemAttachment = [];
+var attachmentId = '';
+var attachment = [];
+
 $(function () {
     DevExpress.config({
         editorStylingMode: 'underlined',
     });
+
+    const gender = [
+        {
+            id: 0,
+            text: l('EntityFieldValue:MDMService:CustomerContact:Gender:MALE')
+        },
+        {
+            id: 1,
+            text: l('EntityFieldValue:MDMService:CustomerContact:Gender:FEMALE')
+        },
+        {
+            id: 2,
+            text: l('EntityFieldValue:MDMService:CustomerContact:Gender:OTHER')
+        }
+    ]
 
     $('#tabpanel-container').dxTabPanel({
         items: [
@@ -46,7 +67,18 @@ $(function () {
                 icon: "attach",
                 template: iniAttachmentTab()
             }
-        ]
+        ],
+        onInitialized: function (e) {
+            if (cusProfile == null) {
+                e.component.option('items[3].disabled', true);
+                e.component.option('items[4].disabled', true);
+                e.component.option('selectedIndex', 0);
+            } else {
+                e.component.option('items[3].disabled', false);
+                e.component.option('items[4].disabled', false);
+                e.component.option('selectedIndex', 0);
+            }
+        }
     }).dxTabPanel('instance');
 
     $("#top-section").dxForm({
@@ -214,6 +246,188 @@ $(function () {
         minHeight: 400,
         handles: "bottom"
     }).dxResizable('instance');
+
+    function initContactTab() {
+        return function () {
+            return $('<div id="dgContact" style="padding-top: 10px">')
+                .dxDataGrid({
+                    dataSource: cusContactStore,
+                    editing: {
+                        mode: "row",
+                        allowAdding: abp.auth.isGranted('MdmService.Customers.Create'),
+                        allowUpdating: abp.auth.isGranted('MdmService.Customers.Edit'),
+                        allowDeleting: abp.auth.isGranted('MdmService.Customers.Delete'),
+                        useIcons: true,
+                        texts: {
+                            editRow: l("Edit"),
+                            deleteRow: l("Delete"),
+                            confirmDeleteMessage: l("DeleteConfirmationMessage")
+                        }
+                    },
+                    remoteOperations: true,
+                    showRowLines: true,
+                    showBorders: true,
+                    cacheEnabled: true,
+                    allowColumnReordering: true,
+                    rowAlternationEnabled: true,
+                    allowColumnResizing: true,
+                    columnResizingMode: 'widget',
+                    columnAutoWidth: true,
+                    filterRow: {
+                        visible: true
+                    },
+                    groupPanel: {
+                        visible: true,
+                    },
+                    searchPanel: {
+                        visible: true
+                    },
+                    columnMinWidth: 50,
+                    columnChooser: {
+                        enabled: true,
+                        mode: "select"
+                    },
+                    columnFixing: {
+                        enabled: true,
+                    },
+                    export: {
+                        enabled: true,
+                    },
+                    onExporting(e) {
+                        const workbook = new ExcelJS.Workbook();
+                        const worksheet = workbook.addWorksheet('Data');
+
+                        DevExpress.excelExporter.exportDataGrid({
+                            component: e.component,
+                            worksheet,
+                            autoFilterEnabled: true,
+                        }).then(() => {
+                            workbook.xlsx.writeBuffer().then((buffer) => {
+                                saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Contact.xlsx');
+                            });
+                        });
+                        e.cancel = true;
+                    },
+                    headerFilter: {
+                        visible: true,
+                    },
+                    stateStoring: {
+                        enabled: true,
+                        type: 'localStorage',
+                        storageKey: 'dgContact',
+                    },
+                    paging: {
+                        enabled: true,
+                        pageSize: pageSize
+                    },
+                    pager: {
+                        visible: true,
+                        showPageSizeSelector: true,
+                        allowedPageSizes: allowedPageSizes,
+                        showInfo: true,
+                        showNavigationButtons: true
+                    },
+                    onRowInserting: function (e) {
+                        e.data.customerId = cusProfile.id;
+                    },
+                    onRowUpdating: function (e) {
+                        e.newData = Object.assign({}, e.oldData, e.newData);
+                    },
+                    toolbar: {
+                        items: [
+                            "groupPanel",
+                            {
+                                location: 'after',
+                                template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                                onClick() {
+                                    $('#dgContact').data('dxDataGrid').addRow()
+                                },
+                            },
+                            'columnChooserButton',
+                            "exportButton",
+                            {
+                                location: 'after',
+                                template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                                onClick() {
+                                    //todo
+                                },
+                            },
+                            "searchPanel"
+                        ],
+                    },
+                    columns: [
+                        {
+                            type: 'buttons',
+                            caption: l("Actions"),
+                            width: 110,
+                            buttons: ['edit', 'delete'],
+                            fixedPosition: 'left'
+                        },
+                        {
+                            dataField: 'customerId',
+                            caption: l("CustomerId"),
+                            dataType: 'string',
+                            visible: false
+                        },
+                        {
+                            dataField: 'firstName',
+                            caption: l("FirstName"),
+                            dataType: 'string',
+                        },
+                        {
+                            dataField: 'lastName',
+                            caption: l("LastName"),
+                            dataType: 'string',
+                        },
+                        {
+                            dataField: 'gender',
+                            caption: l("Gender"),
+                            editorType: 'dxSelectBox',
+                            editorOptions: {
+                                dataSource: {
+                                    store: gender,
+                                    paginate: true,
+                                    pageSize: pageSizeForLookup
+                                },
+                                displayExpr: 'text',
+                                valueExpr: 'id'
+                            }
+                        },
+                        {
+                            dataField: 'phone',
+                            caption: l("Phone"),
+                            dataType: 'string',
+                        },
+                        {
+                            dataField: 'email',
+                            caption: l("Email"),
+                            dataType: 'string',
+                        },
+                        {
+                            dataField: 'address',
+                            caption: l("Address"),
+                            dataType: 'string',
+                        },
+                        {
+                            dataField: 'identityNumber',
+                            caption: l("IdentityNumber"),
+                        },
+                        {
+                            dataField: 'bankName',
+                            caption: l("BankName"),
+                        },
+                        {
+                            dataField: 'bankAccName',
+                            caption: l("BankAccName"),
+                        },
+                        {
+                            dataField: 'bankAccNumber',
+                            caption: l("BankAccNumber"),
+                        },
+                    ],
+                })
+        }
+    }
 });
 
 var pricelistLookup = new DevExpress.data.CustomStore({
@@ -415,8 +629,14 @@ function initAddressTab() {
                         items: [{
                             template: function (data, itemElement) {
                                 const mapsDiv = $("<div style='padding:15px; min-height: 320px;'>")
+                                var latitude = 0;
+                                var longitude = 0;
+                                if (cusProfile != null) {
+                                    latitude = cusProfile.latitude ? cusProfile.latitude : 0;
+                                    longitude = cusProfile.longitude ? cusProfile.longitude : 0;
+                                }
                                 mapsDiv.dxMap({
-                                    center: { lat: cusProfile ? cusProfile.latitude : 0, lng: cusProfile ? cusProfile.longitude : 0 },
+                                    center: { lat: latitude, lng: longitude },
                                     controls: true,
                                     zoom: 14,
                                     height: 380,
@@ -589,179 +809,6 @@ var cusContactStore = new DevExpress.data.CustomStore({
     }
 });
 
-function initContactTab() {
-    return function () {
-        return $('<div id="dgContact" style="padding-top: 10px">')
-            .dxDataGrid({
-                dataSource: cusContactStore,
-                editing: {
-                    mode: "row",
-                    allowAdding: abp.auth.isGranted('MdmService.Customers.Create'),
-                    allowUpdating: abp.auth.isGranted('MdmService.Customers.Edit'),
-                    allowDeleting: abp.auth.isGranted('MdmService.Customers.Delete'),
-                    useIcons: true,
-                    texts: {
-                        editRow: l("Edit"),
-                        deleteRow: l("Delete"),
-                        confirmDeleteMessage: l("DeleteConfirmationMessage")
-                    }
-                },
-                remoteOperations: true,
-                showRowLines: true,
-                showBorders: true,
-                cacheEnabled: true,
-                allowColumnReordering: true,
-                rowAlternationEnabled: true,
-                allowColumnResizing: true,
-                columnResizingMode: 'widget',
-                columnAutoWidth: true,
-                filterRow: {
-                    visible: true
-                },
-                groupPanel: {
-                    visible: true,
-                },
-                searchPanel: {
-                    visible: true
-                },
-                columnMinWidth: 50,
-                columnChooser: {
-                    enabled: true,
-                    mode: "select"
-                },
-                columnFixing: {
-                    enabled: true,
-                },
-                export: {
-                    enabled: true,
-                },
-                onExporting(e) {
-                    const workbook = new ExcelJS.Workbook();
-                    const worksheet = workbook.addWorksheet('Data');
-
-                    DevExpress.excelExporter.exportDataGrid({
-                        component: e.component,
-                        worksheet,
-                        autoFilterEnabled: true,
-                    }).then(() => {
-                        workbook.xlsx.writeBuffer().then((buffer) => {
-                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Contact.xlsx');
-                        });
-                    });
-                    e.cancel = true;
-                },
-                headerFilter: {
-                    visible: true,
-                },
-                stateStoring: {
-                    enabled: true,
-                    type: 'localStorage',
-                    storageKey: 'dgContact',
-                },
-                paging: {
-                    enabled: true,
-                    pageSize: pageSize
-                },
-                pager: {
-                    visible: true,
-                    showPageSizeSelector: true,
-                    allowedPageSizes: allowedPageSizes,
-                    showInfo: true,
-                    showNavigationButtons: true
-                },
-                onRowInserting: function (e) {
-                    e.data.customerId = cusProfile.id;
-                },
-                onRowUpdating: function (e) {
-                    e.newData = Object.assign({}, e.oldData, e.newData);
-                },
-                toolbar: {
-                    items: [
-                        "groupPanel",
-                        {
-                            location: 'after',
-                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                            onClick() {
-                                $('#dgContact').data('dxDataGrid').addRow()
-                            },
-                        },
-                        'columnChooserButton',
-                        "exportButton",
-                        {
-                            location: 'after',
-                            template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                            onClick() {
-                                //todo
-                            },
-                        },
-                        "searchPanel"
-                    ],
-                },
-                columns: [
-                    {
-                        type: 'buttons',
-                        caption: l("Actions"),
-                        width: 110,
-                        buttons: ['edit', 'delete'],
-                        fixedPosition: 'left'
-                    },
-                    {
-                        dataField: 'customerId',
-                        caption: l("CustomerId"),
-                        dataType: 'string',
-                        visible: false
-                    },
-                    {
-                        dataField: 'firstName',
-                        caption: l("FirstName"),
-                        dataType: 'string',
-                    },
-                    {
-                        dataField: 'lastName',
-                        caption: l("LastName"),
-                        dataType: 'string',
-                    },
-                    {
-                        dataField: 'gender',
-                        caption: l("Gender"),
-                        dataType: 'string',
-                    },
-                    {
-                        dataField: 'phone',
-                        caption: l("Phone"),
-                        dataType: 'string',
-                    },
-                    {
-                        dataField: 'email',
-                        caption: l("Email"),
-                        dataType: 'string',
-                    },
-                    {
-                        dataField: 'address',
-                        caption: l("Address"),
-                        dataType: 'string',
-                    },
-                    {
-                        dataField: 'identityNumber',
-                        caption: l("IdentityNumber"),
-                    },
-                    {
-                        dataField: 'bankName',
-                        caption: l("BankName"),
-                    },
-                    {
-                        dataField: 'bankAccName',
-                        caption: l("BankAccName"),
-                    },
-                    {
-                        dataField: 'bankAccNumber',
-                        caption: l("BankAccNumber"),
-                    },
-                ],
-            })
-    }
-}
-
 var cusAttachStore = new DevExpress.data.CustomStore({
     key: 'id',
     load(loadOptions) {
@@ -805,7 +852,7 @@ function iniAttachmentTab() {
             .dxDataGrid({
                 dataSource: cusAttachStore,
                 editing: {
-                    mode: "row",
+                    mode: "popup",
                     allowAdding: true,
                     allowUpdating: true,
                     allowDeleting: true,
@@ -814,6 +861,32 @@ function iniAttachmentTab() {
                         editRow: l("Edit"),
                         deleteRow: l("Delete"),
                         confirmDeleteMessage: l("DeleteConfirmationMessage")
+                    },
+                    popup: {
+                        title: l('Menu:MdmService:CustomerAttachments'),
+                        showTitle: true,
+                        width: '35%',
+                        height: '50%',
+                    },
+                    form: {
+                        colCount: 1,
+                        items: [
+                            {
+                                dataField: 'fileId',
+                                template: function (data, itemElement) {
+                                    renderAttachment(data, itemElement);
+                                }
+                            },
+                            {
+                                dataField: 'description'
+                            },
+                            {
+                                dataField: 'active'
+                            },
+                            {
+                                dataField: 'creationTime'
+                            }
+                        ]
                     }
                 },
                 remoteOperations: true,
@@ -916,24 +989,18 @@ function iniAttachmentTab() {
                         fixedPosition: 'left'
                     },
                     {
-                        dataField: 'customerId',
-                        caption: l("CustomerId"),
-                        dataType: 'string',
-                        visible: false
-                    },
-                    {
                         dataField: 'description',
                         caption: l("Description"),
                         dataType: 'string',
                     },
                     {
-                        dataField: 'url',
-                        caption: l("Url"),
+                        dataField: 'fileId',
+                        caption: l("File"),
                         dataType: 'string',
-                        cellTemplate: function (element, info) {
-                            element.append("<a href='#'>" + info.text + "</a>")
-                                .css("color", "blue");
-                        }
+                        //cellTemplate: function (element, info) {
+                        //    element.append("<a href='#'>" + info.text + "</a>")
+                        //        .css("color", "blue");
+                        //}
                     },
                     {
                         dataField: 'creationTime',
@@ -958,6 +1025,39 @@ function iniAttachmentTab() {
     }
 }
 
+function renderAttachment(data, itemElement) {
+    itemElement.append($("<div>").attr("id", "file-uploader").dxFileUploader({
+        selectButtonText: 'Select photo',
+        labelText: '',
+        accept: 'image/*',
+        uploadMethod: 'POST',
+        uploadMode: 'instantly',
+        onValueChanged(e) {
+            attachment = e.value;
+        },
+        uploadFile: function (file, progressCallback) {
+            var formData = new FormData();
+            formData.append("file", attachment[0]);
+
+            $.ajax({
+                type: "POST",
+                url: `${urlUploadFileAttachment}?itemId=${item.id}`,
+                async: true,
+                processData: false,
+                mimeType: 'multipart/form-data',
+                //contentType: false,
+                data: formData,
+                success: function (data) {
+                },
+                error: function (msg) {
+                    // handle error
+                    console.log(msg.responseText.error);
+                },
+            });
+        }
+    }));
+}
+
 function action(e) {
     var typeButton = e.getAttribute('data-type');
     if (typeButton == 'save') {
@@ -979,6 +1079,12 @@ function action(e) {
                 .done(result => {
                     abp.message.success(l('Congratulations'));
                     sessionStorage.setItem("customerProfile", JSON.stringify(result));
+                    if (result.id != null) {
+                        var dxTab = $('#tabpanel-container').data('dxTabPanel');
+                        dxTab.option('items[3].disabled', false);
+                        dxTab.option('items[4].disabled', false);
+                        dxTab.option('selectedIndex', 0);
+                    }
                 })
         }
     } else {

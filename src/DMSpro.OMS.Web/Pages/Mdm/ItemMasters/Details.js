@@ -14,6 +14,18 @@ var itemAttachService = window.dMSpro.oMS.mdmService.controllers.itemAttachments
 var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
 var vATService = window.dMSpro.oMS.mdmService.controllers.vATs.vAT;
 
+var urlUploadFileImage = `${abp.appPath}api/mdm-service/item-images`;
+var urlGetFileImage = `${abp.appPath}api/mdm-service/item-images/get-file`;
+var itemImage = [];
+var imageId = '';
+var image = [];
+
+var urlUploadFileAttachment = `${abp.appPath}api/mdm-service/item-attachments`;
+var urlGetFileAttachment = `${abp.appPath}api/mdm-service/item-attachments/get-file`;
+var itemAttachment = [];
+var attachmentId = '';
+var attachment = [];
+
 $(function () {
     DevExpress.config({
         editorStylingMode: 'underlined',
@@ -452,6 +464,29 @@ function iniAttachmentTab() {
                         editRow: l("Edit"),
                         deleteRow: l("Delete"),
                         confirmDeleteMessage: l("DeleteConfirmationMessage")
+                    },
+                    popup: {
+                        title: l('Menu:MdmService:ItemAttachments'),
+                        showTitle: true,
+                        width: '35%',
+                        height: '50%',
+                    },
+                    form: {
+                        colCount: 1,
+                        items: [
+                            {
+                                dataField: 'fileId',
+                                template: function (data, itemElement) {
+                                    renderAttachment(data, itemElement);
+                                }
+                            },
+                            {
+                                dataField: 'description'
+                            },
+                            {
+                                dataField: 'active'
+                            }
+                        ]
                     }
                 },
                 remoteOperations: true,
@@ -552,12 +587,6 @@ function iniAttachmentTab() {
                         width: 110,
                         buttons: ['edit', 'delete'],
                         fixedPosition: 'left'
-                    },
-                    {
-                        dataField: 'itemId',
-                        caption: l("ItemId"),
-                        dataType: 'string',
-                        visible: false
                     },
                     {
                         dataField: 'fileId',
@@ -757,10 +786,55 @@ function initImageTab() {
                         editRow: l("Edit"),
                         deleteRow: l("Delete"),
                         confirmDeleteMessage: l("DeleteConfirmationMessage")
+                    },
+                    popup: {
+                        title: l('Menu:MdmService:ItemImages'),
+                        showTitle: true,
+                        width: '65%',
+                        height: '50%',
+                    },
+                    form: {
+                        colCount: 2,
+                        items: [
+                            {
+                                itemType: 'group',
+                                colCount: 1,
+                                items: [
+                                    {
+                                        dataField: 'fileId',
+                                        template: function (data, itemElement) {
+                                            renderImage(data, itemElement);
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                itemType: 'group',
+                                colCount: 1,
+                                items: [
+                                    {
+                                        dataField: 'description'
+                                    },
+                                    {
+                                        dataField: 'displayOrder'
+                                    },
+                                    {
+                                        dataField: 'active'
+                                    }
+                                ]
+                            }
+                        ]
                     }
+                },
+                initNewRow(e) {
+                    itemImage = []
+                },
+                onEditingStart(e) {
+                    itemImage = e.data
                 },
                 onRowInserting: function (e) {
                     e.data.itemId = item.id;
+                    e.data.fileId = imageId;
                 },
                 onRowUpdating: function (e) {
                     e.newData = Object.assign({}, e.oldData, e.newData);
@@ -877,6 +951,117 @@ const imageStore = new DevExpress.data.CustomStore({
     }
 });
 
+function renderImage(data, itemElement) {
+    itemElement.append($('<img>').attr({
+        id: 'item-image',
+        src: '/images/default-avatar-image.jpg',
+        style: 'display: none; max-width: 50%; height: auto'
+    }));
+    //var gridItemImage = $('#dgItemImage').data('dxDataGrid');
+    //var selectedRowsData = gridItemImage.getVisibleRows()[rowEditing];
+    getItemImage(itemImage.id).done(fileId => {
+        if (fileId != '') {
+            getFileImage(fileId, function (dataUrl) {
+                $('#item-image').attr('src', dataUrl);
+                $('#item-image').attr('style', 'display: block !important');
+            })
+        }
+    })
+
+    itemElement.append($("<div>").attr("id", "file-uploader").dxFileUploader({
+        selectButtonText: 'Select photo',
+        labelText: '',
+        accept: 'image/*',
+        uploadMethod: 'POST',
+        uploadMode: 'instantly',
+        onValueChanged(e) {
+            image = e.value;
+        },
+        uploadFile: function (file, progressCallback) {
+            var formData = new FormData();
+            formData.append("file", image[0]);
+
+            $.ajax({
+                type: "POST",
+                url: `${urlUploadFileImage}?itemId=${item.id}`,
+                async: true,
+                processData: false,
+                mimeType: 'multipart/form-data',
+                //contentType: false,
+                data: formData,
+                success: function (data) {
+                },
+                error: function (msg) {
+                    // handle error
+                    console.log(msg.responseText.error);
+                },
+            });
+        }
+    }));
+}
+
+function getFileImage(fileId, callback) {
+    toDataURL(`${urlGetFileImage}?id=${fileId}`, callback);
+}
+
+function toDataURL(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+        var reader = new FileReader();
+        reader.onloadend = function () {
+            callback(reader.result);
+        }
+        reader.readAsDataURL(xhr.response);
+    };
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+    xhr.send();
+}
+
+function getItemImage(imageId) {
+    var d = new $.Deferred();
+    itemImageService.getListDevextremes({ id: imageId }).done(result => {
+        if (result.data.length > 0) {
+            d.resolve(result.data[0].fileId);
+        }
+        d.resolve("");
+    });
+    return d.promise();
+}
+
+function renderAttachment(data, itemElement) {
+    itemElement.append($("<div>").attr("id", "file-uploader").dxFileUploader({
+        selectButtonText: 'Select photo',
+        labelText: '',
+        accept: 'image/*',
+        uploadMethod: 'POST',
+        uploadMode: 'instantly',
+        onValueChanged(e) {
+            attachment = e.value;
+        },
+        uploadFile: function (file, progressCallback) {
+            var formData = new FormData();
+            formData.append("file", attachment[0]);
+
+            $.ajax({
+                type: "POST",
+                url: `${urlUploadFileAttachment}?itemId=${item.id}`,
+                async: true,
+                processData: false,
+                mimeType: 'multipart/form-data',
+                //contentType: false,
+                data: formData,
+                success: function (data) {
+                },
+                error: function (msg) {
+                    // handle error
+                    console.log(msg.responseText.error);
+                },
+            });
+        }
+    }));
+}
+
 function action(e) {
     var typeButton = e.getAttribute('data-type');
     if (typeButton == 'save') {
@@ -898,6 +1083,12 @@ function action(e) {
                 .done(result => {
                     abp.message.success(l('Congratulations'));
                     sessionStorage.setItem("item", JSON.stringify(result));
+                    if (result.id != null) {
+                        var dxTab = $('#tabpanel-container').data('dxTabPanel');
+                        dxTab.option('items[0].disabled', false);
+                        dxTab.option('items[1].disabled', false);
+                        dxTab.option('selectedIndex', 0);
+                    }
                 })
         }
     } else {
