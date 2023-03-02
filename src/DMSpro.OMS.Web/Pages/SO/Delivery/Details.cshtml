@@ -19,6 +19,19 @@
         #resizable {
             height: 300px;
         }
+        #dgItems{
+            max-width:none !important;
+        }
+        
+       div.dx-toolbar.dx-popup-bottom 
+      > div.dx-toolbar-items-container {
+            margin-top: 7px;
+        }
+
+     div.dx-popup-content,
+        div.panel-container.show div.dx-overlay-content.dx-popup-normal {
+         /*height: auto!important;*/
+     }
     </style>
 }
 
@@ -68,6 +81,10 @@
                         <div id="dgDeliveries"> </div>
                     </div>
                 </div>
+            </div>
+
+            <div id="popupItems" style="display:none">
+                <div id="dgItems" ></div> 
             </div>
         </div>
     </div>
