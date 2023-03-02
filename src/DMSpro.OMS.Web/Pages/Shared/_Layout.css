@@ -317,4 +317,6 @@ table.companies > tbody > tr{
     overflow: auto;
     height: 100%;
 }
- 
+.dx-editor-underlined.dx-texteditor-with-floating-label .dx-texteditor-input, .dx-editor-underlined.dx-texteditor-with-floating-label.dx-lookup .dx-lookup-field, .dx-editor-underlined.dx-texteditor-with-label .dx-texteditor-input, .dx-editor-underlined.dx-texteditor-with-label.dx-lookup .dx-lookup-field {
+    padding-top: 18px;
+}
