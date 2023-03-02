@@ -3,6 +3,12 @@ $(function () {
     var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
     var workingPositionService = window.dMSpro.oMS.mdmService.controllers.workingPositions.workingPosition;
     var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
+    var employeeProfileImageService = window.dMSpro.oMS.mdmService.controllers.employeeImages.employeeImage;
+
+    var urlUploadFile = `${abp.appPath}api/mdm-service/employee-images/avatar`;
+    var urlGetFile = `${abp.appPath}api/mdm-service/employee-images/get-file`;
+    var files = [];
+    var rowEditing = -1;
 
     /****custom store*****/
     var employeeProfileStore = new DevExpress.data.CustomStore({
@@ -15,7 +21,6 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-
             employeeProfileService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -173,6 +178,12 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
+        initNewRow(e) {
+            rowEditing = -1;
+        },
+        onEditingStart(e) {
+            rowEditing = e.component.getRowIndexByKey(e.key);
+        },
         editing: {
             mode: 'popup',
             allowAdding: abp.auth.isGranted('MdmService.EmployeeProfiles.Create'),
@@ -198,13 +209,12 @@ $(function () {
                         colSpan: 1,
                         items: [
                             {
-                                caption: "Avatar",
-                                dataField: 'url',
+                                dataField: 'Avatar',
                                 template: function (data, itemElement) {
-                                    $("<img>").attr({
-                                        src: "https://i.pravatar.cc/128",
-                                        style: "border-radius: 50%"
-                                    }).appendTo(itemElement);
+
+                                    renderAvatarField(data, itemElement);
+
+
                                 }
                             }
                         ]
@@ -363,4 +373,82 @@ $(function () {
             }
         ]
     }).dxDataGrid("instance");
+
+    function renderAvatarField(data, itemElement) {
+        itemElement.append($("<img>").attr({
+            id: "img-avatar",
+            src: "/images/default-avatar-image.jpg",
+            style: "border-radius: 50%",
+        }));
+        var selectedRowsData = dataGridContainer.getVisibleRows()[rowEditing];
+        getEmployeeImageAvatar(selectedRowsData.data.id).done(fileId => {
+            if (fileId !== "") {
+                getFileAvatar(fileId, function (dataUrl) {
+                    $("#img-avatar").attr("src", dataUrl);
+                });
+            }
+        });
+
+
+        itemElement.append($("<div>").attr("id", "file-uploader").dxFileUploader({
+            selectButtonText: 'Select photo',
+            labelText: '',
+            accept: 'image/*',
+            uploadMethod: 'POST',
+            uploadMode: 'instantly',
+            onValueChanged(e) {
+                files = e.value;
+            },
+            uploadFile: function (file, progressCallback) {
+                var formData = new FormData();
+                formData.append("file", files[0]);
+                
+                $.ajax({
+                    type: "POST",
+                    url: `${urlUploadFile}?EmployeeProfileId=${selectedRowsData.data.id}`,
+                    async: true,
+                    processData: false,
+                    mimeType: 'multipart/form-data',
+                    contentType:false,
+                    data: formData,
+                    success: function (data) {
+                    },
+                    error: function (msg) {
+                        // handle error
+                        console.log(msg.responseText.error);
+                    },
+                });
+            }
+        }));
+    }
+
+    function getFileAvatar(fileId, callback) {
+        toDataURL(`${urlGetFile}?id=${fileId}`, callback);
+    }
+
+    function toDataURL(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                callback(reader.result);
+            }
+            reader.readAsDataURL(xhr.response);
+        };
+        xhr.open('GET', url);
+        xhr.responseType = 'blob';
+        xhr.send();
+    }
+
+    function getEmployeeImageAvatar(employeeProfileId) {
+        var d = new $.Deferred();
+        employeeProfileImageService.getList({ isAvatar: true, employeeProfileId: employeeProfileId }).done(result => {
+            if (result.items.length > 0) {
+                d.resolve(result.items[0].employeeImage.fileId);
+            }
+            d.resolve("");
+        });
+
+        return d.promise();
+    }
 });
