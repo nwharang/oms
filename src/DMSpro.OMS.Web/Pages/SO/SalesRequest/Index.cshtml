@@ -9,21 +9,20 @@
 @inject IAuthorizationService Authorization
 @inject IPageLayout PageLayout
 @{
-    PageLayout.Content.Title = L["Page.Title.SalesRequest"].Value;
+    PageLayout.Content.Title = L["Menu:SOService:SalesRequest"].Value;
     PageLayout.Content.MenuItemName = OrderServiceMenus.SalesRequestHeaders;
 }
 
 @section scripts {
     <script src="/js/devextreme/exceljs.min.js"></script>
     <script src="/js/devextreme/filesaver.min.js"></script>
-    <abp-script src="/pages/shared/common.SO.js" />
     <abp-script src="/Pages/SO/SalesRequest/index.js" />
 }
 
 @section breadcrumb {
     <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:SO"].Value</a></li>
-        <li class="breadcrumb-item active">@L["Page.Title.SalesRequest"].Value</li>
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:SOService:GroupMenu:SO"].Value</a></li>
+        <li class="breadcrumb-item active">@L["Menu:SOService:SalesRequest"].Value</li>
     </ol>
 }
 
@@ -31,7 +30,7 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fa fa-file-alt"></i> @L["Page.Title.SalesRequest"].Value
+                <i class="subheader-icon fa fa-file-alt"></i> @L["Menu:SOService:SalesRequest"].Value
             </h2>
         </div>
         <div class="panel-container show">
