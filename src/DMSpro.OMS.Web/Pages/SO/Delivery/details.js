@@ -1,5 +1,15 @@
 ﻿var DeliveryModel;
-var DeliveryDetailData = [];
+var DeliveryDetailData = [{
+    itemCode: "1",
+    itemName: "xxx",
+    qty: 111
+},
+    {
+        itemCode: "2",
+        itemName: "yyyy",
+        qty: 2
+    },
+];
 
 $(function () {
 
@@ -160,7 +170,7 @@ $(function () {
         columnAutoWidth: true,
         columnChooser: {
             enabled: true,
-            allowSearch: true,
+            mode: "select"
         },
         columnFixing: {
             enabled: true,
@@ -195,7 +205,7 @@ $(function () {
             showNavigationButtons: true
         },
         editing: {
-            mode: "row",
+            mode: "cell",
             allowAdding: abp.auth.isGranted('OrderService.Deliveries.Create'),
             allowUpdating: abp.auth.isGranted('OrderService.Deliveries.Edit'),
             allowDeleting: true,//missing permission
@@ -245,6 +255,13 @@ $(function () {
             ],
         },
         columns: [
+            {
+                type: 'buttons',
+                caption: l("Actions"),
+                buttons: ['delete'],
+                fixed: true,
+                fixedPosition: "left"
+            },
             {
                 dataField: 'itemCode',
                 caption: l("Item Code"),
@@ -357,7 +374,7 @@ $(function () {
                 width: 110,
                 dataType: 'string',
             },
-        ],
+        ]
     }).dxDataGrid("instance");
 
     $('#resizable').dxResizable({
@@ -407,7 +424,7 @@ $(function () {
         columnAutoWidth: true,
         columnChooser: {
             enabled: true,
-            allowSearch: true,
+            mode: "select"
         },
         columnFixing: {
             enabled: true,
@@ -482,24 +499,33 @@ $(function () {
             },
             {
                 dataField: 'code',
-                caption: l("Item Code"), 
+                caption: l("Item Code"),
                 dataType: 'string',
                 allowEditing: false
             },
             {
                 dataField: 'name',
-                caption: l("Item Name"), 
+                caption: l("Item Name"),
                 dataType: 'string',
                 allowEditing: false
             },
             {
                 dataField: 'inventory',
-                caption: l("Inventory"), 
+                caption: l("Inventory"),
                 dataType: 'number',
                 width: 100,
                 allowEditing: false
             }
         ],
+        //onSelectionChanged: function (e) {
+        //    var selectedRowsData = e.component.getSelectedRowsData();
+        //    if (selectedRowsData.length > 0) {
+        //        $('#submitItemsButton').removeAttr('disabled');
+        //    } else {
+        //        $('#submitItemsButton').prop('disabled', true);
+        //    }
+        //}
+       
     }).dxDataGrid("instance");
 
     const popupItems = $('#popupItems').dxPopup({
@@ -533,8 +559,25 @@ $(function () {
             options: {
                 icon: 'fa fa-check hvr-icon',
                 text: 'Submit',
+                elementAttr: {
+                    id: "submitItemsButton",
+                    //disabled: true,
+                },
                 onClick() {
                     //todo
+                    var selectedItems = $('#dgItems').data('dxDataGrid').getSelectedRowsData();
+                    if (selectedItems.length > 0) {
+                        selectedItems.forEach(u => {
+                            DeliveryDetailData.unshift({
+                                itemCode: u.code,
+                                itemName: u.name,
+                                qty: u.qty
+                            }); 
+                        });
+                        var dataGrid = $('#dgDeliveries').dxDataGrid('instance');
+                        dataGrid.refresh(); 
+                    }
+                    popupItems.hide();
                 },
             },
         }, {
@@ -550,6 +593,6 @@ $(function () {
         }],
     }).dxPopup('instance');
 
-    initImportPopup('api/mdm-service/companies', 'Deliveries_Template', 'dgDeliveries');
+    initImportPopup('', 'Deliveries_Template', 'dgDeliveries');
     initImportPopup('api/mdm-service/companies', 'Items_Template', 'dgItems');
 });
