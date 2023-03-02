@@ -3,18 +3,17 @@
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using DMSpro.OMS.MdmService.Permissions
-@using DMSpro.OMS.MdmService.Web.Pages.Companies
 @using DMSpro.OMS.MdmService.Web.Menus
 @using DMSpro.OMS.MdmService.Companies;
 @using Microsoft.AspNetCore.Mvc.Localization
 @using DMSpro.OMS.MdmService.Localization
 @inject IHtmlLocalizer<MdmServiceResource> L
-@inject IHtmlLocalizer<OMSWebResource> L1
+@inject IHtmlLocalizer<OMSResource> L1
 @inject IAuthorizationService Authorization
-@model IndexModel
+
 @inject IPageLayout PageLayout
 @{
-    PageLayout.Content.Title = "MCP";
+    PageLayout.Content.Title = @L1["Page.Title.MCP"].Value;
     PageLayout.Content.MenuItemName = MdmServiceMenus.MCPHeaders;
 }
 
@@ -29,9 +28,9 @@
 
 @section breadcrumb {
     <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="javascript:void(0);">Mdm</a></li>
-        <li class="breadcrumb-item ">MCP</li>
-        <li class="breadcrumb-item active">Details</li>
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
+        <li class="breadcrumb-item ">@L["Menu:MdmService:RouteAndMCP"].Value</li>
+        <li class="breadcrumb-item active">@L1["Page.Title.MCP"].Value</li>
     </ol>
 }
 
@@ -45,14 +44,21 @@
         <div class="panel-container show" style="padding-top:10px">
             <div class="panel-content jqvmap-bg-ocean p-0" style="">
                 <div style="padding-left:10px" class="buttons-header-grid">
-                    <button id="SaveButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed hvr-icon-pop">
-                        <i class="fa fa-check hvr-icon" style="padding-right: 2px"></i>
-                        Save
-                    </button>
-                    <button id="GenerateButton" type="button" class="btn btn-light btn-sm hvr-icon-pop">
-                        <i class="fa fa-random hvr-icon" style="padding-right: 2px"></i>
-                        <span class="">Generate visit plan</span>
-                    </button>
+                    @if (await Authorization.IsGrantedAsync(MdmServicePermissions.MCPs.Create))
+                    {
+                          <button id="SaveButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed hvr-icon-pop">
+                            <i class="fa fa-check hvr-icon" style="padding-right: 2px"></i>
+                            @L1["Button.Save.MCPHeader"].Value
+                        </button>
+                    }
+                   @if (await Authorization.IsGrantedAsync(MdmServicePermissions.VisitPlans.GenerateVisitPlanFromMCP))
+                    {
+                        <button id="GenerateButton" type="button" class="btn btn-light btn-sm hvr-icon-pop">
+                            <i class="fa fa-random hvr-icon" style="padding-right: 2px"></i>
+                            <span class=""> @L1["Button.GenerateVisitPlans.MCPHeader"].Value </span>
+                        </button>
+                    }
+                     
                     <button id="EnddateButton" type="button" class="btn btn-light btn-sm hvr-icon-pop">
                         <i class="fa fa-power-off hvr-icon" style="padding-right: 2px"></i>
                         <span class="">Enddate MCP</span>
@@ -62,7 +68,8 @@
                         <span>Close</span>
                     </button>
                 </div>
-
+                <div id="importPanel"></div>
+                <div id="popupImport"></div>
                 <div class="dx-viewport">
                     <div class="py-3" id="resizable">
                         <div id="top-section"></div>

@@ -7,11 +7,11 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @using DMSpro.OMS.MdmService.Localization
 @inject IHtmlLocalizer<MdmServiceResource> L
-@inject IHtmlLocalizer<OMSWebResource> L1
+@inject IHtmlLocalizer<OMSResource> L1
 @inject IAuthorizationService Authorization
 @inject IPageLayout PageLayout
 @{
-    PageLayout.Content.Title = L["SalesOrgs"].Value;
+    PageLayout.Content.Title = L["Page.Title.SalesOrgs"].Value;
     PageLayout.Content.MenuItemName = MdmServiceMenus.SalesOrgs;
 }
 
@@ -33,7 +33,7 @@
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
         <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:SalesOrganization"].Value</li>
-        <li class="breadcrumb-item active">@L["SalesOrgs"].Value</li>
+        <li class="breadcrumb-item active">@L["Page.Title.SalesOrgs"].Value</li>
     </ol>
 }
 
@@ -41,7 +41,7 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fa fa-check-square"></i> @L["SalesOrgs"].Value
+                <i class="subheader-icon fa fa-check-square"></i> @L["Page.Title.SalesOrgs"].Value
             </h2>
         </div>
         <div class="panel-container show" style="padding: 10px">

@@ -2,13 +2,12 @@
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using DMSpro.OMS.MdmService.Permissions
-@using DMSpro.OMS.MdmService.Web.Pages.Holidays
 @using DMSpro.OMS.MdmService.Web.Menus
 @using Microsoft.AspNetCore.Mvc.Localization
 @using DMSpro.OMS.MdmService.Localization
 @inject IHtmlLocalizer<MdmServiceResource> L
 @inject IAuthorizationService Authorization
-@model IndexModel
+
 @inject IPageLayout PageLayout
 @{
     PageLayout.Content.Title = L["Holidays"].Value;
@@ -38,16 +37,11 @@
         </div>
         <div class="panel-container show">
             <div class="panel-content jqvmap-bg-ocean p-0"  >
-                <abp-card>
-                    <abp-card-body>
-                        <div id="popupVenderInformation"></div>
-                        <div class="dx-viewport">
-                            <div class="py-2">
-                                <div id="gridHolidays"></div>
-                            </div>
-                        </div>
-                    </abp-card-body>
-                </abp-card>
+                <div class="dx-viewport">
+                    <div class="py-2">
+                        <div id="gridHolidays"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
