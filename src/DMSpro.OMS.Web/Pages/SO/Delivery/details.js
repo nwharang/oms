@@ -16,7 +16,7 @@ $(function () {
     var l = abp.localization.getResource("MdmService");
     var itemsService = window.dMSpro.oMS.mdmService.controllers.items.item;
     var itemsStore = new DevExpress.data.CustomStore({
-        key: 'id',
+        key: 'id', 
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -42,25 +42,6 @@ $(function () {
                 });
 
             return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            itemsService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        },
-        insert(values) {
-            return itemsService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return itemsService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return itemsService.delete(key);
         }
     });
 
@@ -128,6 +109,7 @@ $(function () {
             }
         ]
     });
+
     var dgDeliveries = $('#dgDeliveries').dxDataGrid({
         dataSource: DeliveryDetailData,
         remoteOperations: true,
@@ -460,7 +442,7 @@ $(function () {
         },
         editing: {
             mode: 'cell',
-            allowUpdating: true,
+            allowUpdating: false,
         },
         selection: {
             mode: 'multiple',
@@ -490,12 +472,20 @@ $(function () {
                 "searchPanel",
             ],
         },
+        
         columns: [
             {
                 dataField: 'qty',
                 caption: l("Qty"),
                 width: 100,
-                dataType: 'number'
+                dataType: 'number',
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .dxTextBox({
+                            value: options.value
+                        })
+                        .appendTo(container);
+                }
             },
             {
                 dataField: 'code',
