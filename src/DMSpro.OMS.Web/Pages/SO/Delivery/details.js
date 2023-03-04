@@ -132,7 +132,10 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             }); 
-            companyIdentityUserAssignmentService.getListCompanyByCurrentUser(args)
+            window.dMSpro.oMS.mdmService.controllers
+                .companyIdentityUserAssignments
+                .companyIdentityUserAssignment
+                .getListCompanyByCurrentUser(args)
                 .done(result => {
                     
                     deferred.resolve(result.data, {
