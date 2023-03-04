@@ -111,7 +111,9 @@ $(function () {
                     location: 'after',
                     template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                     onClick(e) {
-                        e.element.closest('div.dx-datagrid.dx-gridbase-container').parent().data('dxDataGrid').addRow();
+                        //e.element.closest('div.dx-datagrid.dx-gridbase-container').parent().data('dxDataGrid').addRow();
+                        var newtab = window.open('/SO/Delivery/Details', '_blank');
+                        newtab.sessionStorage.setItem("DeliveryModel", null);
                     },
                 },
                 {
@@ -226,7 +228,7 @@ $(function () {
                         hint: "View Details",
                         onClick: function (e) {
                             var w = window.open('/SO/Delivery/Details', '_blank');
-                            w.sessionStorage.setItem("model", JSON.stringify(e.row.data));
+                            w.sessionStorage.setItem("DeliveryModel", JSON.stringify(e.row.data));
                         }
                     },
                     'edit', 'delete']
