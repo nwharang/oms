@@ -205,7 +205,6 @@
     /****control*****/
     const dgSalesRequestHeader = $('#dgSalesRequestHeader').dxDataGrid({
         dataSource: salesRequestsHeaderStore,
-        keyExpr: 'id',
         remoteOperations: false,
         cacheEnabled: true,
         export: {
