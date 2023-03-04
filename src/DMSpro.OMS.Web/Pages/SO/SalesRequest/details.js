@@ -20,7 +20,6 @@ $(function () {
     const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
     var pricelistId = null;
     var itemsFromStore = null;
-    var itemsInPopup = null;
 
     /****custom store*****/
     var salesRequestStore = new DevExpress.data.CustomStore({
@@ -1304,16 +1303,10 @@ $(function () {
         },
         editing: {
             mode: 'cell',
-            allowUpdating: true,
+            allowUpdating: false,
         },
         selection: {
             mode: 'multiple',
-        },
-        onContentReady(e) {
-            if (itemsInPopup == null) {
-                itemsInPopup = dgItems.getDataSource().items();
-                dgItems.option('dataSource', itemsInPopup);
-            }
         },
         toolbar: {
             items: [
@@ -1327,6 +1320,13 @@ $(function () {
                 dataField: 'qty',
                 width: 100,
                 dataType: 'number',
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .dxTextBox({
+                            value: options.value
+                        })
+                        .appendTo(container);
+                }
             },
             {
                 dataField: 'code',
@@ -1407,10 +1407,8 @@ $(function () {
                         });
 
                         dgSalesRequestDetails.refresh();
-
-                        itemsInPopup = null;
-                        dgItems.option('dataSource', itemStore);
                     }
+                    popupItems.hide();
                 },
             },
         }, {
@@ -1420,8 +1418,6 @@ $(function () {
             options: {
                 text: 'Cancel',
                 onClick() {
-                    itemsInPopup = null;
-                    dgItems.option('dataSource', itemStore);
                     popupItems.hide();
                 },
             },
