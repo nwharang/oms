@@ -16,6 +16,7 @@ $(function () {
     var l = abp.localization.getResource("OMS");
     var itemsService = window.dMSpro.oMS.mdmService.controllers.items.item;
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+    var companyIdentityUserAssignmentService = window.dMSpro.oMS.mdmService.controllers.companyIdentityUserAssignments.companyIdentityUserAssignment;
     var customerAssignmentService = window.dMSpro.oMS.mdmService.controllers.customerAssignments.customerAssignment;
     var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
     var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
@@ -91,6 +92,8 @@ $(function () {
 
     var itemsStore = new DevExpress.data.CustomStore({
         key: 'id',
+        loadMode: 'raw',
+        cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -100,9 +103,10 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-
+            
             itemsService.getListDevextremes(args)
                 .done(result => {
+                    
                     result.data.forEach(u => {
                         u.inventory = null;
                         u.qty = 1;
@@ -116,7 +120,8 @@ $(function () {
                 });
 
             return deferred.promise();
-        }
+        }//,
+       // update: function() { }
     });
 
     var companyStore = new DevExpress.data.CustomStore({
@@ -146,6 +151,43 @@ $(function () {
             companyService.get(key)
                 .done(data => {
                     d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
+    var companyIdentityUserAssignmentStore = new DevExpress.data.CustomStore({
+        key: "id",
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            }); 
+            companyIdentityUserAssignmentService.getListCompanyByCurrentUser(args)
+                .done(result => {
+                    
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            companyService.get(key)
+                .done(data => {
+                    d.resolve({
+                        company: {
+                            id: data.id,
+                            name: data.name
+                        }
+                    });
                 });
             return d.promise();
         }
@@ -323,14 +365,14 @@ $(function () {
                 editorType: 'dxSelectBox',
                 editorOptions: {
                     dataSource: {
-                        store: companyStore,
+                        store: companyIdentityUserAssignmentStore,//companyStore,
                         paginate: true,
                         pageSize: pageSizeForLookup
                     },
-                    displayExpr: 'name',
-                    valueExpr: 'id',
+                    displayExpr: 'company.name',
+                    valueExpr: 'company.id',
                     value: companyId,
-                    disabled: true
+                    //disabled: true
                 },
                 label: {
                     visible: false,
@@ -658,7 +700,6 @@ $(function () {
             type: 'localStorage',
             storageKey: 'dgDeliveries',
         },
-
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -911,8 +952,7 @@ $(function () {
             enabled: true,
             type: 'localStorage',
             storageKey: 'dgItems',
-        },
-
+        }, 
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -955,8 +995,7 @@ $(function () {
                 },
                 "searchPanel",
             ],
-        },
-
+        }, 
         columns: [
             {
                 dataField: 'qty',
@@ -966,7 +1005,10 @@ $(function () {
                 cellTemplate(container, options) {
                     $('<div>')
                         .dxTextBox({
-                            value: options.value
+                            value: options.value,
+                            onValueChanged: function (e) {
+                                options.data.qty = e.value;
+                            }
                         })
                         .appendTo(container);
                 }
