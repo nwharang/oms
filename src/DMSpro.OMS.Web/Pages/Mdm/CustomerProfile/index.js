@@ -302,7 +302,6 @@
                         groupCount: result.groupCount,
                     });
                 });
-
             return deferred.promise();
         }
     });
@@ -323,536 +322,536 @@
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             },
-            popup: {
-                title: l("Page.Title.Customers"),
-                showTitle: true,
-                width: '95%',
-                height: '90%',
-            },
-            form: {
-                elementAttr: {
-                    id: 'formEditing',
-                    class: 'formEditing'
-                },
-                labelMode: 'floating',
-                colCount: 10,
-                items: [
-                    {
-                        itemType: 'group',
-                        colCount: 2,
-                        colSpan: 8,
-                        items: [
-                            {
-                                itemType: 'group',
-                                caption: 'General',
-                                colSpan: 4,
-                                items: [
-                                    {
-                                        dataField: 'code'
-                                    },
-                                    {
-                                        dataField: 'name'
-                                    },
-                                    {
-                                        dataField: 'phone1'
-                                    },
-                                    {
-                                        dataField: 'phone2'
-                                    },
-                                    {
-                                        dataField: 'erpCode'
-                                    },
-                                    {
-                                        dataField: 'active',
-                                        //colSpan: 2
-                                    }
-                                ]
-                            },
-                            {
-                                itemType: 'group',
-                                caption: 'System Information',
-                                colCount: 2,
-                                colSpan: 4,
-                                items: [
-                                    {
-                                        itemType: 'group',
-                                        items: [
-                                            {
-                                                dataField: 'priceListId'
-                                            },
-                                            //{
-                                            //    dataField: 'warehouseId'
-                                            //},
-                                            {
-                                                dataField: 'license'
-                                            },
-                                            {
-                                                dataField: 'taxCode'
-                                            },
-                                            {
-                                                dataField: 'vatName'
-                                            },
-                                            {
-                                                dataField: 'vatAddress'
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        itemType: 'group',
-                                        items: [
-                                            {
-                                                dataField: 'effectiveDate',
-                                                editorType: "dxDateBox"
-                                            },
-                                            {
-                                                dataField: 'endDate',
-                                                editorType: "dxDateBox"
-                                            },
-                                            {
-                                                dataField: 'lastOrderDate',
-                                                editorType: "dxDateBox"
-                                            },
-                                            {
-                                                dataField: 'creditLimit'
-                                            },
-                                            {
-                                                dataField: 'paymentTermId'
-                                            },
-                                            {
-                                                dataField: 'linkedCompanyId'
-                                            },
-                                            {
-                                                dataField: 'sfaCustomerCode'
-                                            },
-                                            {
-                                                dataField: 'isCompany'
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                        ]
-                    },
-                    {
-                        itemType: 'group',
-                        caption: 'DMS Attribute',
-                        colSpan: 2,
-                        items: getAttrOptions()
-                    },
-                    //{
-                    //    itemType: 'group',
-                    //    caption: '',
-                    //    items: [{
-                    //        itemType: 'tabbed',
-                    //        tabPanelOptions: {
-                    //            deferRendering: false,
-                    //            height: 440
-                    //        },
-                    //        tabs: [{
-                    //            title: 'IMAGE',
-                    //            colCount: 3,
-                    //            items: [
-                    //                {
-                    //                    itemType: "group",
-                    //                    colSpan: 2,
-                    //                    colCount: 1,
-                    //                    items: [{
-                    //                        dataField: "url",
-                    //                        caption: "",
-                    //                        label: {
-                    //                            text: "",
-                    //                        },
-                    //                        template: function (data, itemElement) {
-                    //                            itemElement.append("<img style='width: 300px; height: 280px' src='" + data.editorOptions.value + "'>");
-                    //                        }
-                    //                    }]
-                    //                },
-                    //                {
-                    //                    itemType: "group",
-                    //                    colSpan: 1,
-                    //                    items: ["active", "isAvatar", {
-                    //                        dataField: "creationTime",
-                    //                        editorType: "dxDateBox",
-                    //                    }]
-                    //                }]
-                    //        }, {
-                    //            title: 'ADDRESS',
-                    //            colCount: 2,
-                    //            items: [
-                    //                {
-                    //                    itemType: "group",
-                    //                    items: ["geoMaster0Id", "geoMaster1Id", "geoMaster2Id", "geoMaster3Id", "geoMaster4Id",
-                    //                        "street", "address", "latitude", "longitude"]
-                    //                },
-                    //                {
-                    //                    itemType: "group",
-                    //                    items: [{
-                    //                        template: function (data, itemElement) {
-                    //                            const mapsDiv = $("<div style='padding:15px; min-height: 320px;'>")
-                    //                            mapsDiv.dxMap({
-                    //                                center: { lat: cusProfile.latitude, lng: cusProfile.longitude },
-                    //                                controls: true,
-                    //                                zoom: 14,
-                    //                                height: 380,
-                    //                                width: '100%',
-                    //                                provider: 'google',
-                    //                                apiKey: {
-                    //                                    // Specify your API keys for each map provider:
-                    //                                    // bing: "YOUR_BING_MAPS_API_KEY",
-                    //                                    // google: "YOUR_GOOGLE_MAPS_API_KEY",
-                    //                                    // googleStatic: "YOUR_GOOGLE_STATIC_MAPS_API_KEY"
-                    //                                },
-                    //                            });
-                    //                            mapsDiv.appendTo(itemElement);
-                    //                        }
-                    //                    }]
-                    //                }],
-                    //        },
-                    //        //{
-                    //        //    title: 'ATTRIBUTE',
-                    //        //    colCount: 4,
-                    //        //    items: ["attribute0Id", "attribute1Id", "attribute2Id", "attribute3Id", "attribute4Id", "attribute5Id", "attribute6Id", "attribute7Id", "attribute8Id", "attribute9Id",
-                    //        //        "attribute10Id", "attribute11Id", "attribute12Id", "attribute13Id", "attribute14Id", "attribute15Id", "attribute16Id", "attribute17Id", "attribute18Id", "attribute19Id"]
-                    //        //},
-                    //        {
-                    //            title: 'CONTACT',
-                    //            template: function (itemData, itemIndex, element) {
-                    //                const gridDiv = $("<div style='padding:15px; min-height: 320px;'>")
-                    //                var cusContactGrid = gridDiv.dxDataGrid({
-                    //                    dataSource: cusContactStore,
-                    //                    //keyExpr: "id",
-                    //                    editing: {
-                    //                        mode: "row",
-                    //                        allowAdding: abp.auth.isGranted('MdmService.Customers.Create'),
-                    //                        allowUpdating: abp.auth.isGranted('MdmService.Customers.Edit'),
-                    //                        allowDeleting: abp.auth.isGranted('MdmService.Customers.Delete'),
-                    //                        useIcons: true,
-                    //                        texts: {
-                    //                            editRow: l("Edit"),
-                    //                            deleteRow: l("Delete"),
-                    //                            confirmDeleteMessage: l("DeleteConfirmationMessage")
-                    //                        }
-                    //                    },
-                    //                    remoteOperations: true,
-                    //                    showRowLines: true,
-                    //                    showBorders: true,
-                    //                    cacheEnabled: true,
-                    //                    allowColumnReordering: true,
-                    //                    rowAlternationEnabled: true,
-                    //                    allowColumnResizing: true,
-                    //                    columnResizingMode: 'widget',
-                    //                    columnAutoWidth: true,
-                    //                    filterRow: {
-                    //                        visible: true
-                    //                    },
-                    //                    groupPanel: {
-                    //                        visible: true,
-                    //                    },
-                    //                    searchPanel: {
-                    //                        visible: true
-                    //                    },
-                    //                    columnMinWidth: 50,
-                    //                    columnChooser: {
-                    //                        enabled: true,
-                    //                        mode: "select"
-                    //                    },
-                    //                    columnFixing: {
-                    //                        enabled: true,
-                    //                    },
-                    //                    export: {
-                    //                        enabled: true,
-                    //                    },
-                    //                    onExporting(e) {
-                    //                        const workbook = new ExcelJS.Workbook();
-                    //                        const worksheet = workbook.addWorksheet('Data');
+            //popup: {
+            //    title: l("Page.Title.Customers"),
+            //    showTitle: true,
+            //    width: '95%',
+            //    height: '90%',
+            //},
+            //form: {
+            //    elementAttr: {
+            //        id: 'formEditing',
+            //        class: 'formEditing'
+            //    },
+            //    labelMode: 'floating',
+            //    colCount: 10,
+            //    items: [
+            //        {
+            //            itemType: 'group',
+            //            colCount: 2,
+            //            colSpan: 8,
+            //            items: [
+            //                {
+            //                    itemType: 'group',
+            //                    caption: 'General',
+            //                    colSpan: 4,
+            //                    items: [
+            //                        {
+            //                            dataField: 'code'
+            //                        },
+            //                        {
+            //                            dataField: 'name'
+            //                        },
+            //                        {
+            //                            dataField: 'phone1'
+            //                        },
+            //                        {
+            //                            dataField: 'phone2'
+            //                        },
+            //                        {
+            //                            dataField: 'erpCode'
+            //                        },
+            //                        {
+            //                            dataField: 'active',
+            //                            //colSpan: 2
+            //                        }
+            //                    ]
+            //                },
+            //                {
+            //                    itemType: 'group',
+            //                    caption: 'System Information',
+            //                    colCount: 2,
+            //                    colSpan: 4,
+            //                    items: [
+            //                        {
+            //                            itemType: 'group',
+            //                            items: [
+            //                                {
+            //                                    dataField: 'priceListId'
+            //                                },
+            //                                //{
+            //                                //    dataField: 'warehouseId'
+            //                                //},
+            //                                {
+            //                                    dataField: 'license'
+            //                                },
+            //                                {
+            //                                    dataField: 'taxCode'
+            //                                },
+            //                                {
+            //                                    dataField: 'vatName'
+            //                                },
+            //                                {
+            //                                    dataField: 'vatAddress'
+            //                                }
+            //                            ]
+            //                        },
+            //                        {
+            //                            itemType: 'group',
+            //                            items: [
+            //                                {
+            //                                    dataField: 'effectiveDate',
+            //                                    editorType: "dxDateBox"
+            //                                },
+            //                                {
+            //                                    dataField: 'endDate',
+            //                                    editorType: "dxDateBox"
+            //                                },
+            //                                {
+            //                                    dataField: 'lastOrderDate',
+            //                                    editorType: "dxDateBox"
+            //                                },
+            //                                {
+            //                                    dataField: 'creditLimit'
+            //                                },
+            //                                {
+            //                                    dataField: 'paymentTermId'
+            //                                },
+            //                                {
+            //                                    dataField: 'linkedCompanyId'
+            //                                },
+            //                                {
+            //                                    dataField: 'sfaCustomerCode'
+            //                                },
+            //                                {
+            //                                    dataField: 'isCompany'
+            //                                }
+            //                            ]
+            //                        }
+            //                    ]
+            //                },
+            //            ]
+            //        },
+            //        {
+            //            itemType: 'group',
+            //            caption: 'DMS Attribute',
+            //            colSpan: 2,
+            //            items: getAttrOptions()
+            //        },
+            //        //{
+            //        //    itemType: 'group',
+            //        //    caption: '',
+            //        //    items: [{
+            //        //        itemType: 'tabbed',
+            //        //        tabPanelOptions: {
+            //        //            deferRendering: false,
+            //        //            height: 440
+            //        //        },
+            //        //        tabs: [{
+            //        //            title: 'IMAGE',
+            //        //            colCount: 3,
+            //        //            items: [
+            //        //                {
+            //        //                    itemType: "group",
+            //        //                    colSpan: 2,
+            //        //                    colCount: 1,
+            //        //                    items: [{
+            //        //                        dataField: "url",
+            //        //                        caption: "",
+            //        //                        label: {
+            //        //                            text: "",
+            //        //                        },
+            //        //                        template: function (data, itemElement) {
+            //        //                            itemElement.append("<img style='width: 300px; height: 280px' src='" + data.editorOptions.value + "'>");
+            //        //                        }
+            //        //                    }]
+            //        //                },
+            //        //                {
+            //        //                    itemType: "group",
+            //        //                    colSpan: 1,
+            //        //                    items: ["active", "isAvatar", {
+            //        //                        dataField: "creationTime",
+            //        //                        editorType: "dxDateBox",
+            //        //                    }]
+            //        //                }]
+            //        //        }, {
+            //        //            title: 'ADDRESS',
+            //        //            colCount: 2,
+            //        //            items: [
+            //        //                {
+            //        //                    itemType: "group",
+            //        //                    items: ["geoMaster0Id", "geoMaster1Id", "geoMaster2Id", "geoMaster3Id", "geoMaster4Id",
+            //        //                        "street", "address", "latitude", "longitude"]
+            //        //                },
+            //        //                {
+            //        //                    itemType: "group",
+            //        //                    items: [{
+            //        //                        template: function (data, itemElement) {
+            //        //                            const mapsDiv = $("<div style='padding:15px; min-height: 320px;'>")
+            //        //                            mapsDiv.dxMap({
+            //        //                                center: { lat: cusProfile.latitude, lng: cusProfile.longitude },
+            //        //                                controls: true,
+            //        //                                zoom: 14,
+            //        //                                height: 380,
+            //        //                                width: '100%',
+            //        //                                provider: 'google',
+            //        //                                apiKey: {
+            //        //                                    // Specify your API keys for each map provider:
+            //        //                                    // bing: "YOUR_BING_MAPS_API_KEY",
+            //        //                                    // google: "YOUR_GOOGLE_MAPS_API_KEY",
+            //        //                                    // googleStatic: "YOUR_GOOGLE_STATIC_MAPS_API_KEY"
+            //        //                                },
+            //        //                            });
+            //        //                            mapsDiv.appendTo(itemElement);
+            //        //                        }
+            //        //                    }]
+            //        //                }],
+            //        //        },
+            //        //        //{
+            //        //        //    title: 'ATTRIBUTE',
+            //        //        //    colCount: 4,
+            //        //        //    items: ["attribute0Id", "attribute1Id", "attribute2Id", "attribute3Id", "attribute4Id", "attribute5Id", "attribute6Id", "attribute7Id", "attribute8Id", "attribute9Id",
+            //        //        //        "attribute10Id", "attribute11Id", "attribute12Id", "attribute13Id", "attribute14Id", "attribute15Id", "attribute16Id", "attribute17Id", "attribute18Id", "attribute19Id"]
+            //        //        //},
+            //        //        {
+            //        //            title: 'CONTACT',
+            //        //            template: function (itemData, itemIndex, element) {
+            //        //                const gridDiv = $("<div style='padding:15px; min-height: 320px;'>")
+            //        //                var cusContactGrid = gridDiv.dxDataGrid({
+            //        //                    dataSource: cusContactStore,
+            //        //                    //keyExpr: "id",
+            //        //                    editing: {
+            //        //                        mode: "row",
+            //        //                        allowAdding: abp.auth.isGranted('MdmService.Customers.Create'),
+            //        //                        allowUpdating: abp.auth.isGranted('MdmService.Customers.Edit'),
+            //        //                        allowDeleting: abp.auth.isGranted('MdmService.Customers.Delete'),
+            //        //                        useIcons: true,
+            //        //                        texts: {
+            //        //                            editRow: l("Edit"),
+            //        //                            deleteRow: l("Delete"),
+            //        //                            confirmDeleteMessage: l("DeleteConfirmationMessage")
+            //        //                        }
+            //        //                    },
+            //        //                    remoteOperations: true,
+            //        //                    showRowLines: true,
+            //        //                    showBorders: true,
+            //        //                    cacheEnabled: true,
+            //        //                    allowColumnReordering: true,
+            //        //                    rowAlternationEnabled: true,
+            //        //                    allowColumnResizing: true,
+            //        //                    columnResizingMode: 'widget',
+            //        //                    columnAutoWidth: true,
+            //        //                    filterRow: {
+            //        //                        visible: true
+            //        //                    },
+            //        //                    groupPanel: {
+            //        //                        visible: true,
+            //        //                    },
+            //        //                    searchPanel: {
+            //        //                        visible: true
+            //        //                    },
+            //        //                    columnMinWidth: 50,
+            //        //                    columnChooser: {
+            //        //                        enabled: true,
+            //        //                        mode: "select"
+            //        //                    },
+            //        //                    columnFixing: {
+            //        //                        enabled: true,
+            //        //                    },
+            //        //                    export: {
+            //        //                        enabled: true,
+            //        //                    },
+            //        //                    onExporting(e) {
+            //        //                        const workbook = new ExcelJS.Workbook();
+            //        //                        const worksheet = workbook.addWorksheet('Data');
 
-                    //                        DevExpress.excelExporter.exportDataGrid({
-                    //                            component: e.component,
-                    //                            worksheet,
-                    //                            autoFilterEnabled: true,
-                    //                        }).then(() => {
-                    //                            workbook.xlsx.writeBuffer().then((buffer) => {
-                    //                                saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Contact.xlsx');
-                    //                            });
-                    //                        });
-                    //                        e.cancel = true;
-                    //                    },
-                    //                    headerFilter: {
-                    //                        visible: true,
-                    //                    },
-                    //                    stateStoring: {
-                    //                        enabled: true,
-                    //                        type: 'localStorage',
-                    //                        storageKey: 'gridContact',
-                    //                    },
-                    //                    paging: {
-                    //                        enabled: true,
-                    //                        pageSize: pageSize
-                    //                    },
-                    //                    pager: {
-                    //                        visible: true,
-                    //                        showPageSizeSelector: true,
-                    //                        allowedPageSizes: allowedPageSizes,
-                    //                        showInfo: true,
-                    //                        showNavigationButtons: true
-                    //                    },
-                    //                    onRowInserting: function (e) {
-                    //                        e.data.customerId = cusProfile.id;
-                    //                    },
-                    //                    onRowUpdating: function (e) {
-                    //                        e.newData = Object.assign({}, e.oldData, e.newData);
-                    //                    },
-                    //                    toolbar: {
-                    //                        items: [
-                    //                            "groupPanel",
-                    //                            {
-                    //                                location: 'after',
-                    //                                template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    //                                onClick() {
-                    //                                    cusContactGrid.addRow();
-                    //                                },
-                    //                            },
-                    //                            'columnChooserButton',
-                    //                            "exportButton",
-                    //                            {
-                    //                                location: 'after',
-                    //                                template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    //                                onClick() {
-                    //                                    //todo
-                    //                                },
-                    //                            },
-                    //                            "searchPanel"
-                    //                        ],
-                    //                    },
-                    //                    columns: [
-                    //                        {
-                    //                            type: 'buttons',
-                    //                            caption: l("Actions"),
-                    //                            width: 110,
-                    //                            buttons: ['edit', 'delete'],
-                    //                            fixedPosition: 'left'
-                    //                        },
-                    //                        {
-                    //                            dataField: 'customerId',
-                    //                            caption: l("CustomerId"),
-                    //                            dataType: 'string',
-                    //                            visible: false
-                    //                        },
-                    //                        {
-                    //                            dataField: 'firstName',
-                    //                            caption: l1("FirstName"),
-                    //                            dataType: 'string',
-                    //                        },
-                    //                        {
-                    //                            dataField: 'lastName',
-                    //                            caption: l1("LastName"),
-                    //                            dataType: 'string',
-                    //                        },
-                    //                        {
-                    //                            dataField: 'gender',
-                    //                            caption: l1("Gender"),
-                    //                            dataType: 'string',
-                    //                        },
-                    //                        {
-                    //                            dataField: 'phone',
-                    //                            caption: l1("Phone"),
-                    //                            dataType: 'string',
-                    //                        },
-                    //                        {
-                    //                            dataField: 'email',
-                    //                            caption: l1("Email"),
-                    //                            dataType: 'string',
-                    //                        },
-                    //                        {
-                    //                            dataField: 'address',
-                    //                            caption: l1("Address"),
-                    //                            dataType: 'string',
-                    //                        },
-                    //                        {
-                    //                            dataField: 'identityNumber',
-                    //                            caption: l1("IdentityNumber"),
-                    //                        },
-                    //                        {
-                    //                            dataField: 'bankName',
-                    //                            caption: l1("BankName"),
-                    //                        },
-                    //                        {
-                    //                            dataField: 'bankAccName',
-                    //                            caption: l1("BankAccName"),
-                    //                        },
-                    //                        {
-                    //                            dataField: 'bankAccNumber',
-                    //                            caption: l1("BankAccNumber"),
-                    //                        },
-                    //                    ],
-                    //                }).dxDataGrid("instance");
-                    //                gridDiv.appendTo(element);
-                    //            }
-                    //        }, {
-                    //            title: 'ATTACHMENT',
-                    //            template: function (itemData, itemIndex, element) {
-                    //                const gridDiv = $("<div style='padding:15px; min-height: 320px;'>")
-                    //                var cusAttachGrid = gridDiv.dxDataGrid({
-                    //                    dataSource: cusAttachStore,
-                    //                    keyExpr: "id",
-                    //                    editing: {
-                    //                        mode: "row",
-                    //                        allowAdding: abp.auth.isGranted('MdmService.Customers.Create'),
-                    //                        allowUpdating: abp.auth.isGranted('MdmService.Customers.Edit'),
-                    //                        allowDeleting: abp.auth.isGranted('MdmService.Customers.Delete'),
-                    //                        useIcons: true,
-                    //                        texts: {
-                    //                            editRow: l("Edit"),
-                    //                            deleteRow: l("Delete"),
-                    //                            confirmDeleteMessage: l("DeleteConfirmationMessage")
-                    //                        }
-                    //                    },
-                    //                    remoteOperations: true,
-                    //                    showRowLines: true,
-                    //                    showBorders: true,
-                    //                    cacheEnabled: true,
-                    //                    allowColumnReordering: true,
-                    //                    rowAlternationEnabled: true,
-                    //                    allowColumnResizing: true,
-                    //                    columnResizingMode: 'widget',
-                    //                    columnAutoWidth: true,
-                    //                    filterRow: {
-                    //                        visible: true
-                    //                    },
-                    //                    groupPanel: {
-                    //                        visible: true,
-                    //                    },
-                    //                    searchPanel: {
-                    //                        visible: true
-                    //                    },
-                    //                    columnMinWidth: 50,
-                    //                    columnChooser: {
-                    //                        enabled: true,
-                    //                        mode: "select"
-                    //                    },
-                    //                    columnFixing: {
-                    //                        enabled: true,
-                    //                    },
-                    //                    export: {
-                    //                        enabled: true,
-                    //                    },
-                    //                    onExporting(e) {
-                    //                        const workbook = new ExcelJS.Workbook();
-                    //                        const worksheet = workbook.addWorksheet('Data');
+            //        //                        DevExpress.excelExporter.exportDataGrid({
+            //        //                            component: e.component,
+            //        //                            worksheet,
+            //        //                            autoFilterEnabled: true,
+            //        //                        }).then(() => {
+            //        //                            workbook.xlsx.writeBuffer().then((buffer) => {
+            //        //                                saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Contact.xlsx');
+            //        //                            });
+            //        //                        });
+            //        //                        e.cancel = true;
+            //        //                    },
+            //        //                    headerFilter: {
+            //        //                        visible: true,
+            //        //                    },
+            //        //                    stateStoring: {
+            //        //                        enabled: true,
+            //        //                        type: 'localStorage',
+            //        //                        storageKey: 'gridContact',
+            //        //                    },
+            //        //                    paging: {
+            //        //                        enabled: true,
+            //        //                        pageSize: pageSize
+            //        //                    },
+            //        //                    pager: {
+            //        //                        visible: true,
+            //        //                        showPageSizeSelector: true,
+            //        //                        allowedPageSizes: allowedPageSizes,
+            //        //                        showInfo: true,
+            //        //                        showNavigationButtons: true
+            //        //                    },
+            //        //                    onRowInserting: function (e) {
+            //        //                        e.data.customerId = cusProfile.id;
+            //        //                    },
+            //        //                    onRowUpdating: function (e) {
+            //        //                        e.newData = Object.assign({}, e.oldData, e.newData);
+            //        //                    },
+            //        //                    toolbar: {
+            //        //                        items: [
+            //        //                            "groupPanel",
+            //        //                            {
+            //        //                                location: 'after',
+            //        //                                template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+            //        //                                onClick() {
+            //        //                                    cusContactGrid.addRow();
+            //        //                                },
+            //        //                            },
+            //        //                            'columnChooserButton',
+            //        //                            "exportButton",
+            //        //                            {
+            //        //                                location: 'after',
+            //        //                                template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+            //        //                                onClick() {
+            //        //                                    //todo
+            //        //                                },
+            //        //                            },
+            //        //                            "searchPanel"
+            //        //                        ],
+            //        //                    },
+            //        //                    columns: [
+            //        //                        {
+            //        //                            type: 'buttons',
+            //        //                            caption: l("Actions"),
+            //        //                            width: 110,
+            //        //                            buttons: ['edit', 'delete'],
+            //        //                            fixedPosition: 'left'
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'customerId',
+            //        //                            caption: l("CustomerId"),
+            //        //                            dataType: 'string',
+            //        //                            visible: false
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'firstName',
+            //        //                            caption: l1("FirstName"),
+            //        //                            dataType: 'string',
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'lastName',
+            //        //                            caption: l1("LastName"),
+            //        //                            dataType: 'string',
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'gender',
+            //        //                            caption: l1("Gender"),
+            //        //                            dataType: 'string',
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'phone',
+            //        //                            caption: l1("Phone"),
+            //        //                            dataType: 'string',
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'email',
+            //        //                            caption: l1("Email"),
+            //        //                            dataType: 'string',
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'address',
+            //        //                            caption: l1("Address"),
+            //        //                            dataType: 'string',
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'identityNumber',
+            //        //                            caption: l1("IdentityNumber"),
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'bankName',
+            //        //                            caption: l1("BankName"),
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'bankAccName',
+            //        //                            caption: l1("BankAccName"),
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'bankAccNumber',
+            //        //                            caption: l1("BankAccNumber"),
+            //        //                        },
+            //        //                    ],
+            //        //                }).dxDataGrid("instance");
+            //        //                gridDiv.appendTo(element);
+            //        //            }
+            //        //        }, {
+            //        //            title: 'ATTACHMENT',
+            //        //            template: function (itemData, itemIndex, element) {
+            //        //                const gridDiv = $("<div style='padding:15px; min-height: 320px;'>")
+            //        //                var cusAttachGrid = gridDiv.dxDataGrid({
+            //        //                    dataSource: cusAttachStore,
+            //        //                    keyExpr: "id",
+            //        //                    editing: {
+            //        //                        mode: "row",
+            //        //                        allowAdding: abp.auth.isGranted('MdmService.Customers.Create'),
+            //        //                        allowUpdating: abp.auth.isGranted('MdmService.Customers.Edit'),
+            //        //                        allowDeleting: abp.auth.isGranted('MdmService.Customers.Delete'),
+            //        //                        useIcons: true,
+            //        //                        texts: {
+            //        //                            editRow: l("Edit"),
+            //        //                            deleteRow: l("Delete"),
+            //        //                            confirmDeleteMessage: l("DeleteConfirmationMessage")
+            //        //                        }
+            //        //                    },
+            //        //                    remoteOperations: true,
+            //        //                    showRowLines: true,
+            //        //                    showBorders: true,
+            //        //                    cacheEnabled: true,
+            //        //                    allowColumnReordering: true,
+            //        //                    rowAlternationEnabled: true,
+            //        //                    allowColumnResizing: true,
+            //        //                    columnResizingMode: 'widget',
+            //        //                    columnAutoWidth: true,
+            //        //                    filterRow: {
+            //        //                        visible: true
+            //        //                    },
+            //        //                    groupPanel: {
+            //        //                        visible: true,
+            //        //                    },
+            //        //                    searchPanel: {
+            //        //                        visible: true
+            //        //                    },
+            //        //                    columnMinWidth: 50,
+            //        //                    columnChooser: {
+            //        //                        enabled: true,
+            //        //                        mode: "select"
+            //        //                    },
+            //        //                    columnFixing: {
+            //        //                        enabled: true,
+            //        //                    },
+            //        //                    export: {
+            //        //                        enabled: true,
+            //        //                    },
+            //        //                    onExporting(e) {
+            //        //                        const workbook = new ExcelJS.Workbook();
+            //        //                        const worksheet = workbook.addWorksheet('Data');
 
-                    //                        DevExpress.excelExporter.exportDataGrid({
-                    //                            component: e.component,
-                    //                            worksheet,
-                    //                            autoFilterEnabled: true,
-                    //                        }).then(() => {
-                    //                            workbook.xlsx.writeBuffer().then((buffer) => {
-                    //                                saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Attachment.xlsx');
-                    //                            });
-                    //                        });
-                    //                        e.cancel = true;
-                    //                    },
-                    //                    headerFilter: {
-                    //                        visible: true,
-                    //                    },
-                    //                    stateStoring: {
-                    //                        enabled: true,
-                    //                        type: 'localStorage',
-                    //                        storageKey: 'gridAttachment',
-                    //                    },
-                    //                    paging: {
-                    //                        enabled: true,
-                    //                        pageSize: pageSize
-                    //                    },
-                    //                    pager: {
-                    //                        visible: true,
-                    //                        showPageSizeSelector: true,
-                    //                        allowedPageSizes: allowedPageSizes,
-                    //                        showInfo: true,
-                    //                        showNavigationButtons: true
-                    //                    },
-                    //                    onRowInserting: function (e) {
-                    //                        e.data.customerId = cusProfile.id;
-                    //                    },
-                    //                    onRowUpdating: function (e) {
-                    //                        e.newData = Object.assign({}, e.oldData, e.newData);
-                    //                    },
-                    //                    toolbar: {
-                    //                        items: [
-                    //                            "groupPanel",
-                    //                            {
-                    //                                location: 'after',
-                    //                                template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    //                                onClick() {
-                    //                                    cusAttachGrid.addRow();
-                    //                                },
-                    //                            },
-                    //                            'columnChooserButton',
-                    //                            "exportButton",
-                    //                            {
-                    //                                location: 'after',
-                    //                                template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    //                                onClick() {
-                    //                                    //todo
-                    //                                },
-                    //                            },
-                    //                            "searchPanel"
-                    //                        ],
-                    //                    },
-                    //                    columns: [
-                    //                        {
-                    //                            type: 'buttons',
-                    //                            caption: l("Actions"),
-                    //                            width: 110,
-                    //                            buttons: ['edit', 'delete'],
-                    //                            fixedPosition: 'left'
-                    //                        },
-                    //                        {
-                    //                            dataField: 'customerId',
-                    //                            caption: l("CustomerId"),
-                    //                            dataType: 'string',
-                    //                            visible: false
-                    //                        },
-                    //                        {
-                    //                            dataField: 'description',
-                    //                            caption: l("Description"),
-                    //                            dataType: 'string',
-                    //                        },
-                    //                        {
-                    //                            dataField: 'url',
-                    //                            caption: l("Url"),
-                    //                            dataType: 'string',
-                    //                            cellTemplate: function (element, info) {
-                    //                                element.append("<a href='#'>" + info.text + "</a>")
-                    //                                    .css("color", "blue");
-                    //                            }
-                    //                        },
-                    //                        {
-                    //                            dataField: 'creationTime',
-                    //                            caption: l1("CreationTime"),
-                    //                            width: 150,
-                    //                            dataType: 'date',
-                    //                        },
-                    //                        {
-                    //                            dataField: 'active',
-                    //                            caption: l("Active"),
-                    //                            width: 120,
-                    //                            alignment: 'center',
-                    //                            dataType: 'boolean',
-                    //                            cellTemplate(container, options) {
-                    //                                $('<div>')
-                    //                                    .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                    //                                    .appendTo(container);
-                    //                            },
-                    //                        }
-                    //                    ],
-                    //                }).dxDataGrid("instance");
-                    //                gridDiv.appendTo(element);
-                    //            }
-                    //        }],
-                    //    }],
-                    //}
-                ]
-            }
+            //        //                        DevExpress.excelExporter.exportDataGrid({
+            //        //                            component: e.component,
+            //        //                            worksheet,
+            //        //                            autoFilterEnabled: true,
+            //        //                        }).then(() => {
+            //        //                            workbook.xlsx.writeBuffer().then((buffer) => {
+            //        //                                saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Attachment.xlsx');
+            //        //                            });
+            //        //                        });
+            //        //                        e.cancel = true;
+            //        //                    },
+            //        //                    headerFilter: {
+            //        //                        visible: true,
+            //        //                    },
+            //        //                    stateStoring: {
+            //        //                        enabled: true,
+            //        //                        type: 'localStorage',
+            //        //                        storageKey: 'gridAttachment',
+            //        //                    },
+            //        //                    paging: {
+            //        //                        enabled: true,
+            //        //                        pageSize: pageSize
+            //        //                    },
+            //        //                    pager: {
+            //        //                        visible: true,
+            //        //                        showPageSizeSelector: true,
+            //        //                        allowedPageSizes: allowedPageSizes,
+            //        //                        showInfo: true,
+            //        //                        showNavigationButtons: true
+            //        //                    },
+            //        //                    onRowInserting: function (e) {
+            //        //                        e.data.customerId = cusProfile.id;
+            //        //                    },
+            //        //                    onRowUpdating: function (e) {
+            //        //                        e.newData = Object.assign({}, e.oldData, e.newData);
+            //        //                    },
+            //        //                    toolbar: {
+            //        //                        items: [
+            //        //                            "groupPanel",
+            //        //                            {
+            //        //                                location: 'after',
+            //        //                                template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+            //        //                                onClick() {
+            //        //                                    cusAttachGrid.addRow();
+            //        //                                },
+            //        //                            },
+            //        //                            'columnChooserButton',
+            //        //                            "exportButton",
+            //        //                            {
+            //        //                                location: 'after',
+            //        //                                template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+            //        //                                onClick() {
+            //        //                                    //todo
+            //        //                                },
+            //        //                            },
+            //        //                            "searchPanel"
+            //        //                        ],
+            //        //                    },
+            //        //                    columns: [
+            //        //                        {
+            //        //                            type: 'buttons',
+            //        //                            caption: l("Actions"),
+            //        //                            width: 110,
+            //        //                            buttons: ['edit', 'delete'],
+            //        //                            fixedPosition: 'left'
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'customerId',
+            //        //                            caption: l("CustomerId"),
+            //        //                            dataType: 'string',
+            //        //                            visible: false
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'description',
+            //        //                            caption: l("Description"),
+            //        //                            dataType: 'string',
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'url',
+            //        //                            caption: l("Url"),
+            //        //                            dataType: 'string',
+            //        //                            cellTemplate: function (element, info) {
+            //        //                                element.append("<a href='#'>" + info.text + "</a>")
+            //        //                                    .css("color", "blue");
+            //        //                            }
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'creationTime',
+            //        //                            caption: l1("CreationTime"),
+            //        //                            width: 150,
+            //        //                            dataType: 'date',
+            //        //                        },
+            //        //                        {
+            //        //                            dataField: 'active',
+            //        //                            caption: l("Active"),
+            //        //                            width: 120,
+            //        //                            alignment: 'center',
+            //        //                            dataType: 'boolean',
+            //        //                            cellTemplate(container, options) {
+            //        //                                $('<div>')
+            //        //                                    .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+            //        //                                    .appendTo(container);
+            //        //                            },
+            //        //                        }
+            //        //                    ],
+            //        //                }).dxDataGrid("instance");
+            //        //                gridDiv.appendTo(element);
+            //        //            }
+            //        //        }],
+            //        //    }],
+            //        //}
+            //    ]
+            //}
 
             //form: {
             //    labelMode: 'floating',
@@ -1483,7 +1482,9 @@
                     location: 'after',
                     template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                     onClick() {
-                        gridCustomers.addRow();
+                        //gridCustomers.addRow();
+                        var w = window.open('/Mdm/CustomerProfile/Details', '_blank');
+                        w.sessionStorage.setItem("customerProfile", null);
                     },
                 },
                 'columnChooserButton',
@@ -1503,7 +1504,18 @@
                 type: 'buttons',
                 caption: l("Actions"),
                 width: 90,
-                buttons: ['edit'],
+                buttons: [{
+                    text: "Edit",
+                    icon: "edit",
+                    hint: "Edit",
+                    visible: function (e) {
+                        return !e.row.isNewRow;
+                    },
+                    onClick: function (e) {
+                        var w = window.open('/Mdm/CustomerProfile/Details', '_blank');
+                        w.sessionStorage.setItem("customerProfile", JSON.stringify(e.row.data));
+                    }
+                }],
                 fixedPosition: 'left'
             },
             {
@@ -2070,4 +2082,8 @@
             }
         }
     }
+});
+
+$(window).focus(function () {
+    $('#dgCustomers').data('dxDataGrid').refresh();
 });
