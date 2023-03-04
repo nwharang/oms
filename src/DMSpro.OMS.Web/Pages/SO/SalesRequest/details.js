@@ -19,6 +19,7 @@ $(function () {
     //get data from sessionStorage
     const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
     var pricelistId = null;
+    var itemsFromStore = null;
     var itemsInPopup = null;
 
     /****custom store*****/
@@ -220,6 +221,7 @@ $(function () {
 
             itemService.getListDevextremes(args)
                 .done(result => {
+                    itemsFromStore = result.data;
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -338,7 +340,7 @@ $(function () {
             if (key == 0) return null;
 
             var d = new $.Deferred();
-            uOMGroupDetailService.getListDevextremes({ filter: JSON.stringify(['uomGroup.id', '=', key]) })
+            uOMGroupDetailService.getListDevextremes({ filter: JSON.stringify(['altUOMId', '=', key]) })
                 .done(result => {
                     d.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -984,8 +986,24 @@ $(function () {
                     displayExpr: "name",
                     valueExpr: "id"
                 },
-                setCellValue: function (newData, value) {
-                    return LoadDataByItem(newData, value);
+                setCellValue: function (newData, value, currentData) {
+                    var selectedItem = itemsFromStore.filter(i => i.id == value)[0];
+                    console.log(selectedItem.uomGroupId)
+                    newData.itemId = value;
+                    newData.uomGroupId = selectedItem.uomGroupId;
+                    newData.vatId = selectedItem.vatId;
+                    newData.taxRate = selectedItem.vat.rate;
+                    newData.uomId = selectedItem.salesUOMId;
+
+                    var d = new $.Deferred();
+                    priceListDetailsService.getListDevextremes({ filter: JSON.stringify([['itemId', '=', value], 'and', ['item.uomGroupId', '=', selectedItem.uomGroupId], 'and', ['priceList.id', '=', pricelistId]]) })
+                        .done(result => {
+                            d.resolve(
+                                newData.price = result.data[0].price,
+                                newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100
+                            );
+                        });
+                    return d.promise();
                 },
                 validationRules: [{ type: 'required' }],
                 width: 200
@@ -1045,10 +1063,6 @@ $(function () {
                 editorOptions: {
                     format: '#,##0.##',
                 },
-                setCellValue: function (newData, value, currentdata) {
-                    newData.priceAfterTax = value;
-                    newData.lineAmtAfterTax = currentdata.qty * value - currentdata.discountAmt;
-                },
                 value: 0,
                 validationRules: [{ type: 'required' }],
                 width: 150,
@@ -1057,11 +1071,6 @@ $(function () {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
                 dataField: 'qty',
                 dataType: 'number',
-                setCellValue: function (newData, value, currentdata) {
-                    newData.qty = value;
-                    newData.lineAmt = currentdata.price * value - currentdata.discountAmt;
-                    newData.lineAmtAfterTax = currentdata.priceAfterTax * value - currentdata.discountAmt;
-                },
                 value: 0,
                 validationRules: [
                     {
@@ -1108,52 +1117,46 @@ $(function () {
                 width: 200
             },
             {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:SfaOrderBaseQty'),
+                //caption: l('EntityFieldName:OrderService:SalesRequestDetails:SfaOrderBaseQty'),
+                caption: l('SfaOrderBaseQty'),
                 dataField: 'sfaOrderBaseQty',
                 dataType: 'number',
                 value: 0,
-                setCellValue: function (newData, value, currentRowData) {
-                    if (value < 0 || value > currentRowData.qty) {
-                        newData.sfaOrderBaseQty = 0;
-                    } else {
-                        newData.sfaOrderBaseQty = value;
-                        newData.baseQty = currentRowData.uomRate * value;
-                    }
-                },
                 width: 150
             },
             {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:BaseQty'),
+                //caption: l('EntityFieldName:OrderService:SalesRequestDetails:BaseQty'),
+                caption: l('BaseQty'),
                 dataField: 'baseQty',
                 dataType: 'number',
+                calculateCellValue: function (rowData) {
+                    //console.log(rowData)
+                    return rowData.qty * rowData.uomRate;
+                },
                 value: 0,
                 width: 150
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:Warehouse'),
                 dataField: 'warehouseId',
-                value: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-                validationRules: [{ type: 'required' }],
+                //validationRules: [{ type: 'required' }],
                 width: 200
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:WarehouseLocation'),
                 dataField: 'warehouseLocationId',
-                value: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-                validationRules: [{ type: 'required' }],
+                //validationRules: [{ type: 'required' }],
                 width: 200
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:IsFree'),
                 dataField: 'isFree',
                 dataType: 'boolean',
-                validationRules: [{ type: 'required' }],
                 width: 120
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:Promotion'),
                 dataField: 'promotionId',
-                value: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
                 width: 150
             },
             {
@@ -1163,20 +1166,6 @@ $(function () {
                     dataSource: discountTypeStore,
                     displayExpr: 'text',
                     valueExpr: 'id'
-                },
-                setCellValue: function (newData, value, currentdata) {
-                    newData.discountType = value;
-
-                    switch (value) {
-                        case 1:
-                            newData.discountAmt = currentdata.price * currentdata.discountPerc;
-                            break;
-                        case 2:
-                            newData.discountAmt = currentdata.priceAfterTax * currentdata.discountPerc;
-                            break;
-                        default:
-                            newData.discountAmt = 0;
-                    }
                 },
                 validationRules: [{ type: 'required' }],
                 width: 200
@@ -1189,19 +1178,6 @@ $(function () {
                     format: '#0.00%',
                 },
                 value: 0,
-                setCellValue: function (newData, value, currentdata) {
-                    newData.discountPerc = value;
-                    switch (currentdata.discountType) {
-                        case 1:
-                            newData.discountAmt = currentdata.price * value;
-                            break;
-                        case 2:
-                            newData.discountAmt = currentdata.priceAfterTax * value;
-                            break;
-                        default:
-                            newData.discountAmt = 0;
-                    }
-                },
                 validationRules: [{ type: 'required' }],
                 width: 150
             },
@@ -1211,11 +1187,6 @@ $(function () {
                 dataType: 'number',
                 editorOptions: {
                     format: '#,##0.##',
-                },
-                setCellValue: function (newData, value, currentdata) {
-                    newData.discountAmt = value;
-                    newData.lineAmt = currentdata.price * currentdata.qty - value;
-                    newData.lineAmtAfterTax = currentdata.priceAfterTax * currentdata.qty - value;
                 },
                 value: 0,
                 validationRules: [{ type: 'required' }],
@@ -1476,30 +1447,11 @@ $(function () {
         //    return;
         //}
 
-        var salesRequest = frmSalesRequestDetails.option('formData');
+        var salesRequestHeader = frmSalesRequestDetails.option('formData');
         var salesRequestDetails = dgSalesRequestDetails.getDataSource().items();
 
         var salesRequestObject = {
-            header: {
-                companyId: salesRequest.companyId,
-                docNbr: salesRequest.docNbr,
-                docType: salesRequest.docType,
-                requestDate: salesRequest.requestDate,
-                remark: salesRequest.remark,
-                businessPartnerId: salesRequest.businessPartnerId,
-                routeId: salesRequest.routeId,
-                employeeId: salesRequest.employeeId,
-                linkedSFAId: salesRequest.linkedSFAId,
-                docTotalLineDiscountAmt: salesRequest.docTotalLineDiscountAmt,
-                docTotalLineAmt: salesRequest.docTotalLineAmt,
-                docTotalLineAmtAfterTax: salesRequest.docTotalLineAmtAfterTax,
-                docDiscountType: salesRequest.docDiscountType,
-                docDiscountPerc: salesRequest.docDiscountPerc,
-                docDiscountAmt: salesRequest.docDiscountAmt,
-                docTotalAmt: salesRequest.docTotalAmt,
-                docTotalAmtAfterTax: salesRequest.docTotalAmtAfterTax,
-                docSource: salesRequest.docSource
-            },
+            header: salesRequestHeader,
             details: salesRequestDetails
         };
 
@@ -1524,27 +1476,6 @@ $(function () {
     }
 
     //LoadData();
-
-    function LoadDataByItem(fieldData, itemId) {
-        var d = new $.Deferred();
-        itemService.getListDevextremes({ filter: JSON.stringify(['id', '=', itemId]) })
-            .done(resultItem => {
-                priceListDetailsService.getListDevextremes({ filter: JSON.stringify([['itemId', '=', itemId], 'and', ['item.uomGroupId', '=', resultItem.data[0].uomGroupId], 'and', ['priceList.id', '=', pricelistId]]) })
-                    .done(result => {
-                        d.resolve(
-                            fieldData.itemId = itemId,
-                            fieldData.uomGroupId = resultItem.data[0].uomGroupId,
-                            fieldData.vatId = resultItem.data[0].vatId,
-                            fieldData.taxRate = resultItem.data[0].vat.rate,
-                            fieldData.uomId = resultItem.data[0].salesUOMId,
-                            fieldData.price = result.data[0] == null ? 0 : result.data[0].price,
-                            fieldData.priceAfterTax = fieldData.price + (fieldData.price * fieldData.taxRate) / 100
-                        );
-                    });
-            });
-
-        return d.promise();
-    }
 
     initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestDetails');
 });
