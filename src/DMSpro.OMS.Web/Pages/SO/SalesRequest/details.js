@@ -917,7 +917,6 @@ $(function () {
         toolbar: {
             items: [
                 "groupPanel",
-                "addRowButton",
                 {
                     location: 'after',
                     widget: 'dxButton',
@@ -987,7 +986,7 @@ $(function () {
                 },
                 setCellValue: function (newData, value, currentData) {
                     var selectedItem = itemsFromStore.filter(i => i.id == value)[0];
-                    console.log(selectedItem.uomGroupId)
+
                     newData.itemId = value;
                     newData.uomGroupId = selectedItem.uomGroupId;
                     newData.vatId = selectedItem.vatId;
@@ -1128,10 +1127,6 @@ $(function () {
                 caption: l('BaseQty'),
                 dataField: 'baseQty',
                 dataType: 'number',
-                calculateCellValue: function (rowData) {
-                    //console.log(rowData)
-                    return rowData.qty * rowData.uomRate;
-                },
                 value: 0,
                 width: 150
             },
@@ -1401,8 +1396,7 @@ $(function () {
                                 id: u.id,
                                 itemId: u.id,
                                 uomId: u.salesUOMId,
-                                qty: u.qty,
-
+                                qty: u.qty
                             });
                         });
 
@@ -1451,7 +1445,7 @@ $(function () {
             details: salesRequestDetails
         };
 
-        console.log(salesRequestObject);
+        console.log("Save data: ", salesRequestObject);
 
         salesRequestService.createDoc(salesRequestObject, { contentType: "application/json" })
             .done(result => {
