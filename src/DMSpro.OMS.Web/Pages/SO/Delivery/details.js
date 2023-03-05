@@ -1,128 +1,620 @@
-﻿var DeliveryModel;
-var DeliveryDetailData = [];
+﻿var DeliveryModel = null;
+const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
+var DeliveryDetailData = [{
+    itemCode: "1",
+    itemName: "xxx",
+    qty: 111
+},
+{
+    itemCode: "2",
+    itemName: "yyyy",
+    qty: 2
+},
+];
 
 $(function () {
-   
-    var l = abp.localization.getResource("MdmService"); 
-    $("#frmDeliveryHeader").dxForm({
-        formData: {
-            company: "CEO Company",
-            SRNbr: "hsdjsd939239j23",
-            orderType: "JHeart",
-            docDate: new Date(),
-            deliveryDate: new Date(2022, 4, 13),
-            postingDate: new Date(),
-            remark: "",
-            outletID: "01234567890",
-            isActive: true,
-            routeID: "1",
-            route: "Route 1",
-            employeeID: "JS13343JDD3",
-            salesman: "Jay ne",
-            status: "Open",
-            linkedNbr: "JB893",
-            SFAlinkedNbr: "AH2002",
-            totalAmtNoTax: 400,
-            totalAmtDiscount: 35,
-            totalTaxAmt: 20,
-            totalAmt: 420,
-            docSource: "Đơn Manual",
-        }, 
-        labelMode: 'floating',
-        colCount: 3,
-        items: [
-            {
-                itemType: "group",
-                items: ["SRNbr", "status", "docDate", "deliveryDate", "postingDate", "orderType", "remark"]
-            },
-            {
-                itemType: "group",
-                items: ["company", "route", "salesman", "linkedNbr", "SFAlinkedNbr"]
-            },
-            {
-                itemType: "group",
-                items: ["totalAmtNoTax", "totalAmtDiscount", "totalTaxAmt", "totalAmt"]
-            }
-        ]
-    });  
-    var dgDeliveries = $('#dgDeliveries').dxDataGrid({
-        dataSource: DeliveryDetailData, 
-        remoteOperations: true, 
-        showColumnLines: true,
-        showRowLines: false,
-        rowAlternationEnabled: true,
-        showBorders: false, 
-        export: {
-            enabled: true, 
+    var l = abp.localization.getResource("OMS");
+  
+    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+    var companyIdentityUserAssignmentService = window.dMSpro.oMS.mdmService.controllers.companyIdentityUserAssignments.companyIdentityUserAssignment;
+    var customerAssignmentService = window.dMSpro.oMS.mdmService.controllers.customerAssignments.customerAssignment;
+    var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
+    var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
+    var deliveryService = window.dMSpro.oMS.orderService.controllers.deliveries.delivery;
+
+    const docTypeStore = [
+        {
+            id: 0,
+            text: l('EntityFieldName:OrderService:SalesRequest:PreOrder')
         },
-        onExporting: function (e) {
-            if (e.format === 'xlsx') {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Deliveries');
-                DevExpress.excelExporter.exportDataGrid({
-                    component: e.component,
-                    worksheet,
-                    autoFilterEnabled: true,
-                }).then(() => {
-                    workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Deliveries.xlsx');
+        {
+            id: 1,
+            text: l('EntityFieldName:OrderService:SalesRequest:VanSales')
+        },
+        {
+            id: 2,
+            text: l('EntityFieldName:OrderService:SalesRequest:ThirdPartyDelivery')
+        }
+    ];
+
+    const discountTypeStore = [
+        {
+            id: 0,
+            text: l('EntityFieldName:OrderService:SalesRequest:CashDiscount')
+        },
+        {
+            id: 1,
+            text: l('EntityFieldName:OrderService:SalesRequest:DiscountBeforeTax')
+        },
+        {
+            id: 2,
+            text: l('EntityFieldName:OrderService:SalesRequest:DiscountAfterTax')
+        }
+    ];
+
+    const docSourceStore = [
+        {
+            id: 0,
+            text: l('EntityFieldName:OrderService:SalesRequest:Manual')
+        },
+        {
+            id: 1,
+            text: l('EntityFieldName:OrderService:SalesRequest:SFA')
+        },
+        {
+            id: 2,
+            text: l('EntityFieldName:OrderService:SalesRequest:BonBonShop')
+        },
+        {
+            id: 3,
+            text: l('EntityFieldName:OrderService:SalesRequest:Ecommerce')
+        }
+    ];
+
+    const transactionTypeStore = [
+        {
+            id: 0,
+            text: l('EntityFieldName:OrderService:SalesRequest:Item')
+        },
+        {
+            id: 1,
+            text: l('EntityFieldName:OrderService:SalesRequest:Promotion')
+        },
+        {
+            id: 2,
+            text: l('EntityFieldName:OrderService:SalesRequest:Sampling')
+        },
+        {
+            id: 3,
+            text: l('EntityFieldName:OrderService:SalesRequest:Incentive')
+        }
+    ];
+
+    
+    var companyStore = new DevExpress.data.CustomStore({
+        key: "id",
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            companyService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
                     });
                 });
-                e.cancel = true;
-            }
-            else if (e.format === 'pdf') {
-                const doc = new jsPDF();
-                DevExpress.pdfExporter.exportDataGrid({
-                    jsPDFDocument: doc,
-                    component: e.component,
-                }).then(() => {
-                    doc.save('Deliveries.pdf');
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            companyService.get(key)
+                .done(data => {
+                    d.resolve(data);
                 });
+            return d.promise();
+        }
+    });
+    var companyIdentityUserAssignmentStore = new DevExpress.data.CustomStore({
+        key: "id",
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            }); 
+            window.dMSpro.oMS.mdmService.controllers
+                .companyIdentityUserAssignments
+                .companyIdentityUserAssignment
+                .getListCompanyByCurrentUser(args)
+                .done(result => {
+                    
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            companyService.get(key)
+                .done(data => {
+                    d.resolve({
+                        company: {
+                            id: data.id,
+                            name: data.name
+                        }
+                    });
+                });
+            return d.promise();
+        }
+    });
+
+    var customerAssignmentStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            customerAssignmentService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            customerAssignmentService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
+
+    var employeeProfileStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            employeeProfileService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            employeeProfileService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
+
+    var salesOrgHierarchyStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            salesOrgHierarchyService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            salesOrgHierarchyService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        },
+        insert(values) {
+            return salesOrgHierarchyService.create(values, { contentType: "application/json" });
+        },
+        update(key, values) {
+            return salesOrgHierarchyService.update(key, values, { contentType: "application/json" });
+        },
+        remove(key) {
+            return salesOrgHierarchyService.delete(key);
+        }
+    });
+
+    var itemStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            itemService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            itemService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
+
+    const deliveryForm = $("#frmDeliveryHeader").dxForm({
+        formData: {
+            DeliveryModel
+        },
+        labelMode: 'floating',
+        colCount: 4,
+        items: [
+            // row 1
+            {
+                dataField: "docNbr",
+                label: {
+                    visible: false,
+                    text: l('Doc Nbr')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "companyId",
+                editorType: 'dxSelectBox',
+                editorOptions: {
+                    dataSource: {
+                        store: companyIdentityUserAssignmentStore,//companyStore,
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
+                    displayExpr: 'company.name',
+                    valueExpr: 'company.id',
+                    value: companyId,
+                    //disabled: true
+                },
+                label: {
+                    visible: false,
+                    text: l('Company')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docTotalLineDiscountAmt",
+                editorType: "dxNumberBox",
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                label: {
+                    visible: false,
+                    text: l('Doc Total Line Discount Amt')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docTotalLineAmt",
+                editorType: "dxNumberBox",
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                label: {
+                    visible: false,
+                    text: l('Doc Total Line Amt')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            // row 2
+            {
+                dataField: "docType",
+                editorType: "dxSelectBox",
+                editorOptions: {
+                    dataSource: docTypeStore,
+                    displayExpr: 'text',
+                    valueExpr: 'id'
+                },
+                label: {
+                    visible: false,
+                    text: l('Doc Type')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "businessPartnerId",
+                editorType: 'dxSelectBox',
+                editorOptions: {
+                    dataSource: {
+                        store: customerAssignmentStore,
+                        filter: [["company.id", "=", companyId], 'and', ['customer.active', '=', true], 'and', ['customer.effectiveDate', '<=', new Date()], 'and', [['customer.endDate', '=', null], 'or', ['customer.endDate', '>=', new Date()]]],
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
+                    displayExpr: 'customer.name',
+                    valueExpr: 'customer.id'
+                },
+                label: {
+                    visible: false,
+                    text: l('Business Partner')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docTotalLineAmtAfterTax",
+                editorType: "dxNumberBox",
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                label: {
+                    visible: false,
+                    text: l('Doc Total Line Amt After Tax')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docDiscountType",
+                editorType: "dxNumberBox",
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                label: {
+                    visible: false,
+                    text: l('Doc Discount Type')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            // row 3
+            {
+                dataField: "linkedSFAId",
+                label: {
+                    visible: false,
+                    text: l('Linked SFA')
+                },
+                editorOptions: {
+                    disabled: true,
+                    value: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "employeeId",
+                editorType: 'dxSelectBox',
+                editorOptions: {
+                    dataSource: {
+                        store: employeeProfileStore,
+                        filter: [['active', '=', true], 'and', [['effectiveDate', '=', null], 'or', ['effectiveDate', '<=', new Date()]], 'and', [['endDate', '=', null], 'or', ['endDate', '>=', new Date()]]],
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
+                    displayExpr: 'code',
+                    valueExpr: 'id'
+                },
+                label: {
+                    visible: false,
+                    text: l('Employee')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docDiscountPerc",
+                editorType: "dxNumberBox",
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                label: {
+                    visible: false,
+                    text: l('Doc Discount Perc')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docDiscountAmt",
+                editorType: "dxNumberBox",
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                label: {
+                    visible: false,
+                    text: l('Doc Discount Amt')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            // row 4
+            {
+                dataField: "remark",
+                label: {
+                    visible: false,
+                    text: l('Remark')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "routeId",
+                editorType: "dxSelectBox",
+                editorOptions: {
+                    dataSource: {
+                        store: salesOrgHierarchyStore,
+                        filter: ["isRoute", "=", true],
+                        paginate: true,
+                        pageSize: pageSizeForLookup
+                    },
+                    displayExpr: 'name',
+                    valueExpr: 'id'
+                },
+                label: {
+                    visible: false,
+                    text: l('Route')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docTotalAmt",
+                editorType: "dxNumberBox",
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                label: {
+                    visible: false,
+                    text: l('Doc Total Amt')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docTotalAmtAfterTax",
+                editorType: "dxNumberBox",
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                label: {
+                    visible: false,
+                    text: l('Doc Total Amt After Tax')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            // row 5
+            {
+                dataField: "requestDate",
+                editorType: 'dxDateBox',
+                editorOptions: {
+                    type: 'datetime',
+                    value: new Date(),
+                    disabled: true,
+                },
+                label: {
+                    visible: false,
+                    text: l('Request Date')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docSource",
+                editorType: "dxSelectBox",
+                editorOptions: {
+                    dataSource: docSourceStore,
+                    displayExpr: 'text',
+                    valueExpr: 'id'
+                },
+                label: {
+                    visible: false,
+                    text: l('Doc Source')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
             }
-        },  
-        allowColumnReordering: true, 
-        allowColumnResizing: true,
-        columnResizingMode: 'widget',
-        columnMinWidth: 50,
-        columnAutoWidth: true,
-        columnChooser: {
-            enabled: true,
-            allowSearch: true,
-        },
-        columnFixing: {
-            enabled: true,
-        },
-        filterRow: {
-            visible: true,
-        },
-        groupPanel: {
-            visible: true,
-        },
-        headerFilter: {
-            visible: true,
-        }, 
-        searchPanel: {
-            visible: true
-        }, 
+        ]
+    }).dxForm('instance');;
+
+    var dgDeliveries = $('#dgDeliveries').dxDataGrid(jQuery.extend(dxDataGridConfiguration, {
+        dataSource: DeliveryDetailData,
         stateStoring: { //save state in localStorage
             enabled: true,
             type: 'localStorage',
             storageKey: 'dgDeliveries',
-        },
-
-        paging: {
-            enabled: true,
-            pageSize: pageSize
-        },
-        pager: {
-            visible: true,
-            showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
-            showInfo: true,
-            showNavigationButtons: true
         }, 
-        editing: { 
-            mode: "row",
+        editing: {
+            mode: "cell",
             allowAdding: abp.auth.isGranted('OrderService.Deliveries.Create'),
             allowUpdating: abp.auth.isGranted('OrderService.Deliveries.Edit'),
             allowDeleting: true,//missing permission
@@ -132,34 +624,15 @@ $(function () {
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             },
-        },
-        toolbar: {
-            items: [
-                "groupPanel",
-                "addRowButton",
-                "columnChooserButton",
-                "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
-                "searchPanel",
-            ],
-        },
+        }, 
         columns: [
+            {
+                type: 'buttons',
+                caption: l("Actions"),
+                buttons: ['delete'],
+                fixed: true,
+                fixedPosition: "left"
+            },
             {
                 dataField: 'itemCode',
                 caption: l("Item Code"),
@@ -272,13 +745,44 @@ $(function () {
                 width: 110,
                 dataType: 'string',
             },
-        ],
-    }).dxDataGrid("instance");
+        ]
+    }) ).dxDataGrid("instance");
 
     $('#resizable').dxResizable({
         minHeight: 120,
         handles: "bottom"
     }).dxResizable('instance');
 
-    initImportPopup('api/mdm-service/companies', 'Deliveries_Template', 'dgDeliveries');  
+   
+    initChooseItemsPopup(dgDeliveries);
+
+    initImportPopup('', 'Deliveries_Template', 'dgDeliveries');
+    initImportPopup('api/mdm-service/companies', 'Items_Template', 'dgItems');
+
+    $('#btnSave').click(function (e) {
+        e.preventDefault();
+
+        var headerDelivery = deliveryForm.option('formData');
+
+        var deliveryObject = {
+            header: headerDelivery,
+            details: DeliveryDetailData
+        }
+
+        deliveryService.createDoc(deliveryObject, { contentType: "application/json" })
+            .done(result => {
+                abp.message.success(l('Congratulations'));
+                console.log(result);
+            })
+    })
+
+    $("#btnCancel").click(function (e) {
+        e.preventDefault();
+
+        abp.message.confirm(l('ConfirmationMessage.UnSavedAndLeave'), l('ConfirmationMessage.UnSavedAndLeaveTitle')).then(function (confirmed) {
+            if (confirmed) {
+                window.close();
+            }
+        });
+    });
 });

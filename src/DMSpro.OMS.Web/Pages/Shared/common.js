@@ -7,6 +7,18 @@ function isNotEmpty(value) {
     return value !== undefined && value !== null && value !== '';
 }
 
+function FormatLoadOption(options) {
+    if (options.take == undefined) {
+        options.take = pageSizeForLookup;
+    }
+
+    if (options.skip == undefined) {
+        options.skip = 0;
+    }
+
+    return options;
+}
+
 function pad(num, size) {
     num = num.toString();
     while (num.length < size) num = "0" + num;

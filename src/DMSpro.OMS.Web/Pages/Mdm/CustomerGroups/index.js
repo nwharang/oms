@@ -4,16 +4,31 @@
 
     var GroupModes = [
         {
-            id: "ATTRIBUTE",
+            id: 0,
             displayName: "By Attribute"
         },
         {
-            id: "LIST",
+            id: 1,
             displayName: "By List"
         },
         {
-            id: "GEO",
+            id: 2,
             displayName: "By Geo"
+        }
+    ];
+
+    const status = [
+        {
+            id: 0,
+            text: l('EntityFieldValue:MDMService:ItemGroup:Status:OPEN')
+        },
+        {
+            id: 1,
+            text: l('EntityFieldValue:MDMService:ItemGroup:Status:RELEASED')
+        },
+        {
+            id: 2,
+            text: l('EntityFieldValue:MDMService:ItemGroup:Status:CANCELLED')
         }
     ];
 
@@ -113,7 +128,7 @@
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'CustomerGroups.xlsx');
                 });
             });
             e.cancel = true;
@@ -138,8 +153,17 @@
             showNavigationButtons: true
         },
         onEditorPreparing(e) {
+            
+        },
+        onCellPrepared: function (e) {
+            if (e.rowType === "data" && e.column.command === "edit") {
+                var $links = e.cellElement.find(".dx-link");
+                if (e.row.data.status == 1 || e.row.data.status == 'RELEASED')
+                    $links.filter(".dx-link-edit").remove();
+            }
         },
         onRowInserting: function (e) {
+            e.data.status = 0;
         },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
@@ -170,8 +194,22 @@
             {
                 type: 'buttons',
                 caption: l("Actions"),
-                width: 90,
-                buttons: ['edit', 'delete'],
+                width: 100,
+                buttons: [
+                    {
+                        text: "View Details",
+                        icon: "fieldchooser",
+                        hint: "View Details",
+                        visible: function (e) {
+                            return !e.row.isNewRow;
+                        },
+                        onClick: function (e) {
+                            var w = window.open('/Mdm/CustomerGroups/Details', '_blank');
+                            w.sessionStorage.setItem("customerGroup", JSON.stringify(e.row.data));
+
+                        }
+                    },
+                    'edit', 'delete'],
                 fixedPosition: 'left'
             },
             {
@@ -189,7 +227,7 @@
             {
                 dataField: 'active',
                 caption: l("EntityFieldName:MDMService:CustomerGroup:Active"),
-                width: 70,
+                width: 100,
                 alignment: 'center',
                 dataType: 'boolean',
                 cellTemplate(container, options) {
@@ -209,327 +247,197 @@
                 lookup: {
                     dataSource: GroupModes,
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "displayName",
+                    paginate: true,
+                    pageSize: pageSizeForLookup
+                }
+            },
+            {
+                dataField: 'status',
+                caption: l('EntityFieldName:MDMService:CustomerGroup:Status'),
+                allowEditing: false,
+                lookup: {
+                    dataSource: status,
+                    valueExpr: "id",
+                    displayExpr: "text",
+                    paginate: true,
+                    pageSize: pageSizeForLookup
                 }
             }
         ],
     }).dxDataGrid("instance");
 
-    //$("input#Search").on("input", function () {
-    //    gridCusGroups.searchByText($(this).val());
-    //});
-
-    //$("#btnNewCusGroup").click(function (e) {
-    //    gridCusGroups.addRow();
-    //});
-
-    //$("#ExportToExcelButton").click(function (e) {
-    //    e.preventDefault();
-
-    //    customerGroupService.getDownloadToken().then(
-    //        function (result) {
-    //            var url = abp.appPath + 'api/mdm-service/customer-groups/as-excel-file' +
-    //                abp.utils.buildQueryString([
-    //                    { name: 'downloadToken', value: result.token }
-    //                ]);
-
-    //            var downloadWindow = window.open(url, '_blank');
-    //            downloadWindow.focus();
+    //$("#frmCusGroup").dxForm({
+    //    formData: {
+    //        code: "CUS001",
+    //        description: "KH tạp hoá",
+    //        customerType: "Outlet",
+    //        status: "Released",
+    //        isActive: true,
+    //        groupByMode: "List/Group",
+    //    },
+    //    colCount: 2,
+    //    items: [
+    //        {
+    //            itemType: "group",
+    //            items: [
+    //                {
+    //                    dataField: "code",
+    //                    cssClass: "pr-5"
+    //                },
+    //                {
+    //                    dataField: "description",
+    //                    cssClass: "pr-5"
+    //                },
+    //                {
+    //                    dataField: "customerType",
+    //                    cssClass: "pr-5"
+    //                }
+    //            ]
+    //        },
+    //        {
+    //            itemType: "group",
+    //            items: [
+    //                {
+    //                    dataField: "status",
+    //                    cssClass: "pl-5"
+    //                },
+    //                {
+    //                    dataField: "isActive",
+    //                    cssClass: "pl-5"
+    //                },
+    //                {
+    //                    dataField: "groupByMode",
+    //                    cssClass: "pl-5"
+    //                }
+    //            ]
     //        }
-    //    )
+    //    ]
     //});
 
+    //$("#tabPanel").dxTabPanel({
+    //    items: [{
+    //        title: "By Attribute",
+    //        template: function (itemData, itemIndex, element) {
+    //            const gridDiv = $("<div style='padding:15px'>")
+    //            gridDiv.dxDataGrid({
+    //                dataSource: cusAttributes,
+    //                keyExpr: "attribute00",
+    //                showBorders: true,
+    //                //filterRow: {
+    //                //    visible: true
+    //                //},
+    //                searchPanel: {
+    //                    visible: true
+    //                },
+    //                scrolling: {
+    //                    mode: 'standard'
+    //                },
+    //                allowColumnReordering: false,
+    //                rowAlternationEnabled: true,
+    //                //headerFilter: {
+    //                //    visible: true,
+    //                //},
+    //                //paging:
+    //                //{
+    //                //    pageSize: pageSize,
+    //                //},
+    //                //pager: {
+    //                //    visible: false,
+    //                //    allowedPageSizes: [10, 20, 'all'],
+    //                //    showPageSizeSelector: false,
+    //                //    showInfo: false,
+    //                //    showNavigationButtons: false,
+    //                //},
+    //                columns: ["attribute00", "attribute01", "attribute02", "attribute03", "attribute04", "attribute05", "attribute06", "attribute07", "attribute08", "attribute09"],
+    //            });
+    //            gridDiv.appendTo(element);
+    //        }
+    //        //}, {
+    //        //    title: "By Attrinute",
+    //        //    template: function (itemData, itemIndex, element) {
+    //        //        const formDiv = $("<div style='padding:15px'>")
+    //        //        formDiv.dxForm({
+    //        //            formData: cusAttributes,
+    //        //            colCount: 2,
+    //        //            items: ["attribute00", "attribute01", "attribute02", "attribute03", "attribute04", "attribute05", "attribute06", "attribute07", "attribute08", "attribute09"]
+    //        //        });
+    //        //        formDiv.appendTo(element);
+    //        //    }
+    //    }, {
+    //        title: "By List",
+    //        template: function (itemData, itemIndex, element) {
+    //            const formDiv = $("<div style='padding:15px'>")
+    //            formDiv.dxForm({
+    //                formData: {
+    //                    isActive: true,
+    //                    isAvatar: false,
+    //                    url: "https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_960_720.jpg",
+    //                    createDate: new Date()
+    //                },
+    //                colCount: 2,
+    //                items: [
+    //                    {
+    //                        itemType: "group",
+    //                        items: [{
+    //                            dataField: "url",
+    //                            caption: "",
+    //                            template: function (data, itemElement) {
+    //                                itemElement.append("<img style='width: 300px; height: 250px' src='" + data.editorOptions.value + "'>");
+    //                            }
+    //                        }]
+    //                    },
+    //                    {
+    //                        itemType: "group",
+    //                        items: ["isActive", "isAvatar", "createDate"]
+    //                    }]
+    //            });
+    //            formDiv.appendTo(element);
+    //        }
+    //    }, {
+    //        title: "By GEO",
+    //        template: function (itemData, itemIndex, element) {
+    //            const formDiv = $("<div style='padding:15px'>")
+    //            formDiv.dxForm({
+    //                formData: cusContact,
+    //                colCount: 2,
+    //                items: [
+    //                    {
+    //                        itemType: "group",
+    //                        items: [{
+    //                            itemType: "button",
+    //                            buttonOptions: {
+    //                                text: "Contact 1",
+    //                                type: "success",
+    //                                onClick: function () {
+    //                                    cusContact.firstName = "Tran";
+    //                                    cusContact.lastName = "Bo";
+    //                                }
+    //                            }
+    //                        }, {
+    //                            itemType: "button",
+    //                            buttonOptions: {
+    //                                text: "Contact 2",
+    //                                type: "success",
+    //                                onClick: function () {
+    //                                    cusContact.firstName = "Quynh";
+    //                                    cusContact.lastName = "Han";
+    //                                }
+    //                            }
+    //                        }]
+    //                    },
+    //                    {
+    //                        itemType: "group",
+    //                        items: ["firstName", "lastName", "gender", "dateOfBirth", "email", "phone", "address", "identityNumber", "bankName", "accountName", "accountNumber"]
+    //                    }
+    //                ]
+    //            });
+    //            formDiv.appendTo(element);
+    //        }
+    //    }]
+    //});
+});
 
-    //var outletInfos = [{
-    //    code: "KH001_S1",
-    //    name: "KH 01",
-    //}, {
-    //    code: "KH002_S2",
-    //    name: "KH 02",
-    //}, {
-    //    code: "KH003_S3",
-    //    name: "KH 03",
-    //}]
-    //var cusInfo = {
-    //    code: "CEO",
-    //    name: "John Heart",
-    //    shortname: "JHeart",
-    //    pricelist: 901,
-    //    phone1: "0905111222",
-    //    phone2: "01234567890",
-    //    isActive: true,
-    //    createDate: new Date(2022, 4, 13),
-    //    effDate: new Date(2022, 4, 13),
-    //    endDate: new Date(),
-    //    outletType: "",
-    //    paymentCode: "JS13343JDD3",
-    //    creditLimit: "400",
-    //    paymentTerm: "JS as3999",
-    //    taxCode: "JB893",
-    //    license: "AH2002",
-    //    linkedCompany: "ABC bcx",
-    //    WHId: "CE2342O",
-    //    contactID: "20",
-    //    VATName: "VAT name",
-    //    VATAddress: "Binh Duong, Thang Binh",
-    //    geolevel0: "VN",
-    //    geolevel1: "QN",
-    //    geolevel2: "DB",
-    //    geolevel3: "DNT",
-    //    geolevel4: "QLB",
-    //    street: "Dien Bien Phu",
-    //    address: "quang lang B",
-    //    latitude: 82.2333,
-    //    longitude: 932.23,
-    //};
-    //var cusAddress = {
-    //    geolevel0: "VN",
-    //    geolevel1: "QN",
-    //    geolevel2: "DB",
-    //    geolevel3: "DNT",
-    //    geolevel4: "QLB",
-    //    street: "Dien Bien Phu",
-    //    address: "quang lang B",
-    //    latitude: 82.2333,
-    //    longitude: 932.23,
-    //}
-    //var geoMaster = [
-    //    {
-    //        code: "VN",
-    //        name: "Viet Nam"
-    //    },
-    //    {
-    //        code: "QN",
-    //        name: "Quang Nam"
-    //    },
-    //    {
-    //        code: "DB",
-    //        name: "Dien Ban"
-    //    },
-    //    {
-    //        code: "DNT",
-    //        name: "Dien Nam Trung"
-    //    },
-    //    {
-    //        code: "QLB",
-    //        name: "Quang Lang B"
-    //    }
-    //];
-    //var cusImage = {
-    //    isActive: true,
-    //    isAvatar: false,
-    //    url: "https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_960_720.jpg",
-    //    createDate: new Date()
-    //};
-    //var cusAttributes = [{
-    //    attribute00: "attr00",
-    //    attribute01: "attr01",
-    //    attribute02: "attr02",
-    //    attribute03: "attr03",
-    //    attribute04: "attr04",
-    //    attribute05: "attr05",
-    //    attribute06: "attr06",
-    //    attribute07: "attr07",
-    //    attribute08: "attr08",
-    //    attribute09: "attr09"
-    //}];
-    //var cusContact = {
-    //    firstName: "Tran",
-    //    lastName: "Bo",
-    //    gender: "Nam",
-    //    dateOfBirth: new Date(),
-    //    email: "abc@gmail.com",
-    //    phone: "",
-    //    address: "",
-    //    identityNumber: "",
-    //    bankName: "",
-    //    accountName: "",
-    //    accountNumber: ""
-    //}
-    //var cusAssigments = [
-    //    {
-    //        id: 1,
-    //        name: "Thông tin hợp đồng điểm bán",
-    //        attachment: "D:\abc.txt",
-    //        createDate: new Date(),
-    //        isActive: false
-    //    },
-    //    {
-    //        id: 2,
-    //        name: "Thông tin đại lý bán hàng",
-    //        attachment: "D:\daily.txt",
-    //        createDate: new Date(),
-    //        isActive: true
-    //    }
-    //];
-
-    $("#frmCusGroup").dxForm({
-        formData: {
-            code: "CUS001",
-            description: "KH tạp hoá",
-            customerType: "Outlet",
-            status: "Released",
-            isActive: true,
-            groupByMode: "List/Group",
-        },
-        colCount: 2,
-        items: [
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: "code",
-                        cssClass: "pr-5"
-                    },
-                    {
-                        dataField: "description",
-                        cssClass: "pr-5"
-                    },
-                    {
-                        dataField: "customerType",
-                        cssClass: "pr-5"
-                    }
-                ]
-            },
-            {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: "status",
-                        cssClass: "pl-5"
-                    },
-                    {
-                        dataField: "isActive",
-                        cssClass: "pl-5"
-                    },
-                    {
-                        dataField: "groupByMode",
-                        cssClass: "pl-5"
-                    }
-                ]
-            }
-        ]
-    });
-
-    $("#tabPanel").dxTabPanel({
-        items: [{
-            title: "By Attribute",
-            template: function (itemData, itemIndex, element) {
-                const gridDiv = $("<div style='padding:15px'>")
-                gridDiv.dxDataGrid({
-                    dataSource: cusAttributes,
-                    keyExpr: "attribute00",
-                    showBorders: true,
-                    //filterRow: {
-                    //    visible: true
-                    //},
-                    searchPanel: {
-                        visible: true
-                    },
-                    scrolling: {
-                        mode: 'standard'
-                    },
-                    allowColumnReordering: false,
-                    rowAlternationEnabled: true,
-                    //headerFilter: {
-                    //    visible: true,
-                    //},
-                    //paging:
-                    //{
-                    //    pageSize: pageSize,
-                    //},
-                    //pager: {
-                    //    visible: false,
-                    //    allowedPageSizes: [10, 20, 'all'],
-                    //    showPageSizeSelector: false,
-                    //    showInfo: false,
-                    //    showNavigationButtons: false,
-                    //},
-                    columns: ["attribute00", "attribute01", "attribute02", "attribute03", "attribute04", "attribute05", "attribute06", "attribute07", "attribute08", "attribute09"],
-                });
-                gridDiv.appendTo(element);
-            }
-            //}, {
-            //    title: "By Attrinute",
-            //    template: function (itemData, itemIndex, element) {
-            //        const formDiv = $("<div style='padding:15px'>")
-            //        formDiv.dxForm({
-            //            formData: cusAttributes,
-            //            colCount: 2,
-            //            items: ["attribute00", "attribute01", "attribute02", "attribute03", "attribute04", "attribute05", "attribute06", "attribute07", "attribute08", "attribute09"]
-            //        });
-            //        formDiv.appendTo(element);
-            //    }
-        }, {
-            title: "By List",
-            template: function (itemData, itemIndex, element) {
-                const formDiv = $("<div style='padding:15px'>")
-                formDiv.dxForm({
-                    formData: {
-                        isActive: true,
-                        isAvatar: false,
-                        url: "https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_960_720.jpg",
-                        createDate: new Date()
-                    },
-                    colCount: 2,
-                    items: [
-                        {
-                            itemType: "group",
-                            items: [{
-                                dataField: "url",
-                                caption: "",
-                                template: function (data, itemElement) {
-                                    itemElement.append("<img style='width: 300px; height: 250px' src='" + data.editorOptions.value + "'>");
-                                }
-                            }]
-                        },
-                        {
-                            itemType: "group",
-                            items: ["isActive", "isAvatar", "createDate"]
-                        }]
-                });
-                formDiv.appendTo(element);
-            }
-        }, {
-            title: "By GEO",
-            template: function (itemData, itemIndex, element) {
-                const formDiv = $("<div style='padding:15px'>")
-                formDiv.dxForm({
-                    formData: cusContact,
-                    colCount: 2,
-                    items: [
-                        {
-                            itemType: "group",
-                            items: [{
-                                itemType: "button",
-                                buttonOptions: {
-                                    text: "Contact 1",
-                                    type: "success",
-                                    onClick: function () {
-                                        cusContact.firstName = "Tran";
-                                        cusContact.lastName = "Bo";
-                                    }
-                                }
-                            }, {
-                                itemType: "button",
-                                buttonOptions: {
-                                    text: "Contact 2",
-                                    type: "success",
-                                    onClick: function () {
-                                        cusContact.firstName = "Quynh";
-                                        cusContact.lastName = "Han";
-                                    }
-                                }
-                            }]
-                        },
-                        {
-                            itemType: "group",
-                            items: ["firstName", "lastName", "gender", "dateOfBirth", "email", "phone", "address", "identityNumber", "bankName", "accountName", "accountNumber"]
-                        }
-                    ]
-                });
-                formDiv.appendTo(element);
-            }
-        }]
-    });
+$(window).focus(function () {
+    $('#dgCusGroups').data('dxDataGrid').refresh();
 });

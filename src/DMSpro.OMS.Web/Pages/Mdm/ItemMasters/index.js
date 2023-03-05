@@ -28,17 +28,7 @@
                     });
                 });
             return deferred.promise();
-        },
-        //byKey: function (key) {
-        //    if (key == 0) return null;
-
-        //    var d = new $.Deferred();
-        //    itemTypeService.get(key)
-        //        .done(data => {
-        //            d.resolve(data);
-        //        });
-        //    return d.promise();
-        //}
+        }
     });
 
     // get item attribute value
@@ -60,17 +50,7 @@
                 listAttrValue = attrVal;
             })
             return deferred.promise();
-        },
-        //byKey: function (key) {
-        //    if (key == 0) return null;
-
-        //    var d = new $.Deferred();
-        //    itemAttrValueService.get(key)
-        //        .done(data => {
-        //            d.resolve(data);
-        //        });
-        //    return d.promise();
-        //}
+        }
     });
     // get UOM group lookup
     var getUOMGroups = new DevExpress.data.CustomStore({
@@ -88,17 +68,7 @@
                     });
                 });
             return deferred.promise();
-        },
-        //byKey: function (key) {
-        //    if (key == 0) return null;
-
-        //    var d = new $.Deferred();
-        //    uOMGroupService.get(key)
-        //        .done(data => {
-        //            d.resolve(data);
-        //        });
-        //    return d.promise();
-        //}
+        }
     });
 
     // get UOMs detail lookup
@@ -117,17 +87,7 @@
                     });
                 });
             return deferred.promise();
-        },
-        //byKey: function (key) {
-        //    if (key == 0) return null;
-
-        //    var d = new $.Deferred();
-        //    uOMGroupDetailService.get(key)
-        //        .done(data => {
-        //            d.resolve(data);
-        //        });
-        //    return d.promise();
-        //}
+        }
     });
 
     // get UOMs
@@ -146,17 +106,7 @@
                     });
                 });
             return deferred.promise();
-        },
-        //byKey: function (key) {
-        //    if (key == 0) return null;
-
-        //    var d = new $.Deferred();
-        //    uomService.get(key)
-        //        .done(data => {
-        //            d.resolve(data);
-        //        });
-        //    return d.promise();
-        //}
+        }
     });
 
     // get VATs
@@ -175,17 +125,7 @@
                     });
                 });
             return deferred.promise();
-        },
-        //byKey: function (key) {
-        //    if (key == 0) return null;
-
-        //    var d = new $.Deferred();
-        //    vATService.get(key)
-        //        .done(data => {
-        //            d.resolve(data);
-        //        });
-        //    return d.promise();
-        //}
+        }
     });
 
     // get price list
@@ -204,17 +144,7 @@
                     });
                 });
             return deferred.promise();
-        },
-        //byKey: function (key) {
-        //    if (key == 0) return null;
-
-        //    var d = new $.Deferred();
-        //    priceListService.get(key)
-        //        .done(data => {
-        //            d.resolve(data);
-        //        });
-        //    return d.promise();
-        //}
+        }
     });
 
     const manageItem = [
@@ -292,7 +222,6 @@
             return d.promise();
         },
         insert(values) {
-            debugger
             return itemMasterService.create(values, { contentType: "application/json" });
         },
         update(key, values) {
@@ -371,7 +300,7 @@
             showNavigationButtons: true
         },
         editing: {
-            mode: 'popup',
+            //mode: 'popup',
             allowAdding: abp.auth.isGranted('MdmService.Items.Create'),
             allowUpdating: abp.auth.isGranted('MdmService.Items.Edit'),
             allowDeleting: abp.auth.isGranted('MdmService.Items.Delete'),
@@ -381,169 +310,169 @@
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             },
-            popup: {
-                title: l('Menu:MdmService:GroupMenu:ItemMaster'),
-                showTitle: true,
-                width: '95%',
-                height: '90%',
-            },
-            form: {
-                elementAttr: {
-                    id: 'formEditing',
-                    class: 'formEditing'
-                },
-                labelMode: 'floating',
-                colCount: 10,
-                items: [
-                    {
-                        itemType: 'group',
-                        cssClass: 'first-group',
-                        colCount: 2,
-                        colSpan: 8,
-                        items: [
-                            {
-                                itemType: 'group',
-                                caption: 'General',
-                                colSpan: 4,
-                                items: [
-                                    {
-                                        dataField: 'code'
-                                    },
-                                    {
-                                        dataField: 'name'
-                                    },
-                                    {
-                                        dataField: 'shortName'
-                                    },
-                                    {
-                                        dataField: 'itemTypeId'
-                                    },
-                                    {
-                                        dataField: 'barcode'
-                                    },
-                                    {
-                                        dataField: 'erpCode',
-                                        colSpan: 2
-                                    }
-                                ]
-                            },
-                            {
-                                itemType: 'group',
-                                caption: 'System Information',
-                                colSpan: 4,
-                                colCount: 2,
-                                items: [
-                                    {
-                                        dataField: 'uomGroupId',
-                                        cssClass: 'uomGroup',
-                                        colSpan: 2
-                                    },
-                                    {
-                                        itemType: 'group',
-                                        items: [
-                                            {
-                                                dataField: 'isInventoriable'
-                                            },
-                                            {
-                                                dataField: 'isPurchasable'
-                                            },
-                                            {
-                                                dataField: 'isSaleable'
-                                            },
-                                            {
-                                                dataField: 'manageItemBy',
-                                                cssClass: 'fieldManageItemBy',
-                                            },
-                                            {
-                                                dataField: 'expiredType',
-                                                cssClass: 'fieldExpiredType'
-                                            },
-                                            {
-                                                dataField: 'expiredValue',
-                                                cssClass: 'fieldExpiredValue'
-                                            },
-                                            {
-                                                dataField: 'issueMethod',
-                                                cssClass: 'fieldIssueMethod'
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        itemType: 'group',
-                                        items: [
-                                            {
-                                                dataField: 'inventoryUOMId',
-                                                cssClass: 'fieldInventoryUOMId'
-                                            },
-                                            {
-                                                dataField: 'purUOMId',
-                                                cssClass: 'fieldPurUOMId'
-                                            },
-                                            {
-                                                dataField: 'salesUOMId',
-                                                cssClass: 'fieldSalesUOMId'
-                                            },
-                                            {
-                                                dataField: 'vatId'
-                                            },
-                                            {
-                                                dataField: 'basePrice'
-                                            },
-                                            {
-                                                dataField: 'active'
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                        ]
-                    },
-                    {
-                        itemType: 'group',
-                        cssClass: 'second-group',
-                        caption: 'DMS Attribute',
-                        colSpan: 2,
-                        items: getAttrOptions()
-                    },
-                    //{
-                    //    itemType: 'group',
-                    //    colSpan: 8,
-                    //    colCount: 1,
-                    //    items: [{
-                    //        itemType: 'tabbed',
-                    //        tabPanelOptions: {
-                    //            deferRendering: false,
-                    //        },
-                    //        tabs: [
-                    //            {
-                    //                title: l('Menu:MdmService:ItemImages'),
-                    //                icon: "image",
-                    //                template: initItemImagesTab()
-                    //                //title: 'Images',
-                    //                //icon: "isnotblank",
-                    //                //badge: "new",
-                    //                //template: function (itemData, itemIndex, element) {
-                    //                //    const galleryDiv = $("<div style='padding:10px'>")
-                    //                //    galleryDiv.dxGallery({
-                    //                //        dataSource: items.Images,
-                    //                //        height: 'auto',
-                    //                //        selectedItem: items.Images[1],
-                    //                //        slideshowDelay: 1500,
-                    //                //        loop: true
-                    //                //    });
-                    //                //    galleryDiv.appendTo(element);
-                    //                //}
-                    //            },
-                    //            {
-                    //                title: l('Menu:MdmService:ItemAttachments'),
-                    //                icon: "attach",
-                    //                template: initItemAttachmentTab()
-                    //            }
-                    //        ]
-                    //    }]
-                    //}
-                ]
-            }
+            //popup: {
+            //    title: l('Menu:MdmService:GroupMenu:ItemMaster'),
+            //    showTitle: true,
+            //    width: '95%',
+            //    height: '90%',
+            //},
+            //form: {
+            //    elementAttr: {
+            //        id: 'formEditing',
+            //        class: 'formEditing'
+            //    },
+            //    labelMode: 'floating',
+            //    colCount: 10,
+            //    items: [
+            //        {
+            //            itemType: 'group',
+            //            cssClass: 'first-group',
+            //            colCount: 2,
+            //            colSpan: 8,
+            //            items: [
+            //                {
+            //                    itemType: 'group',
+            //                    caption: 'General',
+            //                    colSpan: 4,
+            //                    items: [
+            //                        {
+            //                            dataField: 'code'
+            //                        },
+            //                        {
+            //                            dataField: 'name'
+            //                        },
+            //                        {
+            //                            dataField: 'shortName'
+            //                        },
+            //                        {
+            //                            dataField: 'itemTypeId'
+            //                        },
+            //                        {
+            //                            dataField: 'barcode'
+            //                        },
+            //                        {
+            //                            dataField: 'erpCode',
+            //                            colSpan: 2
+            //                        }
+            //                    ]
+            //                },
+            //                {
+            //                    itemType: 'group',
+            //                    caption: 'System Information',
+            //                    colSpan: 4,
+            //                    colCount: 2,
+            //                    items: [
+            //                        {
+            //                            dataField: 'uomGroupId',
+            //                            cssClass: 'uomGroup',
+            //                            colSpan: 2
+            //                        },
+            //                        {
+            //                            itemType: 'group',
+            //                            items: [
+            //                                {
+            //                                    dataField: 'isInventoriable'
+            //                                },
+            //                                {
+            //                                    dataField: 'isPurchasable'
+            //                                },
+            //                                {
+            //                                    dataField: 'isSaleable'
+            //                                },
+            //                                {
+            //                                    dataField: 'manageItemBy',
+            //                                    cssClass: 'fieldManageItemBy',
+            //                                },
+            //                                {
+            //                                    dataField: 'expiredType',
+            //                                    cssClass: 'fieldExpiredType'
+            //                                },
+            //                                {
+            //                                    dataField: 'expiredValue',
+            //                                    cssClass: 'fieldExpiredValue'
+            //                                },
+            //                                {
+            //                                    dataField: 'issueMethod',
+            //                                    cssClass: 'fieldIssueMethod'
+            //                                }
+            //                            ]
+            //                        },
+            //                        {
+            //                            itemType: 'group',
+            //                            items: [
+            //                                {
+            //                                    dataField: 'inventoryUOMId',
+            //                                    cssClass: 'fieldInventoryUOMId'
+            //                                },
+            //                                {
+            //                                    dataField: 'purUOMId',
+            //                                    cssClass: 'fieldPurUOMId'
+            //                                },
+            //                                {
+            //                                    dataField: 'salesUOMId',
+            //                                    cssClass: 'fieldSalesUOMId'
+            //                                },
+            //                                {
+            //                                    dataField: 'vatId'
+            //                                },
+            //                                {
+            //                                    dataField: 'basePrice'
+            //                                },
+            //                                {
+            //                                    dataField: 'active'
+            //                                }
+            //                            ]
+            //                        }
+            //                    ]
+            //                },
+            //            ]
+            //        },
+            //        {
+            //            itemType: 'group',
+            //            cssClass: 'second-group',
+            //            caption: 'DMS Attribute',
+            //            colSpan: 2,
+            //            items: getAttrOptions()
+            //        },
+            //        //{
+            //        //    itemType: 'group',
+            //        //    colSpan: 8,
+            //        //    colCount: 1,
+            //        //    items: [{
+            //        //        itemType: 'tabbed',
+            //        //        tabPanelOptions: {
+            //        //            deferRendering: false,
+            //        //        },
+            //        //        tabs: [
+            //        //            {
+            //        //                title: l('Menu:MdmService:ItemImages'),
+            //        //                icon: "image",
+            //        //                template: initItemImagesTab()
+            //        //                //title: 'Images',
+            //        //                //icon: "isnotblank",
+            //        //                //badge: "new",
+            //        //                //template: function (itemData, itemIndex, element) {
+            //        //                //    const galleryDiv = $("<div style='padding:10px'>")
+            //        //                //    galleryDiv.dxGallery({
+            //        //                //        dataSource: items.Images,
+            //        //                //        height: 'auto',
+            //        //                //        selectedItem: items.Images[1],
+            //        //                //        slideshowDelay: 1500,
+            //        //                //        loop: true
+            //        //                //    });
+            //        //                //    galleryDiv.appendTo(element);
+            //        //                //}
+            //        //            },
+            //        //            {
+            //        //                title: l('Menu:MdmService:ItemAttachments'),
+            //        //                icon: "attach",
+            //        //                template: initItemAttachmentTab()
+            //        //            }
+            //        //        ]
+            //        //    }]
+            //        //}
+            //    ]
+            //}
         },
         onInitNewRow: function (e) {
             e.data.active = true;
@@ -562,12 +491,6 @@
         },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
-            //var objectRequire = ['code', 'name', 'shortName', 'barcode', 'erpCode', 'isInventoriable', 'isPurchasable', 'isSaleable', 'manageItemBy', 'inventoryUOMId', 'purUOMId', 'salesUOMId', 'vatId', 'active', 'itemTypeId', 'expiredType', 'expiredValue', 'issueMethod', 'itemTypeId', 'uomGroupId'];
-            //for (var property in e.oldData) {
-            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-            //        e.newData[property] = e.oldData[property];
-            //    }
-            //}
         },
         //onEditorPreparing: function (e) {
         //    if (e.dataField == "manageItemBy" && e.parentType == "dataRow") {
@@ -660,7 +583,9 @@
                     location: 'after',
                     template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                     onClick() {
-                        gridItemMasters.addRow();
+                        //gridItemMasters.addRow();
+                        var w = window.open('/Mdm/ItemMasters/Details', '_blank');
+                        w.sessionStorage.setItem('item', null);
                     },
                 },
                 'columnChooserButton',
@@ -679,12 +604,20 @@
             {
                 type: 'buttons',
                 caption: l('Actions'),
-                buttons: ['edit'],
+                buttons: [
+                    {
+                        text: "Edit",
+                        icon: "edit",
+                        hint: "Edit",
+                        visible: function (e) {
+                            return !e.row.isNewRow;
+                        },
+                        onClick: function (e) {
+                            var w = window.open('/Mdm/ItemMasters/Details', '_blank');
+                            w.sessionStorage.setItem("item", JSON.stringify(e.row.data));
+                        }
+                    }],
                 fixedPosition: 'left'
-            },
-            {
-                dataField: 'id',
-                visible: false
             },
             {
                 dataField: 'code',
@@ -830,8 +763,7 @@
                 editorOptions: {
                     dataSource: getUOMs,
                     valueExpr: 'id',
-                    displayExpr: 'code',
-                    //disabled: true
+                    displayExpr: 'code'
                 },
                 validationRules: [{ type: "required" }],
                 visible: false
@@ -843,8 +775,7 @@
                 editorOptions: {
                     dataSource: getUOMs,
                     valueExpr: 'id',
-                    displayExpr: 'code',
-                    //disabled: true
+                    displayExpr: 'code'
                 },
                 validationRules: [{ type: "required" }],
                 visible: false
@@ -856,8 +787,7 @@
                 editorOptions: {
                     dataSource: getUOMs,
                     valueExpr: 'id',
-                    displayExpr: 'code',
-                    //disabled: true
+                    displayExpr: 'code'
                 },
                 validationRules: [{ type: "required" }],
                 visible: false
@@ -877,12 +807,6 @@
             {
                 dataField: 'basePrice',
                 caption: 'Base Price',
-                //editorType: 'dxSelectBox',
-                //editorOptions: {
-                //    dataSource: getPriceList,
-                //    valueExpr: 'id',
-                //    displayExpr: 'code'
-                //},
                 validationRules: [{ type: "required" }],
                 visible: false
             },
@@ -897,7 +821,6 @@
                         .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
                         .appendTo(container);
                 }
-                //visible: false
             },
             {
                 dataField: 'attr0Id',
@@ -1541,4 +1464,8 @@
             }
         });
     }
+});
+
+$(window).focus(function () {
+    $('#dataGridItemMasters').data('dxDataGrid').refresh();
 });

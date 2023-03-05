@@ -1,4 +1,7 @@
-﻿$(function () {
+﻿var SalesRequestHeaderModel = null;
+var SalesRequestDetailsModel = [];
+
+$(function () {
     var l = abp.localization.getResource("OMS");
     var salesRequestService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
@@ -9,12 +12,14 @@
     var uOMService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
     var uOMGroupService = window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGroup;
     var uOMGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail;
+    var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
+    var priceListDetailsService = window.dMSpro.oMS.mdmService.controllers.priceListDetails.priceListDetail;
+    var vATService = window.dMSpro.oMS.mdmService.controllers.vATs.vAT;
 
     //get data from sessionStorage
-    var SalesRequestModel = JSON.parse(sessionStorage.getItem("SalesRequest"));
-    var salesRequesIdFilter = null;
-    var stateMode = "add";
     const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
+    var pricelistId = null;
+    var itemsFromStore = null;
 
     /****custom store*****/
     var salesRequestStore = new DevExpress.data.CustomStore({
@@ -198,15 +203,6 @@
                     d.resolve(data);
                 });
             return d.promise();
-        },
-        insert(values) {
-            return salesOrgHierarchyService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return salesOrgHierarchyService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return salesOrgHierarchyService.delete(key);
         }
     });
 
@@ -224,6 +220,7 @@
 
             itemService.getListDevextremes(args)
                 .done(result => {
+                    itemsFromStore = result.data;
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -242,7 +239,7 @@
                     d.resolve(data);
                 });
             return d.promise();
-        }
+        },
     });
 
     var uOMStore = new DevExpress.data.CustomStore({
@@ -342,7 +339,117 @@
             if (key == 0) return null;
 
             var d = new $.Deferred();
-            uOMGroupDetailService.get(key)
+            uOMGroupDetailService.getListDevextremes({ filter: JSON.stringify(['altUOMId', '=', key]) })
+                .done(result => {
+                    d.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return d.promise();
+        }
+    });
+
+    var priceListStore = new DevExpress.data.CustomStore({
+        key: 'altUOMId',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            priceListService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            priceListService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
+
+    var priceListDetailsStore = new DevExpress.data.CustomStore({
+        key: 'altUOMId',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            priceListDetailsService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            priceListDetailsService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
+
+    var vATStore = new DevExpress.data.CustomStore({
+        key: 'altUOMId',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            vATService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            vATService.get(key)
                 .done(data => {
                     d.resolve(data);
                 });
@@ -420,9 +527,14 @@
 
     /****control*****/
 
-    const salesRequestForm = $('#salesRequestDetailsForm').dxForm({
+    $('#resizable').dxResizable({
+        minHeight: 120,
+        handles: "bottom"
+    }).dxResizable('instance');
+
+    const frmSalesRequestDetails = $('#frmSalesRequestDetails').dxForm({
         formData: {
-            linkedSFAId: SalesRequestModel ? SalesRequestModel.linkedSFAId : '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+            linkedSFAId: SalesRequestHeaderModel ? SalesRequestHeaderModel.linkedSFAId : '3fa85f64-5717-4562-b3fc-2c963f66afa6'
         },
         labelMode: "floating",
         colCount: 4,
@@ -451,17 +563,6 @@
                     valueExpr: 'id',
                     value: companyId,
                     disabled: true
-                    //onValueChanged: function (e) {
-                    //    const newValue = e.value;
-                    //    var dxbusinessPartnerId = $('input[name=businessPartnerId]').closest('.dx-selectbox').data('dxSelectBox');
-                    //    dxbusinessPartnerId.reset();
-                    //    dxbusinessPartnerId.option('dataSource', new DevExpress.data.DataSource({
-                    //        store: customerAssignmentStore,
-                    //        filter: ["company.id", "=", newValue],
-                    //        paginate: true,
-                    //        pageSize: pageSizeForLookup
-                    //    }));
-                    //}
                 },
                 label: {
                     visible: false,
@@ -472,14 +573,14 @@
                 }]
             },
             {
-                dataField: "docTotalLineDiscountAmt",
+                dataField: "docDiscountPerc",
                 editorType: "dxNumberBox",
                 editorOptions: {
                     format: '#,##0.##',
                 },
                 label: {
                     visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt')
+                    text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc')
                 },
                 validationRules: [{
                     type: 'required',
@@ -527,11 +628,71 @@
                         pageSize: pageSizeForLookup
                     },
                     displayExpr: 'customer.name',
-                    valueExpr: 'customer.id'
+                    valueExpr: 'customer.id',
+                    onValueChanged: function (e) {
+                        const curSelectBox = e.element.dxSelectBox('instance');
+                        const customers = curSelectBox.getDataSource().items().filter(x => x.customerId == e.value);
+                        pricelistId = customers[0].customer.priceListId;
+                    }
                 },
                 label: {
                     visible: false,
                     text: l('EntityFieldName:OrderService:SalesRequest:BusinessPartner')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docTotalLineDiscountAmt",
+                editorType: "dxNumberBox",
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                label: {
+                    visible: false,
+                    text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docTotalAmt",
+                editorType: "dxNumberBox",
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                label: {
+                    visible: false,
+                    text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            // row 3
+            {
+                dataField: "remark",
+                label: {
+                    visible: false,
+                    text: l('EntityFieldName:OrderService:SalesRequest:Remark')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docSource",
+                editorType: "dxSelectBox",
+                editorOptions: {
+                    dataSource: docSourceStore,
+                    displayExpr: 'text',
+                    valueExpr: 'id'
+                },
+                label: {
+                    visible: false,
+                    text: l('EntityFieldName:OrderService:SalesRequest:DocSource')
                 },
                 validationRules: [{
                     type: 'required',
@@ -546,66 +707,6 @@
                 label: {
                     visible: false,
                     text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            {
-                dataField: "docDiscountType",
-                editorType: "dxNumberBox",
-                editorOptions: {
-                    format: '#,##0.##',
-                },
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            // row 3
-            {
-                dataField: "linkedSFAId",
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:LinkedSFA')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            {
-                dataField: "employeeId",
-                editorType: 'dxSelectBox',
-                editorOptions: {
-                    dataSource: {
-                        store: employeeProfileStore,
-                        filter: [['active', '=', true], 'and', [['effectiveDate', '=', null], 'or', ['effectiveDate', '<=', new Date()]], 'and', [['endDate', '=', null], 'or', ['endDate', '>=', new Date()]]],
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    },
-                    displayExpr: 'code',
-                    valueExpr: 'id'
-                },
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:Employee')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            {
-                dataField: "docDiscountPerc",
-                editorType: "dxNumberBox",
-                editorOptions: {
-                    format: '#,##0.##',
-                },
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc')
                 },
                 validationRules: [{
                     type: 'required',
@@ -627,45 +728,32 @@
             },
             // row 4
             {
-                dataField: "remark",
+                dataField: "requestDate",
+                editorType: 'dxDateBox',
+                editorOptions: {
+                    type: 'datetime',
+                    value: new Date(),
+                    disabled: true,
+                },
                 label: {
                     visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:Remark')
+                    text: l('EntityFieldName:OrderService:SalesRequest:RequestDate')
                 },
                 validationRules: [{
                     type: 'required',
                 }]
             },
             {
-                dataField: "routeId",
+                dataField: "docDiscountType",
                 editorType: "dxSelectBox",
                 editorOptions: {
-                    dataSource: {
-                        store: salesOrgHierarchyStore,
-                        filter: ["isRoute", "=", true],
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    },
-                    displayExpr: 'name',
+                    dataSource: discountTypeStore,
+                    displayExpr: 'text',
                     valueExpr: 'id'
                 },
                 label: {
                     visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:Route')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            {
-                dataField: "docTotalAmt",
-                editorType: "dxNumberBox",
-                editorOptions: {
-                    format: '#,##0.##',
-                },
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt')
+                    text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType')
                 },
                 validationRules: [{
                     type: 'required',
@@ -685,44 +773,11 @@
                     type: 'required',
                 }]
             },
-            // row 5
-            {
-                dataField: "requestDate",
-                editorType: 'dxDateBox',
-                editorOptions: {
-                    type: 'datetime',
-                    value: new Date(),
-                    disabled: true,
-                },
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:RequestDate')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            {
-                dataField: "docSource",
-                editorType: "dxSelectBox",
-                editorOptions: {
-                    dataSource: docSourceStore,
-                    displayExpr: 'text',
-                    valueExpr: 'id'
-                },
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:DocSource')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            }
         ]
     }).dxForm('instance');
 
-    const salesRequestDetailsContainer = $('#salesRequestDetailsContainer').dxDataGrid({
-        dataSource: [],// salesRequestStore,
+    const dgSalesRequestDetails = $('#dgSalesRequestDetails').dxDataGrid({
+        dataSource: SalesRequestDetailsModel,
         keyExpr: 'id',
         remoteOperations: false,
         cacheEnabled: true,
@@ -779,7 +834,7 @@
         stateStoring: { //save state in localStorage
             //enabled: true,
             //type: 'localStorage',
-            //storageKey: 'salesRequestDetailsContainer',
+            //storageKey: 'dgSalesRequestDetails',
         },
         paging: {
             enabled: true,
@@ -792,33 +847,44 @@
             showInfo: true,
             showNavigationButtons: true
         },
-        onEditorPreparing: function (e) {
-            //if (e.parentType == 'dataRow' && e.dataField == 'itemId') {
-            //    e.editorOptions.onValueChanged = function (arg) {
-            //        e.setValue(arg.value);
-
-            //        var d = new $.Deferred();
-            //        itemService.getListDevextremes({ filter: JSON.stringify(['id', '=', arg.value])})
-            //            .done(res => {
-            //                d.resolve(e.component.cellValue(e.row.rowIndex, 'uomGroupId', res.data[0].uomGroupId), e.component.cellValue(e.row.rowIndex, 'uomId', res.data[0].salesUOM.id));
-            //            });
-            //        return d.promise();
-
-            //        //e.component.cellValue(e.row.rowIndex, 'uomId', selectItem[0].salesUOM.id);
-            //    }
-            //}
+        onInitNewRow: function (e) {
+            e.data.qty = 1;
+            e.data.discountAmt = 0;
+            e.data.discountPerc = 0;
+            e.data.discountType = 0;
+            e.data.transactionType = 0;
         },
         toolbar: {
             items: [
                 "groupPanel",
-                'addRowButton',
+                "addRowButton",
+                //{
+                //    location: 'after',
+                //    widget: 'dxButton',
+                //    options: {
+                //        icon: "add",
+                //        onClick(e) {
+                //            popupItems.show();
+                //        },
+                //    },
+                //},
                 'columnChooserButton',
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            //id: "import-excel",
+                            class: "import-excel",
+                        },
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
+                        },
                     },
                 },
                 "searchPanel"
@@ -834,28 +900,7 @@
                 editRow: l("Edit"),
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
-            },
-            //popup: {
-            //    showTitle: false,
-            //    width: 1000,
-            //    height: 700
-            //},
-            //form: {
-            //    items: [
-            //        {
-            //            itemType: 'group',
-            //            colCount: 2,
-            //            colSpan: 4,
-            //            items: ['itemId', 'uomId', 'qty', 'price', 'lineAmt', 'discountPerc']
-            //        },
-            //        {
-            //            itemType: 'group',
-            //            colCount: 2,
-            //            colSpan: 4,
-            //            items: ['lineDiscountAmt', 'taxRate', 'lineAmtAfterTax', 'warehouseId', 'warehouseLocationId', 'transactionType']
-            //        }
-            //    ]
-            //}
+            }
         },
         columns: [
             {
@@ -880,24 +925,38 @@
                     displayExpr: "name",
                     valueExpr: "id"
                 },
-                setCellValue: function (newData, value, currentRowData) {
-                    console.log(newData, value, currentRowData);
+                setCellValue: function (newData, value, currentData) {
+                    var selectedItem = itemsFromStore.filter(i => i.id == value)[0];
 
                     newData.itemId = value;
+                    newData.uomGroupId = selectedItem.uomGroupId;
+                    newData.vatId = selectedItem.vatId;
+                    newData.taxRate = selectedItem.vat.rate;
+                    newData.uomId = selectedItem.salesUOMId;
+                    //newData.qty = 1;
+                    //newData.discountAmt = 0;
+                    //newData.discountPerc = 0;
 
                     var d = new $.Deferred();
-                    itemService.get(value)
-                        .done(data => {
-                            d.resolve(newData.uomGroupId = data.uomGroupId);
+                    priceListDetailsService.getListDevextremes({ filter: JSON.stringify([['itemId', '=', value], 'and', ['item.uomGroupId', '=', selectedItem.uomGroupId], 'and', ['priceList.id', '=', pricelistId]]) })
+                        .done(result => {
+                            console.log(newData.priceAfterTax, newData.qty, newData.discountAmt);
+                            d.resolve(
+                                newData.price = result.data[0] != undefined ? result.data[0].price : 0,
+                                newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100,
+                                newData.lineAmtAfterTax = newData.price + (newData.price * newData.taxRate) / 100,
+                                newData.lineAmt = newData.price * newData.qty - newData.discountAmt,
+                            );
                         });
                     return d.promise();
                 },
-                validationRules: [{ type: 'required' }]
+                validationRules: [{ type: 'required' }],
+                width: 200
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:UOM'),
                 dataField: 'uomId',
-                calculateDisplayValue: "altUOM.name",
+                calculateDisplayValue: "salesUOM.name",
                 lookup: {
                     dataSource(options) {
                         return {
@@ -910,15 +969,64 @@
                     displayExpr: "altUOM.name",
                     valueExpr: "altUOM.id"
                 },
+                validationRules: [{ type: 'required' }],
+                width: 200
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Price'),
+                dataField: 'price',
+                dataType: 'number',
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                setCellValue: function (newData, value, currentData) {
+                    newData.price = value;
+                    newData.priceAfterTax = value + (value * currentData.taxRate) / 100;
+                    newData.lineAmt = value * currentData.qty - currentData.discountAmt;
+                    newData.lineAmtAfterTax = newData.priceAfterTax * currentData.qty - currentData.discountAmt;
+                },
+                value: 0,
+                validationRules: [{ type: 'required' }],
+                width: 150,
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:VAT'),
+                dataField: 'vatId',
+                calculateDisplayValue: "vat.name",
+                lookup: {
+                    dataSource() {
+                        return {
+                            store: vATStore,
+                            paginate: true,
+                            pageSize: pageSizeForLookup
+                        };
+                    },
+                    displayExpr: "name",
+                    valueExpr: "id"
+                },
+                width: 150,
                 validationRules: [{ type: 'required' }]
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:PriceAfterTax'),
+                dataField: 'priceAfterTax',
+                dataType: 'number',
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                value: 0,
+                validationRules: [{ type: 'required' }],
+                width: 150,
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
                 dataField: 'qty',
                 dataType: 'number',
-                editorOptions: {
-                    format: '#',
+                setCellValue: function (newData, value, currentData) {
+                    newData.qty = value;
+                    newData.lineAmt = value * currentData.price - currentData.discountAmt;
                 },
+                value: 0,
                 validationRules: [
                     {
                         type: 'required'
@@ -928,46 +1036,106 @@
                         message: 'Quantity can not be Negative!',
                         pattern: /^\d*[1-9]\d*$/,
                     }
-                ]
+                ],
+                width: 150,
             },
             {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Price'),
-                dataField: 'price',
-                validationRules: [{ type: 'required' }]
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:IsFree'),
+                dataField: 'isFree',
+                dataType: 'boolean',
+                width: 120
             },
             {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineAmt'),
-                dataField: 'lineAmt',
-                validationRules: [{ type: 'required' }]
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Promotion'),
+                dataField: 'promotionId',
+                width: 150
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountType'),
+                dataField: 'discountType',
+                lookup: {
+                    dataSource: discountTypeStore,
+                    displayExpr: 'text',
+                    valueExpr: 'id'
+                },
+                setCellValue: function (newData, value, currentData) {
+                    newData.discountType = value;
+
+                    switch (value) {
+                        case 1:
+                            newData.discountAmt = currentData.price * currentData.discountPerc;
+                            newData.lineAmt = currentData.qty * currentData.price - newData.discountAmt;
+                            newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.discountAmt;
+                            break;
+                        case 2:
+                            newData.discountAmt = currentData.priceAfterTax * currentData.discountPerc;
+                            newData.lineAmt = currentData.qty * currentData.price - newData.discountAmt;
+                            newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.discountAmt;
+                            break;
+                        default:
+                            newData.discountPerc = 0;
+                            newData.discountAmt = 0;
+                    }
+                },
+                validationRules: [{ type: 'required' }],
+                width: 200
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountPerc'),
                 dataField: 'discountPerc',
-                validationRules: [{ type: 'required' }]
+                dataType: 'number',
+                editorOptions: {
+                    format: '#0.00%',
+                },
+                setCellValue: function (newData, value, currentData) {
+                    newData.discountPerc = value;
+                    switch (currentData.discountType) {
+                        case 1:
+                            newData.discountAmt = currentData.price * value;
+                            newData.lineAmt = currentData.qty * currentData.price - newData.discountAmt;
+                            newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.discountAmt;
+                            break;
+                        case 2:
+                            newData.discountAmt = currentData.priceAfterTax * value;
+                            newData.lineAmt = currentData.qty * currentData.price - newData.discountAmt;
+                            newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.discountAmt;
+                            break;
+                        default:
+                            newData.discountPerc = 0;
+                            newData.discountAmt = 0;
+                    }
+                },
+                value: 0,
+                validationRules: [{ type: 'required' }],
+                width: 150
             },
             {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineDiscountAmt'),
-                dataField: 'lineDiscountAmt',
-                validationRules: [{ type: 'required' }]
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountAmt'),
+                dataField: 'discountAmt',
+                dataType: 'number',
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                value: 0,
+                validationRules: [{ type: 'required' }],
+                width: 150
             },
             {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:TaxRate'),
-                dataField: 'taxRate',
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineAmt'),
+                dataField: 'lineAmt',
+                dataType: 'number',
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                value: 0,
+                validationRules: [{ type: 'required' }],
+                width: 150
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineAmtAfterTax'),
                 dataField: 'lineAmtAfterTax',
-                validationRules: [{ type: 'required' }]
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Warehouse'),
-                dataField: 'warehouseId',
-                validationRules: [{ type: 'required' }]
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:WarehouseLocation'),
-                dataField: 'warehouseLocationId',
-                validationRules: [{ type: 'required' }]
+                validationRules: [{ type: 'required' }],
+                width: 150
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:TransactionType'),
@@ -977,22 +1145,39 @@
                     displayExpr: 'text',
                     valueExpr: 'id'
                 },
-                validationRules: [{ type: 'required' }]
+                validationRules: [{ type: 'required' }],
+                width: 150
             },
-
-
-
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Warehouse'),
+                dataField: 'warehouseId',
+                //validationRules: [{ type: 'required' }],
+                width: 200
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:WarehouseLocation'),
+                dataField: 'warehouseLocationId',
+                //validationRules: [{ type: 'required' }],
+                width: 200
+            },
+            //hidden field
+            {
+                dataField: 'uomGroupId',
+                visible: false,
+            },
+            {
+                dataField: 'uomRate',
+                visible: false,
+            },
+            {
+                dataField: 'taxRate',
+                visible: false,
+            },
             //{
-            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:VAT'),
-            //    dataField: 'vatId',
+            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineDiscountAmt'),
+            //    dataField: 'lineDiscountAmt',
             //    validationRules: [{ type: 'required' }]
             //},
-            //{
-            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:PriceAfterTax'),
-            //    dataField: 'priceAfterTax',
-            //    validationRules: [{ type: 'required' }]
-            //},
-
             //{
             //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:ProcessQty'),
             //    dataField: 'processQty',
@@ -1008,41 +1193,242 @@
             //    dataField: 'confirmQty',
             //    validationRules: [{ type: 'required' }]
             //},
-
             //{
-            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:IsFree'),
-            //    dataField: 'isFree',
-            //    dataType: 'boolean',
-            //    validationRules: [{ type: 'required' }]
-            //},
-            //{
-            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:Promotion'),
-            //    dataField: 'promotionId',
-            //    validationRules: [{ type: 'required' }]
-            //},
-            //{
-            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountType'),
-            //    dataField: 'discountType',
+            //    caption: l('EntityFieldName:MDMService:UOMGroupDetail:BaseUomId'),
+            //    dataField: 'baseUomId',
+            //    calculateDisplayValue: "baseUOM.name",
             //    lookup: {
-            //        dataSource: discountTypeStore,
-            //        displayExpr: 'text',
-            //        valueExpr: 'id'
+            //        dataSource(options) {
+            //            return {
+            //                store: Store,
+            //                filter: [["uomGroup.id", "=", options.data != null ? options.data.uomGroupId : null]],
+            //                paginate: true,
+            //                pageSize: pageSizeForLookup
+            //            };
+            //        },
+            //        displayExpr: "baseUOM.name",
+            //        valueExpr: "baseUOM.id"
             //    },
-            //    validationRules: [{ type: 'required' }]
+            //    setCellValue: function (newData, value, currentData) {
+            //        newData.baseUomId = value;
+
+            //        var d = new $.Deferred();
+
+            //        uOMGroupDetailService.getListDevextremes({ filter: JSON.stringify(['uomGroupId', '=', currentData.uomGroupId]) })
+            //            .done(result => {
+            //                d.resolve(
+            //                    newData.uomRate = result.data[0].baseQty
+            //                );
+            //            });
+
+            //        return d.promise();
+            //    },
+            //    width: 200
             //},
             //{
-            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountAmt'),
-            //    dataField: 'discountAmt',
-            //    validationRules: [{ type: 'required' }]
+            //    //caption: l('EntityFieldName:OrderService:SalesRequestDetails:SfaOrderBaseQty'),
+            //    caption: l('SfaOrderBaseQty'),
+            //    dataField: 'sfaOrderBaseQty',
+            //    dataType: 'number',
+            //    value: 0,
+            //    width: 150
             //},
+            //{
+            //    //caption: l('EntityFieldName:OrderService:SalesRequestDetails:BaseQty'),
+            //    caption: l('BaseQty'),
+            //    dataField: 'baseQty',
+            //    dataType: 'number',
+            //    value: 0,
+            //    width: 150
+            //},
+        ],
+        summary: {
+            totalItems: [
+                {
+                    column: "discountAmt",
+                    summaryType: "sum",
+                    alignment: "left"
+                },
+                {
+                    column: "lineAmt",
+                    summaryType: "sum",
+                    alignment: "left"
+                },
+                {
+                    column: "lineAmtAfterTax",
+                    summaryType: "sum",
+                    alignment: "left"
+                }
+            ]
+        }
+    }).dxDataGrid("instance");
 
-            //hidden
+    const dgItems = $('#dgItems').dxDataGrid({
+        dataSource: itemStore,
+        remoteOperations: true,
+        showColumnLines: true,
+        showRowLines: false,
+        rowAlternationEnabled: true,
+        showBorders: false,
+        export: {
+            enabled: false,
+        },
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
+        columnMinWidth: 50,
+        columnAutoWidth: true,
+        columnChooser: {
+            enabled: true,
+            allowSearch: true,
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        filterRow: {
+            visible: true,
+        },
+        groupPanel: {
+            visible: true,
+        },
+        headerFilter: {
+            visible: true,
+        },
+        searchPanel: {
+            visible: true
+        },
+        paging: {
+            enabled: true,
+            pageSize: pageSize
+        },
+        pager: {
+            visible: true,
+            showPageSizeSelector: true,
+            allowedPageSizes: allowedPageSizes,
+            showInfo: true,
+            showNavigationButtons: true
+        },
+        editing: {
+            mode: 'cell',
+            allowUpdating: false,
+        },
+        selection: {
+            mode: 'multiple',
+        },
+        toolbar: {
+            items: [
+                "columnChooserButton",
+                "searchPanel",
+            ],
+        },
+        columns: [
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
+                dataField: 'qty',
+                width: 100,
+                dataType: 'number',
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .dxTextBox({
+                            value: options.value
+                        })
+                        .appendTo(container);
+                }
+            },
+            {
+                dataField: 'code',
+                caption: l("EntityFieldName:MDMService:Item:Code"),
+                dataType: 'string',
+                allowEditing: false
+            },
+            {
+                dataField: 'name',
+                caption: l("EntityFieldName:MDMService:Item:Name"),
+                dataType: 'string',
+                allowEditing: false
+            },
+            {
+                dataField: 'inventory',
+                caption: l("Inventory"),
+                dataType: 'number',
+                width: 100,
+                allowEditing: false
+            },
+            {
+                dataField: 'id',
+                visible: false
+            },
+            {
+                dataField: 'salesUOMId',
+                visible: false
+            },
             {
                 dataField: 'uomGroupId',
-                visible: false,
+                visible: false
             },
-        ]
+        ],
     }).dxDataGrid("instance");
+
+    const popupItems = $('#popupItems').dxPopup({
+        width: "100vh",
+        height: 500,
+        container: '.panel-container',
+        showTitle: true,
+        title: 'Choose items',
+        visible: false,
+        dragEnabled: true,
+        hideOnOutsideClick: false,
+        showCloseButton: true,
+        resizeEnabled: true,
+        position: {
+            at: 'center',
+            my: 'center',
+            collision: 'fit',
+        },
+        onShowing: function (e) {
+            var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
+            $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
+        },
+        onResize: function (e) {
+            var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
+            $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
+        },
+        toolbarItems: [{
+            widget: 'dxButton',
+            toolbar: 'bottom',
+            location: 'after',
+            options: {
+                icon: 'fa fa-check hvr-icon',
+                text: 'Submit',
+                onClick() {
+                    var selectedItems = dgItems.getSelectedRowsData();
+                    if (selectedItems.length > 0) {
+                        selectedItems.forEach(u => {
+                            SalesRequestDetailsModel.unshift({
+                                id: u.id,
+                                itemId: u.id,
+                                uomId: u.salesUOMId,
+                                qty: u.qty
+                            });
+                        });
+
+                        dgSalesRequestDetails.refresh();
+                    }
+                    popupItems.hide();
+                },
+            },
+        }, {
+            widget: 'dxButton',
+            toolbar: 'bottom',
+            location: 'after',
+            options: {
+                text: 'Cancel',
+                onClick() {
+                    popupItems.hide();
+                },
+            },
+        }],
+    }).dxPopup('instance');
 
     /****button*****/
     $("#CloseButton").click(function (e) {
@@ -1058,39 +1444,20 @@
     $("#SaveButton").click(function (e) {
         e.preventDefault();
 
-        //if (!salesRequestForm.validate().isValid) {
+        //if (!frmSalesRequestDetails.validate().isValid) {
         //    abp.message.warn(l('WarnMessage.RequiredField'));
         //    return;
         //}
 
-        var salesRequest = salesRequestForm.option('formData');
-        var salesRequestDetails = salesRequestDetailsContainer.getDataSource().items();
+        var salesRequestHeader = frmSalesRequestDetails.option('formData');
+        var salesRequestDetails = dgSalesRequestDetails.getDataSource().items();
 
         var salesRequestObject = {
-            header: {
-                companyId: salesRequest.companyId,
-                docNbr: salesRequest.docNbr,
-                docType: salesRequest.docType,
-                requestDate: salesRequest.requestDate,
-                remark: salesRequest.remark,
-                businessPartnerId: salesRequest.businessPartnerId,
-                routeId: salesRequest.routeId,
-                employeeId: salesRequest.employeeId,
-                linkedSFAId: salesRequest.linkedSFAId,
-                docTotalLineDiscountAmt: salesRequest.docTotalLineDiscountAmt,
-                docTotalLineAmt: salesRequest.docTotalLineAmt,
-                docTotalLineAmtAfterTax: salesRequest.docTotalLineAmtAfterTax,
-                docDiscountType: salesRequest.docDiscountType,
-                docDiscountPerc: salesRequest.docDiscountPerc,
-                docDiscountAmt: salesRequest.docDiscountAmt,
-                docTotalAmt: salesRequest.docTotalAmt,
-                docTotalAmtAfterTax: salesRequest.docTotalAmtAfterTax,
-                docSource: salesRequest.docSource
-            },
+            header: salesRequestHeader,
             details: salesRequestDetails
         };
 
-        console.log(salesRequestObject);
+        console.log("Save data: ", salesRequestObject);
 
         salesRequestService.createDoc(salesRequestObject, { contentType: "application/json" })
             .done(result => {
@@ -1101,15 +1468,16 @@
 
     /****function*****/
     function LoadData() {
-        SalesRequestModel = JSON.parse(sessionStorage.getItem("SalesRequest"));
-        if (SalesRequestModel == null) {
-            stateMode = 'add';
+        SalesRequestHeaderModel = JSON.parse(sessionStorage.getItem("SalesRequest"));
+        if (SalesRequestHeaderModel == null) {
+
         } else {
-            stateMode = 'edit';
-            salesRequesIdFilter = SalesRequestModel.id;
-            salesRequestForm.option('formData', SalesRequestModel);
+            salesRequesIdFilter = SalesRequestHeaderModel.id;
+            frmSalesRequestDetails.option('formData', SalesRequestHeaderModel);
         }
     }
 
-    LoadData();
+    //LoadData();
+
+    initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestDetails');
 });
