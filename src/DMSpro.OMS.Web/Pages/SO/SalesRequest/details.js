@@ -890,6 +890,11 @@ $(function () {
                 "searchPanel"
             ],
         },
+        onEditorPreparing: function (e) {
+            if (e.parentType === "dataRow" && (e.dataField === "uomId" || e.dataField === "vatId" || e.dataField === "priceAfterTax" || e.dataField === "discountAmt" || e.dataField === "lineAmt" || e.dataField === "lineAmtAfterTax")) {
+                e.editorOptions.disabled = true;
+            }
+        },
         editing: {
             mode: 'row',
             allowAdding: true,
@@ -940,12 +945,11 @@ $(function () {
                     var d = new $.Deferred();
                     priceListDetailsService.getListDevextremes({ filter: JSON.stringify([['itemId', '=', value], 'and', ['item.uomGroupId', '=', selectedItem.uomGroupId], 'and', ['priceList.id', '=', pricelistId]]) })
                         .done(result => {
-                            console.log(newData.priceAfterTax, newData.qty, newData.discountAmt);
                             d.resolve(
                                 newData.price = result.data[0] != undefined ? result.data[0].price : 0,
                                 newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100,
-                                newData.lineAmtAfterTax = newData.price + (newData.price * newData.taxRate) / 100,
-                                newData.lineAmt = newData.price * newData.qty - newData.discountAmt,
+                                newData.lineAmtAfterTax = newData.priceAfterTax,
+                                newData.lineAmt = newData.price,
                             );
                         });
                     return d.promise();
@@ -956,18 +960,27 @@ $(function () {
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:UOM'),
                 dataField: 'uomId',
-                calculateDisplayValue: "salesUOM.name",
+                //calculateDisplayValue: "name",
                 lookup: {
+                    //dataSource(options) {
+                    //    return {
+                    //        store: uOMGroupDetailStore,
+                    //        filter: [["uomGroup.id", "=", options.data != null ? options.data.uomGroupId : null]],
+                    //        paginate: true,
+                    //        pageSize: pageSizeForLookup
+                    //    };
+                    //},
+                    //displayExpr: "altUOM.name",
+                    //valueExpr: "altUOM.id"
                     dataSource(options) {
                         return {
-                            store: uOMGroupDetailStore,
-                            filter: [["uomGroup.id", "=", options.data != null ? options.data.uomGroupId : null]],
+                            store: uOMStore,
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
                     },
-                    displayExpr: "altUOM.name",
-                    valueExpr: "altUOM.id"
+                    displayExpr: "name",
+                    valueExpr: "id"
                 },
                 validationRules: [{ type: 'required' }],
                 width: 200
@@ -979,13 +992,16 @@ $(function () {
                 editorOptions: {
                     format: '#,##0.##',
                 },
+                format: {
+                    type: "currency",
+                    currency: "VND"
+                },
                 setCellValue: function (newData, value, currentData) {
                     newData.price = value;
                     newData.priceAfterTax = value + (value * currentData.taxRate) / 100;
                     newData.lineAmt = value * currentData.qty - currentData.discountAmt;
                     newData.lineAmtAfterTax = newData.priceAfterTax * currentData.qty - currentData.discountAmt;
                 },
-                value: 0,
                 validationRules: [{ type: 'required' }],
                 width: 150,
             },
@@ -1014,7 +1030,10 @@ $(function () {
                 editorOptions: {
                     format: '#,##0.##',
                 },
-                value: 0,
+                format: {
+                    type: "currency",
+                    currency: "VND"
+                },
                 validationRules: [{ type: 'required' }],
                 width: 150,
             },
@@ -1116,7 +1135,10 @@ $(function () {
                 editorOptions: {
                     format: '#,##0.##',
                 },
-                value: 0,
+                format: {
+                    type: "currency",
+                    currency: "VND"
+                },
                 validationRules: [{ type: 'required' }],
                 width: 150
             },
@@ -1127,13 +1149,24 @@ $(function () {
                 editorOptions: {
                     format: '#,##0.##',
                 },
-                value: 0,
+                format: {
+                    type: "currency",
+                    currency: "VND"
+                },
                 validationRules: [{ type: 'required' }],
                 width: 150
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineAmtAfterTax'),
                 dataField: 'lineAmtAfterTax',
+                dataType: 'number',
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                format: {
+                    type: "currency",
+                    currency: "VND"
+                },
                 validationRules: [{ type: 'required' }],
                 width: 150
             },
