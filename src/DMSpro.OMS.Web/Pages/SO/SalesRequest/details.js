@@ -563,17 +563,6 @@ $(function () {
                     valueExpr: 'id',
                     value: companyId,
                     disabled: true
-                    //onValueChanged: function (e) {
-                    //    const newValue = e.value;
-                    //    var dxbusinessPartnerId = $('input[name=businessPartnerId]').closest('.dx-selectbox').data('dxSelectBox');
-                    //    dxbusinessPartnerId.reset();
-                    //    dxbusinessPartnerId.option('dataSource', new DevExpress.data.DataSource({
-                    //        store: customerAssignmentStore,
-                    //        filter: ["company.id", "=", newValue],
-                    //        paginate: true,
-                    //        pageSize: pageSizeForLookup
-                    //    }));
-                    //}
                 },
                 label: {
                     visible: false,
@@ -584,14 +573,14 @@ $(function () {
                 }]
             },
             {
-                dataField: "docTotalLineDiscountAmt",
+                dataField: "docDiscountPerc",
                 editorType: "dxNumberBox",
                 editorOptions: {
                     format: '#,##0.##',
                 },
                 label: {
                     visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt')
+                    text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc')
                 },
                 validationRules: [{
                     type: 'required',
@@ -644,16 +633,66 @@ $(function () {
                         const curSelectBox = e.element.dxSelectBox('instance');
                         const customers = curSelectBox.getDataSource().items().filter(x => x.customerId == e.value);
                         pricelistId = customers[0].customer.priceListId;
-
-                        //console.log("new value: " + e.value);
-                        //console.log("cus source:", customers[0].customer)
-                        //console.log("price source:" + customers[0].customer.priceListId)
-                        //console.log("price change: " + pricelistId);
                     }
                 },
                 label: {
                     visible: false,
                     text: l('EntityFieldName:OrderService:SalesRequest:BusinessPartner')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docTotalLineDiscountAmt",
+                editorType: "dxNumberBox",
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                label: {
+                    visible: false,
+                    text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docTotalAmt",
+                editorType: "dxNumberBox",
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                label: {
+                    visible: false,
+                    text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            // row 3
+            {
+                dataField: "remark",
+                label: {
+                    visible: false,
+                    text: l('EntityFieldName:OrderService:SalesRequest:Remark')
+                },
+                validationRules: [{
+                    type: 'required',
+                }]
+            },
+            {
+                dataField: "docSource",
+                editorType: "dxSelectBox",
+                editorOptions: {
+                    dataSource: docSourceStore,
+                    displayExpr: 'text',
+                    valueExpr: 'id'
+                },
+                label: {
+                    visible: false,
+                    text: l('EntityFieldName:OrderService:SalesRequest:DocSource')
                 },
                 validationRules: [{
                     type: 'required',
@@ -668,66 +707,6 @@ $(function () {
                 label: {
                     visible: false,
                     text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            {
-                dataField: "docDiscountType",
-                editorType: "dxNumberBox",
-                editorOptions: {
-                    format: '#,##0.##',
-                },
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            // row 3
-            {
-                dataField: "linkedSFAId",
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:LinkedSFA')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            {
-                dataField: "employeeId",
-                editorType: 'dxSelectBox',
-                editorOptions: {
-                    dataSource: {
-                        store: employeeProfileStore,
-                        filter: [['active', '=', true], 'and', [['effectiveDate', '=', null], 'or', ['effectiveDate', '<=', new Date()]], 'and', [['endDate', '=', null], 'or', ['endDate', '>=', new Date()]]],
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    },
-                    displayExpr: 'code',
-                    valueExpr: 'id'
-                },
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:Employee')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            {
-                dataField: "docDiscountPerc",
-                editorType: "dxNumberBox",
-                editorOptions: {
-                    format: '#,##0.##',
-                },
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc')
                 },
                 validationRules: [{
                     type: 'required',
@@ -749,45 +728,32 @@ $(function () {
             },
             // row 4
             {
-                dataField: "remark",
+                dataField: "requestDate",
+                editorType: 'dxDateBox',
+                editorOptions: {
+                    type: 'datetime',
+                    value: new Date(),
+                    disabled: true,
+                },
                 label: {
                     visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:Remark')
+                    text: l('EntityFieldName:OrderService:SalesRequest:RequestDate')
                 },
                 validationRules: [{
                     type: 'required',
                 }]
             },
             {
-                dataField: "routeId",
+                dataField: "docDiscountType",
                 editorType: "dxSelectBox",
                 editorOptions: {
-                    dataSource: {
-                        store: salesOrgHierarchyStore,
-                        filter: ["isRoute", "=", true],
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    },
-                    displayExpr: 'name',
+                    dataSource: discountTypeStore,
+                    displayExpr: 'text',
                     valueExpr: 'id'
                 },
                 label: {
                     visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:Route')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            {
-                dataField: "docTotalAmt",
-                editorType: "dxNumberBox",
-                editorOptions: {
-                    format: '#,##0.##',
-                },
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt')
+                    text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType')
                 },
                 validationRules: [{
                     type: 'required',
@@ -807,39 +773,6 @@ $(function () {
                     type: 'required',
                 }]
             },
-            // row 5
-            {
-                dataField: "requestDate",
-                editorType: 'dxDateBox',
-                editorOptions: {
-                    type: 'datetime',
-                    value: new Date(),
-                    disabled: true,
-                },
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:RequestDate')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            {
-                dataField: "docSource",
-                editorType: "dxSelectBox",
-                editorOptions: {
-                    dataSource: docSourceStore,
-                    displayExpr: 'text',
-                    valueExpr: 'id'
-                },
-                label: {
-                    visible: false,
-                    text: l('EntityFieldName:OrderService:SalesRequest:DocSource')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            }
         ]
     }).dxForm('instance');
 
@@ -914,19 +847,27 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
+        onInitNewRow: function (e) {
+            e.data.qty = 1;
+            e.data.discountAmt = 0;
+            e.data.discountPerc = 0;
+            e.data.discountType = 0;
+            e.data.transactionType = 0;
+        },
         toolbar: {
             items: [
                 "groupPanel",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "add",
-                        onClick(e) {
-                            popupItems.show();
-                        },
-                    },
-                },
+                "addRowButton",
+                //{
+                //    location: 'after',
+                //    widget: 'dxButton',
+                //    options: {
+                //        icon: "add",
+                //        onClick(e) {
+                //            popupItems.show();
+                //        },
+                //    },
+                //},
                 'columnChooserButton',
                 "exportButton",
                 {
@@ -992,13 +933,19 @@ $(function () {
                     newData.vatId = selectedItem.vatId;
                     newData.taxRate = selectedItem.vat.rate;
                     newData.uomId = selectedItem.salesUOMId;
+                    //newData.qty = 1;
+                    //newData.discountAmt = 0;
+                    //newData.discountPerc = 0;
 
                     var d = new $.Deferred();
                     priceListDetailsService.getListDevextremes({ filter: JSON.stringify([['itemId', '=', value], 'and', ['item.uomGroupId', '=', selectedItem.uomGroupId], 'and', ['priceList.id', '=', pricelistId]]) })
                         .done(result => {
+                            console.log(newData.priceAfterTax, newData.qty, newData.discountAmt);
                             d.resolve(
-                                newData.price = result.data[0].price,
-                                newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100
+                                newData.price = result.data[0] != undefined ? result.data[0].price : 0,
+                                newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100,
+                                newData.lineAmtAfterTax = newData.price + (newData.price * newData.taxRate) / 100,
+                                newData.lineAmt = newData.price * newData.qty - newData.discountAmt,
                             );
                         });
                     return d.promise();
@@ -1032,6 +979,12 @@ $(function () {
                 editorOptions: {
                     format: '#,##0.##',
                 },
+                setCellValue: function (newData, value, currentData) {
+                    newData.price = value;
+                    newData.priceAfterTax = value + (value * currentData.taxRate) / 100;
+                    newData.lineAmt = value * currentData.qty - currentData.discountAmt;
+                    newData.lineAmtAfterTax = newData.priceAfterTax * currentData.qty - currentData.discountAmt;
+                },
                 value: 0,
                 validationRules: [{ type: 'required' }],
                 width: 150,
@@ -1039,7 +992,7 @@ $(function () {
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:VAT'),
                 dataField: 'vatId',
-                calculateDisplayValue: "name",
+                calculateDisplayValue: "vat.name",
                 lookup: {
                     dataSource() {
                         return {
@@ -1069,6 +1022,10 @@ $(function () {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
                 dataField: 'qty',
                 dataType: 'number',
+                setCellValue: function (newData, value, currentData) {
+                    newData.qty = value;
+                    newData.lineAmt = value * currentData.price - currentData.discountAmt;
+                },
                 value: 0,
                 validationRules: [
                     {
@@ -1081,66 +1038,6 @@ $(function () {
                     }
                 ],
                 width: 150,
-            },
-            {
-                caption: l('EntityFieldName:MDMService:UOMGroupDetail:BaseUomId'),
-                dataField: 'baseUomId',
-                calculateDisplayValue: "baseUOM.name",
-                lookup: {
-                    dataSource(options) {
-                        return {
-                            store: uOMGroupDetailStore,
-                            filter: [["uomGroup.id", "=", options.data != null ? options.data.uomGroupId : null]],
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    displayExpr: "baseUOM.name",
-                    valueExpr: "baseUOM.id"
-                },
-                setCellValue: function (newData, value, currentData) {
-                    newData.baseUomId = value;
-
-                    var d = new $.Deferred();
-
-                    uOMGroupDetailService.getListDevextremes({ filter: JSON.stringify(['uomGroupId', '=', currentData.uomGroupId]) })
-                        .done(result => {
-                            d.resolve(
-                                newData.uomRate = result.data[0].baseQty
-                            );
-                        });
-
-                    return d.promise();
-                },
-                width: 200
-            },
-            {
-                //caption: l('EntityFieldName:OrderService:SalesRequestDetails:SfaOrderBaseQty'),
-                caption: l('SfaOrderBaseQty'),
-                dataField: 'sfaOrderBaseQty',
-                dataType: 'number',
-                value: 0,
-                width: 150
-            },
-            {
-                //caption: l('EntityFieldName:OrderService:SalesRequestDetails:BaseQty'),
-                caption: l('BaseQty'),
-                dataField: 'baseQty',
-                dataType: 'number',
-                value: 0,
-                width: 150
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Warehouse'),
-                dataField: 'warehouseId',
-                //validationRules: [{ type: 'required' }],
-                width: 200
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:WarehouseLocation'),
-                dataField: 'warehouseLocationId',
-                //validationRules: [{ type: 'required' }],
-                width: 200
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:IsFree'),
@@ -1161,6 +1058,25 @@ $(function () {
                     displayExpr: 'text',
                     valueExpr: 'id'
                 },
+                setCellValue: function (newData, value, currentData) {
+                    newData.discountType = value;
+
+                    switch (value) {
+                        case 1:
+                            newData.discountAmt = currentData.price * currentData.discountPerc;
+                            newData.lineAmt = currentData.qty * currentData.price - newData.discountAmt;
+                            newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.discountAmt;
+                            break;
+                        case 2:
+                            newData.discountAmt = currentData.priceAfterTax * currentData.discountPerc;
+                            newData.lineAmt = currentData.qty * currentData.price - newData.discountAmt;
+                            newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.discountAmt;
+                            break;
+                        default:
+                            newData.discountPerc = 0;
+                            newData.discountAmt = 0;
+                    }
+                },
                 validationRules: [{ type: 'required' }],
                 width: 200
             },
@@ -1170,6 +1086,24 @@ $(function () {
                 dataType: 'number',
                 editorOptions: {
                     format: '#0.00%',
+                },
+                setCellValue: function (newData, value, currentData) {
+                    newData.discountPerc = value;
+                    switch (currentData.discountType) {
+                        case 1:
+                            newData.discountAmt = currentData.price * value;
+                            newData.lineAmt = currentData.qty * currentData.price - newData.discountAmt;
+                            newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.discountAmt;
+                            break;
+                        case 2:
+                            newData.discountAmt = currentData.priceAfterTax * value;
+                            newData.lineAmt = currentData.qty * currentData.price - newData.discountAmt;
+                            newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.discountAmt;
+                            break;
+                        default:
+                            newData.discountPerc = 0;
+                            newData.discountAmt = 0;
+                    }
                 },
                 value: 0,
                 validationRules: [{ type: 'required' }],
@@ -1211,9 +1145,20 @@ $(function () {
                     displayExpr: 'text',
                     valueExpr: 'id'
                 },
-                value: 0,
                 validationRules: [{ type: 'required' }],
                 width: 150
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Warehouse'),
+                dataField: 'warehouseId',
+                //validationRules: [{ type: 'required' }],
+                width: 200
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:WarehouseLocation'),
+                dataField: 'warehouseLocationId',
+                //validationRules: [{ type: 'required' }],
+                width: 200
             },
             //hidden field
             {
@@ -1248,7 +1193,74 @@ $(function () {
             //    dataField: 'confirmQty',
             //    validationRules: [{ type: 'required' }]
             //},
-        ]
+            //{
+            //    caption: l('EntityFieldName:MDMService:UOMGroupDetail:BaseUomId'),
+            //    dataField: 'baseUomId',
+            //    calculateDisplayValue: "baseUOM.name",
+            //    lookup: {
+            //        dataSource(options) {
+            //            return {
+            //                store: Store,
+            //                filter: [["uomGroup.id", "=", options.data != null ? options.data.uomGroupId : null]],
+            //                paginate: true,
+            //                pageSize: pageSizeForLookup
+            //            };
+            //        },
+            //        displayExpr: "baseUOM.name",
+            //        valueExpr: "baseUOM.id"
+            //    },
+            //    setCellValue: function (newData, value, currentData) {
+            //        newData.baseUomId = value;
+
+            //        var d = new $.Deferred();
+
+            //        uOMGroupDetailService.getListDevextremes({ filter: JSON.stringify(['uomGroupId', '=', currentData.uomGroupId]) })
+            //            .done(result => {
+            //                d.resolve(
+            //                    newData.uomRate = result.data[0].baseQty
+            //                );
+            //            });
+
+            //        return d.promise();
+            //    },
+            //    width: 200
+            //},
+            //{
+            //    //caption: l('EntityFieldName:OrderService:SalesRequestDetails:SfaOrderBaseQty'),
+            //    caption: l('SfaOrderBaseQty'),
+            //    dataField: 'sfaOrderBaseQty',
+            //    dataType: 'number',
+            //    value: 0,
+            //    width: 150
+            //},
+            //{
+            //    //caption: l('EntityFieldName:OrderService:SalesRequestDetails:BaseQty'),
+            //    caption: l('BaseQty'),
+            //    dataField: 'baseQty',
+            //    dataType: 'number',
+            //    value: 0,
+            //    width: 150
+            //},
+        ],
+        summary: {
+            totalItems: [
+                {
+                    column: "discountAmt",
+                    summaryType: "sum",
+                    alignment: "left"
+                },
+                {
+                    column: "lineAmt",
+                    summaryType: "sum",
+                    alignment: "left"
+                },
+                {
+                    column: "lineAmtAfterTax",
+                    summaryType: "sum",
+                    alignment: "left"
+                }
+            ]
+        }
     }).dxDataGrid("instance");
 
     const dgItems = $('#dgItems').dxDataGrid({
