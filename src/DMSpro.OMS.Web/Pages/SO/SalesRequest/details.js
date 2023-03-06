@@ -577,6 +577,19 @@ $(function () {
                 editorType: "dxNumberBox",
                 editorOptions: {
                     format: '#,##0.##',
+                    onValueChanged: function (e) {
+                        calculatorDocTotal();
+                        //var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
+                        //var docDiscountType = formSalesRequest.getEditor('docDiscountType').option('value');
+                        //var docTotalLineAmt = formSalesRequest.getEditor('docTotalLineAmt').option('value');
+                        //var docTotalLineAmtAfterTax = formSalesRequest.getEditor('docTotalLineAmtAfterTax').option('value');
+                        //if (docDiscountType == 1) {
+                        //    formSalesRequest.updateData('docDiscountAmt', docTotalLineAmt * (e.value/100))
+                        //}
+                        //if (docDiscountType == 2) {
+                        //    formSalesRequest.updateData('docDiscountAmt', docTotalLineAmtAfterTax * (e.value/100))
+                        //}
+                    }
                 },
                 label: {
                     visible: false,
@@ -591,7 +604,18 @@ $(function () {
                 editorType: "dxNumberBox",
                 editorOptions: {
                     format: '#,##0.##',
-                    disabled: true
+                    disabled: true,
+                    onValueChanged: function (e) {
+                        calculatorDocTotal();
+                        //var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
+                        //var docDiscountType = formSalesRequest.getEditor('docDiscountType').option('value');
+                        //var docDiscountPerc = formSalesRequest.getEditor('docDiscountPerc').option('value');
+                        //var docDiscountAmt = e.value * (docDiscountPerc / 100);
+                        //if (docDiscountType == 1) {
+                        //    formSalesRequest.updateData('docDiscountAmt', docDiscountAmt)
+                        //}
+                        //formSalesRequest.updateData('docTotalAmt', e.value - docDiscountAmt);
+                    }
                 },
                 label: {
                     visible: false,
@@ -634,6 +658,9 @@ $(function () {
                         const curSelectBox = e.element.dxSelectBox('instance');
                         const customers = curSelectBox.getDataSource().items().filter(x => x.customerId == e.value);
                         pricelistId = customers[0].customer.priceListId;
+
+                        var gridDetails = $('#dgSalesRequestDetails').data('dxDataGrid');
+                        gridDetails.option("editing.allowAdding", true)
                     }
                 },
                 label: {
@@ -664,6 +691,7 @@ $(function () {
                 editorType: "dxNumberBox",
                 editorOptions: {
                     format: '#,##0.##',
+                    disabled: true
                 },
                 label: {
                     visible: false,
@@ -679,10 +707,7 @@ $(function () {
                 label: {
                     visible: false,
                     text: l('EntityFieldName:OrderService:SalesRequest:Remark')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
+                }
             },
             {
                 dataField: "docSource",
@@ -705,7 +730,18 @@ $(function () {
                 editorType: "dxNumberBox",
                 editorOptions: {
                     format: '#,##0.##',
-                    disabled: true
+                    disabled: true,
+                    onValueChanged: function (e) {
+                        calculatorDocTotal();
+                        //var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
+                        //var docDiscountType = formSalesRequest.getEditor('docDiscountType').option('value');
+                        //var docDiscountPerc = formSalesRequest.getEditor('docDiscountPerc').option('value');
+                        //var docDiscountAmt = e.value * (docDiscountPerc/100);
+                        //if (docDiscountType == 2) {
+                        //    formSalesRequest.updateData('docDiscountAmt', docDiscountAmt)
+                        //}
+                        //formSalesRequest.updateData('docTotalAmtAfterTax', e.value - docDiscountAmt);
+                    }
                 },
                 label: {
                     visible: false,
@@ -753,16 +789,35 @@ $(function () {
                     dataSource: discountTypeStore,
                     displayExpr: 'text',
                     valueExpr: 'id',
+                    value: 0,
                     onValueChanged: function (e) {
-                        var docDiscountType = $('#frmSalesRequestDetails').data('dxForm').getEditor('docTotalLineAmt').option('value');
-                        var docDiscountPercb = $('#frmSalesRequestDetails').data('dxForm').getEditor('docDiscountPerc').option('value');
-                        var docTotalAmtAfterTax = $('#frmSalesRequestDetails').data('dxForm').getEditor('docTotalAmtAfterTax').option('value');
-                        if (e.value == 2) {
-                            frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountType * docDiscountPercb);
-                        }
-                        if (e.value == 3) {
-                            frmSalesRequestDetails.updateData('docDiscountAmt', docTotalAmtAfterTax * docDiscountPercb);
-                        }
+                        calculatorDocTotal()
+                        //var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
+                        //var docTotalLineAmt = formSalesRequest.getEditor('docTotalLineAmt').option('value');
+                        //var docDiscountPerc = formSalesRequest.getEditor('docDiscountPerc').option('value');
+                        //var docTotalLineAmtAfterTax = formSalesRequest.getEditor('docTotalLineAmtAfterTax').option('value');
+                        //var docDiscountAmt = 0;
+                        //if (e.value == 0) {
+                        //    docDiscountAmt = 0;
+                        //    frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountAmt);
+                        //    formSalesRequest.getEditor('docDiscountAmt').option('disabled', false);
+                        //    formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
+                        //    formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
+                        //}
+                        //if (e.value == 1) {
+                        //    docDiscountAmt = docTotalLineAmt * docDiscountPerc;
+                        //    frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountAmt);
+                        //    formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+                        //    formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
+                        //    formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
+                        //}
+                        //if (e.value == 2) {
+                        //    docDiscountAmt = docTotalLineAmtAfterTax * docDiscountPerc;
+                        //    frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountAmt);
+                        //    formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+                        //    formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
+                        //    formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
+                        //}
                     }
                 },
                 label: {
@@ -778,6 +833,7 @@ $(function () {
                 editorType: "dxNumberBox",
                 editorOptions: {
                     format: '#,##0.##',
+                    disabled: true
                 },
                 label: {
                     visible: false,
@@ -876,9 +932,15 @@ $(function () {
             frmSalesRequestDetails.updateData('docTotalLineAmt', sumLineAmt);
             frmSalesRequestDetails.updateData('docTotalLineAmtAfterTax', sumLineAmtAfterTax);
         },
+        onContentReady: function (e) {
+            var businessPartner = frmSalesRequestDetails.getEditor('businessPartnerId').option('value');
+            if (businessPartner == null) {
+                e.component.option("editing.allowAdding", false)
+            }
+        },
         toolbar: {
             items: [
-                "groupPanel",
+                //"groupPanel",
                 "addRowButton",
                 //{
                 //    location: 'after',
@@ -1030,7 +1092,7 @@ $(function () {
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:VAT'),
                 dataField: 'vatId',
-                calculateDisplayValue: "vat.name",
+                //calculateDisplayValue: "vat.name",
                 lookup: {
                     dataSource() {
                         return {
@@ -1535,4 +1597,62 @@ $(function () {
     //LoadData();
 
     initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestDetails');
+
+    function calculatorDocTotal() {
+        var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
+        var docTotalLineDiscountAmt = formSalesRequest.getEditor('docTotalLineDiscountAmt').option('value');
+        var docTotalLineAmt = formSalesRequest.getEditor('docTotalLineAmt').option('value');
+        var docTotalLineAmtAfterTax = formSalesRequest.getEditor('docTotalLineAmtAfterTax').option('value');
+        var docDiscountType = formSalesRequest.getEditor('docDiscountType').option('value');
+        var docDiscountPerc = (formSalesRequest.getEditor('docDiscountPerc').option('value')) / 100;
+        var docDiscountAmt = formSalesRequest.getEditor('docDiscountAmt').option('value');
+        if (docDiscountType == 0) {
+            formSalesRequest.updateData('docDiscountAmt', 0);
+            formSalesRequest.getEditor('docDiscountAmt').option('disabled', false);
+            formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
+            formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
+        }
+        if (docDiscountType == 1) {
+            var _docDiscountAmt = docTotalLineAmt * docDiscountPerc;
+            frmSalesRequestDetails.updateData('docDiscountAmt', _docDiscountAmt);
+            formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+            formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
+            formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
+        }
+        if (docDiscountType == 2) {
+            var _docDiscountAmt = docTotalLineAmtAfterTax * docDiscountPerc;
+            frmSalesRequestDetails.updateData('docDiscountAmt', _docDiscountAmt);
+            formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+            formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
+            formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
+        }
+
+        //var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
+        //var docTotalLineAmt = formSalesRequest.getEditor('docTotalLineAmt').option('value');
+        //var docDiscountPerc = formSalesRequest.getEditor('docDiscountPerc').option('value');
+        //var docTotalLineAmtAfterTax = formSalesRequest.getEditor('docTotalLineAmtAfterTax').option('value');
+        //var docDiscountAmt = 0;
+        //if (e.value == 0) {
+        //    docDiscountAmt = 0;
+        //    frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountAmt);
+        //    formSalesRequest.getEditor('docDiscountAmt').option('disabled', false);
+        //    formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
+        //    formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
+        //}
+        //if (e.value == 1) {
+        //    docDiscountAmt = docTotalLineAmt * docDiscountPerc;
+        //    frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountAmt);
+        //    formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+        //    formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
+        //    formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
+        //}
+        //if (e.value == 2) {
+        //    docDiscountAmt = docTotalLineAmtAfterTax * docDiscountPerc;
+        //    frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountAmt);
+        //    formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+        //    formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
+        //    formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
+        //}
+
+    }
 });

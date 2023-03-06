@@ -321,7 +321,7 @@
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:Company'),
                 dataField: 'companyId',
-                calculateDisplayValue: "name",
+                //calculateDisplayValue: "name",
                 lookup: {
                     dataSource() {
                         return {
