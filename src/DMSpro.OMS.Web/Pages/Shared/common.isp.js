@@ -312,9 +312,14 @@ function initChooseItemsPopup(dxDataGrid) {
         ],
         onSelectionChanged: function (e) {
             var selectedRowsData = e.component.getSelectedRowsData();
-            $('#numSelectedItems').text(`Selected ${selectedRowsData.length} items`);
-        }
-
+            $('#numSelectedItems').text(l('Popup.Title.SelectedItems').replace('{0}', selectedRowsData.length));
+        },
+        onInitialized: function (e) {
+            console.log(2)
+        },
+        onContentReady: function (e) {
+            console.log(3)
+        },
     }).dxDataGrid("instance");
 
     const popupItems = $('#popupItems').dxPopup({
@@ -322,7 +327,7 @@ function initChooseItemsPopup(dxDataGrid) {
         height: 500,
         container: '.panel-container',
         showTitle: true,
-        title: 'Choose items',
+        title: l('Popup.Title.ChooseItems'),
         visible: false,
         dragEnabled: true,
         hideOnOutsideClick: false,
@@ -338,9 +343,10 @@ function initChooseItemsPopup(dxDataGrid) {
             $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
         },
         onShown: function (e) {
-            var selectedRowsData = $('#dgItems').data('dxDataGrid').getSelectedRowsData();
-            $('#numSelectedItems').text(`Selected ${selectedRowsData.length} items`);
-
+            var dgItems = $('#dgItems').data('dxDataGrid');
+            if (!dgItems) return;
+            var selectedRowsData = dgItems.getSelectedRowsData();
+            $('#numSelectedItems').text(l('Popup.Title.SelectedItems').replace('{0}', selectedRowsData.length));
             initImportPopup('api/mdm-service/items', 'Items_Template', 'dgItems');
         },
         onResize: function (e) {
@@ -350,7 +356,7 @@ function initChooseItemsPopup(dxDataGrid) {
         toolbarItems: [{
             widget: 'dxButton',
             toolbar: 'bottom',
-            location: 'before',
+            location: 'after',
             options: {
                 icon: 'fa fa-check hvr-icon',
                 text: 'Submit',
@@ -390,3 +396,7 @@ function initChooseItemsPopup(dxDataGrid) {
     }).dxPopup('instance');
 
 }
+
+$(function () {
+    initImportPopup('api/mdm-service/companies', 'Items_Template', 'dgItems');
+});

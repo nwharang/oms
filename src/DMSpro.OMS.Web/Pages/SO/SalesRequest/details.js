@@ -846,77 +846,11 @@ $(function () {
         ]
     }).dxForm('instance');
 
-    const dgSalesRequestDetails = $('#dgSalesRequestDetails').dxDataGrid({
+    const dgSalesRequestDetails = $('#dgSalesRequestDetails').dxDataGrid(
+        jQuery.extend(dxDataGridConfiguration,{
         dataSource: SalesRequestDetailsModel,
         keyExpr: 'id',
-        remoteOperations: false,
-        cacheEnabled: true,
-        export: {
-            enabled: true,
-            // allowExportSelectedData: true,
-        },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('SalesRequestDetails');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'SalesRequestDetails.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
-        showRowLines: true,
-        showBorders: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: true,
-        allowColumnResizing: true,
-        columnResizingMode: 'widget',
-        columnMinWidth: 50,
-        columnAutoWidth: true,
-        columnChooser: {
-            enabled: true,
-            mode: "select"
-        },
-        columnFixing: {
-            enabled: true,
-        },
-        filterRow: {
-            visible: true,
-        },
-        groupPanel: {
-            visible: true,
-        },
-        headerFilter: {
-            visible: true,
-        },
-        rowAlternationEnabled: true,
-        searchPanel: {
-            visible: true
-        },
-        //scrolling: {
-        //    mode: 'standard'
-        //},
-        stateStoring: { //save state in localStorage
-            //enabled: true,
-            //type: 'localStorage',
-            //storageKey: 'dgSalesRequestDetails',
-        },
-        paging: {
-            enabled: true,
-            pageSize: pageSize
-        },
-        pager: {
-            visible: true,
-            showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
-            showInfo: true,
-            showNavigationButtons: true
-        },
+        remoteOperations: false, 
         onInitNewRow: function (e) {
             e.data.qty = 1;
             e.data.discountAmt = 0;
@@ -1378,174 +1312,176 @@ $(function () {
                 }
             ]
         }
-    }).dxDataGrid("instance");
+    })).dxDataGrid("instance");
 
-    const dgItems = $('#dgItems').dxDataGrid({
-        dataSource: itemStore,
-        remoteOperations: true,
-        showColumnLines: true,
-        showRowLines: false,
-        rowAlternationEnabled: true,
-        showBorders: false,
-        export: {
-            enabled: false,
-        },
-        allowColumnReordering: true,
-        allowColumnResizing: true,
-        columnResizingMode: 'widget',
-        columnMinWidth: 50,
-        columnAutoWidth: true,
-        columnChooser: {
-            enabled: true,
-            allowSearch: true,
-        },
-        columnFixing: {
-            enabled: true,
-        },
-        filterRow: {
-            visible: true,
-        },
-        groupPanel: {
-            visible: true,
-        },
-        headerFilter: {
-            visible: true,
-        },
-        searchPanel: {
-            visible: true
-        },
-        paging: {
-            enabled: true,
-            pageSize: pageSize
-        },
-        pager: {
-            visible: true,
-            showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
-            showInfo: true,
-            showNavigationButtons: true
-        },
-        editing: {
-            mode: 'cell',
-            allowUpdating: false,
-        },
-        selection: {
-            mode: 'multiple',
-        },
-        toolbar: {
-            items: [
-                "columnChooserButton",
-                "searchPanel",
-            ],
-        },
-        columns: [
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
-                dataField: 'qty',
-                width: 100,
-                dataType: 'number',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .dxTextBox({
-                            value: options.value
-                        })
-                        .appendTo(container);
-                }
-            },
-            {
-                dataField: 'code',
-                caption: l("EntityFieldName:MDMService:Item:Code"),
-                dataType: 'string',
-                allowEditing: false
-            },
-            {
-                dataField: 'name',
-                caption: l("EntityFieldName:MDMService:Item:Name"),
-                dataType: 'string',
-                allowEditing: false
-            },
-            {
-                dataField: 'inventory',
-                caption: l("Inventory"),
-                dataType: 'number',
-                width: 100,
-                allowEditing: false
-            },
-            {
-                dataField: 'id',
-                visible: false
-            },
-            {
-                dataField: 'salesUOMId',
-                visible: false
-            },
-            {
-                dataField: 'uomGroupId',
-                visible: false
-            },
-        ],
-    }).dxDataGrid("instance");
+    initChooseItemsPopup(dgSalesRequestDetails);
 
-    const popupItems = $('#popupItems').dxPopup({
-        width: "100vh",
-        height: 500,
-        container: '.panel-container',
-        showTitle: true,
-        title: 'Choose items',
-        visible: false,
-        dragEnabled: true,
-        hideOnOutsideClick: false,
-        showCloseButton: true,
-        resizeEnabled: true,
-        position: {
-            at: 'center',
-            my: 'center',
-            collision: 'fit',
-        },
-        onShowing: function (e) {
-            var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
-            $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
-        },
-        onResize: function (e) {
-            var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
-            $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
-        },
-        toolbarItems: [{
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'after',
-            options: {
-                icon: 'fa fa-check hvr-icon',
-                text: 'Submit',
-                onClick() {
-                    var selectedItems = dgItems.getSelectedRowsData();
-                    if (selectedItems.length > 0) {
-                        selectedItems.forEach(u => {
-                            SalesRequestDetailsModel.unshift({
-                                id: u.id,
-                                itemId: u.id,
-                                uomId: u.salesUOMId,
-                                qty: u.qty
-                            });
-                        });
+    //const dgItems = $('#dgItems').dxDataGrid({
+    //    dataSource: itemStore,
+    //    remoteOperations: true,
+    //    showColumnLines: true,
+    //    showRowLines: false,
+    //    rowAlternationEnabled: true,
+    //    showBorders: false,
+    //    export: {
+    //        enabled: false,
+    //    },
+    //    allowColumnReordering: true,
+    //    allowColumnResizing: true,
+    //    columnResizingMode: 'widget',
+    //    columnMinWidth: 50,
+    //    columnAutoWidth: true,
+    //    columnChooser: {
+    //        enabled: true,
+    //        allowSearch: true,
+    //    },
+    //    columnFixing: {
+    //        enabled: true,
+    //    },
+    //    filterRow: {
+    //        visible: true,
+    //    },
+    //    groupPanel: {
+    //        visible: true,
+    //    },
+    //    headerFilter: {
+    //        visible: true,
+    //    },
+    //    searchPanel: {
+    //        visible: true
+    //    },
+    //    paging: {
+    //        enabled: true,
+    //        pageSize: pageSize
+    //    },
+    //    pager: {
+    //        visible: true,
+    //        showPageSizeSelector: true,
+    //        allowedPageSizes: allowedPageSizes,
+    //        showInfo: true,
+    //        showNavigationButtons: true
+    //    },
+    //    editing: {
+    //        mode: 'cell',
+    //        allowUpdating: false,
+    //    },
+    //    selection: {
+    //        mode: 'multiple',
+    //    },
+    //    toolbar: {
+    //        items: [
+    //            "columnChooserButton",
+    //            "searchPanel",
+    //        ],
+    //    },
+    //    columns: [
+    //        {
+    //            caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
+    //            dataField: 'qty',
+    //            width: 100,
+    //            dataType: 'number',
+    //            cellTemplate(container, options) {
+    //                $('<div>')
+    //                    .dxTextBox({
+    //                        value: options.value
+    //                    })
+    //                    .appendTo(container);
+    //            }
+    //        },
+    //        {
+    //            dataField: 'code',
+    //            caption: l("EntityFieldName:MDMService:Item:Code"),
+    //            dataType: 'string',
+    //            allowEditing: false
+    //        },
+    //        {
+    //            dataField: 'name',
+    //            caption: l("EntityFieldName:MDMService:Item:Name"),
+    //            dataType: 'string',
+    //            allowEditing: false
+    //        },
+    //        {
+    //            dataField: 'inventory',
+    //            caption: l("Inventory"),
+    //            dataType: 'number',
+    //            width: 100,
+    //            allowEditing: false
+    //        },
+    //        {
+    //            dataField: 'id',
+    //            visible: false
+    //        },
+    //        {
+    //            dataField: 'salesUOMId',
+    //            visible: false
+    //        },
+    //        {
+    //            dataField: 'uomGroupId',
+    //            visible: false
+    //        },
+    //    ],
+    //}).dxDataGrid("instance");
 
-                        dgSalesRequestDetails.refresh();
-                    }
-                    popupItems.hide();
-                },
-            },
-        }, {
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'after',
-            options: {
-                text: 'Cancel',
-                onClick() {
-                    popupItems.hide();
-                },
-            },
-        }],
-    }).dxPopup('instance');
+    //const popupItems = $('#popupItems').dxPopup({
+    //    width: "100vh",
+    //    height: 500,
+    //    container: '.panel-container',
+    //    showTitle: true,
+    //    title: 'Choose items',
+    //    visible: false,
+    //    dragEnabled: true,
+    //    hideOnOutsideClick: false,
+    //    showCloseButton: true,
+    //    resizeEnabled: true,
+    //    position: {
+    //        at: 'center',
+    //        my: 'center',
+    //        collision: 'fit',
+    //    },
+    //    onShowing: function (e) {
+    //        var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
+    //        $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
+    //    },
+    //    onResize: function (e) {
+    //        var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
+    //        $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
+    //    },
+    //    toolbarItems: [{
+    //        widget: 'dxButton',
+    //        toolbar: 'bottom',
+    //        location: 'after',
+    //        options: {
+    //            icon: 'fa fa-check hvr-icon',
+    //            text: 'Submit',
+    //            onClick() {
+    //                var selectedItems = dgItems.getSelectedRowsData();
+    //                if (selectedItems.length > 0) {
+    //                    selectedItems.forEach(u => {
+    //                        SalesRequestDetailsModel.unshift({
+    //                            id: u.id,
+    //                            itemId: u.id,
+    //                            uomId: u.salesUOMId,
+    //                            qty: u.qty
+    //                        });
+    //                    });
+
+    //                    dgSalesRequestDetails.refresh();
+    //                }
+    //                popupItems.hide();
+    //            },
+    //        },
+    //    }, {
+    //        widget: 'dxButton',
+    //        toolbar: 'bottom',
+    //        location: 'after',
+    //        options: {
+    //            text: 'Cancel',
+    //            onClick() {
+    //                popupItems.hide();
+    //            },
+    //        },
+    //    }],
+    //}).dxPopup('instance');
 
     /****button*****/
     $("#CloseButton").click(function (e) {
