@@ -4,115 +4,8 @@
 
     var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
-    var cusAttachService = window.dMSpro.oMS.mdmService.controllers.customerAttachments.customerAttachment;
-    var cusContactService = window.dMSpro.oMS.mdmService.controllers.customerContacts.customerContact;
-    var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
-    var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
     var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
     var cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
-    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
-
-    var pricelistLookup = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            priceListService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            priceListService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
-
-    var systemDataLookup = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = { filter: JSON.stringify(['code', '=', 'MD04']) };
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            systemDataService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            systemDataService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
-
-    //var cusAttrLookup = new DevExpress.data.CustomStore({
-    //    key: 'id',
-    //    load(loadOptions) {
-    //        const deferred = $.Deferred();
-    //        const args = {};
-    //        requestOptions.forEach((i) => {
-    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-    //                args[i] = JSON.stringify(loadOptions[i]);
-    //            }
-    //        });
-
-    //        cusAttributeValueService.getListDevextremes(args)
-    //            .done(result => {
-    //                deferred.resolve(result.data, {
-    //                    totalCount: result.totalCount,
-    //                    summary: result.summary,
-    //                    groupCount: result.groupCount,
-    //                });
-    //            });
-
-    //        return deferred.promise();
-    //    },
-    //    byKey: function (key) {
-    //        if (key == 0) return null;
-
-    //        var d = new $.Deferred();
-    //        cusAttributeValueService.get(key)
-    //            .done(data => {
-    //                d.resolve(data);
-    //            });
-    //        return d.promise();
-    //    }
-    //});
 
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
@@ -185,81 +78,6 @@
             return customerService.delete(key);
         }
     });
-    var cusAttachStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            args.filter = JSON.stringify(['customerId', '=', cusProfile.id])
-
-            cusAttachService.getListDevextremes(args)
-                .done(result => {
-                    //console.log('data CusAttachments:', result)
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            return key == 0 ? cusAttachService.get(key) : null;
-        },
-        insert(values) {
-            return cusAttachService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return cusAttachService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return cusAttachService.delete(key);
-        }
-    });
-
-    var cusContactStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            args.filter = JSON.stringify(['customerId', '=', cusProfile.id])
-
-            cusContactService.getListDevextremes(args)
-                .done(result => {
-                    //console.log('data cusContactService:', result)
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            return key == 0 ? cusContactService.get(key) : null;
-        },
-        insert(values) {
-            return cusContactService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return cusContactService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return cusContactService.delete(key);
-        }
-    });
 
     var getCusAttrValue = new DevExpress.data.CustomStore({
         key: 'id',
@@ -282,177 +100,10 @@
         }
     });
 
-    var companyData = new DevExpress.data.CustomStore({
-        key: 'id',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            companyService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        }
-    });
-
-
-    var files = [];
-    var url = `${abp.appPath}api/mdm-service/customers/insert-from-excel`;
-
-    const popupContentTemplate = function () {
-        
-        const content = $('<div />');
-        content.append(
-            $('<div>').dxSelectBox({
-                dataSource: [
-                    { name: l('Insert from Excel'), value: 'I' },
-                    { name: l('Update from Excel'), value: 'U' },
-                ],
-                valueExpr: 'value',
-                displayExpr: 'name',
-                value: 'I',
-                onValueChanged(e) {
-                    if (e.value == 'I') {
-                        url = `${abp.appPath}api/mdm-service/companies/insert-from-excel`;
-                    } else url = `${abp.appPath}api/mdm-service/companies/update-from-excel`
-                },
-            })); 
-        content.append(
-            $('<div>').dxFileUploader({
-                selectButtonText: l('Select a file'),
-                icon: 'import',
-                //labelText: '',
-                multiple: false,
-                uploadMode: 'useForm',
-                allowedFileExtensions: ['.xlsx', '.xls'],
-                onValueChanged(e) {
-                    files = e.value;
-                }
-            })); 
-        return content;
-    };
-
-    const popup_m = $('#popup').dxPopup({
-        width: 400,
-        height: 300,
-        //container: '#import-excel',
-        showTitle: true,
-        title: l('Import Excel'),
-        visible: false,
-        dragEnabled: true,
-        hideOnOutsideClick: true,
-        showCloseButton: true,
-        position: {
-            my: 'top',
-            at: 'center',
-            //collision: 'fit',
-        },
-        toolbarItems: [{
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'before',
-            options: {
-                icon: 'download',
-                text: l('Download Template'),
-                onClick() {
-                    const url = '/api/mdm-service/companies/get-excel-template';
-                    fetch(url)
-                        // Retrieve its body as ReadableStream
-                    .then((response) => {
-                        console.log(response);
-                        const reader = response.body.getReader();
-                        console.log(reader);
-                        return new ReadableStream({
-                            start(controller) {
-                                return pump();
-                                function pump() {
-                                    return reader.read().then(({ done, value }) => {
-                                        // When no more data needs to be consumed, close the stream
-                                        if (done) {
-                                            controller.close();
-                                            return;
-                                        }
-                                        // Enqueue the next data chunk into our target stream
-                                        controller.enqueue(value);
-                                        return pump();
-                                        });
-                                    }
-                                }
-                                })
-                            })
-                            // Create a new response out of the stream
-                            .then((stream) => new Response(stream))
-                            // Create an object URL for the response
-                            .then((response) => response.blob())
-                            .then((blob) => URL.createObjectURL(blob))
-                            .then((href) => {
-                                const a = document.createElement("a");
-                                document.body.appendChild(a);
-                                a.style = "display: none";
-                                a.href = href;
-                                a.download = 'Customer_Template.xlsx';
-                                a.click();
-
-                            });
-                           
-                                },
-            },
-        }, {
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'after',
-            options: {
-                icon: 'upload',
-                text: l('Import'),
-                onClick(e) {
-                    if (files.length > 0) {
-                        var formData = new FormData();
-                        formData.append("file", files[0]);
-
-                        $.ajax({
-                            type: "POST",
-                            url: url,
-                            async: true,
-                            data: formData,
-                            cache: false,
-                            contentType: false,
-                            processData: false,
-                            //timeout: 60000,
-                            success: function (data) {
-                                popup.hide();
-                                gridCompanies.refresh();
-                            },
-                            error: function (msg) {
-                                // handle error
-                                console.log(msg.responseText.error);
-                            },
-                            
-                        });
-                        
-                    }
-                },
-            },
-        }, 
-        ],
-    }).dxPopup('instance');
-    
-
     var cusProfile = {};
 
     var gridCustomers = $('#dgCustomers').dxDataGrid({
         dataSource: customStore,
-        keyExpr: "id",
         editing: {
             mode: "popup",
             allowAdding: abp.auth.isGranted('MdmService.Customers.Create'),
@@ -1763,6 +1414,14 @@
                 dataField: 'isCompany',
                 caption: l("IsCompany"),
                 dataType: 'boolean',
+                width: 110,
+                alignment: 'center',
+                dataType: 'boolean',
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                        .appendTo(container);
+                },
             },
             {
                 dataField: 'creditLimit',
@@ -1775,31 +1434,31 @@
                 caption: l("PaymentTerm"),
                 dataType: 'string',
                 visible: false,
-                lookup: {
-                    dataSource: {
-                        store: systemDataLookup,
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    },
-                    valueExpr: "id",
-                    displayExpr: function (e) {
-                        return e.code + ' - ' + e.valueCode
-                    }
-                }
+                //lookup: {
+                //    dataSource: {
+                //        store: systemDataLookup,
+                //        paginate: true,
+                //        pageSize: pageSizeForLookup
+                //    },
+                //    valueExpr: "id",
+                //    displayExpr: function (e) {
+                //        return e.code + ' - ' + e.valueCode
+                //    }
+                //}
             },
             {
                 dataField: 'linkedCompanyId',
                 caption: l("LinkedCompany"),
                 //dataType: 'string',
-                lookup: {
-                    dataSource: {
-                        store: companyData,
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    },
-                    valueExpr: "id",
-                    displayExpr: "code"
-                },
+                //lookup: {
+                //    dataSource: {
+                //        store: companyData,
+                //        paginate: true,
+                //        pageSize: pageSizeForLookup
+                //    },
+                //    valueExpr: "id",
+                //    displayExpr: "code"
+                //},
                 visible: false
             },
             {
@@ -1820,15 +1479,15 @@
                 dataType: 'string',
                 visible: false,
                 validationRules: [{ type: "required" }],
-                lookup: {
-                    dataSource: {
-                        store: pricelistLookup,
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    },
-                    valueExpr: "id",
-                    displayExpr: "name"
-                }
+                //lookup: {
+                //    dataSource: {
+                //        store: pricelistLookup,
+                //        paginate: true,
+                //        pageSize: pageSizeForLookup
+                //    },
+                //    valueExpr: "id",
+                //    displayExpr: "code"
+                //}
             },
             {
                 dataField: "geoMaster0Id",
@@ -2187,17 +1846,6 @@
         },
     }).dxDataGrid("instance");
 
-    var genderStore = [
-        {
-            id: 1,
-            displayName: l1("Male")
-        },
-        {
-            id: 0,
-            displayName: l1("Female")
-        }
-    ]
-
     const dsAttrValue = function (n) {
         return {
             store: getCusAttrValue,
@@ -2241,8 +1889,4 @@
             }
         }
     }
-});
-
-$(window).focus(function () {
-    $('#dgCustomers').data('dxDataGrid').refresh();
 });

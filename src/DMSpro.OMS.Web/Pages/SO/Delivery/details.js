@@ -604,7 +604,7 @@ $(function () {
                 }]
             }
         ]
-    }).dxForm('instance');;
+    }).dxForm('instance');
 
     var dgDeliveries = $('#dgDeliveries').dxDataGrid(jQuery.extend(dxDataGridConfiguration, {
         dataSource: DeliveryDetailData,
