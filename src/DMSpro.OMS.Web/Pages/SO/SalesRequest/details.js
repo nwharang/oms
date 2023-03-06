@@ -591,6 +591,7 @@ $(function () {
                 editorType: "dxNumberBox",
                 editorOptions: {
                     format: '#,##0.##',
+                    disabled: true
                 },
                 label: {
                     visible: false,
@@ -648,6 +649,7 @@ $(function () {
                 editorType: "dxNumberBox",
                 editorOptions: {
                     format: '#,##0.##',
+                    disabled: true
                 },
                 label: {
                     visible: false,
@@ -703,6 +705,7 @@ $(function () {
                 editorType: "dxNumberBox",
                 editorOptions: {
                     format: '#,##0.##',
+                    disabled: true
                 },
                 label: {
                     visible: false,
@@ -749,7 +752,18 @@ $(function () {
                 editorOptions: {
                     dataSource: discountTypeStore,
                     displayExpr: 'text',
-                    valueExpr: 'id'
+                    valueExpr: 'id',
+                    onValueChanged: function (e) {
+                        var docDiscountType = $('#frmSalesRequestDetails').data('dxForm').getEditor('docTotalLineAmt').option('value');
+                        var docDiscountPercb = $('#frmSalesRequestDetails').data('dxForm').getEditor('docDiscountPerc').option('value');
+                        var docTotalAmtAfterTax = $('#frmSalesRequestDetails').data('dxForm').getEditor('docTotalAmtAfterTax').option('value');
+                        if (e.value == 2) {
+                            frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountType * docDiscountPercb);
+                        }
+                        if (e.value == 3) {
+                            frmSalesRequestDetails.updateData('docDiscountAmt', docTotalAmtAfterTax * docDiscountPercb);
+                        }
+                    }
                 },
                 label: {
                     visible: false,
@@ -772,7 +786,7 @@ $(function () {
                 validationRules: [{
                     type: 'required',
                 }]
-            },
+            }
         ]
     }).dxForm('instance');
 
@@ -853,6 +867,14 @@ $(function () {
             e.data.discountPerc = 0;
             e.data.discountType = 0;
             e.data.transactionType = 0;
+        },
+        onSaved: function (e) {
+            var sumDiscountAmt = dgSalesRequestDetails.getTotalSummaryValue('discountAmt');
+            var sumLineAmt = dgSalesRequestDetails.getTotalSummaryValue('lineAmt');
+            var sumLineAmtAfterTax = dgSalesRequestDetails.getTotalSummaryValue('lineAmtAfterTax');
+            frmSalesRequestDetails.updateData('docTotalLineDiscountAmt', sumDiscountAmt);
+            frmSalesRequestDetails.updateData('docTotalLineAmt', sumLineAmt);
+            frmSalesRequestDetails.updateData('docTotalLineAmtAfterTax', sumLineAmtAfterTax);
         },
         toolbar: {
             items: [

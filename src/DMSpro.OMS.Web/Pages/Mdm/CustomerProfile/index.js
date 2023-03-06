@@ -4,115 +4,8 @@
 
     var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
-    var cusAttachService = window.dMSpro.oMS.mdmService.controllers.customerAttachments.customerAttachment;
-    var cusContactService = window.dMSpro.oMS.mdmService.controllers.customerContacts.customerContact;
-    var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
-    var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
     var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
     var cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
-    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
-
-    var pricelistLookup = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            priceListService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            priceListService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
-
-    var systemDataLookup = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = { filter: JSON.stringify(['code', '=', 'MD04']) };
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            systemDataService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            systemDataService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
-
-    //var cusAttrLookup = new DevExpress.data.CustomStore({
-    //    key: 'id',
-    //    load(loadOptions) {
-    //        const deferred = $.Deferred();
-    //        const args = {};
-    //        requestOptions.forEach((i) => {
-    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-    //                args[i] = JSON.stringify(loadOptions[i]);
-    //            }
-    //        });
-
-    //        cusAttributeValueService.getListDevextremes(args)
-    //            .done(result => {
-    //                deferred.resolve(result.data, {
-    //                    totalCount: result.totalCount,
-    //                    summary: result.summary,
-    //                    groupCount: result.groupCount,
-    //                });
-    //            });
-
-    //        return deferred.promise();
-    //    },
-    //    byKey: function (key) {
-    //        if (key == 0) return null;
-
-    //        var d = new $.Deferred();
-    //        cusAttributeValueService.get(key)
-    //            .done(data => {
-    //                d.resolve(data);
-    //            });
-    //        return d.promise();
-    //    }
-    //});
 
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
@@ -185,81 +78,6 @@
             return customerService.delete(key);
         }
     });
-    var cusAttachStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            args.filter = JSON.stringify(['customerId', '=', cusProfile.id])
-
-            cusAttachService.getListDevextremes(args)
-                .done(result => {
-                    //console.log('data CusAttachments:', result)
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            return key == 0 ? cusAttachService.get(key) : null;
-        },
-        insert(values) {
-            return cusAttachService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return cusAttachService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return cusAttachService.delete(key);
-        }
-    });
-
-    var cusContactStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            args.filter = JSON.stringify(['customerId', '=', cusProfile.id])
-
-            cusContactService.getListDevextremes(args)
-                .done(result => {
-                    //console.log('data cusContactService:', result)
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            return key == 0 ? cusContactService.get(key) : null;
-        },
-        insert(values) {
-            return cusContactService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return cusContactService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return cusContactService.delete(key);
-        }
-    });
 
     var getCusAttrValue = new DevExpress.data.CustomStore({
         key: 'id',
@@ -282,35 +100,10 @@
         }
     });
 
-    var companyData = new DevExpress.data.CustomStore({
-        key: 'id',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            companyService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        }
-    });
-
     var cusProfile = {};
 
     var gridCustomers = $('#dgCustomers').dxDataGrid({
         dataSource: customStore,
-        keyExpr: "id",
         editing: {
             mode: "popup",
             allowAdding: abp.auth.isGranted('MdmService.Customers.Create'),
@@ -1609,6 +1402,14 @@
                 dataField: 'isCompany',
                 caption: l("IsCompany"),
                 dataType: 'boolean',
+                width: 110,
+                alignment: 'center',
+                dataType: 'boolean',
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                        .appendTo(container);
+                },
             },
             {
                 dataField: 'creditLimit',
@@ -1621,31 +1422,31 @@
                 caption: l("PaymentTerm"),
                 dataType: 'string',
                 visible: false,
-                lookup: {
-                    dataSource: {
-                        store: systemDataLookup,
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    },
-                    valueExpr: "id",
-                    displayExpr: function (e) {
-                        return e.code + ' - ' + e.valueCode
-                    }
-                }
+                //lookup: {
+                //    dataSource: {
+                //        store: systemDataLookup,
+                //        paginate: true,
+                //        pageSize: pageSizeForLookup
+                //    },
+                //    valueExpr: "id",
+                //    displayExpr: function (e) {
+                //        return e.code + ' - ' + e.valueCode
+                //    }
+                //}
             },
             {
                 dataField: 'linkedCompanyId',
                 caption: l("LinkedCompany"),
                 //dataType: 'string',
-                lookup: {
-                    dataSource: {
-                        store: companyData,
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    },
-                    valueExpr: "id",
-                    displayExpr: "code"
-                },
+                //lookup: {
+                //    dataSource: {
+                //        store: companyData,
+                //        paginate: true,
+                //        pageSize: pageSizeForLookup
+                //    },
+                //    valueExpr: "id",
+                //    displayExpr: "code"
+                //},
                 visible: false
             },
             {
@@ -1666,15 +1467,15 @@
                 dataType: 'string',
                 visible: false,
                 validationRules: [{ type: "required" }],
-                lookup: {
-                    dataSource: {
-                        store: pricelistLookup,
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    },
-                    valueExpr: "id",
-                    displayExpr: "code"
-                }
+                //lookup: {
+                //    dataSource: {
+                //        store: pricelistLookup,
+                //        paginate: true,
+                //        pageSize: pageSizeForLookup
+                //    },
+                //    valueExpr: "id",
+                //    displayExpr: "code"
+                //}
             },
             {
                 dataField: "geoMaster0Id",
@@ -2028,17 +1829,6 @@
         ],
     }).dxDataGrid("instance");
 
-    var genderStore = [
-        {
-            id: 1,
-            displayName: l1("Male")
-        },
-        {
-            id: 0,
-            displayName: l1("Female")
-        }
-    ]
-
     const dsAttrValue = function (n) {
         return {
             store: getCusAttrValue,
@@ -2082,8 +1872,4 @@
             }
         }
     }
-});
-
-$(window).focus(function () {
-    $('#dgCustomers').data('dxDataGrid').refresh();
 });
