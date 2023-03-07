@@ -313,13 +313,7 @@ function initChooseItemsPopup(dxDataGrid) {
         onSelectionChanged: function (e) {
             var selectedRowsData = e.component.getSelectedRowsData();
             $('#numSelectedItems').text(l('Popup.Title.SelectedItems').replace('{0}', selectedRowsData.length));
-        },
-        onInitialized: function (e) {
-            console.log(2)
-        },
-        onContentReady: function (e) {
-            console.log(3)
-        },
+        }
     }).dxDataGrid("instance");
 
     const popupItems = $('#popupItems').dxPopup({
@@ -341,13 +335,6 @@ function initChooseItemsPopup(dxDataGrid) {
         onShowing: function (e) {
             var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
             $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
-        },
-        onShown: function (e) {
-            var dgItems = $('#dgItems').data('dxDataGrid');
-            if (!dgItems) return;
-            var selectedRowsData = dgItems.getSelectedRowsData();
-            $('#numSelectedItems').text(l('Popup.Title.SelectedItems').replace('{0}', selectedRowsData.length));
-            initImportPopup('api/mdm-service/items', 'Items_Template', 'dgItems');
         },
         onResize: function (e) {
             var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
@@ -398,5 +385,5 @@ function initChooseItemsPopup(dxDataGrid) {
 }
 
 $(function () {
-    initImportPopup('api/mdm-service/companies', 'Items_Template', 'dgItems');
+    initImportPopup('api/mdm-service/items', 'Items_Template', 'dgItems');
 });
