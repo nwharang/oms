@@ -4,7 +4,7 @@ class Common {
         let keyList = Object.keys(data);
         for (let i = 0; i < keyList.length; i++) {
             let aKey = keyList[i];
-            let aValue = object[aKey];
+            let aValue = data[aKey];
             let updateRequired = aValue["updateRequired"];
             if (updateRequired == "false") {
                 result[aKey] = this.loadFromStorage(aKey);
@@ -16,7 +16,7 @@ class Common {
         return result;
     };
 
-    static GetLastAPICallDates() {
+    static getLastAPICallDates() {
         let keyList = ["itemInfo", "customerInfo", "routeInfo", "vendorInfo",];
         let result = {};
         for (let i = 0; i < keyList.length; i++) {
@@ -45,5 +45,16 @@ class Common {
             return;
         }
         return localStorage.getItem(key);
+    };
+
+    static parseJSON(input) {
+        return new Promise(function (resolve, reject) {
+            try {
+                let jsonRes = JSON.parse(input);
+                resolve(jsonRes);
+            } catch (error) {
+                reject(error);
+            }
+        });
     };
 };
