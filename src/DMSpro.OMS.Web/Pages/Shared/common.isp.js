@@ -6,9 +6,9 @@ DevExpress.config({
 var dxDataGridConfiguration = {
     remoteOperations: true,
     showColumnLines: true,
-    showRowLines: false,
+    showRowLines: true,
     rowAlternationEnabled: true,
-    showBorders: false,
+    showBorders: true,
     export: {
         enabled: true,
     },
@@ -139,81 +139,13 @@ function initChooseItemsPopup(items) {
                 <div id="dgItems" ></div> 
             </div>`);
 
-    var dgItems = $('#dgItems').dxDataGrid({
-        dataSource: items,
-        remoteOperations: true,
-        showColumnLines: true,
-        showRowLines: false,
-        // rowAlternationEnabled: true,
-        showBorders: false,
-        export: {
-            enabled: true,
-        },
-        onExporting: function (e) {
-            if (e.format === 'xlsx') {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Items');
-                DevExpress.excelExporter.exportDataGrid({
-                    component: e.component,
-                    worksheet,
-                    autoFilterEnabled: true,
-                }).then(() => {
-                    workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Items.xlsx');
-                    });
-                });
-                e.cancel = true;
-            }
-            else if (e.format === 'pdf') {
-                const doc = new jsPDF();
-                DevExpress.pdfExporter.exportDataGrid({
-                    jsPDFDocument: doc,
-                    component: e.component,
-                }).then(() => {
-                    doc.save('Items.pdf');
-                });
-            }
-        },
-        allowColumnReordering: true,
-        allowColumnResizing: true,
-        columnResizingMode: 'widget',
-        columnMinWidth: 50,
-        columnAutoWidth: true,
-        columnChooser: {
-            enabled: true,
-            mode: "select"
-        },
-        columnFixing: {
-            enabled: true,
-        },
-        filterRow: {
-            visible: true,
-        },
-        groupPanel: {
-            visible: true,
-        },
-        headerFilter: {
-            visible: true,
-        },
-        searchPanel: {
-            visible: true
-        },
+    var dgItems = $('#dgItems').dxDataGrid(jQuery.extend(dxDataGridConfiguration, {
+        dataSource: items, 
         stateStoring: { //save state in localStorage
             enabled: true,
             type: 'localStorage',
             storageKey: 'dgItems',
-        },
-        paging: {
-            enabled: true,
-            pageSize: pageSize
-        },
-        pager: {
-            visible: true,
-            showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
-            showInfo: true,
-            showNavigationButtons: true
-        },
+        }, 
         editing: {
             mode: 'cell',
             allowUpdating: false,
@@ -305,7 +237,7 @@ function initChooseItemsPopup(items) {
             var selectedRowsData = e.component.getSelectedRowsData();
             $('#numSelectedItems').text(l('Popup.Title.SelectedItems').replace('{0}', selectedRowsData.length));
         }
-    }).dxDataGrid("instance");
+    })).dxDataGrid("instance");
 
     const popupItems = $('#popupItems').dxPopup({
         width: "100vh",

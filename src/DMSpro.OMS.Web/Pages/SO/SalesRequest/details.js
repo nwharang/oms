@@ -533,7 +533,8 @@ var loadControl = function () {
                     lookup: {
                         dataSource: itemList,
                         displayExpr: "name",
-                        valueExpr: "id"
+                        valueExpr: "id",
+                        place
                     },
                     setCellValue: function (newData, value, currentData) {
                         var selectedItem = itemList.filter(i => i.id == value)[0];
@@ -567,7 +568,7 @@ var loadControl = function () {
                         //    });
                         //return d.promise();
                     },
-                    validationRules: [{ type: 'required' }],
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 200
                 },
                 {
@@ -595,7 +596,7 @@ var loadControl = function () {
                         displayExpr: "name",
                         valueExpr: "id"
                     },
-                    validationRules: [{ type: 'required' }],
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 200
                 },
                 {
@@ -615,7 +616,7 @@ var loadControl = function () {
                         newData.lineAmt = value * currentData.qty - currentData.discountAmt;
                         newData.lineAmtAfterTax = newData.priceAfterTax * currentData.qty - currentData.discountAmt;
                     },
-                    validationRules: [{ type: 'required' }],
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 150,
                 },
                 {
@@ -634,7 +635,7 @@ var loadControl = function () {
                         valueExpr: "id"
                     },
                     width: 150,
-                    validationRules: [{ type: 'required' }]
+                    validationRules: [{ type: 'required', message: '' }]
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:PriceAfterTax'),
@@ -647,7 +648,7 @@ var loadControl = function () {
                         type: "currency",
                         currency: "VND"
                     },
-                    validationRules: [{ type: 'required' }],
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 150,
                 },
                 {
@@ -661,7 +662,7 @@ var loadControl = function () {
                     value: 0,
                     validationRules: [
                         {
-                            type: 'required'
+                            type: 'required', message: ''
                         },
                         {
                             type: 'pattern',
@@ -752,7 +753,7 @@ var loadControl = function () {
                         type: "currency",
                         currency: "VND"
                     },
-                    validationRules: [{ type: 'required' }],
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 150
                 },
                 {
@@ -766,7 +767,7 @@ var loadControl = function () {
                         type: "currency",
                         currency: "VND"
                     },
-                    validationRules: [{ type: 'required' }],
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 150
                 },
                 {
@@ -780,7 +781,7 @@ var loadControl = function () {
                         type: "currency",
                         currency: "VND"
                     },
-                    validationRules: [{ type: 'required' }],
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 150
                 },
                 {
@@ -791,7 +792,7 @@ var loadControl = function () {
                         displayExpr: 'text',
                         valueExpr: 'id'
                     },
-                    validationRules: [{ type: 'required' }],
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 150
                 },
                 {
