@@ -600,6 +600,11 @@ var loadControl = function () {
                         displayExpr: "name",
                         valueExpr: "id"
                     },
+                    editorOptions: {
+                        onValueChanged: function (e) {
+                            //var dataRow = 
+                        }
+                    },
                     validationRules: [{ type: 'required' }],
                     width: 200
                 },
@@ -713,120 +718,120 @@ var loadControl = function () {
                 validationRules: [{ type: 'required' }],
                 width: 200
             },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Price'),
-                dataField: 'price',
-                dataType: 'number',
-                editorOptions: {
-                    format: '#,##0.##',
-                },
-                format: {
-                    type: "currency",
-                    currency: "VND"
-                },
-                setCellValue: function (newData, value, currentData) {
-                    newData.price = value;
-                    newData.priceAfterTax = value + (value * currentData.taxRate) / 100;
-                    newData.lineAmt = value * currentData.qty - currentData.discountAmt;
-                    newData.lineAmtAfterTax = newData.priceAfterTax * currentData.qty - currentData.discountAmt;
-                },
-                validationRules: [{ type: 'required' }],
-                width: 150,
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:VAT'),
-                dataField: 'vatId',
-                //calculateDisplayValue: "vat.name",
-                lookup: {
-                    dataSource() {
-                        return {
-                            store: vATStore,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    displayExpr: "name",
-                    valueExpr: "id"
-                },
-                width: 150,
-                validationRules: [{ type: 'required' }]
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:PriceAfterTax'),
-                dataField: 'priceAfterTax',
-                dataType: 'number',
-                editorOptions: {
-                    format: '#,##0.##',
-                },
-                format: {
-                    type: "currency",
-                    currency: "VND"
-                },
-                validationRules: [{ type: 'required' }],
-                width: 150,
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
-                dataField: 'qty',
-                dataType: 'number',
-                setCellValue: function (newData, value, currentData) {
-                    newData.qty = value;
-                    newData.lineAmt = value * currentData.price - currentData.discountAmt;
-                },
-                value: 0,
-                validationRules: [
-                    {
-                        type: 'required'
-                    },
-                    {
-                        type: 'pattern',
-                        message: 'Quantity can not be Negative!',
-                        pattern: /^\d*[1-9]\d*$/,
-                    }
-                ],
-                width: 150,
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:IsFree'),
-                dataField: 'isFree',
-                dataType: 'boolean',
-                width: 120
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Promotion'),
-                dataField: 'promotionId',
-                width: 150
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountType'),
-                dataField: 'discountType',
-                lookup: {
-                    dataSource: discountTypeStore,
-                    displayExpr: 'text',
-                    valueExpr: 'id'
-                },
-                setCellValue: function (newData, value, currentData) {
-                    newData.discountType = value;
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:Price'),
+            //    dataField: 'price',
+            //    dataType: 'number',
+            //    editorOptions: {
+            //        format: '#,##0.##',
+            //    },
+            //    format: {
+            //        type: "currency",
+            //        currency: "VND"
+            //    },
+            //    setCellValue: function (newData, value, currentData) {
+            //        newData.price = value;
+            //        newData.priceAfterTax = value + (value * currentData.taxRate) / 100;
+            //        newData.lineAmt = value * currentData.qty - currentData.discountAmt;
+            //        newData.lineAmtAfterTax = newData.priceAfterTax * currentData.qty - currentData.discountAmt;
+            //    },
+            //    validationRules: [{ type: 'required' }],
+            //    width: 150,
+            //},
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:VAT'),
+            //    dataField: 'vatId',
+            //    //calculateDisplayValue: "vat.name",
+            //    lookup: {
+            //        dataSource() {
+            //            return {
+            //                store: vATStore,
+            //                paginate: true,
+            //                pageSize: pageSizeForLookup
+            //            };
+            //        },
+            //        displayExpr: "name",
+            //        valueExpr: "id"
+            //    },
+            //    width: 150,
+            //    validationRules: [{ type: 'required' }]
+            //},
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:PriceAfterTax'),
+            //    dataField: 'priceAfterTax',
+            //    dataType: 'number',
+            //    editorOptions: {
+            //        format: '#,##0.##',
+            //    },
+            //    format: {
+            //        type: "currency",
+            //        currency: "VND"
+            //    },
+            //    validationRules: [{ type: 'required' }],
+            //    width: 150,
+            //},
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
+            //    dataField: 'qty',
+            //    dataType: 'number',
+            //    setCellValue: function (newData, value, currentData) {
+            //        newData.qty = value;
+            //        newData.lineAmt = value * currentData.price - currentData.discountAmt;
+            //    },
+            //    value: 0,
+            //    validationRules: [
+            //        {
+            //            type: 'required'
+            //        },
+            //        {
+            //            type: 'pattern',
+            //            message: 'Quantity can not be Negative!',
+            //            pattern: /^\d*[1-9]\d*$/,
+            //        }
+            //    ],
+            //    width: 150,
+            //},
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:IsFree'),
+            //    dataField: 'isFree',
+            //    dataType: 'boolean',
+            //    width: 120
+            //},
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:Promotion'),
+            //    dataField: 'promotionId',
+            //    width: 150
+            //},
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountType'),
+            //    dataField: 'discountType',
+            //    lookup: {
+            //        dataSource: discountTypeStore,
+            //        displayExpr: 'text',
+            //        valueExpr: 'id'
+            //    },
+            //    setCellValue: function (newData, value, currentData) {
+            //        newData.discountType = value;
 
-                        switch (value) {
-                            case 1:
-                                newData.discountAmt = currentData.price * currentData.discountPerc;
-                                newData.lineAmt = currentData.qty * currentData.price - newData.discountAmt;
-                                newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.discountAmt;
-                                break;
-                            case 2:
-                                newData.discountAmt = currentData.priceAfterTax * currentData.discountPerc;
-                                newData.lineAmt = currentData.qty * currentData.price - newData.discountAmt;
-                                newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.discountAmt;
-                                break;
-                            default:
-                                newData.discountPerc = 0;
-                                newData.discountAmt = 0;
-                        }
-                    },
-                    validationRules: [{ type: 'required' }],
-                    width: 200
-                },
+            //            switch (value) {
+            //                case 1:
+            //                    newData.discountAmt = currentData.price * currentData.discountPerc;
+            //                    newData.lineAmt = currentData.qty * currentData.price - newData.discountAmt;
+            //                    newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.discountAmt;
+            //                    break;
+            //                case 2:
+            //                    newData.discountAmt = currentData.priceAfterTax * currentData.discountPerc;
+            //                    newData.lineAmt = currentData.qty * currentData.price - newData.discountAmt;
+            //                    newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.discountAmt;
+            //                    break;
+            //                default:
+            //                    newData.discountPerc = 0;
+            //                    newData.discountAmt = 0;
+            //            }
+            //        },
+            //        validationRules: [{ type: 'required' }],
+            //        width: 200
+            //    },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountPerc'),
                     dataField: 'discountPerc',
