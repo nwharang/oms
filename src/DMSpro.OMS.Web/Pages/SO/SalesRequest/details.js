@@ -939,9 +939,6 @@ var loadControl = function () {
             }
 
             if (e.dataField === 'uomId') {
-                if (e.row.isEditing) {
-                    debugger
-                }
             }
         },
         editing: {
@@ -1012,24 +1009,28 @@ var loadControl = function () {
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:UOM'),
                 dataField: 'uomId',
-                //calculateDisplayValue: "name",
                 lookup: {
-                    //dataSource(options) {
-                    //    return {
-                    //        store: uOMGroupDetailStore,
-                    //        filter: [["uomGroup.id", "=", options.data != null ? options.data.uomGroupId : null]],
-                    //        paginate: true,
-                    //        pageSize: pageSizeForLookup
-                    //    };
-                    //},
-                    //displayExpr: "altUOM.name",
-                    //valueExpr: "altUOM.id"
                     dataSource(options) {
-                        return {
-                            store: uOMStore,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
+                        if (options.data != null) {
+                            var uomGroupId = options.data.uomGroupId;
+                            var uomGroup = uomGroupList.find(x => x = uomGroupId);
+                            var uOMListOfItem = [];
+                            uomGroup.forEach(x => {
+                                var uOM = uOMList.filter(y => y.id == x)[0];
+                                uOMListOfItem.push(uOM);
+                            })
+                            return {
+                                store: uOMListOfItem,
+                                paginate: true,
+                                pageSize: pageSizeForLookup
+                            };
+                        } else {
+                            return {
+                                store: uOMList,
+                                paginate: true,
+                                pageSize: pageSizeForLookup
+                            };
+                        }
                     },
                     displayExpr: "name",
                     valueExpr: "id"
