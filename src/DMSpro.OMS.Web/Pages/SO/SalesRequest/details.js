@@ -534,7 +534,7 @@ var loadControl = function () {
                         dataSource: itemList,
                         displayExpr: "name",
                         valueExpr: "id",
-                        place
+                        
                     },
                     setCellValue: function (newData, value, currentData) {
                         var selectedItem = itemList.filter(i => i.id == value)[0];
@@ -574,29 +574,33 @@ var loadControl = function () {
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:UOM'),
                     dataField: 'uomId',
-                    //calculateDisplayValue: "name",
                     lookup: {
-                        //dataSource(options) {
-                        //    return {
-                        //        store: uOMGroupDetailStore,
-                        //        filter: [["uomGroup.id", "=", options.data != null ? options.data.uomGroupId : null]],
-                        //        paginate: true,
-                        //        pageSize: pageSizeForLookup
-                        //    };
-                        //},
-                        //displayExpr: "altUOM.name",
-                        //valueExpr: "altUOM.id"
                         dataSource(options) {
-                            return {
-                                store: uOMStore,
-                                paginate: true,
-                                pageSize: pageSizeForLookup
-                            };
+                            if (options.data != null) {
+                                var uomGroupId = options.data.uomGroupId;
+                                var uomGroup = uomGroupList.find(x => x = uomGroupId);
+                                var uOMListOfItem = [];
+                                uomGroup.forEach(x => {
+                                    var uOM = uOMList.filter(y => y.id == x)[0];
+                                    uOMListOfItem.push(uOM);
+                                })
+                                return {
+                                    store: uOMListOfItem,
+                                    paginate: true,
+                                    pageSize: pageSizeForLookup
+                                };
+                            } else {
+                                return {
+                                    store: uOMList,
+                                    paginate: true,
+                                    pageSize: pageSizeForLookup
+                                };
+                            }
                         },
                         displayExpr: "name",
                         valueExpr: "id"
                     },
-                    validationRules: [{ type: 'required', message: '' }],
+                    validationRules: [{ type: 'required' }],
                     width: 200
                 },
                 {
@@ -705,38 +709,6 @@ var loadControl = function () {
                     //        );
                     //    });
                     //return d.promise();
-                },
-                validationRules: [{ type: 'required' }],
-                width: 200
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:UOM'),
-                dataField: 'uomId',
-                lookup: {
-                    dataSource(options) {
-                        if (options.data != null) {
-                            var uomGroupId = options.data.uomGroupId;
-                            var uomGroup = uomGroupList.find(x => x = uomGroupId);
-                            var uOMListOfItem = [];
-                            uomGroup.forEach(x => {
-                                var uOM = uOMList.filter(y => y.id == x)[0];
-                                uOMListOfItem.push(uOM);
-                            })
-                            return {
-                                store: uOMListOfItem,
-                                paginate: true,
-                                pageSize: pageSizeForLookup
-                            };
-                        } else {
-                            return {
-                                store: uOMList,
-                                paginate: true,
-                                pageSize: pageSizeForLookup
-                            };
-                        }
-                    },
-                    displayExpr: "name",
-                    valueExpr: "id"
                 },
                 validationRules: [{ type: 'required' }],
                 width: 200
