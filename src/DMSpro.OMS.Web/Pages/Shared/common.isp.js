@@ -74,13 +74,13 @@ var dxDataGridConfiguration = {
     },
     toolbar: {
         items: [
-            "groupPanel",
-            //"addRowButton",
+            //"groupPanel",
+            "addRowButton",
             {
                 location: 'after',
                 widget: 'dxButton',
                 options: {
-                    icon: "add",
+                    icon: "checklist",
                     onClick(e) {
                         var popup = $(`#popupItems`).data('dxPopup');
                         popup.show();
@@ -112,44 +112,13 @@ var dxDataGridConfiguration = {
     }
 };
 
-function initChooseItemsPopup(dxDataGrid) {
+function initChooseItemsPopup(items) {
     $('div.panel-container.show').append(`<div id="popupItems" style="display:none">
                 <div id="dgItems" ></div> 
             </div>`);
 
     $('#dgItems').dxDataGrid({
-        dataSource: new DevExpress.data.CustomStore({
-            key: 'id',
-            loadMode: 'raw',
-            cacheRawData: true,
-            load(loadOptions) {
-                const deferred = $.Deferred();
-                const args = {};
-
-                requestOptions.forEach((i) => {
-                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                        args[i] = JSON.stringify(loadOptions[i]);
-                    }
-                });
-
-                window.dMSpro.oMS.mdmService.controllers.items.item.getListDevextremes(args)
-                    .done(result => {
-
-                        result.data.forEach(u => {
-                            u.inventory = null;
-                            u.qty = 1;
-                        });
-
-                        deferred.resolve(result.data, {
-                            totalCount: result.totalCount,
-                            summary: result.summary,
-                            groupCount: result.groupCount,
-                        });
-                    });
-
-                return deferred.promise();
-            }
-        }),
+        dataSource: items,
         remoteOperations: true,
         showColumnLines: true,
         showRowLines: false,
@@ -275,8 +244,8 @@ function initChooseItemsPopup(dxDataGrid) {
         },
         columns: [
             {
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
                 dataField: 'qty',
-                caption: l("Qty"),
                 width: 100,
                 dataType: 'number',
                 cellTemplate(container, options) {
@@ -292,13 +261,13 @@ function initChooseItemsPopup(dxDataGrid) {
             },
             {
                 dataField: 'code',
-                caption: l("Item Code"),
+                caption: l("EntityFieldName:MDMService:Item:Code"),
                 dataType: 'string',
                 allowEditing: false
             },
             {
                 dataField: 'name',
-                caption: l("Item Name"),
+                caption: l("EntityFieldName:MDMService:Item:Name"),
                 dataType: 'string',
                 allowEditing: false
             },
@@ -308,7 +277,19 @@ function initChooseItemsPopup(dxDataGrid) {
                 dataType: 'number',
                 width: 100,
                 allowEditing: false
-            }
+            },
+            {
+                dataField: 'id',
+                visible: false
+            },
+            {
+                dataField: 'salesUOMId',
+                visible: false
+            },
+            {
+                dataField: 'uomGroupId',
+                visible: false
+            },
         ],
         onSelectionChanged: function (e) {
             var selectedRowsData = e.component.getSelectedRowsData();
@@ -355,18 +336,9 @@ function initChooseItemsPopup(dxDataGrid) {
                     //todo
                     var selectedItems = $('#dgItems').data('dxDataGrid').getSelectedRowsData();
                     if (selectedItems.length > 0) {
-                        selectedItems.forEach(u => {
-                            DeliveryDetailData.unshift({
-                                itemCode: u.code,
-                                itemName: u.name,
-                                qty: u.qty
-                            });
-                        });
-
-                        if (dxDataGrid)
-                            dxDataGrid.refresh();
+                        appendSelectedItems(selectedItems);
+                        popupItems.hide();
                     }
-                    popupItems.hide();
                 },
             },
         }, {
@@ -381,7 +353,6 @@ function initChooseItemsPopup(dxDataGrid) {
             },
         }],
     }).dxPopup('instance');
-
 }
 
 $(function () {

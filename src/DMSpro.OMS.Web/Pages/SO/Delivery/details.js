@@ -754,7 +754,7 @@ $(function () {
     }).dxResizable('instance');
 
    
-    initChooseItemsPopup(dgDeliveries);
+    initChooseItemsPopup();
     initImportPopup('', 'Deliveries_Template', 'dgDeliveries');
    
     $('#btnSave').click(function (e) {

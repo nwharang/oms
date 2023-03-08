@@ -13,13 +13,14 @@ var customerId = 0;
 
 // get data api getInfoForSo in item service
 var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
-itemService.getInfoForSO(companyId, null, true)
-    .done(result => {
-        console.log(JSON.parse(result));
-        data = JSON.parse(result);
-        convertResultToJson(data);
-        loadControl();
-    });
+//itemService.getInfoForSO(companyId, null, true)
+//    .done(result => {
+//        console.log(JSON.parse(result));
+//        data = JSON.parse(result);
+//        convertResultToJson(data);
+//        loadControl();
+//    });
+
 
 var loadControl = function () {
     var l = abp.localization.getResource("OMS");
@@ -809,66 +810,66 @@ var loadControl = function () {
     // Sales Request details grid
     const dgSalesRequestDetails = $('#dgSalesRequestDetails').dxDataGrid({
         dataSource: SalesRequestDetailsModel,
-        keyExpr: 'id',
-        remoteOperations: false,
-        // cacheEnabled: true,
-        export: {
-            enabled: true
-        },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('SalesRequestDetails');
+        //keyExpr: 'id',
+        //remoteOperations: false,
+        //// cacheEnabled: true,
+        //export: {
+        //    enabled: true
+        //},
+        //onExporting(e) {
+        //    const workbook = new ExcelJS.Workbook();
+        //    const worksheet = workbook.addWorksheet('SalesRequestDetails');
 
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'SalesRequestDetails.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
-        showRowLines: true,
-        showBorders: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: true,
-        allowColumnResizing: true,
-        columnResizingMode: 'widget',
-        columnMinWidth: 50,
-        columnAutoWidth: true,
-        columnChooser: {
-            enabled: true,
-            mode: "select"
-        },
-        columnFixing: {
-            enabled: true,
-        },
-        filterRow: {
-            visible: true,
-        },
-        groupPanel: {
-            visible: true,
-        },
-        headerFilter: {
-            visible: true,
-        },
-        rowAlternationEnabled: true,
-        searchPanel: {
-            visible: true
-        },
-        paging: {
-            enabled: true,
-            pageSize: pageSize
-        },
-        pager: {
-            visible: true,
-            showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
-            showInfo: true,
-            showNavigationButtons: true
-        },
+        //    DevExpress.excelExporter.exportDataGrid({
+        //        component: e.component,
+        //        worksheet,
+        //        autoFilterEnabled: true,
+        //    }).then(() => {
+        //        workbook.xlsx.writeBuffer().then((buffer) => {
+        //            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'SalesRequestDetails.xlsx');
+        //        });
+        //    });
+        //    e.cancel = true;
+        //},
+        //showRowLines: true,
+        //showBorders: true,
+        //focusedRowEnabled: true,
+        //allowColumnReordering: true,
+        //allowColumnResizing: true,
+        //columnResizingMode: 'widget',
+        //columnMinWidth: 50,
+        //columnAutoWidth: true,
+        //columnChooser: {
+        //    enabled: true,
+        //    mode: "select"
+        //},
+        //columnFixing: {
+        //    enabled: true,
+        //},
+        //filterRow: {
+        //    visible: true,
+        //},
+        //groupPanel: {
+        //    visible: true,
+        //},
+        //headerFilter: {
+        //    visible: true,
+        //},
+        //rowAlternationEnabled: true,
+        //searchPanel: {
+        //    visible: true
+        //},
+        //paging: {
+        //    enabled: true,
+        //    pageSize: pageSize
+        //},
+        //pager: {
+        //    visible: true,
+        //    showPageSizeSelector: true,
+        //    allowedPageSizes: allowedPageSizes,
+        //    showInfo: true,
+        //    showNavigationButtons: true
+        //},
         onInitNewRow: function (e) {
             e.data.qty = 1;
             e.data.discountAmt = 0;
@@ -898,41 +899,41 @@ var loadControl = function () {
             //    //e.component.option("editing.allowAdding", false)
             //}
         },
-        toolbar: {
-            items: [
-                "addRowButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "checklist",
-                        onClick(e) {
-                            popupItems.show();
-                        },
-                    },
-                },
-                'columnChooserButton',
-                "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
-                "searchPanel"
-            ],
-        },
+        //toolbar: {
+        //    items: [
+        //        "addRowButton",
+        //        {
+        //            location: 'after',
+        //            widget: 'dxButton',
+        //            options: {
+        //                icon: "checklist",
+        //                onClick(e) {
+        //                    popupItems.show();
+        //                },
+        //            },
+        //        },
+        //        'columnChooserButton',
+        //        "exportButton",
+        //        {
+        //            location: 'after',
+        //            widget: 'dxButton',
+        //            options: {
+        //                icon: "import",
+        //                elementAttr: {
+        //                    //id: "import-excel",
+        //                    class: "import-excel",
+        //                },
+        //                onClick(e) {
+        //                    var gridControl = e.element.closest('div.dx-datagrid').parent();
+        //                    var gridName = gridControl.attr('id');
+        //                    var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+        //                    if (popup) popup.show();
+        //                },
+        //            },
+        //        },
+        //        "searchPanel"
+        //    ],
+        //},
         onEditorPreparing: function (e) {
             if (e.parentType === "dataRow" && (e.dataField === "vatId" || e.dataField === "priceAfterTax" || e.dataField === "discountAmt" || e.dataField === "lineAmt" || e.dataField === "lineAmtAfterTax")) {
                 e.editorOptions.disabled = true;
@@ -1348,185 +1349,170 @@ var loadControl = function () {
         }
     }).dxDataGrid("instance");
 
-    const dgItems = $('#dgItems').dxDataGrid({
-        dataSource: itemList,
-        remoteOperations: true,
-        showColumnLines: true,
-        showRowLines: false,
-        rowAlternationEnabled: true,
-        showBorders: false,
-        export: {
-            enabled: false,
-        },
-        allowColumnReordering: true,
-        allowColumnResizing: true,
-        columnResizingMode: 'widget',
-        columnMinWidth: 50,
-        columnAutoWidth: true,
-        columnChooser: {
-            enabled: true,
-            allowSearch: true,
-        },
-        columnFixing: {
-            enabled: true,
-        },
-        filterRow: {
-            visible: true,
-        },
-        groupPanel: {
-            visible: true,
-        },
-        headerFilter: {
-            visible: true,
-        },
-        searchPanel: {
-            visible: true
-        },
-        paging: {
-            enabled: true,
-            pageSize: pageSize
-        },
-        pager: {
-            visible: true,
-            showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
-            showInfo: true,
-            showNavigationButtons: true
-        },
-        editing: {
-            mode: 'cell',
-            allowUpdating: false,
-        },
-        selection: {
-            mode: 'multiple',
-        },
-        toolbar: {
-            items: [
-                "columnChooserButton",
-                "searchPanel",
-            ],
-        },
-        columns: [
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
-                dataField: 'qty',
-                width: 100,
-                dataType: 'number',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .dxTextBox({
-                            value: options.value,
-                            onValueChanged: function (e) {
-                                options.data.qty = e.value;
-                            }
-                        })
-                        .appendTo(container);
-                }
-            },
-            {
-                dataField: 'code',
-                caption: l("EntityFieldName:MDMService:Item:Code"),
-                dataType: 'string',
-                allowEditing: false
-            },
-            {
-                dataField: 'name',
-                caption: l("EntityFieldName:MDMService:Item:Name"),
-                dataType: 'string',
-                allowEditing: false
-            },
-            {
-                dataField: 'inventory',
-                caption: l("Inventory"),
-                dataType: 'number',
-                width: 100,
-                allowEditing: false
-            },
-            {
-                dataField: 'id',
-                visible: false
-            },
-            {
-                dataField: 'salesUOMId',
-                visible: false
-            },
-            {
-                dataField: 'uomGroupId',
-                visible: false
-            },
-        ],
-    }).dxDataGrid("instance");
+    initChooseItemsPopup(itemList);
 
-    const popupItems = $('#popupItems').dxPopup({
-        width: "100vh",
-        height: 500,
-        container: '.panel-container',
-        showTitle: true,
-        title: 'Choose items',
-        visible: false,
-        dragEnabled: true,
-        hideOnOutsideClick: false,
-        showCloseButton: true,
-        resizeEnabled: true,
-        position: {
-            at: 'center',
-            my: 'center',
-            collision: 'fit',
-        },
-        onShowing: function (e) {
-            var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
-            $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
-        },
-        onResize: function (e) {
-            var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
-            $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
-        },
-        toolbarItems: [{
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'after',
-            options: {
-                icon: 'fa fa-check hvr-icon',
-                text: 'Submit',
-                onClick() {
-                    var selectedItems = dgItems.getSelectedRowsData();
-                    if (selectedItems.length > 0) {
-                        selectedItems.forEach(u => {
-                            SalesRequestDetailsModel.unshift({
-                                id: u.id,
-                                itemId: u.id,
-                                vatId: u.vatId,
-                                taxRate: vatList.filter(x => x.id == u.vatId)[0].rate,
-                                uomId: u.salesUomId,
-                                price: u.basePrice,
-                                qty: parseInt(u.qty),
-                                priceAfterTax: u.basePrice + (u.basePrice * vatList.filter(x => x.id == u.vatId)[0].rate) / 100,
-                                lineAmtAfterTax: u.basePrice + (u.basePrice * vatList.filter(x => x.id == u.vatId)[0].rate) / 100,
-                                lineAmt: u.basePrice,
-                                discountAmt: 0,
-                                discountPerc: 0,
-                                discountType: 0,
-                                transactionType: 0,
-                                uomGroupId: u.uomGroupId
-                            });
-                        });
-                        dgSalesRequestDetails.refresh();
-                    }
-                    popupItems.hide();
-                },
-            },
-        }, {
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'after',
-            options: {
-                text: 'Cancel',
-                onClick() {
-                    popupItems.hide();
-                },
-            },
-        }],
-    }).dxPopup('instance');
+
+    //const dgItems = $('#dgItems').dxDataGrid({
+    //    dataSource: itemList,
+    //    remoteOperations: true,
+    //    showColumnLines: true,
+    //    showRowLines: false,
+    //    rowAlternationEnabled: true,
+    //    showBorders: false,
+    //    export: {
+    //        enabled: false,
+    //    },
+    //    allowColumnReordering: true,
+    //    allowColumnResizing: true,
+    //    columnResizingMode: 'widget',
+    //    columnMinWidth: 50,
+    //    columnAutoWidth: true,
+    //    columnChooser: {
+    //        enabled: true,
+    //        allowSearch: true,
+    //    },
+    //    columnFixing: {
+    //        enabled: true,
+    //    },
+    //    filterRow: {
+    //        visible: true,
+    //    },
+    //    groupPanel: {
+    //        visible: true,
+    //    },
+    //    headerFilter: {
+    //        visible: true,
+    //    },
+    //    searchPanel: {
+    //        visible: true
+    //    },
+    //    paging: {
+    //        enabled: true,
+    //        pageSize: pageSize
+    //    },
+    //    pager: {
+    //        visible: true,
+    //        showPageSizeSelector: true,
+    //        allowedPageSizes: allowedPageSizes,
+    //        showInfo: true,
+    //        showNavigationButtons: true
+    //    },
+    //    editing: {
+    //        mode: 'cell',
+    //        allowUpdating: false,
+    //    },
+    //    selection: {
+    //        mode: 'multiple',
+    //    },
+    //    toolbar: {
+    //        items: [
+    //            "columnChooserButton",
+    //            "searchPanel",
+    //        ],
+    //    },
+    //    columns: [
+    //        {
+    //            caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
+    //            dataField: 'qty',
+    //            width: 100,
+    //            dataType: 'number',
+    //            cellTemplate(container, options) {
+    //                $('<div>')
+    //                    .dxTextBox({
+    //                        value: options.value,
+    //                        onValueChanged: function (e) {
+    //                            options.data.qty = e.value;
+    //                        }
+    //                    })
+    //                    .appendTo(container);
+    //            }
+    //        },
+    //        {
+    //            dataField: 'code',
+    //            caption: l("EntityFieldName:MDMService:Item:Code"),
+    //            dataType: 'string',
+    //            allowEditing: false
+    //        },
+    //        {
+    //            dataField: 'name',
+    //            caption: l("EntityFieldName:MDMService:Item:Name"),
+    //            dataType: 'string',
+    //            allowEditing: false
+    //        },
+    //        {
+    //            dataField: 'inventory',
+    //            caption: l("Inventory"),
+    //            dataType: 'number',
+    //            width: 100,
+    //            allowEditing: false
+    //        },
+    //        {
+    //            dataField: 'id',
+    //            visible: false
+    //        },
+    //        {
+    //            dataField: 'salesUOMId',
+    //            visible: false
+    //        },
+    //        {
+    //            dataField: 'uomGroupId',
+    //            visible: false
+    //        },
+    //    ],
+    //}).dxDataGrid("instance");
+
+     
+    //const popupItems = $('#popupItems').dxPopup({
+    //    width: "100vh",
+    //    height: 500,
+    //    container: '.panel-container',
+    //    showTitle: true,
+    //    title: 'Choose items',
+    //    visible: false,
+    //    dragEnabled: true,
+    //    hideOnOutsideClick: false,
+    //    showCloseButton: true,
+    //    resizeEnabled: true,
+    //    position: {
+    //        at: 'center',
+    //        my: 'center',
+    //        collision: 'fit',
+    //    },
+    //    onShowing: function (e) {
+    //        var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
+    //        $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
+    //    },
+    //    onResize: function (e) {
+    //        var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
+    //        $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
+    //    },
+    //    toolbarItems: [{
+    //        widget: 'dxButton',
+    //        toolbar: 'bottom',
+    //        location: 'after',
+    //        options: {
+    //            icon: 'fa fa-check hvr-icon',
+    //            text: 'Submit',
+    //            onClick() {
+    //                var selectedItems = dgItems.getSelectedRowsData();
+    //                if (selectedItems.length > 0) {
+                       
+    //                }
+    //                popupItems.hide();
+    //            },
+    //        },
+    //    }, {
+    //        widget: 'dxButton',
+    //        toolbar: 'bottom',
+    //        location: 'after',
+    //        options: {
+    //            text: 'Cancel',
+    //            onClick() {
+    //                popupItems.hide();
+    //            },
+    //        },
+    //    }],
+    //}).dxPopup('instance');
 
     /****button*****/
     $("#CloseButton").click(function (e) {
@@ -1637,7 +1623,30 @@ var loadControl = function () {
 
     }
 };
+loadControl();
 
+function appendSelectedItems(selectedItems) {
+    selectedItems.forEach(u => {
+        SalesRequestDetailsModel.unshift({
+            id: u.id,
+            itemId: u.id,
+            vatId: u.vatId,
+            taxRate: vatList.filter(x => x.id == u.vatId)[0].rate,
+            uomId: u.salesUomId,
+            price: u.basePrice,
+            qty: parseInt(u.qty),
+            priceAfterTax: u.basePrice + (u.basePrice * vatList.filter(x => x.id == u.vatId)[0].rate) / 100,
+            lineAmtAfterTax: u.basePrice + (u.basePrice * vatList.filter(x => x.id == u.vatId)[0].rate) / 100,
+            lineAmt: u.basePrice,
+            discountAmt: 0,
+            discountPerc: 0,
+            discountType: 0,
+            transactionType: 0,
+            uomGroupId: u.uomGroupId
+        });
+    });
+    dgSalesRequestDetails.refresh();
+}
 function convertResultToJson(data) {
     // get customer list
     customerList = Object.keys(data.customerInfo.customer).map(function (key) {
