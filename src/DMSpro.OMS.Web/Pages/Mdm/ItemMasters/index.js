@@ -441,6 +441,7 @@
             e.data.isInventoriable = true;
             e.data.isPurchasable = true;
             e.data.isSaleable = true;
+            e.data.itemType = 'I';
         },
         onEditingStart(e) {
             itemMaster = e.data;

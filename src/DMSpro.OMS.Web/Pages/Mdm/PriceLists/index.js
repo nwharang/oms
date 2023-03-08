@@ -57,7 +57,6 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-
             priceListDetailsService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -176,14 +175,14 @@ $(function () {
             id: 1,
             text: l('EntityFieldValue:MDMService:PriceList:ArithmeticOperation:SUBTRACT')
         },
-        {
-            id: 2,
-            text: l('EntityFieldValue:MDMService:PriceList:ArithmeticOperation:MULTIPLICATION')
-        },
-        {
-            id: 3,
-            text: l('EntityFieldValue:MDMService:PriceList:ArithmeticOperation:DIVISION')
-        }
+        //{
+        //    id: 2,
+        //    text: l('EntityFieldValue:MDMService:PriceList:ArithmeticOperation:MULTIPLICATION')
+        //},
+        //{
+        //    id: 3,
+        //    text: l('EntityFieldValue:MDMService:PriceList:ArithmeticOperation:DIVISION')
+        //}
     ];
 
     const arithmeticFactorType = [
@@ -198,6 +197,7 @@ $(function () {
     ];
 
     const dataGrid = $('#gridPriceLists').dxDataGrid({
+        key: 'id',
         dataSource: customStore,
         remoteOperations: true,
         showRowLines: true,
@@ -410,9 +410,10 @@ $(function () {
                     .dxDataGrid({
                         dataSource: {
                             store: detailStore,
-                            filter: ['priceListId', '=', options.key]
+                            filter: ['priceListId', '=', options.key],
+                            paginate: true,
+                            pageSize: pageSize,
                         },
-                        keyExpr: 'id',
                         remoteOperations: true,
                         showRowLines: true,
                         showBorders: true,

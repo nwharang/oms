@@ -14,7 +14,7 @@
         $('#selected-company').text($(arg).find('td:nth-child(3)').text());
     }
 
-    if (abp.currentUser.isAuthenticated) {
+    if (!$.isEmptyObject(abp.auth.grantedPolicies)) {
         //if (abp.auth.isAnyGranted()) { };
         return;
         window.dMSpro.oMS.mdmService.controllers.companyIdentityUserAssignments.companyIdentityUserAssignment.getListCompanyByCurrentUser({})

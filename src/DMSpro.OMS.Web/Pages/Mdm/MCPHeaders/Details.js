@@ -170,7 +170,8 @@ $(function () {
             return deferred.promise();
         },
         byKey: function (key) {
-            if (key == 0) return null;
+            console.log(key);
+            if (key == undefined) return null;
             var d = new $.Deferred();
             salesOrgHierarchyService.get(key)
                 .done(data => {
@@ -504,10 +505,10 @@ $(function () {
                 e.data.friday = false;
                 e.data.saturday = false;
                 e.data.sunday = false;
-                e.data.week1 = false;
-                e.data.week2 = false;
-                e.data.week3 = false;
-                e.data.week4 = false,
+                e.data.week1 = true;
+                e.data.week2 = true;
+                e.data.week3 = true;
+                e.data.week4 = true,
                     e.data.customerId = null;
                 //e.data.mcpHeaderId = MCPModel ? MCPModel.id : null;
             },
@@ -539,6 +540,12 @@ $(function () {
                         searchMode: 'contains'
                     }
                 },
+                //{
+                //    caption: "Address",
+                //    dataField: "customer.address",
+                //    width: 150,
+                //    allowEditing: false,
+                //},
                 {
                     caption: l("EntityFieldName:MDMService:MCPDetail:EffectiveDate"),  
                     dataField: "effectiveDate",
@@ -836,6 +843,7 @@ $(function () {
 
     function LoadData() {
         var jsonData = sessionStorage.getItem("MCPModel");
+        //console.log(jsonData);
         if (jsonData) {
             MCPModel = JSON.parse(jsonData);
             var form = $("#top-section").data('dxForm');
@@ -865,6 +873,8 @@ $(function () {
 
             LoadDataGrid();
         }
+
+        //sessionStorage.removeItem('MCPModel');
     }
     function LoadDataGrid() {
 
@@ -881,7 +891,6 @@ $(function () {
 
         mCPDetailsService.getListDevextremes(args)
             .done(result => {
-                
                 var data = result.data;
                 mcpDetailData = data;
                 mcpDetailData.forEach(x => x.customerIdExtra = x.customerId);

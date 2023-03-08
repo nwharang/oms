@@ -1284,9 +1284,21 @@
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            id: "import-excel",
+                            class: "import-excel",
+                        },
+                        onClick() {
+                            //console.log(popup);
+                            popup_m.option({
+                                contentTemplate: () => popupContentTemplate(),
+                                'position.of': `#import-excel`,
+                            });
+                            popup_m.show();
+                        },
                     },
                 },
                 "searchPanel"
@@ -1827,6 +1839,11 @@
                 }
             },
         ],
+        onInitNewRow: function (e) {
+            e.data.sfaCustomerCode = "sfaCode";
+            e.data.effectiveDate = Date.now();
+            e.data.active = true;
+        },
     }).dxDataGrid("instance");
 
     const dsAttrValue = function (n) {
