@@ -556,7 +556,7 @@ var loadControl = function () {
             linkedSFAId: SalesRequestHeaderModel ? SalesRequestHeaderModel.linkedSFAId : '3fa85f64-5717-4562-b3fc-2c963f66afa6'
         },
         labelMode: "floating",
-        colCount: 4,
+        colCount: 3,
         items: [
             {
                 // col 1
@@ -618,15 +618,17 @@ var loadControl = function () {
                             dataSource: customerList,
                             displayExpr: 'name',
                             valueExpr: 'id',
-                            onValueChanged: function (e) {
-                                customerId = e.value;
-                                //const curSelectBox = e.element.dxSelectBox('instance');
-                                //const customers = curSelectBox.getDataSource().items().filter(x => x.customerId == e.value);
-                                //pricelistId = customers[0].customer.priceListId;
+                            //onValueChanged: function (e) {
+                            //    customerId = e.value;
+                            //    //const curSelectBox = e.element.dxSelectBox('instance');
+                            //    //const customers = curSelectBox.getDataSource().items().filter(x => x.customerId == e.value);
+                            //    //pricelistId = customers[0].customer.priceListId;
 
-                                var gridDetails = $('#dgSalesRequestDetails').data('dxDataGrid');
-                                gridDetails.option("editing.allowAdding", true)
-                            }
+                            //    //var gridDetails = $('#dgSalesRequestDetails').data('dxDataGrid');
+                            //    //gridDetails.option('toolbar.items[0]').visible = true;
+                            //    //gridDetails.option('toolbar.items[1]').visible = true;
+                            //    //gridDetails.option("editing.allowAdding", true)
+                            //}
                         },
                         label: {
                             visible: false,
@@ -656,63 +658,6 @@ var loadControl = function () {
             },
             {
                 // col 2
-                itemType: 'group',
-                items: [
-                    {
-                        dataField: "docDiscountType",
-                        editorType: "dxSelectBox",
-                        editorOptions: {
-                            dataSource: discountTypeStore,
-                            displayExpr: 'text',
-                            valueExpr: 'id',
-                            value: 0,
-                            onValueChanged: function (e) {
-                                calculatorDocTotal()
-                            }
-                        },
-                        label: {
-                            visible: false,
-                            text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType')
-                        },
-                        validationRules: [{
-                            type: 'required',
-                        }]
-                    },
-                    {
-                        dataField: "docDiscountPerc",
-                        editorType: "dxNumberBox",
-                        editorOptions: {
-                            format: '#,##0.##',
-                            onValueChanged: function (e) {
-                                calculatorDocTotal();
-                            }
-                        },
-                        label: {
-                            visible: false,
-                            text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc')
-                        },
-                        validationRules: [{
-                            type: 'required',
-                        }]
-                    },
-                    {
-                        dataField: "docDiscountAmt",
-                        editorType: "dxNumberBox",
-                        editorOptions: {
-                            format: '#,##0.##',
-                        },
-                        label: {
-                            visible: false,
-                            text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt')
-                        },
-                        validationRules: [{
-                            type: 'required',
-                        }]
-                    }
-                ]
-            },
-            {
-                // col 3
                 itemType: 'group',
                 items: [
                     {
@@ -765,13 +710,7 @@ var loadControl = function () {
                         validationRules: [{
                             type: 'required',
                         }]
-                    }
-                ]
-            },
-            {
-                // col 4
-                itemType: 'group',
-                items: [
+                    },
                     {
                         dataField: "docTotalAmt",
                         editorType: "dxNumberBox",
@@ -803,7 +742,67 @@ var loadControl = function () {
                         }]
                     }
                 ]
-            }
+            },
+            {
+                // col 3
+                itemType: 'group',
+                items: [
+                    {
+                        dataField: "docDiscountType",
+                        editorType: "dxSelectBox",
+                        editorOptions: {
+                            dataSource: discountTypeStore,
+                            displayExpr: 'text',
+                            valueExpr: 'id',
+                            value: 0,
+                            onValueChanged: function (e) {
+                                calculatorDocTotal()
+                            }
+                        },
+                        label: {
+                            visible: false,
+                            text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType')
+                        },
+                        validationRules: [{
+                            type: 'required',
+                        }]
+                    },
+                    {
+                        dataField: "docDiscountPerc",
+                        editorType: "dxNumberBox",
+                        editorOptions: {
+                            format: '#,##0.##',
+                            onValueChanged: function (e) {
+                                calculatorDocTotal();
+                            }
+                        },
+                        label: {
+                            visible: false,
+                            text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc')
+                        },
+                        validationRules: [{
+                            type: 'required',
+                        }]
+                    },
+                    {
+                        dataField: "docDiscountAmt",
+                        editorType: "dxNumberBox",
+                        editorOptions: {
+                            format: '#,##0.##',
+                            onValueChanged: function (e) {
+                                calculatorDocTotal();
+                            }
+                        },
+                        label: {
+                            visible: false,
+                            text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt')
+                        },
+                        validationRules: [{
+                            type: 'required',
+                        }]
+                    }
+                ]
+            },
         ]
     }).dxForm('instance');
 
@@ -812,7 +811,7 @@ var loadControl = function () {
         dataSource: SalesRequestDetailsModel,
         keyExpr: 'id',
         remoteOperations: false,
-        cacheEnabled: true,
+        // cacheEnabled: true,
         export: {
             enabled: true
         },
@@ -886,10 +885,18 @@ var loadControl = function () {
             frmSalesRequestDetails.updateData('docTotalLineAmtAfterTax', sumLineAmtAfterTax);
         },
         onContentReady: function (e) {
-            var businessPartner = frmSalesRequestDetails.getEditor('businessPartnerId').option('value');
-            if (businessPartner == null) {
-                e.component.option("editing.allowAdding", false)
-            }
+            var sumDiscountAmt = e.component.getTotalSummaryValue('discountAmt');
+            var sumLineAmt = e.component.getTotalSummaryValue('lineAmt');
+            var sumLineAmtAfterTax = e.component.getTotalSummaryValue('lineAmtAfterTax');
+            frmSalesRequestDetails.updateData('docTotalLineDiscountAmt', sumDiscountAmt);
+            frmSalesRequestDetails.updateData('docTotalLineAmt', sumLineAmt);
+            frmSalesRequestDetails.updateData('docTotalLineAmtAfterTax', sumLineAmtAfterTax);
+            //var businessPartner = frmSalesRequestDetails.getEditor('businessPartnerId').option('value');
+            //if (businessPartner == null) {
+            //    e.component.option('toolbar.items[0]').visible = false;
+            //    e.component.option('toolbar.items[1]').visible = false;
+            //    //e.component.option("editing.allowAdding", false)
+            //}
         },
         toolbar: {
             items: [
@@ -898,7 +905,7 @@ var loadControl = function () {
                     location: 'after',
                     widget: 'dxButton',
                     options: {
-                        icon: "add",
+                        icon: "checklist",
                         onClick(e) {
                             popupItems.show();
                         },
@@ -927,12 +934,18 @@ var loadControl = function () {
             ],
         },
         onEditorPreparing: function (e) {
-            if (e.parentType === "dataRow" && (e.dataField === "uomId" || e.dataField === "vatId" || e.dataField === "priceAfterTax" || e.dataField === "discountAmt" || e.dataField === "lineAmt" || e.dataField === "lineAmtAfterTax")) {
+            if (e.parentType === "dataRow" && (e.dataField === "vatId" || e.dataField === "priceAfterTax" || e.dataField === "discountAmt" || e.dataField === "lineAmt" || e.dataField === "lineAmtAfterTax")) {
                 e.editorOptions.disabled = true;
+            }
+
+            if (e.dataField === 'uomId') {
+                if (e.row.isEditing) {
+                    debugger
+                }
             }
         },
         editing: {
-            mode: 'row',
+            mode: 'cell',
             allowAdding: true,
             allowUpdating: true,
             allowDeleting: true,
@@ -1486,10 +1499,15 @@ var loadControl = function () {
                                 taxRate: vatList.filter(x => x.id == u.vatId)[0].rate,
                                 uomId: u.salesUomId,
                                 price: u.basePrice,
-                                qty: u.qty,
+                                qty: parseInt(u.qty),
                                 priceAfterTax: u.basePrice + (u.basePrice * vatList.filter(x => x.id == u.vatId)[0].rate) / 100,
                                 lineAmtAfterTax: u.basePrice + (u.basePrice * vatList.filter(x => x.id == u.vatId)[0].rate) / 100,
-                                lineAmt: u.basePrice
+                                lineAmt: u.basePrice,
+                                discountAmt: 0,
+                                discountPerc: 0,
+                                discountType: 0,
+                                transactionType: 0,
+                                uomGroupId: u.uomGroupId
                             });
                         });
                         dgSalesRequestDetails.refresh();
