@@ -287,7 +287,7 @@ $(function () {
             },
             {
                 dataField: 'id',
-                caption: l("EntityFieldName:MDMService:CompanyProfile:Id"),
+                caption: l("Id"),
                 dataType: 'string',
                 allowEditing: false,
                 visible: false,
@@ -331,13 +331,13 @@ $(function () {
                 //calculateCellValue: function (rowData) {
                 //    return rowData.geoLevel0.name;
                 //},
-                //setCellValue(rowData, value) {
-                //    rowData.geoLevel0Id = value;
-                //    rowData.geoLevel1Id = null;
-                //    rowData.geoLevel2Id = null;
-                //    rowData.geoLevel3Id = null;
-                //    rowData.geoLevel4Id = null;
-                //},
+                setCellValue(rowData, value) {
+                    rowData.geoLevel0Id = value;
+                    rowData.geoLevel1Id = null;
+                    rowData.geoLevel2Id = null;
+                    rowData.geoLevel3Id = null;
+                    rowData.geoLevel4Id = null;
+                },
                 lookup: {
                     valueExpr: "id",
                     displayExpr: "name",
@@ -430,14 +430,14 @@ $(function () {
                     //        filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
                     //    };
                     //},
-                    // dataSource(options) {
-                    //     return {
-                    //         store: geoMasterStore,
-                    //         filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
-                    //         paginate: true,
-                    //         pageSize: pageSizeForLookup
-                    //     };
-                    // },
+                     dataSource(options) {
+                         return {
+                             store: geoMasterStore,
+                             filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
+                             paginate: true,
+                             pageSize: pageSizeForLookup
+                         };
+                     },
                     valueExpr: 'id',
                     displayExpr: 'name',
                     //lookup: {

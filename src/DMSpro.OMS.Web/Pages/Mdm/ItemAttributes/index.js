@@ -6,7 +6,9 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
+
             const args = {};
+
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);

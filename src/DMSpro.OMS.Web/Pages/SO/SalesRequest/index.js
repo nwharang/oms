@@ -203,76 +203,15 @@
     ];
 
     /****control*****/
-    const dgSalesRequestHeader = $('#dgSalesRequestHeader').dxDataGrid({
+    const dgSalesRequestHeader = $('#dgSalesRequestHeader').dxDataGrid(
+        jQuery.extend(dxDataGridConfiguration, {
         dataSource: salesRequestsHeaderStore,
-        remoteOperations: false,
-        cacheEnabled: true,
-        export: {
-            enabled: true,
-            // allowExportSelectedData: true,
-        },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('SalesRequestHeader');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'SalesRequestHeader.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
-        showRowLines: true,
-        showBorders: true,
-        focusedRowEnabled: true,
-        allowColumnReordering: true,
-        allowColumnResizing: true,
-        columnResizingMode: 'widget',
-        columnMinWidth: 50,
-        columnAutoWidth: true,
-        columnChooser: {
-            enabled: true,
-            mode: "select"
-        },
-        columnFixing: {
-            enabled: true,
-        },
-        filterRow: {
-            visible: true,
-        },
-        groupPanel: {
-            visible: true,
-        },
-        headerFilter: {
-            visible: true,
-        },
-        rowAlternationEnabled: true,
-        searchPanel: {
-            visible: true
-        },
-        //scrolling: {
-        //    mode: 'standard'
-        //},
+        remoteOperations: false, 
         stateStoring: { //save state in localStorage
             enabled: false,
             type: 'localStorage',
             storageKey: 'dgSalesRequestHeader',
-        },
-        paging: {
-            enabled: true,
-            pageSize: pageSize
-        },
-        pager: {
-            visible: true,
-            showPageSizeSelector: true,
-            allowedPageSizes: [10, 20, 50, 100],
-            showInfo: true,
-            showNavigationButtons: true
-        },
+        }, 
         toolbar: {
             items: [
                 "groupPanel",
@@ -287,11 +226,21 @@
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            //id: "import-excel",
+                            class: "import-excel",
+                        },
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
+                        },
                     },
-                },
+                }, 
                 "searchPanel"
             ],
         },
@@ -484,10 +433,7 @@
                 visible: false,
             },
         ]
-    }).dxDataGrid("instance");
+    })).dxDataGrid("instance");
 
-    /****button*****/
-
-    /****function*****/
-
+    initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestHeader');
 });

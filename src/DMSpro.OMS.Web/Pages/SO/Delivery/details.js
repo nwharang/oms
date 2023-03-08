@@ -754,11 +754,9 @@ $(function () {
     }).dxResizable('instance');
 
    
-    initChooseItemsPopup(dgDeliveries);
-
+    initChooseItemsPopup();
     initImportPopup('', 'Deliveries_Template', 'dgDeliveries');
-    initImportPopup('api/mdm-service/companies', 'Items_Template', 'dgItems');
-
+   
     $('#btnSave').click(function (e) {
         e.preventDefault();
 

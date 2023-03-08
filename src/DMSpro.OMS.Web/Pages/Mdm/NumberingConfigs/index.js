@@ -197,6 +197,7 @@ $(function () {
             },
             {
                 dataField: 'companyId',
+                calculateDisplayValue: "company.name",
                 caption: l("EntityFieldName:MDMService:NumberingConfig:CompanyName"),
                 lookup: {
                     valueExpr: 'id',
