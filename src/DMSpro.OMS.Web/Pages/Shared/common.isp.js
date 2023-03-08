@@ -86,7 +86,10 @@ var dxDataGridConfiguration = {
                         class: "addNewButton",
                     },
                     onClick(e) {
-                        debugger
+                        var gridElement = e.element.closest('div.dx-datagrid.dx-gridbase-container').parent();
+                        var dxGrid = gridElement.data('dxDataGrid');
+                        if (dxGrid)
+                            dxGrid.addRow();
                     },
                 },
             },
