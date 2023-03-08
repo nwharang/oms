@@ -75,12 +75,31 @@ var dxDataGridConfiguration = {
     toolbar: {
         items: [
             //"groupPanel",
-            "addRowButton",
+            //"addRowButton",
             {
                 location: 'after',
                 widget: 'dxButton',
                 options: {
+                    disabled: true,
+                    icon: "add",
+                    elementAttr: {
+                        class: "addNewButton",
+                    },
+                    onClick(e) {
+                        debugger
+                    },
+                },
+            },
+
+            {
+                location: 'after',
+                widget: 'dxButton',
+                options: {
+                    disabled: true,
                     icon: "checklist",
+                    elementAttr: { 
+                        class: "openItemsPopupButton",
+                    },
                     onClick(e) {
                         var popup = $(`#popupItems`).data('dxPopup');
                         popup.show();
@@ -117,7 +136,7 @@ function initChooseItemsPopup(items) {
                 <div id="dgItems" ></div> 
             </div>`);
 
-    $('#dgItems').dxDataGrid({
+    var dgItems = $('#dgItems').dxDataGrid({
         dataSource: items,
         remoteOperations: true,
         showColumnLines: true,
@@ -277,19 +296,7 @@ function initChooseItemsPopup(items) {
                 dataType: 'number',
                 width: 100,
                 allowEditing: false
-            },
-            {
-                dataField: 'id',
-                visible: false
-            },
-            {
-                dataField: 'salesUOMId',
-                visible: false
-            },
-            {
-                dataField: 'uomGroupId',
-                visible: false
-            },
+            }
         ],
         onSelectionChanged: function (e) {
             var selectedRowsData = e.component.getSelectedRowsData();
@@ -334,7 +341,7 @@ function initChooseItemsPopup(items) {
                 },
                 onClick() {
                     //todo
-                    var selectedItems = $('#dgItems').data('dxDataGrid').getSelectedRowsData();
+                    var selectedItems = dgItems.getSelectedRowsData();
                     if (selectedItems.length > 0) {
                         appendSelectedItems(selectedItems);
                         popupItems.hide();
