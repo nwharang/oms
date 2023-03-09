@@ -64,7 +64,7 @@ var loadControl = function () {
             return d.promise();
         }
     });
-     
+
     var vATStore = new DevExpress.data.CustomStore({
         key: 'altUOMId',
         load(loadOptions) {
@@ -428,7 +428,7 @@ var loadControl = function () {
         jQuery.extend(dxDataGridConfiguration, {
             dataSource: SalesRequestDetailsModel,
             onInitialized: function (e) {
-                 //todo
+                //todo
             },
             onInitNewRow: function (e) {
                 e.data.qty = 1;
@@ -452,7 +452,7 @@ var loadControl = function () {
                 frmSalesRequestDetails.updateData('docTotalLineDiscountAmt', sumDiscountAmt);
                 frmSalesRequestDetails.updateData('docTotalLineAmt', sumLineAmt);
                 frmSalesRequestDetails.updateData('docTotalLineAmtAfterTax', sumLineAmtAfterTax);
-             
+
             },
             onEditorPreparing: function (e) {
                 if (e.parentType === "dataRow" && (e.dataField === "vatId" || e.dataField === "priceAfterTax" || e.dataField === "discountAmt" || e.dataField === "lineAmt" || e.dataField === "lineAmtAfterTax")) {
@@ -490,7 +490,7 @@ var loadControl = function () {
                         dataSource: itemList,
                         displayExpr: "name",
                         valueExpr: "id",
-                        
+
                     },
                     setCellValue: function (newData, value, currentData) {
                         var selectedItem = itemList.filter(i => i.id == value)[0];
@@ -641,12 +641,12 @@ var loadControl = function () {
                     },
                     setCellValue: function (newData, value, currentData) {
                         newData.discountType = value;
-                 
+
+                    },
+                    validationRules: [{ type: 'required' }],
+                    width: 200
                 },
-                validationRules: [{ type: 'required' }],
-                width: 200
-            },
-           
+
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountPerc'),
                     dataField: 'discountPerc',
@@ -687,17 +687,17 @@ var loadControl = function () {
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineAmt'),
                     dataField: 'lineAmt',
-                    dataType: 'number', 
+                    dataType: 'number',
                     format: ",##0.###",
-                   // validationRules: [{ type: 'required', message: '' }],
+                    // validationRules: [{ type: 'required', message: '' }],
                     width: 150
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineAmtAfterTax'),
                     dataField: 'lineAmtAfterTax',
-                    dataType: 'number', 
+                    dataType: 'number',
                     format: ",##0.###",
-                   // validationRules: [{ type: 'required', message: '' }],
+                    // validationRules: [{ type: 'required', message: '' }],
                     width: 150
                 },
                 {
@@ -875,7 +875,7 @@ var loadControl = function () {
                 console.log(result);
             })
     });
-     
+
     initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestDetails');
 
     function calculatorDocTotal() {
