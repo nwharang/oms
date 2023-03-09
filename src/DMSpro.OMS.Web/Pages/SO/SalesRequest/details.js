@@ -194,7 +194,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocNbr')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -210,7 +210,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocType')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -226,7 +226,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocSource')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -253,7 +253,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:BusinessPartner')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -269,7 +269,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:RequestDate')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                 ]
@@ -290,7 +290,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -308,7 +308,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -326,7 +326,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -341,7 +341,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -356,7 +356,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     }
                 ]
@@ -382,7 +382,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -399,7 +399,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -416,7 +416,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     }
                 ]
@@ -515,6 +515,8 @@ var loadControl = function () {
                         dataSource(options) {
                             if (options.data != null) {
                                 var uomGroupId = options.data.uomGroupId;
+                                if (!uomGroupId) return;
+
                                 var uomGroup = uomGroupList.find(x => x = uomGroupId);
                                 var uOMListOfItem = [];
                                 uomGroup.forEach(x => {
@@ -554,22 +556,8 @@ var loadControl = function () {
 
                         needSummaryUpdate = true;
                     },
-                    //editorOptions:{
-                    //    onValueChanged: function (e) {
-                    //        var rows = dgSalesRequestDetails.getVisibleRows();
-                    //        var tr = e.element.closest('tr');  
-                    //        var dataRow = rows[tr.index()].data;
-                    //        var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
-                    //        var customerId = formSalesRequest.getEditor('businessPartnerId').option('value');
-                    //        var customer = customerList.filter(x => x.id == customerId)[0];
-                    //        var price = priceList.find(x => x = customer.priceListId + '|' + dataRow.itemId + '|' + e.value);
-                    //        var priceAfterTax = price + (price * dataRow.taxRate) / 100;
-                    //        var lineAmtAfterTax = priceAfterTax;
-                    //        var lineAmt = price;
-
-                    //    }
-                    //},
-                    validationRules: [{ type: 'required' }],
+                   
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 200
                 },
                 {
@@ -666,20 +654,9 @@ var loadControl = function () {
                     },
                     setCellValue: function (newData, value, currentData) {
                         newData.discountType = value;
-                        // get price
-                        //var d = new $.Deferred();
-                        //priceListDetailsService.getListDevextremes({ filter: JSON.stringify([['itemId', '=', value], 'and', ['item.uomGroupId', '=', selectedItem.uomGroupId], 'and', ['priceList.id', '=', pricelistId]]) })
-                        //    .done(result => {
-                        //        d.resolve(
-                        //            newData.price = result.data[0] != undefined ? result.data[0].price : 0,
-                        //            newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100,
-                        //            newData.lineAmtAfterTax = newData.priceAfterTax,
-                        //            newData.lineAmt = newData.price,
-                        //        );
-                        //    });
-                        //return d.promise();
+                       
                     },
-                    validationRules: [{ type: 'required' }],
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 200
                 },
                 {
@@ -708,7 +685,7 @@ var loadControl = function () {
                         }
                     },
                     value: 0,
-                    validationRules: [{ type: 'required' }],
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 150
                 },
                 {
@@ -758,87 +735,20 @@ var loadControl = function () {
                     //validationRules: [{ type: 'required' }],
                     width: 200
                 },
-                //hidden field
-                {
-                    dataField: 'uomGroupId',
-                    visible: false,
-                },
-                {
-                    dataField: 'uomRate',
-                    visible: false,
-                },
-                {
-                    dataField: 'taxRate',
-                    visible: false,
-                },
+                ////hidden field
                 //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineDiscountAmt'),
-                //    dataField: 'lineDiscountAmt',
-                //    validationRules: [{ type: 'required' }]
+                //    dataField: 'uomGroupId',
+                //    visible: false,
                 //},
                 //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:ProcessQty'),
-                //    dataField: 'processQty',
-                //    validationRules: [{ type: 'required' }]
+                //    dataField: 'uomRate',
+                //    visible: false,
                 //},
                 //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:OpenQty'),
-                //    dataField: 'openQty',
-                //    validationRules: [{ type: 'required' }]
+                //    dataField: 'taxRate',
+                //    visible: false,
                 //},
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:ConfirmQty'),
-                //    dataField: 'confirmQty',
-                //    validationRules: [{ type: 'required' }]
-                //},
-                //{
-                //    caption: l('EntityFieldName:MDMService:UOMGroupDetail:BaseUomId'),
-                //    dataField: 'baseUomId',
-                //    calculateDisplayValue: "baseUOM.name",
-                //    lookup: {
-                //        dataSource(options) {
-                //            return {
-                //                store: Store,
-                //                filter: [["uomGroup.id", "=", options.data != null ? options.data.uomGroupId : null]],
-                //                paginate: true,
-                //                pageSize: pageSizeForLookup
-                //            };
-                //        },
-                //        displayExpr: "baseUOM.name",
-                //        valueExpr: "baseUOM.id"
-                //    },
-                //    setCellValue: function (newData, value, currentData) {
-                //        newData.baseUomId = value;
-
-                //        var d = new $.Deferred();
-
-                //        uOMGroupDetailService.getListDevextremes({ filter: JSON.stringify(['uomGroupId', '=', currentData.uomGroupId]) })
-                //            .done(result => {
-                //                d.resolve(
-                //                    newData.uomRate = result.data[0].baseQty
-                //                );
-                //            });
-
-                //        return d.promise();
-                //    },
-                //    width: 200
-                //},
-                //{
-                //    //caption: l('EntityFieldName:OrderService:SalesRequestDetails:SfaOrderBaseQty'),
-                //    caption: l('SfaOrderBaseQty'),
-                //    dataField: 'sfaOrderBaseQty',
-                //    dataType: 'number',
-                //    value: 0,
-                //    width: 150
-                //},
-                //{
-                //    //caption: l('EntityFieldName:OrderService:SalesRequestDetails:BaseQty'),
-                //    caption: l('BaseQty'),
-                //    dataField: 'baseQty',
-                //    dataType: 'number',
-                //    value: 0,
-                //    width: 150
-                //},
+              
             ],
             summary: {
                 totalItems: [
@@ -846,28 +756,19 @@ var loadControl = function () {
                         column: "discountAmt",
                         summaryType: "sum",
                         alignment: "left",
-                        valueFormat: ",##0.###",
-                        customizeText: function (data) {
-                            return data.valueText;
-                        },
+                        valueFormat: ",##0.###"
                     },
                     {
                         column: "lineAmt",
                         summaryType: "sum",
                         alignment: "left",
-                        valueFormat: ",##0.###",
-                        customizeText: function (data) {
-                            return data.valueText;
-                        },
+                        valueFormat: ",##0.###"
                     },
                     {
                         column: "lineAmtAfterTax",
                         summaryType: "sum",
                         alignment: "left",
-                        valueFormat: ",##0.###",
-                        customizeText: function (data) {
-                            return data.valueText;
-                        },
+                        valueFormat: ",##0.###"
                     }
                 ]
             }
@@ -940,35 +841,7 @@ var loadControl = function () {
             formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
             formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
             formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
-        }
-
-        //var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
-        //var docTotalLineAmt = formSalesRequest.getEditor('docTotalLineAmt').option('value');
-        //var docDiscountPerc = formSalesRequest.getEditor('docDiscountPerc').option('value');
-        //var docTotalLineAmtAfterTax = formSalesRequest.getEditor('docTotalLineAmtAfterTax').option('value');
-        //var docDiscountAmt = 0;
-        //if (e.value == 0) {
-        //    docDiscountAmt = 0;
-        //    frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountAmt);
-        //    formSalesRequest.getEditor('docDiscountAmt').option('disabled', false);
-        //    formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
-        //    formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
-        //}
-        //if (e.value == 1) {
-        //    docDiscountAmt = docTotalLineAmt * docDiscountPerc;
-        //    frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountAmt);
-        //    formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
-        //    formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
-        //    formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
-        //}
-        //if (e.value == 2) {
-        //    docDiscountAmt = docTotalLineAmtAfterTax * docDiscountPerc;
-        //    frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountAmt);
-        //    formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
-        //    formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
-        //    formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
-        //}
-
+        } 
     }
 };
 
