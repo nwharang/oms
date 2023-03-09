@@ -265,7 +265,7 @@ $(function () {
                 dataField: 'companyIdentityUserAssignment.identityUserId',
                 caption: l("UserName"),
                 validationRules: [{ type: "required" }],
-                //calculateDisplayValue: "companyIdentityUserAssignment.identityUserId",
+                calculateDisplayValue: "identityUser.userName",
                 lookup: {
                     dataSource() {
                         return {
