@@ -1,13 +1,13 @@
 ﻿var SalesRequestHeaderModel = null;
 var SalesRequestDetailsModel = [];
-var data = {};
-var customerList = {};
-var priceList = {};
-var uomGroupList = {};
-var itemList = {};
-var uOMList = {};
-var itemGroupList = {};
-var vatList = {};
+//var data = {};
+//var customerList = {};
+//var priceList = {};
+//var uomGroupList = {};
+//var itemList = {};
+//var uOMList = {};
+//var itemGroupList = {};
+let vatList = {};
 const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
 var needSummaryUpdate = false;
 
@@ -21,85 +21,85 @@ itemService.getInfoForSO(companyId,
         let resultJson = await Common.parseJSON(result);
         let data = Common.processInitData(resultJson);
         console.log(data);
-        convertResultToJson(data);
-        loadControl();
+        addListToData(data);
+        loadControl(data);
     });
 
-var loadControl = function () {
+var loadControl = function (data) {
     var l = abp.localization.getResource("OMS");
     var salesRequestService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
-    var uOMService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
-    var vATService = window.dMSpro.oMS.mdmService.controllers.vATs.vAT;
+    //var uOMService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
+    //var vATService = window.dMSpro.oMS.mdmService.controllers.vATs.vAT;
 
-    var uOMStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
+    //var uOMStore = new DevExpress.data.CustomStore({
+    //    key: 'id',
+    //    load(loadOptions) {
+    //        const deferred = $.Deferred();
+    //        const args = {};
 
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
+    //        requestOptions.forEach((i) => {
+    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+    //                args[i] = JSON.stringify(loadOptions[i]);
+    //            }
+    //        });
 
-            uOMService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
+    //        uOMService.getListDevextremes(args)
+    //            .done(result => {
+    //                deferred.resolve(result.data, {
+    //                    totalCount: result.totalCount,
+    //                    summary: result.summary,
+    //                    groupCount: result.groupCount,
+    //                });
+    //            });
 
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
+    //        return deferred.promise();
+    //    },
+    //    byKey: function (key) {
+    //        if (key == 0) return null;
 
-            var d = new $.Deferred();
-            uOMService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
+    //        var d = new $.Deferred();
+    //        uOMService.get(key)
+    //            .done(data => {
+    //                d.resolve(data);
+    //            });
+    //        return d.promise();
+    //    }
+    //});
 
-    var vATStore = new DevExpress.data.CustomStore({
-        key: 'altUOMId',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
+    //var vATStore = new DevExpress.data.CustomStore({
+    //    key: 'altUOMId',
+    //    load(loadOptions) {
+    //        const deferred = $.Deferred();
+    //        const args = {};
 
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
+    //        requestOptions.forEach((i) => {
+    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+    //                args[i] = JSON.stringify(loadOptions[i]);
+    //            }
+    //        });
 
-            vATService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
+    //        vATService.getListDevextremes(args)
+    //            .done(result => {
+    //                deferred.resolve(result.data, {
+    //                    totalCount: result.totalCount,
+    //                    summary: result.summary,
+    //                    groupCount: result.groupCount,
+    //                });
+    //            });
 
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
+    //        return deferred.promise();
+    //    },
+    //    byKey: function (key) {
+    //        if (key == 0) return null;
 
-            var d = new $.Deferred();
-            vATService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
+    //        var d = new $.Deferred();
+    //        vATService.get(key)
+    //            .done(data => {
+    //                d.resolve(data);
+    //            });
+    //        return d.promise();
+    //    }
+    //});
 
     const docTypeStore = [
         {
@@ -194,7 +194,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocNbr')
                         },
                         validationRules: [{
-                            type: 'required', message: '' 
+                            type: 'required', message: ''
                         }]
                     },
                     {
@@ -203,14 +203,15 @@ var loadControl = function () {
                         editorOptions: {
                             dataSource: docTypeStore,
                             displayExpr: 'text',
-                            valueExpr: 'id'
+                            valueExpr: 'id',
+                            showClearButton: true
                         },
                         label: {
                             visible: false,
                             text: l('EntityFieldName:OrderService:SalesRequest:DocType')
                         },
                         validationRules: [{
-                            type: 'required', message: '' 
+                            type: 'required', message: ''
                         }]
                     },
                     {
@@ -219,14 +220,15 @@ var loadControl = function () {
                         editorOptions: {
                             dataSource: docSourceStore,
                             displayExpr: 'text',
-                            valueExpr: 'id'
+                            valueExpr: 'id',
+                            showClearButton: true
                         },
                         label: {
                             visible: false,
                             text: l('EntityFieldName:OrderService:SalesRequest:DocSource')
                         },
                         validationRules: [{
-                            type: 'required', message: '' 
+                            type: 'required', message: ''
                         }]
                     },
                     {
@@ -240,9 +242,10 @@ var loadControl = function () {
                         dataField: "businessPartnerId",
                         editorType: 'dxSelectBox',
                         editorOptions: {
-                            dataSource: customerList,
+                            dataSource: data.customerList,
                             displayExpr: 'name',
                             valueExpr: 'id',
+                            showClearButton: true,
                             onValueChanged: function (e) {
                                 $('.addNewButton').data('dxButton').option('disabled', false);
                                 $('.openItemsPopupButton').data('dxButton').option('disabled', false);
@@ -253,7 +256,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:BusinessPartner')
                         },
                         validationRules: [{
-                            type: 'required', message: '' 
+                            type: 'required', message: ''
                         }]
                     },
                     {
@@ -269,7 +272,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:RequestDate')
                         },
                         validationRules: [{
-                            type: 'required', message: '' 
+                            type: 'required', message: ''
                         }]
                     },
                 ]
@@ -290,7 +293,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt')
                         },
                         validationRules: [{
-                            type: 'required', message: '' 
+                            type: 'required', message: ''
                         }]
                     },
                     {
@@ -308,7 +311,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt')
                         },
                         validationRules: [{
-                            type: 'required', message: '' 
+                            type: 'required', message: ''
                         }]
                     },
                     {
@@ -326,7 +329,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax')
                         },
                         validationRules: [{
-                            type: 'required', message: '' 
+                            type: 'required', message: ''
                         }]
                     },
                     {
@@ -341,7 +344,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt')
                         },
                         validationRules: [{
-                            type: 'required', message: '' 
+                            type: 'required', message: ''
                         }]
                     },
                     {
@@ -356,7 +359,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax')
                         },
                         validationRules: [{
-                            type: 'required', message: '' 
+                            type: 'required', message: ''
                         }]
                     }
                 ]
@@ -373,6 +376,7 @@ var loadControl = function () {
                             displayExpr: 'text',
                             valueExpr: 'id',
                             value: 0,
+                            showClearButton: true,
                             onValueChanged: function (e) {
                                 calculatorDocTotal()
                             }
@@ -382,7 +386,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType')
                         },
                         validationRules: [{
-                            type: 'required', message: '' 
+                            type: 'required', message: ''
                         }]
                     },
                     {
@@ -399,7 +403,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc')
                         },
                         validationRules: [{
-                            type: 'required', message: '' 
+                            type: 'required', message: ''
                         }]
                     },
                     {
@@ -416,7 +420,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt')
                         },
                         validationRules: [{
-                            type: 'required', message: '' 
+                            type: 'required', message: ''
                         }]
                     }
                 ]
@@ -486,13 +490,13 @@ var loadControl = function () {
                     fixed: true,
                     fixedPosition: 'left',
                     lookup: {
-                        dataSource: itemList,
+                        dataSource: data.itemList,
                         displayExpr: "name",
                         valueExpr: "id",
 
                     },
                     setCellValue: function (newData, value, currentData) {
-                        var selectedItem = itemList.filter(i => i.id == value)[0];
+                        var selectedItem = data.itemList.filter(i => i.id == value)[0];
                         var vat = vatList.filter(i => i.id == selectedItem.vatId)[0];
 
                         newData.itemId = value;
@@ -517,10 +521,10 @@ var loadControl = function () {
                                 var uomGroupId = options.data.uomGroupId;
                                 if (!uomGroupId) return;
 
-                                var uomGroup = uomGroupList.find(x => x = uomGroupId);
+                                var uomGroup = data.uomGroupList.find(x => x = uomGroupId);
                                 var uOMListOfItem = [];
                                 uomGroup.forEach(x => {
-                                    var uOM = uOMList.filter(y => y.id == x)[0];
+                                    var uOM = data.uOMList.filter(y => y.id == x)[0];
                                     uOMListOfItem.push(uOM);
                                 })
                                 return {
@@ -530,7 +534,7 @@ var loadControl = function () {
                                 };
                             } else {
                                 return {
-                                    store: uOMList,
+                                    store: data.uOMList,
                                     paginate: true,
                                     pageSize: pageSizeForLookup
                                 };
@@ -542,8 +546,8 @@ var loadControl = function () {
                     setCellValue: function (newData, value, currentData) {
                         var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
                         var customerId = formSalesRequest.getEditor('businessPartnerId').option('value');
-                        var customer = customerList.filter(x => x.id == customerId)[0];
-                        var price = priceList.find(x => x = customer.priceListId + '|' + currentData.itemId + '|' + value);
+                        var customer = data.customerList.filter(x => x.id == customerId)[0];
+                        var price = data.priceList.find(x => x = customer.priceListId + '|' + currentData.itemId + '|' + value);
                         var priceAfterTax = price + (price * currentData.taxRate) / 100;
                         var lineAmtAfterTax = priceAfterTax;
                         var lineAmt = price;
@@ -556,7 +560,7 @@ var loadControl = function () {
 
                         needSummaryUpdate = true;
                     },
-                   
+
                     validationRules: [{ type: 'required', message: '' }],
                     width: 200
                 },
@@ -584,7 +588,7 @@ var loadControl = function () {
                     lookup: {
                         dataSource() {
                             return {
-                                store: vATStore,
+                                store: vatList,
                                 paginate: true,
                                 pageSize: pageSizeForLookup
                             };
@@ -613,6 +617,7 @@ var loadControl = function () {
                     setCellValue: function (newData, value, currentData) {
                         newData.qty = value;
                         newData.lineAmt = value * currentData.price - currentData.discountAmt;
+                        newData.lineAmtAfterTax = currentData.priceAfterTax * value - currentData.discountAmt;
                     },
                     value: 0,
                     validationRules: [
@@ -648,7 +653,7 @@ var loadControl = function () {
                     },
                     setCellValue: function (newData, value, currentData) {
                         newData.discountType = value;
-                       
+
                     },
                     validationRules: [{ type: 'required', message: '' }],
                     width: 200
@@ -742,7 +747,7 @@ var loadControl = function () {
                 //    dataField: 'taxRate',
                 //    visible: false,
                 //},
-              
+
             ],
             summary: {
                 totalItems: [
@@ -768,7 +773,7 @@ var loadControl = function () {
             }
         })).dxDataGrid("instance");
 
-    initChooseItemsPopup(itemList);
+    initChooseItemsPopup(data.itemList);
 
     /****button*****/
     $("#CloseButton").click(function (e) {
@@ -798,6 +803,17 @@ var loadControl = function () {
             .done(result => {
                 abp.message.success(l('Congratulations'));
                 console.log(result);
+            })
+            .fail(result => {
+                var message = result.message;
+                try {
+
+                    var details = JSON.parse(result.details);
+                    Object.keys(details).forEach(function (key) {
+                        message = message.replace(`{${key}}`, details[key]);
+                    });
+                } catch { }
+                abp.message.error(message);
             })
     });
 
@@ -874,30 +890,31 @@ function appendSelectedItems(selectedItems) {
     $('#dgSalesRequestDetails').data('dxDataGrid').refresh();
     calculatorDocTotal();
 }
-function convertResultToJson(data) {
+function addListToData(data) {
+
     // get customer list
-    customerList = Object.keys(data.customerInfo.customer).map(function (key) {
+    data.customerList = Object.keys(data.customerInfo.customer).map(function (key) {
         return data.customerInfo.customer[key];
     });
     // get price list
-    priceList = Object.keys(data.customerInfo.price).map(function (key) {
+    data.priceList = Object.keys(data.customerInfo.price).map(function (key) {
         return data.customerInfo.price[key];
     });
     // get item list
-    itemList = Object.keys(data.itemInfo.item).map(function (key) {
+    data.itemList = Object.keys(data.itemInfo.item).map(function (key) {
         data.itemInfo.item[key].qty = 1;
         return data.itemInfo.item[key];
     });
     // get UOM group list
-    uomGroupList = Object.keys(data.itemInfo.uomGroup).map(function (key) {
+    data.uomGroupList = Object.keys(data.itemInfo.uomGroup).map(function (key) {
         return data.itemInfo.uomGroup[key];
     });
     // get UOM list
-    uOMList = Object.keys(data.itemInfo.uom).map(function (key) {
+    data.uOMList = Object.keys(data.itemInfo.uom).map(function (key) {
         return data.itemInfo.uom[key];
     });
     // get item group list
-    itemGroupList = Object.keys(data.itemInfo.itemGroup).map(function (key) {
+    data.itemGroupList = Object.keys(data.itemInfo.itemGroup).map(function (key) {
         return data.itemInfo.itemGroup[key];
     });
     // get vat list
