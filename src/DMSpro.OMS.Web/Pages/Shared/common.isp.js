@@ -4,7 +4,7 @@ DevExpress.config({
     editorStylingMode: 'underlined',
 });
 var dxDataGridConfiguration = {
-    remoteOperations: true,
+    //remoteOperations: true,
     showColumnLines: true,
     showRowLines: true,
     rowAlternationEnabled: true,

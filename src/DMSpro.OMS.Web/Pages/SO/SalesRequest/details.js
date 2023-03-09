@@ -194,7 +194,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocNbr')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -210,7 +210,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocType')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -226,7 +226,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocSource')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -253,7 +253,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:BusinessPartner')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -269,7 +269,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:RequestDate')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                 ]
@@ -290,7 +290,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -308,7 +308,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -326,7 +326,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -341,7 +341,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -356,7 +356,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     }
                 ]
@@ -382,7 +382,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -399,7 +399,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     },
                     {
@@ -416,7 +416,7 @@ var loadControl = function () {
                             text: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt')
                         },
                         validationRules: [{
-                            type: 'required',
+                            type: 'required', message: '' 
                         }]
                     }
                 ]
@@ -454,10 +454,6 @@ var loadControl = function () {
                 frmSalesRequestDetails.updateData('docTotalLineAmt', sumLineAmt);
                 frmSalesRequestDetails.updateData('docTotalLineAmtAfterTax', sumLineAmtAfterTax);
 
-                if (needSummaryUpdate) {
-                    needSummaryUpdate = false;
-                    e.component.refresh();
-                }
             },
             onEditorPreparing: function (e) {
                 if (e.parentType === "dataRow" && (e.dataField === "vatId" || e.dataField === "priceAfterTax" || e.dataField === "discountAmt" || e.dataField === "lineAmt" || e.dataField === "lineAmtAfterTax")) {
@@ -487,6 +483,8 @@ var loadControl = function () {
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:Item'),
                     dataField: 'itemId',
+                    fixed: true,
+                    fixedPosition: 'left',
                     lookup: {
                         dataSource: itemList,
                         displayExpr: "name",
@@ -558,7 +556,8 @@ var loadControl = function () {
 
                         needSummaryUpdate = true;
                     },
-                    validationRules: [{ type: 'required' }],
+                   
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 200
                 },
                 {
@@ -655,8 +654,9 @@ var loadControl = function () {
                     },
                     setCellValue: function (newData, value, currentData) {
                         newData.discountType = value;
+                       
                     },
-                    validationRules: [{ type: 'required' }],
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 200
                 },
                 {
@@ -685,49 +685,31 @@ var loadControl = function () {
                         }
                     },
                     value: 0,
-                    validationRules: [{ type: 'required' }],
+                    validationRules: [{ type: 'required', message: '' }],
                     width: 150
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountAmt'),
                     dataField: 'discountAmt',
                     dataType: 'number',
-                    editorOptions: {
-                        format: '#,##0.##',
-                    },
-                    format: {
-                        type: "currency",
-                        currency: "VND"
-                    },
-                    validationRules: [{ type: 'required', message: '' }],
+                    format: ",##0.###",
+                    //validationRules: [{ type: 'required', message: '' }],
                     width: 150
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineAmt'),
                     dataField: 'lineAmt',
                     dataType: 'number',
-                    editorOptions: {
-                        format: '#,##0.##',
-                    },
-                    format: {
-                        type: "currency",
-                        currency: "VND"
-                    },
-                    validationRules: [{ type: 'required', message: '' }],
+                    format: ",##0.###",
+                    // validationRules: [{ type: 'required', message: '' }],
                     width: 150
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineAmtAfterTax'),
                     dataField: 'lineAmtAfterTax',
                     dataType: 'number',
-                    editorOptions: {
-                        format: '#,##0.##',
-                    },
-                    format: {
-                        type: "currency",
-                        currency: "VND"
-                    },
-                    validationRules: [{ type: 'required', message: '' }],
+                    format: ",##0.###",
+                    // validationRules: [{ type: 'required', message: '' }],
                     width: 150
                 },
                 {
@@ -753,36 +735,40 @@ var loadControl = function () {
                     //validationRules: [{ type: 'required' }],
                     width: 200
                 },
-                //hidden field
-                {
-                    dataField: 'uomGroupId',
-                    visible: false,
-                },
-                {
-                    dataField: 'uomRate',
-                    visible: false,
-                },
-                {
-                    dataField: 'taxRate',
-                    visible: false,
-                }
+                ////hidden field
+                //{
+                //    dataField: 'uomGroupId',
+                //    visible: false,
+                //},
+                //{
+                //    dataField: 'uomRate',
+                //    visible: false,
+                //},
+                //{
+                //    dataField: 'taxRate',
+                //    visible: false,
+                //},
+              
             ],
             summary: {
                 totalItems: [
                     {
                         column: "discountAmt",
                         summaryType: "sum",
-                        alignment: "left"
+                        alignment: "left",
+                        valueFormat: ",##0.###"
                     },
                     {
                         column: "lineAmt",
                         summaryType: "sum",
-                        alignment: "left"
+                        alignment: "left",
+                        valueFormat: ",##0.###"
                     },
                     {
                         column: "lineAmtAfterTax",
                         summaryType: "sum",
-                        alignment: "left"
+                        alignment: "left",
+                        valueFormat: ",##0.###"
                     }
                 ]
             }
@@ -824,50 +810,36 @@ var loadControl = function () {
     initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestDetails');
 };
 
-function calculatorDocTotal() {
-    // get data in grid details
-    var dataRows = SalesRequestDetailsModel;
-    var sumDiscountAmt = 0;
-    var sumLineAmt = 0;
-    var sumLineAmtAfterTax = 0;
-    dataRows.forEach(x => {
-        sumDiscountAmt = sumDiscountAmt + x.discountAmt;
-        sumLineAmt = sumLineAmt + x.lineAmt;
-        sumLineAmtAfterTax = sumLineAmtAfterTax + x.lineAmtAfterTax;
-    })
-    // caculator doc total
-    var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
-    var docTotalLineDiscountAmt = sumDiscountAmt;
-    var docTotalLineAmt = sumLineAmt;
-    var docTotalLineAmtAfterTax = sumLineAmtAfterTax;
-    var docDiscountType = formSalesRequest.getEditor('docDiscountType').option('value');
-    var docDiscountPerc = (formSalesRequest.getEditor('docDiscountPerc').option('value')) / 100;
-    var docDiscountAmt = formSalesRequest.getEditor('docDiscountAmt').option('value');
-    formSalesRequest.updateData('docTotalLineDiscountAmt', docTotalLineDiscountAmt);
-    formSalesRequest.updateData('docTotalLineAmt', docTotalLineAmt);
-    formSalesRequest.updateData('docTotalLineAmtAfterTax', docTotalLineAmtAfterTax);
-
-    if (docDiscountType == 0) {
-        formSalesRequest.updateData('docDiscountAmt', docDiscountAmt);
-        formSalesRequest.getEditor('docDiscountAmt').option('disabled', false);
-        formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
-        formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
+    function calculatorDocTotal() {
+        var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
+        var docTotalLineDiscountAmt = formSalesRequest.getEditor('docTotalLineDiscountAmt').option('value');
+        var docTotalLineAmt = formSalesRequest.getEditor('docTotalLineAmt').option('value');
+        var docTotalLineAmtAfterTax = formSalesRequest.getEditor('docTotalLineAmtAfterTax').option('value');
+        var docDiscountType = formSalesRequest.getEditor('docDiscountType').option('value');
+        var docDiscountPerc = (formSalesRequest.getEditor('docDiscountPerc').option('value')) / 100;
+        var docDiscountAmt = formSalesRequest.getEditor('docDiscountAmt').option('value');
+        if (docDiscountType == 0) {
+            formSalesRequest.updateData('docDiscountAmt', 0);
+            formSalesRequest.getEditor('docDiscountAmt').option('disabled', false);
+            formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
+            formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
+        }
+        if (docDiscountType == 1) {
+            var _docDiscountAmt = docTotalLineAmt * docDiscountPerc;
+            frmSalesRequestDetails.updateData('docDiscountAmt', _docDiscountAmt);
+            formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+            formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
+            formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
+        }
+        if (docDiscountType == 2) {
+            var _docDiscountAmt = docTotalLineAmtAfterTax * docDiscountPerc;
+            frmSalesRequestDetails.updateData('docDiscountAmt', _docDiscountAmt);
+            formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+            formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
+            formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
+        } 
     }
-    if (docDiscountType == 1) {
-        var _docDiscountAmt = docTotalLineAmt * docDiscountPerc;
-        formSalesRequest.updateData('docDiscountAmt', _docDiscountAmt);
-        formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
-        formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
-        formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
-    }
-    if (docDiscountType == 2) {
-        var _docDiscountAmt = docTotalLineAmtAfterTax * docDiscountPerc;
-        formSalesRequest.updateData('docDiscountAmt', _docDiscountAmt);
-        formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
-        formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
-        formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
-    }
-}
+};
 
 function appendSelectedItems(selectedItems) {
     selectedItems.forEach(u => {
