@@ -9,7 +9,7 @@ var uOMList = {};
 var itemGroupList = {};
 var vatList = {};
 const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
-var customerId = 0;
+var needSummaryUpdate = false;
 
 // get data api getInfoForSo in item service
 var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
@@ -20,6 +20,7 @@ itemService.getInfoForSO(companyId,
     .done(async result => {
         let resultJson = await Common.parseJSON(result);
         let data = Common.processInitData(resultJson);
+        console.log(data);
         convertResultToJson(data);
         loadControl();
     });
@@ -465,8 +466,6 @@ var loadControl = function () {
                 allowUpdating: true,
                 allowDeleting: true,
                 useIcons: true,
-                //selectTextOnEditStart: true,
-                //startEditAction: 'click',
                 texts: {
                     editRow: l("Edit"),
                     deleteRow: l("Delete"),
@@ -495,7 +494,6 @@ var loadControl = function () {
                     setCellValue: function (newData, value, currentData) {
                         var selectedItem = itemList.filter(i => i.id == value)[0];
                         var vat = vatList.filter(i => i.id == selectedItem.vatId)[0];
-                        var customer = customerList.filter(i => i.id == customerId)[0];
 
                         newData.itemId = value;
                         newData.uomGroupId = selectedItem.uomGroupId;
@@ -539,11 +537,38 @@ var loadControl = function () {
                         displayExpr: "name",
                         valueExpr: "id"
                     },
-                    editorOptions: {
-                        onValueChanged: function (e) {
-                            //var dataRow = 
-                        }
+                    setCellValue: function (newData, value, currentData) {
+                        var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
+                        var customerId = formSalesRequest.getEditor('businessPartnerId').option('value');
+                        var customer = customerList.filter(x => x.id == customerId)[0];
+                        var price = priceList.find(x => x = customer.priceListId + '|' + currentData.itemId + '|' + value);
+                        var priceAfterTax = price + (price * currentData.taxRate) / 100;
+                        var lineAmtAfterTax = priceAfterTax;
+                        var lineAmt = price;
+
+                        newData.uomId = value;
+                        newData.price = price;
+                        newData.priceAfterTax = priceAfterTax;
+                        newData.lineAmtAfterTax = lineAmtAfterTax;
+                        newData.lineAmt = lineAmt;
+
+                        needSummaryUpdate = true;
                     },
+                    //editorOptions:{
+                    //    onValueChanged: function (e) {
+                    //        var rows = dgSalesRequestDetails.getVisibleRows();
+                    //        var tr = e.element.closest('tr');  
+                    //        var dataRow = rows[tr.index()].data;
+                    //        var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
+                    //        var customerId = formSalesRequest.getEditor('businessPartnerId').option('value');
+                    //        var customer = customerList.filter(x => x.id == customerId)[0];
+                    //        var price = priceList.find(x => x = customer.priceListId + '|' + dataRow.itemId + '|' + e.value);
+                    //        var priceAfterTax = price + (price * dataRow.taxRate) / 100;
+                    //        var lineAmtAfterTax = priceAfterTax;
+                    //        var lineAmt = price;
+
+                    //    }
+                    //},
                     validationRules: [{ type: 'required' }],
                     width: 200
                 },
@@ -641,12 +666,22 @@ var loadControl = function () {
                     },
                     setCellValue: function (newData, value, currentData) {
                         newData.discountType = value;
-
+                        // get price
+                        //var d = new $.Deferred();
+                        //priceListDetailsService.getListDevextremes({ filter: JSON.stringify([['itemId', '=', value], 'and', ['item.uomGroupId', '=', selectedItem.uomGroupId], 'and', ['priceList.id', '=', pricelistId]]) })
+                        //    .done(result => {
+                        //        d.resolve(
+                        //            newData.price = result.data[0] != undefined ? result.data[0].price : 0,
+                        //            newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100,
+                        //            newData.lineAmtAfterTax = newData.priceAfterTax,
+                        //            newData.lineAmt = newData.price,
+                        //        );
+                        //    });
+                        //return d.promise();
                     },
                     validationRules: [{ type: 'required' }],
                     width: 200
                 },
-
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountPerc'),
                     dataField: 'discountPerc',
