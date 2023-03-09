@@ -77,6 +77,51 @@
         }
     });
 
+    const manageItem = [
+        {
+            id: 0,
+            text: l('EntityFieldValue:MDMService:Item:ManageItemBy:NONE')
+        },
+        {
+            id: 1,
+            text: l('EntityFieldValue:MDMService:Item:ManageItemBy:LOT')
+        },
+        {
+            id: 2,
+            text: l('EntityFieldValue:MDMService:Item:ManageItemBy:SERIAL')
+        }
+    ];
+
+    const expiredType = [
+        {
+            id: 0,
+            text: l('EntityFieldValue:MDMService:Item:ExpiredType:DAY')
+        },
+        {
+            id: 1,
+            text: l('EntityFieldValue:MDMService:Item:ExpiredType:WEEK')
+        },
+        {
+            id: 2,
+            text: l('EntityFieldValue:MDMService:Item:ExpiredType:MONTH')
+        },
+        {
+            id: 3,
+            text: l('EntityFieldValue:MDMService:Item:ExpiredType:YEAR')
+        }
+    ];
+
+    const issueMethod = [
+        {
+            id: 0,
+            text: l('EntityFieldValue:MDMService:Item:IssueMethod:FEFO')
+        },
+        {
+            id: 1,
+            text: l('EntityFieldValue:MDMService:Item:IssueMethod:SERIAL')
+        }
+    ];
+
     /****control*****/
 
     var gridItemMasters = $('#dataGridItemMasters').dxDataGrid({
@@ -315,12 +360,22 @@
                 dataField: 'manageItemBy',
                 caption: l('EntityFieldName:MDMService:Item:ManageItemBy'),
                 validationRules: [{ type: "required" }],
+                lookup: {
+                    dataSource: manageItem,
+                    valueExpr: "id",
+                    displayExpr: "text"
+                },
                 visible: false
             },
             {
                 name: 'ExpiredType',
                 dataField: 'expiredType',
                 caption: l('EntityFieldName:MDMService:Item:ExpiredType'),
+                lookup: {
+                    dataSource: expiredType,
+                    valueExpr: "id",
+                    displayExpr: "text"
+                },
                 visible: false
             },
             {
@@ -335,6 +390,11 @@
             {
                 dataField: 'issueMethod',
                 caption: l('EntityFieldName:MDMService:Item:IssueMethod'),
+                lookup: {
+                    dataSource: issueMethod,
+                    valueExpr: "id",
+                    displayExpr: "text"
+                },
                 visible: false
             },
             {
