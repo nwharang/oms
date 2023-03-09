@@ -459,41 +459,6 @@ var loadControl = function () {
                     e.component.refresh();
                 }
             },
-            //toolbar: {
-            //    items: [
-            //        "addRowButton",
-            //        {
-            //            location: 'after',
-            //            widget: 'dxButton',
-            //            options: {
-            //                icon: "checklist",
-            //                onClick(e) {
-            //                    popupItems.show();
-            //                },
-            //            },
-            //        },
-            //        'columnChooserButton',
-            //        "exportButton",
-            //        {
-            //            location: 'after',
-            //            widget: 'dxButton',
-            //            options: {
-            //                icon: "import",
-            //                elementAttr: {
-            //                    //id: "import-excel",
-            //                    class: "import-excel",
-            //                },
-            //                onClick(e) {
-            //                    var gridControl = e.element.closest('div.dx-datagrid').parent();
-            //                    var gridName = gridControl.attr('id');
-            //                    var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-            //                    if (popup) popup.show();
-            //                },
-            //            },
-            //        },
-            //        "searchPanel"
-            //    ],
-            //},
             onEditorPreparing: function (e) {
                 if (e.parentType === "dataRow" && (e.dataField === "vatId" || e.dataField === "priceAfterTax" || e.dataField === "discountAmt" || e.dataField === "lineAmt" || e.dataField === "lineAmtAfterTax")) {
                     e.editorOptions.disabled = true;
@@ -541,23 +506,6 @@ var loadControl = function () {
                         newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100;
                         newData.lineAmtAfterTax = newData.priceAfterTax;
                         newData.lineAmt = newData.price;
-
-                        //newData.qty = 1;
-                        //newData.discountAmt = 0;
-                        //newData.discountPerc = 0;
-
-                        // get price
-                        //var d = new $.Deferred();
-                        //priceListDetailsService.getListDevextremes({ filter: JSON.stringify([['itemId', '=', value], 'and', ['item.uomGroupId', '=', selectedItem.uomGroupId], 'and', ['priceList.id', '=', pricelistId]]) })
-                        //    .done(result => {
-                        //        d.resolve(
-                        //            newData.price = result.data[0] != undefined ? result.data[0].price : 0,
-                        //            newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100,
-                        //            newData.lineAmtAfterTax = newData.priceAfterTax,
-                        //            newData.lineAmt = newData.price,
-                        //        );
-                        //    });
-                        //return d.promise();
                     },
                     validationRules: [{ type: 'required', message: '' }],
                     width: 200
@@ -569,6 +517,8 @@ var loadControl = function () {
                         dataSource(options) {
                             if (options.data != null) {
                                 var uomGroupId = options.data.uomGroupId;
+                                if (!uomGroupId) return;
+
                                 var uomGroup = uomGroupList.find(x => x = uomGroupId);
                                 var uOMListOfItem = [];
                                 uomGroup.forEach(x => {
@@ -608,21 +558,6 @@ var loadControl = function () {
 
                         needSummaryUpdate = true;
                     },
-                    //editorOptions:{
-                    //    onValueChanged: function (e) {
-                    //        var rows = dgSalesRequestDetails.getVisibleRows();
-                    //        var tr = e.element.closest('tr');  
-                    //        var dataRow = rows[tr.index()].data;
-                    //        var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
-                    //        var customerId = formSalesRequest.getEditor('businessPartnerId').option('value');
-                    //        var customer = customerList.filter(x => x.id == customerId)[0];
-                    //        var price = priceList.find(x => x = customer.priceListId + '|' + dataRow.itemId + '|' + e.value);
-                    //        var priceAfterTax = price + (price * dataRow.taxRate) / 100;
-                    //        var lineAmtAfterTax = priceAfterTax;
-                    //        var lineAmt = price;
-
-                    //    }
-                    //},
                     validationRules: [{ type: 'required' }],
                     width: 200
                 },
@@ -720,18 +655,6 @@ var loadControl = function () {
                     },
                     setCellValue: function (newData, value, currentData) {
                         newData.discountType = value;
-                        // get price
-                        //var d = new $.Deferred();
-                        //priceListDetailsService.getListDevextremes({ filter: JSON.stringify([['itemId', '=', value], 'and', ['item.uomGroupId', '=', selectedItem.uomGroupId], 'and', ['priceList.id', '=', pricelistId]]) })
-                        //    .done(result => {
-                        //        d.resolve(
-                        //            newData.price = result.data[0] != undefined ? result.data[0].price : 0,
-                        //            newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100,
-                        //            newData.lineAmtAfterTax = newData.priceAfterTax,
-                        //            newData.lineAmt = newData.price,
-                        //        );
-                        //    });
-                        //return d.promise();
                     },
                     validationRules: [{ type: 'required' }],
                     width: 200
@@ -842,75 +765,7 @@ var loadControl = function () {
                 {
                     dataField: 'taxRate',
                     visible: false,
-                },
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineDiscountAmt'),
-                //    dataField: 'lineDiscountAmt',
-                //    validationRules: [{ type: 'required' }]
-                //},
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:ProcessQty'),
-                //    dataField: 'processQty',
-                //    validationRules: [{ type: 'required' }]
-                //},
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:OpenQty'),
-                //    dataField: 'openQty',
-                //    validationRules: [{ type: 'required' }]
-                //},
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequestDetails:ConfirmQty'),
-                //    dataField: 'confirmQty',
-                //    validationRules: [{ type: 'required' }]
-                //},
-                //{
-                //    caption: l('EntityFieldName:MDMService:UOMGroupDetail:BaseUomId'),
-                //    dataField: 'baseUomId',
-                //    calculateDisplayValue: "baseUOM.name",
-                //    lookup: {
-                //        dataSource(options) {
-                //            return {
-                //                store: Store,
-                //                filter: [["uomGroup.id", "=", options.data != null ? options.data.uomGroupId : null]],
-                //                paginate: true,
-                //                pageSize: pageSizeForLookup
-                //            };
-                //        },
-                //        displayExpr: "baseUOM.name",
-                //        valueExpr: "baseUOM.id"
-                //    },
-                //    setCellValue: function (newData, value, currentData) {
-                //        newData.baseUomId = value;
-
-                //        var d = new $.Deferred();
-
-                //        uOMGroupDetailService.getListDevextremes({ filter: JSON.stringify(['uomGroupId', '=', currentData.uomGroupId]) })
-                //            .done(result => {
-                //                d.resolve(
-                //                    newData.uomRate = result.data[0].baseQty
-                //                );
-                //            });
-
-                //        return d.promise();
-                //    },
-                //    width: 200
-                //},
-                //{
-                //    //caption: l('EntityFieldName:OrderService:SalesRequestDetails:SfaOrderBaseQty'),
-                //    caption: l('SfaOrderBaseQty'),
-                //    dataField: 'sfaOrderBaseQty',
-                //    dataType: 'number',
-                //    value: 0,
-                //    width: 150
-                //},
-                //{
-                //    //caption: l('EntityFieldName:OrderService:SalesRequestDetails:BaseQty'),
-                //    caption: l('BaseQty'),
-                //    dataField: 'baseQty',
-                //    dataType: 'number',
-                //    value: 0,
-                //    width: 150
-                //},
+                }
             ],
             summary: {
                 totalItems: [
@@ -949,11 +804,6 @@ var loadControl = function () {
     $("#SaveButton").click(function (e) {
         e.preventDefault();
 
-        //if (!frmSalesRequestDetails.validate().isValid) {
-        //    abp.message.warn(l('WarnMessage.RequiredField'));
-        //    return;
-        //}
-
         var salesRequestHeader = frmSalesRequestDetails.option('formData');
         var salesRequestDetails = dgSalesRequestDetails.getDataSource().items();
 
@@ -972,68 +822,57 @@ var loadControl = function () {
     });
 
     initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestDetails');
-
-    function calculatorDocTotal() {
-        var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
-        var docTotalLineDiscountAmt = formSalesRequest.getEditor('docTotalLineDiscountAmt').option('value');
-        var docTotalLineAmt = formSalesRequest.getEditor('docTotalLineAmt').option('value');
-        var docTotalLineAmtAfterTax = formSalesRequest.getEditor('docTotalLineAmtAfterTax').option('value');
-        var docDiscountType = formSalesRequest.getEditor('docDiscountType').option('value');
-        var docDiscountPerc = (formSalesRequest.getEditor('docDiscountPerc').option('value')) / 100;
-        var docDiscountAmt = formSalesRequest.getEditor('docDiscountAmt').option('value');
-        if (docDiscountType == 0) {
-            formSalesRequest.updateData('docDiscountAmt', 0);
-            formSalesRequest.getEditor('docDiscountAmt').option('disabled', false);
-            formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
-            formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
-        }
-        if (docDiscountType == 1) {
-            var _docDiscountAmt = docTotalLineAmt * docDiscountPerc;
-            frmSalesRequestDetails.updateData('docDiscountAmt', _docDiscountAmt);
-            formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
-            formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
-            formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
-        }
-        if (docDiscountType == 2) {
-            var _docDiscountAmt = docTotalLineAmtAfterTax * docDiscountPerc;
-            frmSalesRequestDetails.updateData('docDiscountAmt', _docDiscountAmt);
-            formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
-            formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
-            formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
-        }
-
-        //var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
-        //var docTotalLineAmt = formSalesRequest.getEditor('docTotalLineAmt').option('value');
-        //var docDiscountPerc = formSalesRequest.getEditor('docDiscountPerc').option('value');
-        //var docTotalLineAmtAfterTax = formSalesRequest.getEditor('docTotalLineAmtAfterTax').option('value');
-        //var docDiscountAmt = 0;
-        //if (e.value == 0) {
-        //    docDiscountAmt = 0;
-        //    frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountAmt);
-        //    formSalesRequest.getEditor('docDiscountAmt').option('disabled', false);
-        //    formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
-        //    formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
-        //}
-        //if (e.value == 1) {
-        //    docDiscountAmt = docTotalLineAmt * docDiscountPerc;
-        //    frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountAmt);
-        //    formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
-        //    formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
-        //    formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
-        //}
-        //if (e.value == 2) {
-        //    docDiscountAmt = docTotalLineAmtAfterTax * docDiscountPerc;
-        //    frmSalesRequestDetails.updateData('docDiscountAmt', docDiscountAmt);
-        //    formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
-        //    formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
-        //    formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
-        //}
-
-    }
 };
+
+function calculatorDocTotal() {
+    // get data in grid details
+    var dataRows = SalesRequestDetailsModel;
+    var sumDiscountAmt = 0;
+    var sumLineAmt = 0;
+    var sumLineAmtAfterTax = 0;
+    dataRows.forEach(x => {
+        sumDiscountAmt = sumDiscountAmt + x.discountAmt;
+        sumLineAmt = sumLineAmt + x.lineAmt;
+        sumLineAmtAfterTax = sumLineAmtAfterTax + x.lineAmtAfterTax;
+    })
+    // caculator doc total
+    var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
+    var docTotalLineDiscountAmt = sumDiscountAmt;
+    var docTotalLineAmt = sumLineAmt;
+    var docTotalLineAmtAfterTax = sumLineAmtAfterTax;
+    var docDiscountType = formSalesRequest.getEditor('docDiscountType').option('value');
+    var docDiscountPerc = (formSalesRequest.getEditor('docDiscountPerc').option('value')) / 100;
+    var docDiscountAmt = formSalesRequest.getEditor('docDiscountAmt').option('value');
+    formSalesRequest.updateData('docTotalLineDiscountAmt', docTotalLineDiscountAmt);
+    formSalesRequest.updateData('docTotalLineAmt', docTotalLineAmt);
+    formSalesRequest.updateData('docTotalLineAmtAfterTax', docTotalLineAmtAfterTax);
+
+    if (docDiscountType == 0) {
+        formSalesRequest.updateData('docDiscountAmt', docDiscountAmt);
+        formSalesRequest.getEditor('docDiscountAmt').option('disabled', false);
+        formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
+        formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
+    }
+    if (docDiscountType == 1) {
+        var _docDiscountAmt = docTotalLineAmt * docDiscountPerc;
+        formSalesRequest.updateData('docDiscountAmt', _docDiscountAmt);
+        formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+        formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
+        formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
+    }
+    if (docDiscountType == 2) {
+        var _docDiscountAmt = docTotalLineAmtAfterTax * docDiscountPerc;
+        formSalesRequest.updateData('docDiscountAmt', _docDiscountAmt);
+        formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+        formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
+        formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
+    }
+}
 
 function appendSelectedItems(selectedItems) {
     selectedItems.forEach(u => {
+        var priceAfterTax = u.basePrice + (u.basePrice * vatList.filter(x => x.id == u.vatId)[0].rate) / 100;
+        var lineAmtAfterTax = (priceAfterTax * parseInt(u.qty)) - 0;
         SalesRequestDetailsModel.unshift({
             id: u.id,
             itemId: u.id,
@@ -1042,9 +881,9 @@ function appendSelectedItems(selectedItems) {
             uomId: u.salesUomId,
             price: u.basePrice,
             qty: parseInt(u.qty),
-            priceAfterTax: u.basePrice + (u.basePrice * vatList.filter(x => x.id == u.vatId)[0].rate) / 100,
-            lineAmtAfterTax: u.basePrice + (u.basePrice * vatList.filter(x => x.id == u.vatId)[0].rate) / 100,
-            lineAmt: u.basePrice,
+            priceAfterTax: priceAfterTax,
+            lineAmtAfterTax: lineAmtAfterTax,
+            lineAmt: u.basePrice * parseInt(u.qty) - 0,
             discountAmt: 0,
             discountPerc: 0,
             discountType: 0,
@@ -1053,6 +892,7 @@ function appendSelectedItems(selectedItems) {
         });
     });
     $('#dgSalesRequestDetails').data('dxDataGrid').refresh();
+    calculatorDocTotal();
 }
 function convertResultToJson(data) {
     // get customer list
@@ -1084,5 +924,4 @@ function convertResultToJson(data) {
     vatList = Object.keys(data.itemInfo.vat).map(function (key) {
         return data.itemInfo.vat[key];
     });
-    //
 };
