@@ -1,81 +1,12 @@
 ﻿$(function () {
     var l = abp.localization.getResource("OMS");
     var itemMasterService = window.dMSpro.oMS.mdmService.controllers.items.item;
-    var itemTypeService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
-    var uOMGroupService = window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGroup;
     var itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
 
     var itemMaster = {};
 
     /****custom store*****/
 
-    // get item type list
-    var getItemTypes = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            itemTypeService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        }
-    });
-    // get item attribute value
-    var getItemAttrValue = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            itemAttrValueService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        }
-    });
-    // get UOM group lookup
-    var getUOMGroups = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            uOMGroupService.getListDevextremes({})
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        }
-    });
     // get Item Master
     var itemStore = new DevExpress.data.CustomStore({
         key: 'id',
@@ -116,6 +47,33 @@
         },
         remove(key) {
             return itemMasterService.delete(key);
+        }
+    });
+
+    // get item attribute value
+    var getItemAttrValue = new DevExpress.data.CustomStore({
+        key: 'id',
+        loadMode: 'raw',
+        cacheRawData: true,
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            itemAttrValueService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+            return deferred.promise();
         }
     });
 
@@ -300,19 +258,7 @@
             {
                 dataField: 'itemTypeId',
                 caption: l("EntityFieldName:MDMService:Item:ItemTypeName"),
-                calculateDisplayValue: "itemType.valueName",
-                lookup: {
-                    dataSource(options) {
-                        return {
-                            store: getItemTypes,
-                            filter: ['code', '=', 'MD02'],
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    valueExpr: 'id',
-                    displayExpr: 'valueName'
-                }
+                calculateDisplayValue: "itemType.valueName"
             },
             {
                 dataField: 'erpCode',
@@ -322,12 +268,7 @@
             {
                 dataField: 'uomGroupId',
                 caption: l('EntityFieldName:MDMService:Item:UOMGroupCode'),
-                editorType: 'dxSelectBox',
-                editorOptions: {
-                    dataSource: getUOMGroups,
-                    valueExpr: 'id',
-                    displayExpr: 'code'
-                },
+                calculateDisplayValue: "uomGroup.code",
                 visible: false
             },
             {
@@ -398,24 +339,28 @@
             {
                 dataField: 'inventoryUOMId',
                 caption: l('EntityFieldName:MDMService:Item:InventoryUnitName'),
+                calculateDisplayValue: "inventoryUOM.name",
                 validationRules: [{ type: "required" }],
                 visible: false
             },
             {
                 dataField: 'purUOMId',
                 caption: l('EntityFieldName:MDMService:Item:PurUnitName'),
+                calculateDisplayValue: "purUOM.name",
                 validationRules: [{ type: "required" }],
                 visible: false
             },
             {
                 dataField: 'salesUOMId',
                 caption: l('EntityFieldName:MDMService:Item:SalesUnitName'),
+                calculateDisplayValue: "salesUOM.name",
                 validationRules: [{ type: "required" }],
                 visible: false
             },
             {
                 dataField: 'vatId',
                 caption: l('EntityFieldName:MDMService:Item:VATName'),
+                calculateDisplayValue: 'vat.name',
                 validationRules: [{ type: "required" }],
                 visible: false
             },
