@@ -567,10 +567,7 @@ var loadControl = function () {
                     editorOptions: {
                         format: '#,##0.##',
                     },
-                    format: {
-                        type: "currency",
-                        currency: "VND"
-                    },
+                    format: ",##0.###",
                     setCellValue: function (newData, value, currentData) {
                         newData.price = value;
                         newData.priceAfterTax = value + (value * currentData.taxRate) / 100;
@@ -605,10 +602,7 @@ var loadControl = function () {
                     editorOptions: {
                         format: '#,##0.##',
                     },
-                    format: {
-                        type: "currency",
-                        currency: "VND"
-                    },
+                    format: ",##0.###",
                     validationRules: [{ type: 'required', message: '' }],
                     width: 150,
                 },
@@ -810,36 +804,50 @@ var loadControl = function () {
     initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestDetails');
 };
 
-    function calculatorDocTotal() {
-        var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
-        var docTotalLineDiscountAmt = formSalesRequest.getEditor('docTotalLineDiscountAmt').option('value');
-        var docTotalLineAmt = formSalesRequest.getEditor('docTotalLineAmt').option('value');
-        var docTotalLineAmtAfterTax = formSalesRequest.getEditor('docTotalLineAmtAfterTax').option('value');
-        var docDiscountType = formSalesRequest.getEditor('docDiscountType').option('value');
-        var docDiscountPerc = (formSalesRequest.getEditor('docDiscountPerc').option('value')) / 100;
-        var docDiscountAmt = formSalesRequest.getEditor('docDiscountAmt').option('value');
-        if (docDiscountType == 0) {
-            formSalesRequest.updateData('docDiscountAmt', 0);
-            formSalesRequest.getEditor('docDiscountAmt').option('disabled', false);
-            formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
-            formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
-        }
-        if (docDiscountType == 1) {
-            var _docDiscountAmt = docTotalLineAmt * docDiscountPerc;
-            frmSalesRequestDetails.updateData('docDiscountAmt', _docDiscountAmt);
-            formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
-            formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
-            formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
-        }
-        if (docDiscountType == 2) {
-            var _docDiscountAmt = docTotalLineAmtAfterTax * docDiscountPerc;
-            frmSalesRequestDetails.updateData('docDiscountAmt', _docDiscountAmt);
-            formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
-            formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
-            formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
-        } 
+function calculatorDocTotal() {
+    // get data in grid details
+    var dataRows = SalesRequestDetailsModel;
+    var sumDiscountAmt = 0;
+    var sumLineAmt = 0;
+    var sumLineAmtAfterTax = 0;
+    dataRows.forEach(x => {
+        sumDiscountAmt = sumDiscountAmt + x.discountAmt;
+        sumLineAmt = sumLineAmt + x.lineAmt;
+        sumLineAmtAfterTax = sumLineAmtAfterTax + x.lineAmtAfterTax;
+    })
+    // caculator doc total
+    var formSalesRequest = $('#frmSalesRequestDetails').data('dxForm');
+    var docTotalLineDiscountAmt = sumDiscountAmt;
+    var docTotalLineAmt = sumLineAmt;
+    var docTotalLineAmtAfterTax = sumLineAmtAfterTax;
+    var docDiscountType = formSalesRequest.getEditor('docDiscountType').option('value');
+    var docDiscountPerc = (formSalesRequest.getEditor('docDiscountPerc').option('value')) / 100;
+    var docDiscountAmt = formSalesRequest.getEditor('docDiscountAmt').option('value');
+    formSalesRequest.updateData('docTotalLineDiscountAmt', docTotalLineDiscountAmt);
+    formSalesRequest.updateData('docTotalLineAmt', docTotalLineAmt);
+    formSalesRequest.updateData('docTotalLineAmtAfterTax', docTotalLineAmtAfterTax);
+
+    if (docDiscountType == 0) {
+        formSalesRequest.updateData('docDiscountAmt', docDiscountAmt);
+        formSalesRequest.getEditor('docDiscountAmt').option('disabled', false);
+        formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
+        formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
     }
-};
+    if (docDiscountType == 1) {
+        var _docDiscountAmt = docTotalLineAmt * docDiscountPerc;
+        formSalesRequest.updateData('docDiscountAmt', _docDiscountAmt);
+        formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+        formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
+        formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
+    }
+    if (docDiscountType == 2) {
+        var _docDiscountAmt = docTotalLineAmtAfterTax * docDiscountPerc;
+        formSalesRequest.updateData('docDiscountAmt', _docDiscountAmt);
+        formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+        formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
+        formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
+    }
+}
 
 function appendSelectedItems(selectedItems) {
     selectedItems.forEach(u => {
