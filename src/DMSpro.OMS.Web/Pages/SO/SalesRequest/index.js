@@ -134,59 +134,6 @@
         }
     ];
 
-    const discountTypeStore = [
-        {
-            id: 0,
-            text: l('EntityFieldName:OrderService:SalesRequest:CashDiscount')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldName:OrderService:SalesRequest:DiscountBeforeTax')
-        },
-        {
-            id: 2,
-            text: l('EntityFieldName:OrderService:SalesRequest:DiscountAfterTax')
-        }
-    ];
-
-    const docSourceStore = [
-        {
-            id: 0,
-            text: l('EntityFieldName:OrderService:SalesRequest:Manual')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldName:OrderService:SalesRequest:SFA')
-        },
-        {
-            id: 2,
-            text: l('EntityFieldName:OrderService:SalesRequest:BonBonShop')
-        },
-        {
-            id: 3,
-            text: l('EntityFieldName:OrderService:SalesRequest:Ecommerce')
-        }
-    ];
-
-    const transactionTypeStore = [
-        {
-            id: 0,
-            text: l('EntityFieldName:OrderService:SalesRequest:Item')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldName:OrderService:SalesRequest:Promotion')
-        },
-        {
-            id: 2,
-            text: l('EntityFieldName:OrderService:SalesRequest:Sampling')
-        },
-        {
-            id: 3,
-            text: l('EntityFieldName:OrderService:SalesRequest:Incentive')
-        }
-    ];
-
     const docStatusStore = [
         {
             id: 0,
@@ -219,7 +166,7 @@
                     template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("Button.New.SalesRequest")}" style="height: 36px;"> <i class="fa fa-plus"></i> <span></span> </button>`,
                     onClick() {
                         var newtab = window.open('/SO/SalesRequest/Details', '_blank');
-                        newtab.sessionStorage.setItem("SalesRequestModel", null);
+                       // newtab.sessionStorage.setItem("SalesRequestHeaderId", null);
                     },
                 },
                 'columnChooserButton',
@@ -254,7 +201,7 @@
                         icon: "fieldchooser",
                         onClick: function (e) {
                             var newtab = window.open('/SO/SalesRequest/Details', '_blank');
-                            newtab.sessionStorage.setItem("SalesRequestModel", JSON.stringify(e.row.data));
+                            newtab.sessionStorage.setItem("SalesRequestHeaderId", JSON.stringify(e.row.data.id));
                         }
                     }
                 ],
@@ -290,7 +237,7 @@
                     dataSource: docTypeStore,
                     displayExpr: "text",
                     valueExpr: "id"
-                },
+                }
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocDate'),
