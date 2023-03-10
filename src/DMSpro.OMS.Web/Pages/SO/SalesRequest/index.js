@@ -49,75 +49,75 @@
         }
     });
 
-    var companyStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
+    //var companyStore = new DevExpress.data.CustomStore({
+    //    key: 'id',
+    //    load(loadOptions) {
+    //        const deferred = $.Deferred();
+    //        const args = {};
 
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
+    //        requestOptions.forEach((i) => {
+    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+    //                args[i] = JSON.stringify(loadOptions[i]);
+    //            }
+    //        });
 
-            companyService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
+    //        companyService.getListDevextremes(args)
+    //            .done(result => {
+    //                deferred.resolve(result.data, {
+    //                    totalCount: result.totalCount,
+    //                    summary: result.summary,
+    //                    groupCount: result.groupCount,
+    //                });
+    //            });
 
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
+    //        return deferred.promise();
+    //    },
+    //    byKey: function (key) {
+    //        if (key == 0) return null;
 
-            var d = new $.Deferred();
-            companyService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
+    //        var d = new $.Deferred();
+    //        companyService.get(key)
+    //            .done(data => {
+    //                d.resolve(data);
+    //            });
+    //        return d.promise();
+    //    }
+    //});
 
-    var customerStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
+    //var customerStore = new DevExpress.data.CustomStore({
+    //    key: 'id',
+    //    load(loadOptions) {
+    //        const deferred = $.Deferred();
+    //        const args = {};
 
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
+    //        requestOptions.forEach((i) => {
+    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+    //                args[i] = JSON.stringify(loadOptions[i]);
+    //            }
+    //        });
 
-            customerService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
+    //        customerService.getListDevextremes(args)
+    //            .done(result => {
+    //                deferred.resolve(result.data, {
+    //                    totalCount: result.totalCount,
+    //                    summary: result.summary,
+    //                    groupCount: result.groupCount,
+    //                });
+    //            });
 
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
+    //        return deferred.promise();
+    //    },
+    //    byKey: function (key) {
+    //        if (key == 0) return null;
 
-            var d = new $.Deferred();
-            customerService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
+    //        var d = new $.Deferred();
+    //        customerService.get(key)
+    //            .done(data => {
+    //                d.resolve(data);
+    //            });
+    //        return d.promise();
+    //    }
+    //});
 
     const docTypeStore = [
         {
@@ -217,18 +217,18 @@
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:Company'),
                 dataField: 'companyId',
-                //calculateDisplayValue: "company.name",
-                lookup: {
-                    dataSource() {
-                        return {
-                            store: companyStore,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    displayExpr: "name",
-                    valueExpr: "id"
-                },
+                calculateDisplayValue: "company.name",
+                //lookup: {
+                //    dataSource() {
+                //        return {
+                //            store: companyStore,
+                //            paginate: true,
+                //            pageSize: pageSizeForLookup
+                //        };
+                //    },
+                //    displayExpr: "name",
+                //    valueExpr: "id"
+                //},
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocType'),
@@ -244,18 +244,18 @@
                 dataField: 'docDate',
                 dataType: 'datetime'
             },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:DeliveryDate'),
-                dataField: 'deliveryDate',
-                dataType: 'date',
-                visible: false,
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:PostingDate'),
-                dataField: 'postingDate',
-                dataType: 'datetime',
-                visible: false,
-            },
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequest:DeliveryDate'),
+            //    dataField: 'deliveryDate',
+            //    dataType: 'date',
+            //    visible: false,
+            //},
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequest:PostingDate'),
+            //    dataField: 'postingDate',
+            //    dataType: 'datetime',
+            //    visible: false,
+            //},
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:Remark'),
                 dataField: 'remark',
@@ -271,47 +271,46 @@
                     valueExpr: "id"
                 },
             },
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequest:BusinessPartner'),
+            //    dataField: 'businessPartnerDisplay',
+            //    calculateDisplayValue: "name",
+            //    lookup: {
+            //        dataSource() {
+            //            return {
+            //                store: customerStore,
+            //                paginate: true,
+            //                pageSize: pageSizeForLookup
+            //            };
+            //        },
+            //        displayExpr: "name",
+            //        valueExpr: "id"
+            //    },
+            //    visible: false,
+            //},
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequest:Route'),
+            //    dataField: 'routeDisplay',
+            //    dataType: 'string',
+            //    visible: false,
+            //},
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequest:Employee'),
+            //    dataField: 'employeeDisplay',
+            //    dataType: 'string',
+            //    visible: false,
+            //},
 
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:BusinessPartner'),
-                dataField: 'businessPartnerDisplay',
-                calculateDisplayValue: "name",
-                lookup: {
-                    dataSource() {
-                        return {
-                            store: customerStore,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    displayExpr: "name",
-                    valueExpr: "id"
-                },
-                visible: false,
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:Route'),
-                dataField: 'routeDisplay',
-                dataType: 'string',
-                visible: false,
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:Employee'),
-                dataField: 'employeeDisplay',
-                dataType: 'string',
-                visible: false,
-            },
-
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:LinkedDoc'),
-                dataField: 'linkedDoc',
-                visible: false,
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:LinkedSFA'),
-                dataField: 'linkedSFAId',
-                visible: false,
-            },
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequest:LinkedDoc'),
+            //    dataField: 'linkedDoc',
+            //    visible: false,
+            //},
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequest:LinkedSFA'),
+            //    dataField: 'linkedSFAId',
+            //    visible: false,
+            //},
 
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt'),
@@ -361,24 +360,24 @@
                 dataType: 'number',
                 visible: true,
             },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:DocBaseType'),
-                dataField: 'docBaseType',
-                dataType: 'number',
-                visible: false,
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:BaseDoc'),
-                dataField: 'baseDocId',
-                dataType: 'string',
-                visible: false,
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:DocSource'),
-                dataField: 'docSource',
-                dataType: 'number',
-                visible: false,
-            },
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequest:DocBaseType'),
+            //    dataField: 'docBaseType',
+            //    dataType: 'number',
+            //    visible: false,
+            //},
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequest:BaseDoc'),
+            //    dataField: 'baseDocId',
+            //    dataType: 'string',
+            //    visible: false,
+            //},
+            //{
+            //    caption: l('EntityFieldName:OrderService:SalesRequest:DocSource'),
+            //    dataField: 'docSource',
+            //    dataType: 'number',
+            //    visible: false,
+            //},
         ]
     })).dxDataGrid("instance");
 

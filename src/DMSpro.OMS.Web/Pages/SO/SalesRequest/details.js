@@ -1,5 +1,23 @@
 ﻿var SalesRequestHeaderModel = null;
 var SalesRequestDetailsModel = [];
+
+const defaultEmptyModel = {
+    itemId: null,
+    vatId: null,
+    taxRate: null,
+    uomId: null,
+    price: 0,
+    qty: 1,
+    priceAfterTax: 0,
+    lineAmtAfterTax: 0,
+    lineAmt: 0,
+    discountAmt: 0,
+    discountPerc: 0,
+    discountType: 0,
+    transactionType: 0,
+    uomGroupId: null
+}
+
 //var data = {};
 //var customerList = {};
 //var priceList = {};
@@ -11,7 +29,7 @@ let vatList = {};
 const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
 const linkedSFAId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
 var needSummaryUpdate = false;
-
+var editingEmptyRow = false;
 // get data api getInfoForSo in item service
 var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
 let lastCallDates = Common.getLastAPICallDates();
@@ -179,9 +197,9 @@ var loadControl = function (data) {
                             valueExpr: 'id',
                             showClearButton: true,
                             onValueChanged: function (e) {
-                                $('.addNewButton').data('dxButton').option('disabled', false);
                                 $('.openItemsPopupButton').data('dxButton').option('disabled', false);
-                                //$('#dgSalesRequestDetails').data('dxDataGrid').addRow();
+                                SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+                                dgSalesRequestDetails.refresh();
                             }
                         },
                         label: {
@@ -387,9 +405,18 @@ var loadControl = function (data) {
                 frmSalesRequestDetails.updateData('docTotalLineDiscountAmt', sumDiscountAmt);
                 frmSalesRequestDetails.updateData('docTotalLineAmt', sumLineAmt);
                 frmSalesRequestDetails.updateData('docTotalLineAmtAfterTax', sumLineAmtAfterTax);
+
+                if (editingEmptyRow) {
+                    editingEmptyRow = false;
+                    SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+                    dgSalesRequestDetails.refresh();
+                }
             },
+
             onContentReady: function (e) {
+                $('.addNewButton').data('dxButton').option('visible', false);
                 calculatorDocTotal();
+
                 //var sumDiscountAmt = e.component.getTotalSummaryValue('discountAmt');
                 //var sumLineAmt = e.component.getTotalSummaryValue('lineAmt');
                 //var sumLineAmtAfterTax = e.component.getTotalSummaryValue('lineAmtAfterTax');
@@ -467,6 +494,8 @@ var loadControl = function (data) {
                         newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100;
                         newData.lineAmtAfterTax = newData.priceAfterTax * currentData.qty - currentData.discountAmt;
                         newData.lineAmt = newData.price * currentData.qty - currentData.discountAmt;
+                        if (!currentData.itemId)
+                            editingEmptyRow = true;
                     },
                     //validationRules: [{ type: 'required', message: '' }],
                     //width: 200
@@ -834,6 +863,7 @@ var loadControl = function (data) {
         salesRequestService.getDetailListDevextremes(args)
             .done(result => {
                 SalesRequestDetailsModel = result.data;
+                SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
                 gridDetails = $('#dgSalesRequestDetails').data('dxDataGrid')
                 gridDetails.option('dataSource', SalesRequestDetailsModel);
                 gridDetails.refresh();
