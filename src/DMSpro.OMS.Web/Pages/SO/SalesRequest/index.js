@@ -166,7 +166,7 @@
                     template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("Button.New.SalesRequest")}" style="height: 36px;"> <i class="fa fa-plus"></i> <span></span> </button>`,
                     onClick() {
                         var newtab = window.open('/SO/SalesRequest/Details', '_blank');
-                       // newtab.sessionStorage.setItem("SalesRequestHeaderId", null);
+                        newtab.sessionStorage.setItem("SalesRequestHeaderId", null);
                     },
                 },
                 'columnChooserButton',

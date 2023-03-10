@@ -18,13 +18,6 @@ const defaultEmptyModel = {
     uomGroupId: null
 }
 
-//var data = {};
-//var customerList = {};
-//var priceList = {};
-//var uomGroupList = {};
-//var itemList = {};
-//var uOMList = {};
-//var itemGroupList = {};
 let vatList = {};
 const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
 const linkedSFAId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
@@ -126,7 +119,6 @@ var loadControl = function (data) {
     const frmSalesRequestDetails = $('#frmSalesRequestDetails').dxForm({
         formData: {
             SalesRequestHeaderModel
-            //linkedSFAId: SalesRequestHeaderModel ? SalesRequestHeaderModel.linkedSFAId : '3fa85f64-5717-4562-b3fc-2c963f66afa6'
         },
         labelMode: "floating",
         colCount: 3,
@@ -198,6 +190,7 @@ var loadControl = function (data) {
                             showClearButton: true,
                             onValueChanged: function (e) {
                                 $('.openItemsPopupButton').data('dxButton').option('disabled', false);
+                                //$('#dgSalesRequestDetails').data('dxDataGrid').addRow();
                                 SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
                                 dgSalesRequestDetails.refresh();
                             }
@@ -386,10 +379,6 @@ var loadControl = function (data) {
             onInitialized: function (e) {
                 //todo
             },
-            //onRowInserting: function (e) {
-            //    var max = Math.max.apply(Math, SalesRequestDetailsModel.map(function (d) { return d.position; }))
-            //    e.SalesRequestDetailsModel.position = max + 1;
-            //},
             onInitNewRow: function (e) {
                 e.data.qty = 1;
                 e.data.discountAmt = 0;
@@ -399,20 +388,21 @@ var loadControl = function (data) {
                 e.data.price = 0;
             },
             onSaved: function (e) {
-                var sumDiscountAmt = dgSalesRequestDetails.getTotalSummaryValue('discountAmt');
-                var sumLineAmt = dgSalesRequestDetails.getTotalSummaryValue('lineAmt');
-                var sumLineAmtAfterTax = dgSalesRequestDetails.getTotalSummaryValue('lineAmtAfterTax');
-                frmSalesRequestDetails.updateData('docTotalLineDiscountAmt', sumDiscountAmt);
-                frmSalesRequestDetails.updateData('docTotalLineAmt', sumLineAmt);
-                frmSalesRequestDetails.updateData('docTotalLineAmtAfterTax', sumLineAmtAfterTax);
+                calculatorDocTotal();
+                //var sumDiscountAmt = dgSalesRequestDetails.getTotalSummaryValue('discountAmt');
+                //var sumLineAmt = dgSalesRequestDetails.getTotalSummaryValue('lineAmt');
+                //var sumLineAmtAfterTax = dgSalesRequestDetails.getTotalSummaryValue('lineAmtAfterTax');
+                //frmSalesRequestDetails.updateData('docTotalLineDiscountAmt', sumDiscountAmt);
+                //frmSalesRequestDetails.updateData('docTotalLineAmt', sumLineAmt);
+                //frmSalesRequestDetails.updateData('docTotalLineAmtAfterTax', sumLineAmtAfterTax);
 
                 if (editingEmptyRow) {
                     editingEmptyRow = false;
                     SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
                     dgSalesRequestDetails.refresh();
                 }
+                //dgSalesRequestDetails.saveEditData();
             },
-
             onContentReady: function (e) {
                 $('.addNewButton').data('dxButton').option('visible', false);
                 calculatorDocTotal();
@@ -436,6 +426,9 @@ var loadControl = function (data) {
             },
             editing: {
                 mode: 'cell',
+                //mode: 'batch',
+                //selectTextOnEditStart: true,
+                //startEditAction: 'click',
                 allowAdding: true,
                 allowUpdating: true,
                 allowDeleting: true,
@@ -454,15 +447,6 @@ var loadControl = function (data) {
                     buttons: ['edit', 'delete'],
                     fixedPosition: 'left'
                 },
-                //{
-                //    dataField: "position",
-                //    allowEditing: false,
-                //    sortOrder: 'desc',
-                //    allowSorting: false,
-                //    formItem: {
-                //        visible: false
-                //    }
-                //},
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:Item'),
                     dataField: 'itemId',
@@ -496,6 +480,8 @@ var loadControl = function (data) {
                         newData.lineAmt = newData.price * currentData.qty - currentData.discountAmt;
                         if (!currentData.itemId)
                             editingEmptyRow = true;
+
+                        //dgSalesRequestDetails.saveEditData();
                     },
                     //validationRules: [{ type: 'required', message: '' }],
                     //width: 200
@@ -804,14 +790,13 @@ var loadControl = function (data) {
         //var salesRequestDetails = dgSalesRequestDetails.getDataSource().items();
         var salesRequestObject = {
             header: salesRequestHeader,
-            details: SalesRequestDetailsModel
+            details: removeEmtyDetail(SalesRequestDetailsModel)
         };
 
         console.log("Save data: ", salesRequestObject);
 
-        debugger
         if (salesRequestHeader.id) {
-            salesRequestService.updateDoc(salesRequestObject, { contentType: "application/json" })
+            salesRequestService.updateDoc(salesRequestHeader.id, salesRequestObject, { contentType: "application/json" })
                 .done(result => {
                     abp.message.success(l('Congratulations'));
                     console.log(result);
@@ -848,12 +833,11 @@ var loadControl = function (data) {
 
     initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestDetails');
 
-    var headerId = sessionStorage.getItem('SalesRequestHeaderId');
-    if (headerId) {
-        headerId = JSON.parse(headerId);
+    var headerId = JSON.parse(sessionStorage.getItem('SalesRequestHeaderId'));
+    if (headerId != null) {
+        //headerId = JSON.parse(headerId);
         salesRequestService.getHeader(headerId)
             .done(result => {
-                debugger
                 SalesRequestHeaderModel = result;
                 $('#frmSalesRequestDetails').data('dxForm').option('formData', SalesRequestHeaderModel);
             });
@@ -863,13 +847,21 @@ var loadControl = function (data) {
         salesRequestService.getDetailListDevextremes(args)
             .done(result => {
                 SalesRequestDetailsModel = result.data;
-                SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+                if (SalesRequestDetailsModel.find(x => x.itemId == null) == null)
+                    SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
                 gridDetails = $('#dgSalesRequestDetails').data('dxDataGrid')
                 gridDetails.option('dataSource', SalesRequestDetailsModel);
                 gridDetails.refresh();
             });
     }
 };
+
+function removeEmtyDetail(detailList) {
+    var itemEmty = detailList.find(x => x.itemId == null);
+    var index = detailList.indexOf(itemEmty);
+    detailList.splice(index, 1);
+    return detailList;
+}
 
 function calculatorDocTotal() {
 
