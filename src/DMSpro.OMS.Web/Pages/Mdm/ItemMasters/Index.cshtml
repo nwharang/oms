@@ -14,8 +14,15 @@
     PageLayout.Content.MenuItemName = MdmServiceMenus.Items;
 }
 
-@section scripts
-    {
+@section styles {
+    <style>
+        .dx-tabpanel-container {
+            padding-bottom: 20px !important;
+        }
+    </style>
+}
+
+@section scripts {
     <script src="/js/devextreme/exceljs.min.js"></script>
     <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/Mdm/ItemMasters/index.js" />
@@ -45,9 +52,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    .dx-tabpanel-container {
-        padding-bottom: 20px !important;
-    }
-</style>

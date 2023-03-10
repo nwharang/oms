@@ -37,7 +37,7 @@ class Common {
         if (typeof (Storage) === "undefined") {
             return;
         }
-        localStorage.setItem(key, value);
+        localStorage.setItem(key, JSON.stringify(value));
     };
 
     static loadFromStorage(key) {
