@@ -493,6 +493,12 @@ $(function () {
             message: '',
         }],
     });
+    function getCurrentDateFormat()
+    { 
+        var currentDate = new Date();
+        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2) + "T00:00:00";
+        return date;
+    }
     function getNormalDate(currentDate) {
         if (!currentDate || (typeof currentDate == "string")) return currentDate;
 

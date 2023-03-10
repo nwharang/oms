@@ -63,6 +63,7 @@ $(function () {
 
     var companyStore = new DevExpress.data.CustomStore({ 
         key: 'id',
+        useDefaultSearch: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -98,6 +99,7 @@ $(function () {
 
     var userStore = new DevExpress.data.CustomStore({ 
         key: 'id',
+        useDefaultSearch: true,
         load: function (loadOptions) {
             var deferred = $.Deferred();
             const params = {};
