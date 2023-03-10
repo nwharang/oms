@@ -1,4 +1,4 @@
-﻿var SalesRequestHeaderModel = null;
+﻿var SalesRequestHeaderId = sessionStorage.getItem('SalesRequestHeaderId');
 var SalesRequestDetailsModel = [];
 
 const defaultEmptyModel = {
@@ -116,10 +116,7 @@ var loadControl = function (data) {
     }).dxResizable('instance');
 
     // Sales Request herader form
-    const frmSalesRequestDetails = $('#frmSalesRequestDetails').dxForm({
-        formData: {
-            SalesRequestHeaderModel
-        },
+    const frmSalesRequestDetails = $('#frmSalesRequestDetails').dxForm({ 
         labelMode: "floating",
         colCount: 3,
         items: [
@@ -796,8 +793,8 @@ var loadControl = function (data) {
 
         console.log("Save data: ", salesRequestObject);
 
-        if (SalesRequestHeaderModel && SalesRequestHeaderModel.id) {
-            salesRequestService.updateDoc(SalesRequestHeaderModel.id, salesRequestObject, { contentType: "application/json" })
+        if (SalesRequestHeaderId) {
+            salesRequestService.updateDoc(SalesRequestHeaderId, salesRequestObject, { contentType: "application/json" })
                 .done(result => {
                     abp.message.success(l('Congratulations'));
                     console.log(result);
@@ -817,7 +814,8 @@ var loadControl = function (data) {
             salesRequestService.createDoc(salesRequestObject, { contentType: "application/json" })
                 .done(result => {
                     abp.message.success(l('Congratulations'));
-                    SalesRequestHeaderModel = result.header;
+                    SalesRequestHeaderId = result.header.id;
+                    sessionStorage.setItem('SalesRequestHeaderId', SalesRequestHeaderId);
                     console.log(result);
                 })
                 .fail(result => {
@@ -835,17 +833,16 @@ var loadControl = function (data) {
 
     initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestDetails');
 
-    var headerId = JSON.parse(sessionStorage.getItem('SalesRequestHeaderId'));
-    if (headerId != null) {
+  //  var headerId = JSON.parse(sessionStorage.getItem('SalesRequestHeaderId'));
+    if (SalesRequestHeaderId != null) {
         //headerId = JSON.parse(headerId);
-        salesRequestService.getHeader(headerId)
-            .done(result => {
-                SalesRequestHeaderModel = result;
-                $('#frmSalesRequestDetails').data('dxForm').option('formData', SalesRequestHeaderModel);
+        salesRequestService.getHeader(SalesRequestHeaderId)
+            .done(result => { 
+                $('#frmSalesRequestDetails').data('dxForm').option('formData', result);
             });
 
         const args = {};
-        args.filter = JSON.stringify(['docId', '=', headerId])
+        args.filter = JSON.stringify(['docId', '=', SalesRequestHeaderId])
         salesRequestService.getDetailListDevextremes(args)
             .done(result => {
                 SalesRequestDetailsModel = result.data;
