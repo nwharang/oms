@@ -209,7 +209,8 @@ var loadControl = function (data) {
                         editorOptions: {
                             type: 'datetime',
                             value: new Date(),
-                            disabled: true,
+                            displayFormat: "dd/MM/yyyy HH:mm",
+                           // disabled: true,
                         },
                         label: {
                             visible: false,
@@ -790,7 +791,7 @@ var loadControl = function (data) {
         //var salesRequestDetails = dgSalesRequestDetails.getDataSource().items();
         var salesRequestObject = {
             header: salesRequestHeader,
-            details: removeEmtyDetail(SalesRequestDetailsModel)
+            details: removeEmtyDetail(JSON.parse(JSON.stringify(SalesRequestDetailsModel)))
         };
 
         console.log("Save data: ", salesRequestObject);
@@ -857,7 +858,7 @@ var loadControl = function (data) {
 };
 
 function removeEmtyDetail(detailList) {
-    var itemEmty = detailList.find(x => x.itemId == null);
+    var itemEmty = detailList.find(x => !x.itemId);
     var index = detailList.indexOf(itemEmty);
     detailList.splice(index, 1);
     return detailList;
