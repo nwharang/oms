@@ -74,7 +74,6 @@ $(function () {
         }
     ];
 
-
     $('#tabpanel-container').dxTabPanel({
         items: [
             {
@@ -153,6 +152,7 @@ $(function () {
                                         editorOptions: {
                                             dataSource: {
                                                 store: getItemTypes,
+                                                filter: ['code', '=', 'MD02'],
                                                 paginate: true,
                                                 pageSize: pageSizeForLookup
                                             },
@@ -372,28 +372,9 @@ $(function () {
         return {
             store: getItemAttrValue,
             filter: ['itemAttribute.attrNo', '=', n],
+            paginate: true,
+            pageSize: pageSizeForLookup
         };
-    }
-
-    function getAttrOptions(e) {
-        const options = [];
-
-        const deferred = $.Deferred();
-        itemAttrService.getListDevextremes({})
-            .done(result => {
-                deferred.resolve(result.data, {
-                    totalCount: result.totalCount,
-                    summary: result.summary,
-                    groupCount: result.groupCount,
-                });
-            });
-        deferred.promise().then(u => {
-            var listAttrActive = u.filter(x => x.active == true);
-            listAttrActive.forEach((i) => {
-                options.push(generateAttrOptions(i))
-            });
-        });
-        return options;
     }
 
     function generateAttrOptions(attr) {
@@ -404,7 +385,7 @@ $(function () {
             },
             editorType: 'dxSelectBox',
             editorOptions: {
-                dataSource: dsAttrValue(attr.attrNo), //listAttrValue.filter(x => x.itemAttributeId == attr.id),
+                dataSource: dsAttrValue(attr.attrNo),
                 valueExpr: 'id',
                 displayExpr: 'attrValName'
             }
@@ -621,7 +602,15 @@ var getItemTypes = new DevExpress.data.CustomStore({
     cacheRawData: true,
     load(loadOptions) {
         const deferred = $.Deferred();
-        itemTypeService.getListDevextremes({ filter: JSON.stringify(['code', '=', 'MD02']) })
+        const args = {};
+
+        requestOptions.forEach((i) => {
+            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                args[i] = JSON.stringify(loadOptions[i]);
+            }
+        });
+
+        itemTypeService.getListDevextremes(args)
             .done(result => {
                 deferred.resolve(result.data, {
                     totalCount: result.totalCount,
@@ -630,6 +619,16 @@ var getItemTypes = new DevExpress.data.CustomStore({
                 });
             });
         return deferred.promise();
+    },
+    byKey: function (key) {
+        if (key == 0) return null;
+
+        var d = new $.Deferred();
+        itemTypeService.get(key)
+            .done(data => {
+                d.resolve(data);
+            });
+        return d.promise();
     }
 });
 
@@ -639,7 +638,14 @@ var getUOMGroups = new DevExpress.data.CustomStore({
     cacheRawData: true,
     load(loadOptions) {
         const deferred = $.Deferred();
-        uOMGroupService.getListDevextremes({})
+        const args = {};
+
+        requestOptions.forEach((i) => {
+            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                args[i] = JSON.stringify(loadOptions[i]);
+            }
+        });
+        uOMGroupService.getListDevextremes(args)
             .done(result => {
                 deferred.resolve(result.data, {
                     totalCount: result.totalCount,
@@ -648,6 +654,16 @@ var getUOMGroups = new DevExpress.data.CustomStore({
                 });
             });
         return deferred.promise();
+    },
+    byKey: function (key) {
+        if (key == 0) return null;
+
+        var d = new $.Deferred();
+        uOMGroupService.get(key)
+            .done(data => {
+                d.resolve(data);
+            });
+        return d.promise();
     }
 });
 
@@ -657,7 +673,14 @@ var getUOMs = new DevExpress.data.CustomStore({
     cacheRawData: true,
     load(loadOptions) {
         const deferred = $.Deferred();
-        uomService.getListDevextremes({})
+        const args = {};
+
+        requestOptions.forEach((i) => {
+            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                args[i] = JSON.stringify(loadOptions[i]);
+            }
+        });
+        uomService.getListDevextremes(args)
             .done(result => {
                 deferred.resolve(result.data, {
                     totalCount: result.totalCount,
@@ -666,6 +689,16 @@ var getUOMs = new DevExpress.data.CustomStore({
                 });
             });
         return deferred.promise();
+    },
+    byKey: function (key) {
+        if (key == 0) return null;
+
+        var d = new $.Deferred();
+        uomService.get(key)
+            .done(data => {
+                d.resolve(data);
+            });
+        return d.promise();
     }
 });
 
@@ -675,7 +708,14 @@ var getVATs = new DevExpress.data.CustomStore({
     cacheRawData: true,
     load(loadOptions) {
         const deferred = $.Deferred();
-        vATService.getListDevextremes({})
+        const args = {};
+
+        requestOptions.forEach((i) => {
+            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                args[i] = JSON.stringify(loadOptions[i]);
+            }
+        });
+        vATService.getListDevextremes(args)
             .done(result => {
                 deferred.resolve(result.data, {
                     totalCount: result.totalCount,
@@ -684,6 +724,16 @@ var getVATs = new DevExpress.data.CustomStore({
                 });
             });
         return deferred.promise();
+    },
+    byKey: function (key) {
+        if (key == 0) return null;
+
+        var d = new $.Deferred();
+        vATService.get(key)
+            .done(data => {
+                d.resolve(data);
+            });
+        return d.promise();
     }
 });
 
@@ -693,7 +743,14 @@ var getItemAttrValue = new DevExpress.data.CustomStore({
     cacheRawData: true,
     load(loadOptions) {
         const deferred = $.Deferred();
-        itemAttrValueService.getListDevextremes({})
+        const args = {};
+
+        requestOptions.forEach((i) => {
+            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                args[i] = JSON.stringify(loadOptions[i]);
+            }
+        });
+        itemAttrValueService.getListDevextremes(args)
             .done(result => {
                 deferred.resolve(result.data, {
                     totalCount: result.totalCount,
@@ -701,10 +758,17 @@ var getItemAttrValue = new DevExpress.data.CustomStore({
                     groupCount: result.groupCount,
                 });
             });
-        deferred.promise().then(attrVal => {
-            listAttrValue = attrVal;
-        })
         return deferred.promise();
+    },
+    byKey: function (key) {
+        if (key == 0) return null;
+
+        var d = new $.Deferred();
+        itemAttrValueService.get(key)
+            .done(data => {
+                d.resolve(data);
+            });
+        return d.promise();
     }
 });
 
@@ -879,7 +943,7 @@ function initImageTab() {
                         validationRules: [{ type: "required" }],
                         cellTemplate(container, options) {
                             $('<div>')
-                                .append($(options.value ? "<img src=\"" + options.value + "\"> " : ""))
+                                .append($(options.value ? `<img src='${urlGetFileImage}?id=${options.value}' width='150' />` : ""))
                                 .appendTo(container);
                         }
                     },
@@ -957,13 +1021,13 @@ function renderImage(data, itemElement) {
         src: '/images/default-avatar-image.jpg',
         style: 'display: none; max-width: 50%; height: auto'
     }));
-    //var gridItemImage = $('#dgItemImage').data('dxDataGrid');
-    //var selectedRowsData = gridItemImage.getVisibleRows()[rowEditing];
+
     getItemImage(itemImage.id).done(fileId => {
         if (fileId != '') {
             getFileImage(fileId, function (dataUrl) {
                 $('#item-image').attr('src', dataUrl);
                 $('#item-image').attr('style', 'display: block !important');
+                $('#item-image').attr('width', '200');
             })
         }
     })
