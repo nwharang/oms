@@ -784,20 +784,20 @@ var loadControl = function (data) {
     $("#SaveButton").click(function (e) {
         e.preventDefault();
 
-        var salesRequestHeader = frmSalesRequestDetails.option('formData');
-        salesRequestHeader.companyId = companyId;
-        salesRequestHeader.linkedSFAId = linkedSFAId;
+        var header = frmSalesRequestDetails.option('formData');
+        header.companyId = companyId;
+        header.linkedSFAId = linkedSFAId;
 
         //var salesRequestDetails = dgSalesRequestDetails.getDataSource().items();
         var salesRequestObject = {
-            header: salesRequestHeader,
+            header: header,
             details: removeEmtyDetail(JSON.parse(JSON.stringify(SalesRequestDetailsModel)))
         };
 
         console.log("Save data: ", salesRequestObject);
 
-        if (salesRequestHeader.id) {
-            salesRequestService.updateDoc(salesRequestHeader.id, salesRequestObject, { contentType: "application/json" })
+        if (SalesRequestHeaderModel && SalesRequestHeaderModel.id) {
+            salesRequestService.updateDoc(SalesRequestHeaderModel.id, salesRequestObject, { contentType: "application/json" })
                 .done(result => {
                     abp.message.success(l('Congratulations'));
                     console.log(result);
@@ -817,6 +817,7 @@ var loadControl = function (data) {
             salesRequestService.createDoc(salesRequestObject, { contentType: "application/json" })
                 .done(result => {
                     abp.message.success(l('Congratulations'));
+                    SalesRequestHeaderModel = result.header;
                     console.log(result);
                 })
                 .fail(result => {
