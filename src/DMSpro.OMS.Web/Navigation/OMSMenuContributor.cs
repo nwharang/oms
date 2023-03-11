@@ -149,6 +149,7 @@ public class OMSMenuContributor : IMenuContributor
         AddMenuItemArCreditMemoHeaders(context, soMenu);
         AddMenuItemProcessSalesOrderHeaders(context, soMenu);
         AddMenuItemProcessDeliveryHeaders(context, soMenu);
+        AddMenuItemProcessSOToInvoice(context, soMenu);
 
 		//maps
         var mapsMenu = AddModuleMapsMenuItem(context);
@@ -207,7 +208,7 @@ public class OMSMenuContributor : IMenuContributor
             new ApplicationMenuItem(
                 OrderServiceMenus.SalesOrderHeaders,
                 context.GetLocalizer<OMSResource>()["Menu:SOService:ProcessSalesOrder"],
-                "/SO/SalesOrders",
+                "/SO/ProcessSalesOrder",
                 icon: "fa fa-list-ol",
                 requiredPermissionName: OrderServicePermissions.SalesOrders.Default
             )
@@ -402,7 +403,19 @@ public class OMSMenuContributor : IMenuContributor
             new ApplicationMenuItem(
                 OrderServiceMenus.DeliveryHeaders,
                 context.GetLocalizer<OMSResource>()["Menu:SOService:ProcessDelivery"],
-                "/SO/Delivery",
+                "/SO/ProcessDelivery",
+                icon: "fa fa-archive",
+                requiredPermissionName: OrderServicePermissions.Deliveries.Default
+            )
+        );
+    }
+    private static void AddMenuItemProcessSOToInvoice(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    {
+        parentMenu.AddItem(
+            new ApplicationMenuItem(
+                OrderServiceMenus.DeliveryHeaders,
+                context.GetLocalizer<OMSResource>()["Menu:SOService:ProcessSOToInvoice"],
+                "/SO/ProcessSOToInvoice",
                 icon: "fa fa-archive",
                 requiredPermissionName: OrderServicePermissions.Deliveries.Default
             )
