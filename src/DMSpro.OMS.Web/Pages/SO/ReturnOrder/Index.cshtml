@@ -1,16 +1,23 @@
 @page
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using DMSpro.OMS.OrderService.Permissions
+@using DMSpro.OMS.OrderService.Web.Menus
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.Localization
 @inject IPageLayout PageLayout
+@inject IHtmlLocalizer<OMSResource> L
+@inject IAuthorizationService Authorization
 @{
-    PageLayout.Content.Title = "SO";
-    PageLayout.Content.MenuItemName = "SO.ReturnOrder";
+    PageLayout.Content.Title = L["Menu:SOService:ReturnOrder"].Value;
+    PageLayout.Content.MenuItemName = OrderServiceMenus.ReturnOrderHeaders;
 }
 
 @section styles {
     <abp-style src="/Pages/POs/PurchaseOrders/index.css" />
 }
 @section scripts {
+    <abp-script src="/pages/shared/common.isp.js" />
     <script src="/js/devextreme/exceljs.min.js"></script>
     <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/SO/ReturnOrder/index.js" />
@@ -19,8 +26,8 @@
 
 @section breadcrumb {
     <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="javascript:void(0);">SO</a></li>
-        <li class="breadcrumb-item active">Return Order</li>
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:SOService:GroupMenu:SO"].Value</a></li>
+        <li class="breadcrumb-item active">@L["Menu:SOService:ReturnOrder"].Value</li>
     </ol>
 }
 
@@ -28,15 +35,13 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fa fa-file-alt"></i>
+                <i class="subheader-icon fa fa-file-alt"></i> @L["Menu:SOService:ReturnOrder"].Value
             </h2>
         </div>
         <div class="panel-container show">
-            <div class="panel-content jqvmap-bg-ocean p-0" style="">
-                <div class="dx-viewport">
-                    <div class="py-2">
-                        <div id="gridPurchaseOrders"></div>
-                    </div>
+            <div class="panel-content jqvmap-bg-ocean p-0">
+                <div class="dx-viewport p-2">
+                    <div id="dgReturnOrderHeader"></div>
                 </div>
             </div>
         </div>
