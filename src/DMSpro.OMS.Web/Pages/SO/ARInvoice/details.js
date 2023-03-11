@@ -835,7 +835,7 @@ var loadControl = function (data) {
                 })
     });
 
-    initImportPopup('', 'ArCreditMemoDetails_Template', 'dgArInvoiceDetails');
+    initImportPopup('', 'ArInvoiceDetails_Template', 'dgArInvoiceDetails');
 
     //  var headerId = JSON.parse(sessionStorage.getItem('ArInvoiceHeaderId'));
     if (ArInvoiceHeaderId != null) {
