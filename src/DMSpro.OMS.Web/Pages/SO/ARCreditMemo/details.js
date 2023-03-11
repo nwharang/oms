@@ -483,8 +483,7 @@ var loadControl = function (data) {
 
                         //dgArCreditMemoDetails.saveEditData();
                     },
-                    //validationRules: [{ type: 'required', message: '' }],
-                    //width: 200
+                    minWidth: 300
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:UOM'),
@@ -534,8 +533,7 @@ var loadControl = function (data) {
 
                         needSummaryUpdate = true;
                     },
-                    //validationRules: [{ type: 'required', message: '' }],
-                    //width: 200
+                    width: 200
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:IsFree'),
@@ -566,7 +564,8 @@ var loadControl = function (data) {
                             newData.lineAmt = lineAmt;
                         }
                         calculatorDocTotal();
-                    }
+                    },
+                    width: 200
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:Price'),
@@ -583,7 +582,7 @@ var loadControl = function (data) {
                         newData.lineAmtAfterTax = newData.priceAfterTax * currentData.qty - currentData.discountAmt;
                     },
                     validationRules: [{ type: 'required', message: '' }],
-                    width: 150,
+                    width: 200,
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:VAT'),
@@ -601,7 +600,7 @@ var loadControl = function (data) {
                         valueExpr: "id"
                     },
                     visible: false,
-                    width: 150,
+                    width: 200,
                     //validationRules: [{ type: 'required', message: '' }]
                 },
                 {
@@ -613,7 +612,7 @@ var loadControl = function (data) {
                     },
                     format: ",##0.###",
                     validationRules: [{ type: 'required', message: '' }],
-                    width: 150,
+                    width: 200,
                     visible: false
                 },
                 {
@@ -636,12 +635,12 @@ var loadControl = function (data) {
                             pattern: /^\d*[1-9]\d*$/,
                         }
                     ],
-                    width: 150,
+                    width: 200,
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:Promotion'),
                     dataField: 'promotionId',
-                    width: 150,
+                    width: 200,
                     visible: false
                 },
                 {
@@ -687,7 +686,7 @@ var loadControl = function (data) {
                     },
                     value: 0,
                     validationRules: [{ type: 'required', message: '' }],
-                    width: 150,
+                    width: 200,
                     visible: false
                 },
                 {
@@ -696,7 +695,7 @@ var loadControl = function (data) {
                     dataType: 'number',
                     format: ",##0.###",
                     //validationRules: [{ type: 'required', message: '' }],
-                    width: 150,
+                    width: 200,
                     visible: false
                 },
                 {
@@ -705,7 +704,7 @@ var loadControl = function (data) {
                     dataType: 'number',
                     format: ",##0.###",
                     // validationRules: [{ type: 'required', message: '' }],
-                    width: 150
+                    width: 200
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineAmtAfterTax'),
@@ -713,7 +712,7 @@ var loadControl = function (data) {
                     dataType: 'number',
                     format: ",##0.###",
                     // validationRules: [{ type: 'required', message: '' }],
-                    width: 150
+                    width: 200
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:TransactionType'),
@@ -724,7 +723,7 @@ var loadControl = function (data) {
                         valueExpr: 'id'
                     },
                     validationRules: [{ type: 'required', message: '' }],
-                    width: 150,
+                    width: 200,
                     visible: false
                 },
                 {
