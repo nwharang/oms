@@ -298,7 +298,7 @@ $(function () {
                             if (popup) popup.show();
                         },
                     },
-                },
+                }, 
                 "searchPanel",
             ],
         },

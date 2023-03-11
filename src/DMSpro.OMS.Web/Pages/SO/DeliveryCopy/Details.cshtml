@@ -1,0 +1,88 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using DMSpro.OMS.MdmService.Permissions
+@using DMSpro.OMS.MdmService.Web.Menus
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.MdmService.Localization
+@inject IHtmlLocalizer<MdmServiceResource> L
+@inject IAuthorizationService Authorization
+
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = L["Delivery"].Value;
+    PageLayout.Content.MenuItemName = "SO";
+}
+
+@section styles {
+    <style>
+        #resizable {
+            height: 300px;
+        }
+        #dgItems{
+            max-width:none !important;
+        }
+        
+       div.dx-toolbar.dx-popup-bottom > div.dx-toolbar-items-container {
+            margin-top: 7px;
+       }
+
+     div.dx-popup-content,
+        div.panel-container.show div.dx-overlay-content.dx-popup-normal {
+         /*height: auto!important;*/
+     }
+    </style>
+}
+
+@section scripts {
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
+    <abp-script src="/pages/shared/common.isp.js" />
+    <abp-script src="/Pages/SO/DeliveryCopy/details.js" />
+}
+
+@section breadcrumb
+    {
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["SO"].Value</a></li>
+        <li class="breadcrumb-item">@L["Delivery"].Value</li>
+        <li class="breadcrumb-item active">Details</li>
+    </ol>
+}
+<div class="col-lg-12">
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="ui-sortable-handle">
+                <i class="subheader-icon fal fa-credit-card-front"></i> @L["Delivery"].Value
+            </h2>
+        </div>
+        <div class="panel-container show">
+            <div class="panel-content jqvmap-bg-ocean p-0">
+                <div style="padding-left:12px" class="buttons-header-grid">
+                    <div class="btn-group">
+                        <button id="btnActions" type="button" class="btn btn-light btn-sm dropdown-toggle hvr-icon-pop"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-gear hvr-icon"></i>
+                            <span class="">Action</span>
+                        </button>
+                        <div class="dropdown-menu fadeindown">
+                            <button id="btnSave" class="dropdown-item" type="button">Save</button>
+                            <button id="btnConfirm" class="dropdown-item" type="button">Confirm</button>
+                            <button id="btnCancel" class="dropdown-item" type="button">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="dx-viewport">
+                    <div class="py-3" id="resizable">
+                        <div id="frmDeliveryHeader"></div>
+                    </div>
+                    <div class="py-2">
+                        <div id="dgDeliveries"> </div>
+                    </div>
+                </div>
+            </div>
+
+           
+        </div>
+    </div>
+</div>

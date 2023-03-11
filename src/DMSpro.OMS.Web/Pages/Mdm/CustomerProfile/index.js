@@ -1288,19 +1288,17 @@
                     options: {
                         icon: "import",
                         elementAttr: {
-                            id: "import-excel",
+                            //id: "import-excel",
                             class: "import-excel",
                         },
-                        onClick() {
-                            //console.log(popup);
-                            popup_m.option({
-                                contentTemplate: () => popupContentTemplate(),
-                                'position.of': `#import-excel`,
-                            });
-                            popup_m.show();
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
                         },
                     },
-                },
+                }, 
                 "searchPanel"
             ],
         },
@@ -1845,7 +1843,7 @@
             e.data.active = true;
         },
     }).dxDataGrid("instance");
-
+    initImportPopup('api/mdm-service/customers', 'Customers_Template', 'dgCustomers');
     const dsAttrValue = function (n) {
         return {
             store: getCusAttrValue,
