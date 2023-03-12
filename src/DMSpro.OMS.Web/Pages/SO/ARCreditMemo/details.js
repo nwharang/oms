@@ -40,6 +40,78 @@ itemService.getInfoForSO(companyId,
 var loadControl = function (data) {
     var l = abp.localization.getResource("OMS");
     var arCreditMemoService = window.dMSpro.oMS.orderService.controllers.arCreditMemos.arCreditMemo;
+    var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
+    var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
+
+    var employeeProfileStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            employeeProfileService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            employeeProfileService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
+
+    var salesOrgHierarchyStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            salesOrgHierarchyService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            salesOrgHierarchyService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
 
     const docTypeStore = [
         {
@@ -119,7 +191,7 @@ var loadControl = function (data) {
     // A/R Credit Memo Headers form
     const frmArCreditMemoHeaders = $('#frmArCreditMemoHeaders').dxForm({
         labelMode: "floating",
-        colCount: 3,
+        colCount: 4,
         items: [
             {
                 // col 1
@@ -154,30 +226,35 @@ var loadControl = function (data) {
                         }]
                     },
                     {
-                        dataField: "docSource",
-                        editorType: "dxSelectBox",
-                        editorOptions: {
-                            dataSource: docSourceStore,
-                            displayExpr: 'text',
-                            valueExpr: 'id',
-                            showClearButton: true,
-                            value: 0
-                        },
-                        label: {
-                            visible: false,
-                            text: l('EntityFieldName:OrderService:SalesRequest:DocSource')
-                        },
-                        validationRules: [{
-                            type: 'required', message: ''
-                        }]
-                    },
-                    {
                         dataField: "remark",
                         label: {
                             visible: false,
                             text: l('EntityFieldName:OrderService:SalesRequest:Remark')
                         }
                     },
+                    {
+                        dataField: "requestDate",
+                        editorType: 'dxDateBox',
+                        editorOptions: {
+                            type: 'datetime',
+                            value: new Date(),
+                            displayFormat: "dd/MM/yyyy HH:mm",
+                            // disabled: true,
+                        },
+                        label: {
+                            visible: false,
+                            text: l('EntityFieldName:OrderService:SalesRequest:RequestDate')
+                        },
+                        validationRules: [{
+                            type: 'required', message: ''
+                        }]
+                    },
+                ]
+            },
+            {
+                // col 2
+                itemType: 'group',
+                items: [
                     {
                         dataField: "businessPartnerId",
                         editorType: 'dxSelectBox',
@@ -203,17 +280,60 @@ var loadControl = function (data) {
                         }]
                     },
                     {
-                        dataField: "requestDate",
-                        editorType: 'dxDateBox',
+                        dataField: "employeeId",
+                        editorType: 'dxSelectBox',
                         editorOptions: {
-                            type: 'datetime',
-                            value: new Date(),
-                            displayFormat: "dd/MM/yyyy HH:mm",
-                            // disabled: true,
+                            dataSource: {
+                                store: employeeProfileStore,
+                                filter: [['active', '=', true], 'and', [['effectiveDate', '=', null], 'or', ['effectiveDate', '<=', new Date()]], 'and', [['endDate', '=', null], 'or', ['endDate', '>=', new Date()]]],
+                                paginate: true,
+                                pageSize: pageSizeForLookup
+                            },
+                            displayExpr: 'code',
+                            valueExpr: 'id'
                         },
                         label: {
                             visible: false,
-                            text: l('EntityFieldName:OrderService:SalesRequest:RequestDate')
+                            text: l('EntityFieldName:OrderService:SalesRequest:Employee')
+                        },
+                        validationRules: [{
+                            type: 'required', message: ''
+                        }]
+                    },
+                    {
+                        dataField: "routeId",
+                        editorType: "dxSelectBox",
+                        editorOptions: {
+                            dataSource: {
+                                store: salesOrgHierarchyStore,
+                                filter: ["isRoute", "=", true],
+                                paginate: true,
+                                pageSize: pageSizeForLookup
+                            },
+                            displayExpr: 'name',
+                            valueExpr: 'id'
+                        },
+                        label: {
+                            visible: false,
+                            text: l('EntityFieldName:OrderService:SalesRequest:Route')
+                        },
+                        validationRules: [{
+                            type: 'required', message: ''
+                        }]
+                    },
+                    {
+                        dataField: "docSource",
+                        editorType: "dxSelectBox",
+                        editorOptions: {
+                            dataSource: docSourceStore,
+                            displayExpr: 'text',
+                            valueExpr: 'id',
+                            showClearButton: true,
+                            value: 0
+                        },
+                        label: {
+                            visible: false,
+                            text: l('EntityFieldName:OrderService:SalesRequest:DocSource')
                         },
                         validationRules: [{
                             type: 'required', message: ''
@@ -222,7 +342,7 @@ var loadControl = function (data) {
                 ]
             },
             {
-                // col 2
+                // col 3
                 itemType: 'group',
                 items: [
                     {
@@ -290,26 +410,11 @@ var loadControl = function (data) {
                         validationRules: [{
                             type: 'required', message: ''
                         }]
-                    },
-                    {
-                        dataField: "docTotalAmtAfterTax",
-                        editorType: "dxNumberBox",
-                        editorOptions: {
-                            format: '#,##0.##',
-                            disabled: true
-                        },
-                        label: {
-                            visible: false,
-                            text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax')
-                        },
-                        validationRules: [{
-                            type: 'required', message: ''
-                        }]
                     }
                 ]
             },
             {
-                // col 3
+                // col 4
                 itemType: 'group',
                 items: [
                     {
@@ -366,9 +471,24 @@ var loadControl = function (data) {
                         validationRules: [{
                             type: 'required', message: ''
                         }]
+                    },
+                    {
+                        dataField: "docTotalAmtAfterTax",
+                        editorType: "dxNumberBox",
+                        editorOptions: {
+                            format: '#,##0.##',
+                            disabled: true
+                        },
+                        label: {
+                            visible: false,
+                            text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax')
+                        },
+                        validationRules: [{
+                            type: 'required', message: ''
+                        }]
                     }
                 ]
-            },
+            }
         ]
     }).dxForm('instance');
 
