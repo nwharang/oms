@@ -188,7 +188,8 @@ var loadControl = function (data) {
                             onValueChanged: function (e) {
                                 $('.openItemsPopupButton').data('dxButton').option('disabled', false);
                                 //$('#dgSalesRequestDetails').data('dxDataGrid').addRow();
-                                SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+                                if (SalesRequestDetailsModel.find(x => x.itemId == null) == null)
+                                    SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
                                 dgSalesRequestDetails.refresh();
                             }
                         },
