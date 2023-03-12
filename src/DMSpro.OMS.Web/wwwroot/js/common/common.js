@@ -1,4 +1,19 @@
 class Common {
+    static async getCurrentCompany() {
+        let keyString = `currentlySelectedCompany|${abp.currentUser.id}`;
+        let storedObject =
+            await this.loadFromStorage(keyString);
+        if (storedObject == null) {
+            let assignmentService =
+                window.dMSpro.oMS.mdmService.controllers.companyIdentityUserAssignments.companyIdentityUserAssignment;
+            let result = await assignmentService.getCurrentlySelectedCompany();
+            Common.saveToStorage(keyString, result);
+            return (result);
+        } else {
+            return storedObject
+        }
+    };
+
     static processInitData(data) {
         let result = {};
         let keyList = Object.keys(data);
@@ -16,12 +31,12 @@ class Common {
         return result;
     };
 
-    static getLastAPICallDates() {
+    static async getLastAPICallDates() {
         let keyList = ["itemInfo", "customerInfo", "routeInfo", "vendorInfo",];
         let result = {};
         for (let i = 0; i < keyList.length; i++) {
             let key = keyList[i];
-            let value = this.loadFromStorage(key);
+            let value = await this.loadFromStorage(key);
             if (value == null || value["lastUpdated"] == null) {
                 result[key] = null;
                 continue;
@@ -37,14 +52,21 @@ class Common {
         if (typeof (Storage) === "undefined") {
             return;
         }
+        if (value == null || value == 'undefined') {
+            return;
+        }
         localStorage.setItem(key, JSON.stringify(value));
     };
 
-    static loadFromStorage(key) {
+    static async loadFromStorage(key) {
         if (typeof (Storage) === "undefined") {
             return;
         }
-        return localStorage.getItem(key);
+        let storageObject = localStorage.getItem(key);
+        if (storageObject === 'undefined') {
+            return null;
+        }
+        return await this.parseJSON(storageObject);
     };
 
     static parseJSON(input) {
