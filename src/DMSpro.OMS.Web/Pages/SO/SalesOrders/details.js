@@ -118,7 +118,7 @@ var loadControl = function (data) {
     // Sales Request herader form
     const frmSalesOrderDetails = $('#frmSalesOrderDetails').dxForm({
         labelMode: "floating",
-        colCount: 3,
+        colCount: 4,
         items: [
             {
                 // col 1
@@ -153,30 +153,34 @@ var loadControl = function (data) {
                         }]
                     },
                     {
-                        dataField: "docSource",
-                        editorType: "dxSelectBox",
-                        editorOptions: {
-                            dataSource: docSourceStore,
-                            displayExpr: 'text',
-                            valueExpr: 'id',
-                            showClearButton: true,
-                            value: 0
-                        },
-                        label: {
-                            visible: false,
-                            text: l('EntityFieldName:OrderService:SalesRequest:DocSource')
-                        },
-                        validationRules: [{
-                            type: 'required', message: ''
-                        }]
-                    },
-                    {
                         dataField: "remark",
                         label: {
                             visible: false,
                             text: l('EntityFieldName:OrderService:SalesRequest:Remark')
                         }
                     },
+                    {
+                        dataField: "requestDate",
+                        editorType: 'dxDateBox',
+                        editorOptions: {
+                            type: 'datetime',
+                            value: new Date(),
+                            displayFormat: "dd/MM/yyyy HH:mm"
+                        },
+                        label: {
+                            visible: false,
+                            text: l('EntityFieldName:OrderService:SalesRequest:RequestDate')
+                        },
+                        validationRules: [{
+                            type: 'required', message: ''
+                        }]
+                    },
+                ]
+            },
+            {
+                // col 2
+                itemType: 'group',
+                items: [
                     {
                         dataField: "businessPartnerId",
                         editorType: 'dxSelectBox',
@@ -201,17 +205,73 @@ var loadControl = function (data) {
                         }]
                     },
                     {
-                        dataField: "requestDate",
-                        editorType: 'dxDateBox',
+                        dataField: "routeId",
+                        editorType: "dxSelectBox",
                         editorOptions: {
-                            type: 'datetime',
-                            value: setValueRequestDate(),
-                            displayFormat: "dd/MM/yyyy HH:mm",
-                            // disabled: true,
+                            dataSource: {
+                                store: data.routeList,
+                                //filter: ["isRoute", "=", true],
+                                paginate: true,
+                                pageSize: pageSizeForLookup
+                            },
+                            displayExpr: 'name',
+                            valueExpr: 'id',
+                            showClearButton: true,
+                            disabled: true,
+                            onValueChanged: function (e) {
+                                var formSalesOrder = $('#frmSalesOrderDetails').data('dxForm');
+                                formSalesOrder.getEditor('employeeId').option('disabled', false);
+                            }
                         },
                         label: {
                             visible: false,
-                            text: l('EntityFieldName:OrderService:SalesRequest:RequestDate')
+                            text: l('EntityFieldName:OrderService:SalesRequest:Route')
+                        },
+                        //validationRules: [{
+                        //    type: 'required', message: ''
+                        //}]
+                    },
+                    {
+                        dataField: "employeeId",
+                        editorType: 'dxSelectBox',
+                        editorOptions: {
+                            dataSource: function (options) {
+                                //var formSalesOrder = $('#frmSalesOrderDetails').data('dxForm');
+                                //var routeId = formSalesOrder.getEditor('routeId').option('value');
+                                //if (routeId != null) {
+
+                                //}
+                                return {
+                                    store: data.employeeList,
+                                    paginate: true,
+                                    pageSize: pageSizeForLookup
+                                }
+                            },
+                            displayExpr: 'code',
+                            valueExpr: 'id',
+                            disabled: true
+                        },
+                        label: {
+                            visible: false,
+                            text: l('EntityFieldName:OrderService:SalesRequest:Employee')
+                        },
+                        //validationRules: [{
+                        //    type: 'required', message: ''
+                        //}]
+                    },
+                    {
+                        dataField: "docSource",
+                        editorType: "dxSelectBox",
+                        editorOptions: {
+                            dataSource: docSourceStore,
+                            displayExpr: 'text',
+                            valueExpr: 'id',
+                            showClearButton: true,
+                            value: 0
+                        },
+                        label: {
+                            visible: false,
+                            text: l('EntityFieldName:OrderService:SalesRequest:DocSource')
                         },
                         validationRules: [{
                             type: 'required', message: ''
@@ -220,7 +280,7 @@ var loadControl = function (data) {
                 ]
             },
             {
-                // col 2
+                // col 3
                 itemType: 'group',
                 items: [
                     {
@@ -282,26 +342,11 @@ var loadControl = function (data) {
                         validationRules: [{
                             type: 'required', message: ''
                         }]
-                    },
-                    {
-                        dataField: "docTotalAmtAfterTax",
-                        editorType: "dxNumberBox",
-                        editorOptions: {
-                            format: '#,##0.##',
-                            disabled: true
-                        },
-                        label: {
-                            visible: false,
-                            text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax')
-                        },
-                        validationRules: [{
-                            type: 'required', message: ''
-                        }]
                     }
                 ]
             },
             {
-                // col 3
+                // col 4
                 itemType: 'group',
                 items: [
                     {
@@ -358,9 +403,24 @@ var loadControl = function (data) {
                         validationRules: [{
                             type: 'required', message: ''
                         }]
+                    },
+                    {
+                        dataField: "docTotalAmtAfterTax",
+                        editorType: "dxNumberBox",
+                        editorOptions: {
+                            format: '#,##0.##',
+                            disabled: true
+                        },
+                        label: {
+                            visible: false,
+                            text: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax')
+                        },
+                        validationRules: [{
+                            type: 'required', message: ''
+                        }]
                     }
                 ]
-            },
+            }
         ]
     }).dxForm('instance');
 
@@ -929,6 +989,14 @@ function addListToData(data) {
     // get vat list
     vatList = Object.keys(data.itemInfo.vat).map(function (key) {
         return data.itemInfo.vat[key];
+    });
+    // get route list
+    data.routeList = Object.keys(data.routeInfo.route).map(function (key) {
+        return data.routeInfo.route[key];
+    });
+    // get employee list
+    data.employeeList = Object.keys(data.routeInfo.employee).map(function (key) {
+        return data.routeInfo.employee[key];
     });
 };
 

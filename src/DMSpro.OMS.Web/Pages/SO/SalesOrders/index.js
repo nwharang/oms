@@ -41,30 +41,30 @@
     const docTypeStore = [
         {
             id: 0,
-            text: l('EntityFieldName:OrderService:SalesOrder:PreOrder')
+            text: l('EntityFieldName:OrderService:SalesRequest:PreOrder')
         },
         {
             id: 1,
-            text: l('EntityFieldName:OrderService:SalesOrder:VanSales')
+            text: l('EntityFieldName:OrderService:SalesRequest:VanSales')
         },
         {
             id: 2,
-            text: l('EntityFieldName:OrderService:SalesOrder:ThirdPartyDelivery')
+            text: l('EntityFieldName:OrderService:SalesRequest:ThirdPartyDelivery')
         }
     ];
 
     const docStatusStore = [
         {
             id: 0,
-            text: l('EntityFieldName:OrderService:SalesOrder:DocStatus.Open')
+            text: l('EntityFieldName:OrderService:SalesRequest:DocStatus.Open')
         },
         {
             id: 1,
-            text: l('EntityFieldName:OrderService:SalesOrder:DocStatus.Released')
+            text: l('EntityFieldName:OrderService:SalesRequest:DocStatus.Released')
         },
         {
             id: 2,
-            text: l('EntityFieldName:OrderService:SalesOrder:DocStatus.Cancelled')
+            text: l('EntityFieldName:OrderService:SalesRequest:DocStatus.Cancelled')
         }
     ];
 
@@ -128,17 +128,17 @@
                     allowExporting: false,
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:DocNbr'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
                     dataField: 'docNbr',
                     dataType: 'string'
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:Company'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:Company'),
                     dataField: 'companyId',
                     calculateDisplayValue: "company.name"
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:DocType'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocType'),
                     dataField: 'docType',
                     lookup: {
                         dataSource: docTypeStore,
@@ -147,17 +147,17 @@
                     }
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:DocDate'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDate'),
                     dataField: 'docDate',
                     dataType: 'datetime'
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:Remark'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:Remark'),
                     dataField: 'remark',
                     dataType: 'string'
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:DocStatus'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocStatus'),
                     dataField: 'docStatus',
                     dataType: 'string',
                     lookup: {
@@ -167,49 +167,49 @@
                     }
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:DocTotalLineDiscountAmt'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt'),
                     dataField: 'docTotalLineDiscountAmt',
                     dataType: 'number',
                     visible: true,
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:DocTotalLineAmt'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
                     dataField: 'docTotalLineAmt',
                     dataType: 'number',
                     visible: true,
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:DocTotalLineAmtAfterTax'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
                     dataField: 'docTotalLineAmtAfterTax',
                     dataType: 'number',
                     visible: true,
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:DocDiscountType'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType'),
                     dataField: 'docDiscountType',
                     dataType: 'number',
                     visible: true,
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:DocDiscountPerc'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc'),
                     dataField: 'docDiscountPerc',
                     dataType: 'number',
                     visible: true,
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:DocDiscountAmt'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt'),
                     dataField: 'docDiscountAmt',
                     dataType: 'number',
                     visible: true,
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:DocTotalAmt'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
                     dataField: 'docTotalAmt',
                     dataType: 'number',
                     visible: true,
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesOrder:DocTotalAmtAfterTax'),
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax'),
                     dataField: 'docTotalAmtAfterTax',
                     dataType: 'number',
                     visible: true,
