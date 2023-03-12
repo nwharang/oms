@@ -1,5 +1,4 @@
 ﻿$(function () {
-    debugger;
     var l = abp.localization.getResource("OMS");
     var deliveryOrderService = window.dMSpro.oMS.orderService.controllers.deliveries.delivery;
 
@@ -78,7 +77,7 @@
     ];
 
     /****control*****/
-    const dgProcessSalesOrder = $('#dgProcessDeliveryOrder').dxDataGrid(
+    const dgProcessDeliveryOrder = $('#dgProcessDeliveryOrder').dxDataGrid(
         jQuery.extend(dxDataGridConfiguration, {
             dataSource: deliveryOrderStore,
             remoteOperations: false,
@@ -131,7 +130,7 @@
                     caption: l('No.'),
                     alignment: 'center',
                     cellTemplate: function (container, options) {
-                        container.text(dgProcessSalesOrder.pageIndex() * dgProcessSalesOrder.pageSize() + options.rowIndex + 1);
+                        container.text(dgProcessDeliveryOrder.pageIndex() * dgProcessDeliveryOrder.pageSize() + options.rowIndex + 1);
                     },
                     allowResizing: false,
                     fixed: true,
@@ -315,7 +314,7 @@
                     deliveryOrderService.approveDoc(id, { contentType: "application/json" })
                         .done(result => {
                             abp.message.success(l('Congratulations'));
-                            dgProcessSalesOrder.refresh();
+                            dgProcessDeliveryOrder.refresh();
                         })
                         .fail(result => {
                             var message = result.message;
@@ -329,7 +328,7 @@
                     deliveryOrderService.cancelDoc(id, { contentType: "application/json" })
                         .done(result => {
                             abp.message.success(l('Congratulations'));
-                            dgProcessSalesOrder.refresh();
+                            dgProcessDeliveryOrder.refresh();
                         })
                         .fail(result => {
                             var message = result.message;
