@@ -840,7 +840,7 @@ var loadControl = function (data) {
                 })
     });
 
-    initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestDetails');
+    initImportPopup('', 'SalesRequestDetails_Template', 'dgSalesRequestDetails');
 
   //  var headerId = JSON.parse(sessionStorage.getItem('SalesRequestHeaderId'));
     if (SalesRequestHeaderId != null) {

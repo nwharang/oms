@@ -1,9 +1,6 @@
 ﻿$(function () {
     var l = abp.localization.getResource("OMS");
     var salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
-    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
-    var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
-
     /****custom store*****/
     var salesRequestsHeaderStore = new DevExpress.data.CustomStore({
         key: 'id',
@@ -28,97 +25,27 @@
 
             return deferred.promise();
         },
-        byKey: function (key) {
-            if (key == 0) return null;
+        //byKey: function (key) {
+        //    if (key == 0) return null;
 
-            var d = new $.Deferred();
-            salesRequestsHeaderService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        },
-        insert(values) {
-            return salesRequestsHeaderService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return salesRequestsHeaderService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return salesRequestsHeaderService.delete(key);
-        }
+        //    var d = new $.Deferred();
+        //    salesRequestsHeaderService.get(key)
+        //        .done(data => {
+        //            d.resolve(data);
+        //        });
+        //    return d.promise();
+        //},
+        //insert(values) {
+        //    return salesRequestsHeaderService.create(values, { contentType: "application/json" });
+        //},
+        //update(key, values) {
+        //    return salesRequestsHeaderService.update(key, values, { contentType: "application/json" });
+        //},
+        //remove(key) {
+        //    return salesRequestsHeaderService.delete(key);
+        //}
     });
-
-    //var companyStore = new DevExpress.data.CustomStore({
-    //    key: 'id',
-    //    load(loadOptions) {
-    //        const deferred = $.Deferred();
-    //        const args = {};
-
-    //        requestOptions.forEach((i) => {
-    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-    //                args[i] = JSON.stringify(loadOptions[i]);
-    //            }
-    //        });
-
-    //        companyService.getListDevextremes(args)
-    //            .done(result => {
-    //                deferred.resolve(result.data, {
-    //                    totalCount: result.totalCount,
-    //                    summary: result.summary,
-    //                    groupCount: result.groupCount,
-    //                });
-    //            });
-
-    //        return deferred.promise();
-    //    },
-    //    byKey: function (key) {
-    //        if (key == 0) return null;
-
-    //        var d = new $.Deferred();
-    //        companyService.get(key)
-    //            .done(data => {
-    //                d.resolve(data);
-    //            });
-    //        return d.promise();
-    //    }
-    //});
-
-    //var customerStore = new DevExpress.data.CustomStore({
-    //    key: 'id',
-    //    load(loadOptions) {
-    //        const deferred = $.Deferred();
-    //        const args = {};
-
-    //        requestOptions.forEach((i) => {
-    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-    //                args[i] = JSON.stringify(loadOptions[i]);
-    //            }
-    //        });
-
-    //        customerService.getListDevextremes(args)
-    //            .done(result => {
-    //                deferred.resolve(result.data, {
-    //                    totalCount: result.totalCount,
-    //                    summary: result.summary,
-    //                    groupCount: result.groupCount,
-    //                });
-    //            });
-
-    //        return deferred.promise();
-    //    },
-    //    byKey: function (key) {
-    //        if (key == 0) return null;
-
-    //        var d = new $.Deferred();
-    //        customerService.get(key)
-    //            .done(data => {
-    //                d.resolve(data);
-    //            });
-    //        return d.promise();
-    //    }
-    //});
-
+     
     const docTypeStore = [
         {
             id: 0,
@@ -150,7 +77,7 @@
     ];
 
     /****control*****/
-    const dgSalesRequestHeader = $('#dgSalesRequestHeader').dxDataGrid(
+    $('#dgSalesRequestHeader').dxDataGrid(
         jQuery.extend(dxDataGridConfiguration, {
             dataSource: salesRequestsHeaderStore,
             remoteOperations: false,
@@ -166,8 +93,7 @@
                         template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("Button.New.SalesRequest")}" style="height: 36px;"> <i class="fa fa-plus"></i> <span></span> </button>`,
                         onClick() {
                             var newtab = window.open('/SO/SalesRequest/Details', '_blank');
-                            newtab.sessionStorage.removeItem("ArInvoiceHeaderId");
-                            //newtab.sessionStorage.setItem("SalesRequestHeaderId", null);
+                            newtab.sessionStorage.removeItem('SalesRequestHeaderId');
                         },
                     },
                     'columnChooserButton',
@@ -178,7 +104,6 @@
                         options: {
                             icon: "import",
                             elementAttr: {
-                                //id: "import-excel",
                                 class: "import-excel",
                             },
                             onClick(e) {
@@ -217,19 +142,7 @@
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequest:Company'),
-                    dataField: 'companyId',
-                    calculateDisplayValue: "company.name",
-                    //lookup: {
-                    //    dataSource() {
-                    //        return {
-                    //            store: companyStore,
-                    //            paginate: true,
-                    //            pageSize: pageSizeForLookup
-                    //        };
-                    //    },
-                    //    displayExpr: "name",
-                    //    valueExpr: "id"
-                    //},
+                    dataField: 'company.name'
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequest:DocType'),
@@ -245,18 +158,6 @@
                     dataField: 'docDate',
                     dataType: 'datetime'
                 },
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequest:DeliveryDate'),
-                //    dataField: 'deliveryDate',
-                //    dataType: 'date',
-                //    visible: false,
-                //},
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequest:PostingDate'),
-                //    dataField: 'postingDate',
-                //    dataType: 'datetime',
-                //    visible: false,
-                //},
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequest:Remark'),
                     dataField: 'remark',
@@ -272,47 +173,6 @@
                         valueExpr: "id"
                     },
                 },
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequest:BusinessPartner'),
-                //    dataField: 'businessPartnerDisplay',
-                //    calculateDisplayValue: "name",
-                //    lookup: {
-                //        dataSource() {
-                //            return {
-                //                store: customerStore,
-                //                paginate: true,
-                //                pageSize: pageSizeForLookup
-                //            };
-                //        },
-                //        displayExpr: "name",
-                //        valueExpr: "id"
-                //    },
-                //    visible: false,
-                //},
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequest:Route'),
-                //    dataField: 'routeDisplay',
-                //    dataType: 'string',
-                //    visible: false,
-                //},
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequest:Employee'),
-                //    dataField: 'employeeDisplay',
-                //    dataType: 'string',
-                //    visible: false,
-                //},
-
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequest:LinkedDoc'),
-                //    dataField: 'linkedDoc',
-                //    visible: false,
-                //},
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequest:LinkedSFA'),
-                //    dataField: 'linkedSFAId',
-                //    visible: false,
-                //},
-
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt'),
                     dataField: 'docTotalLineDiscountAmt',
@@ -360,25 +220,7 @@
                     dataField: 'docTotalAmtAfterTax',
                     dataType: 'number',
                     visible: true,
-                },
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequest:DocBaseType'),
-                //    dataField: 'docBaseType',
-                //    dataType: 'number',
-                //    visible: false,
-                //},
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequest:BaseDoc'),
-                //    dataField: 'baseDocId',
-                //    dataType: 'string',
-                //    visible: false,
-                //},
-                //{
-                //    caption: l('EntityFieldName:OrderService:SalesRequest:DocSource'),
-                //    dataField: 'docSource',
-                //    dataType: 'number',
-                //    visible: false,
-                //},
+                }
             ]
         })).dxDataGrid("instance");
 
