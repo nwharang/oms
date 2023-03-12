@@ -19,23 +19,31 @@ const defaultEmptyModel = {
 }
 
 let vatList = {};
-const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
+let companyId = null;
 const linkedSFAId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
 var needSummaryUpdate = false;
 var editingEmptyRow = false;
-// get data api getInfoForSo in item service
-var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
-let lastCallDates = Common.getLastAPICallDates();
-itemService.getInfoForSO(companyId,
-    lastCallDates.itemInfo, lastCallDates.customerInfo,
-    lastCallDates.routeInfo, lastCallDates.vendorInfo)
-    .done(async result => {
-        let resultJson = await Common.parseJSON(result);
-        let data = Common.processInitData(resultJson);
-        console.log(data);
-        addListToData(data);
-        loadControl(data);
-    });
+
+window.onload = async function () {
+    let company = await Common.getCurrentCompany();
+    if (company != null)
+        companyId = company.id;
+    else
+        companyId = '29d43197-c742-90b8-65d8-3a099166f987';
+    // get data api getInfoForSo in item service
+    var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
+    let lastCallDates = Common.getLastAPICallDates();
+    itemService.getInfoForSO(companyId,
+        lastCallDates.itemInfo, lastCallDates.customerInfo,
+        lastCallDates.routeInfo, lastCallDates.vendorInfo)
+        .done(async result => {
+            let resultJson = await Common.parseJSON(result);
+            let data = Common.processInitData(resultJson);
+            console.log(data);
+            addListToData(data);
+            loadControl(data);
+        });
+}
 
 var loadControl = function (data) {
     var l = abp.localization.getResource("OMS");

@@ -19,15 +19,18 @@ const defaultEmptyModel = {
 }
 
 let vatList = {};
-const companyId = 0;
+let companyId = null;
 const linkedSFAId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
 var needSummaryUpdate = false;
 var editingEmptyRow = false;
 
 window.onload = async function () {
+    let company = await Common.getCurrentCompany();
+    if (company != null)
+        companyId = company.id;
+    else
+        companyId = '29d43197-c742-90b8-65d8-3a099166f987';
     // get data api getInfoForSo in item service
-    companyId = await Common.getCurrentCompany();
-    debugger
     var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
     let lastCallDates = Common.getLastAPICallDates();
     itemService.getInfoForSO(companyId,
