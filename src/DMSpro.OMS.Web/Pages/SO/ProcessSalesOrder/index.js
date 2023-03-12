@@ -2,10 +2,22 @@
     var l = abp.localization.getResource("OMS");
     var salesOrderService = window.dMSpro.oMS.orderService.controllers.salesOrders.salesOrder;
 
+
+    const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
+
     /****custom store*****/
     var salesOrderStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
+
+            //console.log(loadOptions)
+
+            if (loadOptions.filter == undefined) {
+                loadOptions.filter = ['companyId', '=', companyId];
+            } else {
+                loadOptions.filter = [loadOptions.filter, 'and', ['companyId', '=', companyId]];
+            }
+
             const deferred = $.Deferred();
             const args = {};
 
@@ -143,12 +155,12 @@
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequest:DocStatus'),
                     dataField: 'docStatus',
-                    dataType: 'string',
                     lookup: {
                         dataSource: docStatusStore,
                         displayExpr: "text",
                         valueExpr: "id"
                     },
+                    filterValue: 0,
                     width: 200
                 },
                 {
