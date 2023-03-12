@@ -1,316 +1,361 @@
 ﻿$(function () {
-    // language texts
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
+    var salesOrderService = window.dMSpro.oMS.orderService.controllers.salesOrders.salesOrder;
 
-    const dataForm = {
-        fromDate: new Date(),
-        toDate: new Date()
-    }
 
-    $("#frmProcessSalesOrders").dxForm({
-        colCount: 2,
-        labelMode: 'floating',
-        formData: dataForm,
-        items: [
-            {
-                itemType: 'group',
-                caption: 'Filter by date',
-                items: [
-                    {
-                        itemType: 'group',
-                        items: ['fromDate', 'toDate']
-                    }
-                ]
-            },
-            {
-                itemType: 'group',
-                caption: 'NVBH',
-                items: [
-                    {
+    const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
 
-                        itemType: 'simple',
-                        editorType: 'dxCheckBox',
-                        editorOptions: {
-                            text: 'LE VAN A',
-                            value: true
-                        },
-                    }, {
-                        itemType: 'simple',
-                        editorType: 'dxCheckBox',
-                        editorOptions: {
-                            text: 'PHAN THI B',
-                            value: true
-                        }
-                    }
-                ]
-            }]
+    /****custom store*****/
+    var salesOrderStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+
+            //console.log(loadOptions)
+
+            if (loadOptions.filter == undefined) {
+                loadOptions.filter = ['companyId', '=', companyId];
+            } else {
+                loadOptions.filter = [loadOptions.filter, 'and', ['companyId', '=', companyId]];
+            }
+
+            const deferred = $.Deferred();
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            salesOrderService.getHeaderListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            salesOrderService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
     });
 
-    const data = [
+    const docTypeStore = [
+        {
+            id: 0,
+            text: l('EntityFieldName:OrderService:SalesRequest:PreOrder')
+        },
         {
             id: 1,
-            docDate: new Date('2022/11/01'),
-            soNbr: 234,
-            status: 'Shipping',
-            salesMan: 'LE VAN A',
-            customerName: 'KH 1',
-            address: 'Address - Ward - Dis',
-            amount: '12,032,031',
-            discount: 0,
-            message: 'Item IT0032 out of stock',
-            check: true
+            text: l('EntityFieldName:OrderService:SalesRequest:VanSales')
         },
         {
             id: 2,
-            docDate: new Date('2022/11/01'),
-            soNbr: 235,
-            status: 'Open',
-            salesMan: 'LE VAN A',
-            customerName: 'Chi 4',
-            address: 'Address - Ward - Dis',
-            amount: '12,032,031',
-            discount: 0,
-            message: 'Item IT0032, item IT9999 out of stock',
-            check: true
-        },
-        {
-            id: 3,
-            docDate: new Date('2022/11/01'),
-            soNbr: 236,
-            status: 'Open',
-            salesMan: 'LE VAN A',
-            customerName: 'Chi 5',
-            address: 'Address - Ward - Dis',
-            amount: '12,032,031',
-            discount: 0,
-            message: 'Item IT0032 out of stock',
-            check: true
-        },
-        {
-            id: 4,
-            docDate: new Date('2022/11/01'),
-            soNbr: 237,
-            status: 'Open',
-            salesMan: 'LE VAN A',
-            customerName: 'Chi 6',
-            address: 'Address - Ward - Dis',
-            amount: '12,032,031',
-            discount: 0,
-            message: 'Item IT0032 out of stock',
-            check: true
-        },
-        {
-            id: 5,
-            docDate: new Date('2022/11/01'),
-            soNbr: 238,
-            status: 'Open',
-            salesMan: 'LE VAN A',
-            customerName: 'Chi 7',
-            address: 'Address - Ward - Dis',
-            amount: '12,032,031',
-            discount: 0,
-            message: 'Item IT0032 out of stock',
-            check: true
-        },
-        {
-            id: 6,
-            docDate: new Date('2022/11/01'),
-            soNbr: 239,
-            status: 'Open',
-            salesMan: 'PHAN THI B',
-            customerName: 'Chi 8',
-            address: 'Address - Ward - Dis',
-            amount: '12,032,031',
-            discount: 0,
-            message: 'You must assgin LOT/BAT cho SP IT9999',
-            check: true
-        },
-        {
-            id: 7,
-            docDate: new Date('2022/11/01'),
-            soNbr: 240,
-            status: 'Open',
-            salesMan: 'PHAN THI B',
-            customerName: 'Chi 9',
-            address: 'Address - Ward - Dis',
-            amount: '12,032,031',
-            discount: 0,
-            message: '',
-            check: true
-        },
-        {
-            id: 8,
-            docDate: new Date('2022/11/01'),
-            soNbr: 241,
-            status: 'Open',
-            salesMan: 'PHAN THI B',
-            customerName: 'Chi 10',
-            address: 'Address - Ward - Dis',
-            amount: '12,032,031',
-            discount: 576,
-            message: '',
-            check: true
-        },
-        {
-            id: 9,
-            docDate: new Date('2022/11/22'),
-            soNbr: 242,
-            status: 'Open',
-            salesMan: 'PHAN THI B',
-            customerName: 'Chi 11',
-            address: 'Address - Ward - Dis',
-            amount: '12,032,031',
-            discount: '534,234',
-            message: '',
-            check: true
-        },
-        {
-            id: 10,
-            docDate: new Date('2022/11/22'),
-            soNbr: 243,
-            status: 'Open',
-            salesMan: 'PHAN THI B',
-            customerName: 'Chi 12',
-            address: 'Address - Ward - Dis',
-            amount: '12,032,031',
-            discount: '534,234',
-            message: '',
-            check: true
+            text: l('EntityFieldName:OrderService:SalesRequest:ThirdPartyDelivery')
         }
-    ]
+    ];
 
-    var gridProcessSalesOrder = $('#gridProcessSaleOrder').dxDataGrid({
-        dataSource: data,
-        keyExpr: "id",
-        showBorders: true,
-        //filterRow: {
-        //    visible: true
-        //},
-        searchPanel: {
-            visible: true
-        },
-        scrolling: {
-            mode: 'standard'
-        },
-        allowColumnReordering: false,
-        rowAlternationEnabled: true,
-        //headerFilter: {
-        //    visible: true,
-        //},
-        paging:
+    const docStatusStore = [
         {
-            pageSize: pageSize,
+            id: 0,
+            text: l('EntityFieldName:OrderService:SalesRequest:DocStatus.Open')
         },
-        pager: {
-            visible: true,
-            allowedPageSizes: [10, 20, 'all'],
-            showPageSizeSelector: true,
-            showInfo: true,
-            showNavigationButtons: true,
+        {
+            id: 1,
+            text: l('EntityFieldName:OrderService:SalesRequest:DocStatus.Released')
         },
-        columns: [
-            {
-                dataField: 'check',
-                caption: '',
-                width: 50
+        {
+            id: 2,
+            text: l('EntityFieldName:OrderService:SalesRequest:DocStatus.Cancelled')
+        }
+    ];
+
+    /****control*****/
+    const dgProcessSalesOrder = $('#dgProcessSalesOrder').dxDataGrid(
+        jQuery.extend(dxDataGridConfiguration, {
+            dataSource: salesOrderStore,
+            remoteOperations: false,
+            selection: {
+                mode: 'multiple',
             },
-            {
-                dataField: 'id',
-                caption: 'No.',
-                width: 70,
-                alignment: 'center'
+            stateStoring: { //save state in localStorage
+                enabled: false,
+                type: 'localStorage',
+                storageKey: 'dgProcessSalesOrder',
             },
-            {
-                dataField: 'docDate',
-                caption: 'DocDate',
-                dataType: 'date',
-                width: 150,
-                alignment: 'center'
-            },
-            {
-                dataField: 'soNbr',
-                caption: 'SO Nbr',
-                width: 100,
-                alignment: 'center'
-            },
-            {
-                dataField: 'status',
-                caption: 'Status',
-                width: 150,
-                alignment: 'center'
-            },
-            {
-                dataField: 'salesMan',
-                caption: 'SalesMan',
-                width: 200,
-                alignment: 'center'
-            },
-            {
-                dataField: 'customerName',
-                caption: 'Customer Name',
-                width: 200,
-                alignment: 'center'
-            },
-            {
-                dataField: 'address',
-                caption: 'Address',
-                width: 300,
-                alignment: 'center'
-            },
-            {
-                dataField: 'amount',
-                caption: 'Amount',
-                width: 150,
-                alignment: 'right'
-            },
-            {
-                dataField: 'discount',
-                caption: 'Discount',
-                width: 150,
-                alignment: 'center'
-            },
-            {
-                dataField: 'message',
-                caption: 'Message',
-                width: 300,
-                alignment: 'left'
-            },
-            {
-                type: 'buttons',
-                caption: 'Actions',
-                buttons: [
+            toolbar: {
+                items: [
                     {
-                        hint: 'Reject',
-                        icon: 'fa fa-ban'
-                    }, {
-                        hint: 'Delivery',
-                        icon: 'fa fa-truck'
+                        location: 'before',
+                        widget: 'dxButton',
+                        options: {
+                            icon: "fa fa-truck",
+                            text: l("Button.DeliveryAll"),
+                            onClick(e) {
+                                DeliveryAll();
+                            },
+                        },
+                    },
+                    "groupPanel",
+                    'columnChooserButton',
+                    "exportButton",
+                    {
+                        location: 'after',
+                        widget: 'dxButton',
+                        options: {
+                            icon: "import",
+                            elementAttr: {
+                                //id: "import-excel",
+                                class: "import-excel",
+                            },
+                            onClick(e) {
+                                var gridControl = e.element.closest('div.dx-datagrid').parent();
+                                var gridName = gridControl.attr('id');
+                                var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                                if (popup) popup.show();
+                            },
+                        },
+                    },
+                    "searchPanel"
+                ],
+            },
+            columns: [
+                {
+                    caption: l('No.'),
+                    alignment: 'center',
+                    cellTemplate: function (container, options) {
+                        container.text(dgProcessSalesOrder.pageIndex() * dgProcessSalesOrder.pageSize() + options.rowIndex + 1);
+                    },
+                    allowResizing: false,
+                    fixed: true,
+                    width: 50
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDate'),
+                    dataField: 'docDate',
+                    dataType: 'datetime',
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
+                    dataField: 'docNbr',
+                    dataType: 'string',
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocStatus'),
+                    dataField: 'docStatus',
+                    lookup: {
+                        dataSource: docStatusStore,
+                        displayExpr: "text",
+                        valueExpr: "id"
+                    },
+                    filterValue: 0,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:Employee'),
+                    dataField: 'employeeDisplay',
+                    calculateDisplayValue: "employeeDisplay",
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:BusinessPartner'),
+                    dataField: 'businessPartnerDisplay',
+                    calculateDisplayValue: "businessPartnerDisplay",
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
+                    dataField: 'docTotalAmt',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: true,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt'),
+                    dataField: 'docDiscountAmt',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: true,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:Remark'),
+                    dataField: 'remark',
+                    dataType: 'string',
+                    visible: true,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:Company'),
+                    dataField: 'companyId',
+                    calculateDisplayValue: "company.name",
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocType'),
+                    dataField: 'docType',
+                    lookup: {
+                        dataSource: docTypeStore,
+                        displayExpr: "text",
+                        valueExpr: "id"
+                    },
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt'),
+                    dataField: 'docTotalLineDiscountAmt',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
+                    dataField: 'docTotalLineAmt',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
+                    dataField: 'docTotalLineAmtAfterTax',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType'),
+                    dataField: 'docDiscountType',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc'),
+                    dataField: 'docDiscountPerc',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax'),
+                    dataField: 'docTotalAmtAfterTax',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: false,
+                    width: 200
+                },
+
+                {
+                    caption: l("Actions"),
+                    type: 'buttons',
+                    buttons: [
+                        {
+                            text: l('Button.Reject'),
+                            cssClass: 'px-1',
+                            onClick: function (e) {
+                                RejectDelivery(e.row.data.id, false);
+                            }
+                        },
+                        {
+                            text: l('Button.Delivery'),
+                            cssClass: 'px-1',
+                            onClick: function (e) {
+                                RejectDelivery(e.row.data.id, true);
+                            }
+                        },
+                    ],
+                    fixed: true,
+                    fixedPosition: "right",
+                    allowExporting: false,
+                    width: 120
+                },
+            ],
+            summary: {
+                totalItems: [
+                    {
+                        column: "docTotalAmt",
+                        summaryType: "sum",
+                        alignment: "right",
+                        valueFormat: ",##0.###",
+                        displayFormat: `${l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt')}: {0}`
+                    },
+                    {
+                        column: "docDiscountAmt",
+                        summaryType: "sum",
+                        alignment: "right",
+                        valueFormat: ",##0.###",
+                        displayFormat: `${l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt')}: {0}`
                     }
                 ]
             }
-        ],
-        summary: {
-            totalItems: [
-                {
-                    name: 'TotalAmount',
-                    showInColumn: 'Address',
-                    displayFormat: 'Total Amount:',
-                    summaryType: 'custom',
-                    alignment: 'right'
-                },
-                {
-                    name: 'Amount',
-                    showInColumn: 'Amount',
-                    displayFormat: '120,320,031',
-                    summaryType: 'custom'
-                },
-                {
-                    name: 'Discount',
-                    showInColumn: 'Discount',
-                    displayFormat: '1,069,044',
-                    summaryType: 'custom'
+        })).dxDataGrid("instance");
+
+    /****function*****/
+    function RejectDelivery(id, type) {
+        if (type) {
+            abp.message.confirm(l('ConfirmationMessage.Delivery')).then(function (confirmed) {
+                if (confirmed) {
+                    salesOrderService.approveDoc(id, { contentType: "application/json" })
+                        .done(result => {
+                            abp.message.success(l('Congratulations'));
+                            dgProcessSalesOrder.refresh();
+                        })
+                        .fail(result => {
+                            var message = result.message;
+                            abp.message.error(message);
+                        });
                 }
-            ],
-        },
-    }).dxDataGrid("instance");
+            });
+        } else {
+            abp.message.confirm(l('ConfirmationMessage.Reject')).then(function (confirmed) {
+                if (confirmed) {
+                    salesOrderService.cancelDoc(id, { contentType: "application/json" })
+                        .done(result => {
+                            abp.message.success(l('Congratulations'));
+                            dgProcessSalesOrder.refresh();
+                        })
+                        .fail(result => {
+                            var message = result.message;
+                            abp.message.error(message);
+                        });
+                }
+            });
+        }
+    }
+
+    function DeliveryAll() {
+        abp.message.confirm(l('ConfirmationMessage.DeliveryAll')).then(function (confirmed) {
+            if (confirmed) {
+                //var selectedRowsData = dgProcessSalesOrder.getSelectedRowsData();
+                //let ids = [];
+                //selectedRowsData.forEach(rowData => {
+                //    ids.push(rowData.id);
+                //});
+
+                alert('coming soon!');
+            }
+        });
+    }
+
+    initImportPopup('', 'ProcessSalesOrder_Template', 'dgProcessSalesOrder');
 });

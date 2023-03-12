@@ -1,222 +1,351 @@
 ﻿$(function () {
-    // language texts
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
+    var deliveryOrderService = window.dMSpro.oMS.orderService.controllers.deliveries.delivery;
 
-    const dataForm = {
-        fromDate: new Date(),
-        toDate: new Date()
-    }
+    const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
 
-    $("#frmProcessDelivery").dxForm({
-        labelMode: 'floating',
-        colCount: 2,
-        formData: dataForm,
-        items: [
-            {
-                itemType: 'group',
-                caption: 'Filter by date',
-                items: [
-                    {
-                        itemType: 'group',
-                        items: ['fromDate', 'toDate']
-                    }
-                ]
-            },
-            {
-                itemType: 'group',
-                caption: 'NVBH',
-                items: [
-                    {
+    /****custom store*****/
+    var deliveryOrderStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            if (loadOptions.filter == undefined) {
+                loadOptions.filter = ['companyId', '=', companyId];
+            } else {
+                loadOptions.filter = [loadOptions.filter, 'and', ['companyId', '=', companyId]];
+            }
 
-                        itemType: 'simple',
-                        editorType: 'dxCheckBox',
-                        editorOptions: {
-                            text: 'LE VAN A',
-                            value: true
-                        },
-                    }, {
-                        itemType: 'simple',
-                        editorType: 'dxCheckBox',
-                        editorOptions: {
-                            text: 'PHAN THI B',
-                            value: true
-                        }
-                    }
-                ]
-            }]
+            const deferred = $.Deferred();
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            deliveryOrderService.getHeaderListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            deliveryOrderService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
     });
 
-    const data = [
+    const docTypeStore = [
+        {
+            id: 0,
+            text: l('EntityFieldName:OrderService:SalesRequest:PreOrder')
+        },
         {
             id: 1,
-            docDate: new Date('2022/11/22'),
-            doNbr: 32324,
-            salesMan: 'LE VAN A',
-            customerName: 'CHI 4',
-            address: 'Address - Ward - Dis',
-            amount: '30,230,203',
-            discount: 0,
-            check: true
+            text: l('EntityFieldName:OrderService:SalesRequest:VanSales')
         },
         {
             id: 2,
-            docDate: new Date('2022/11/22'),
-            doNbr: 32325,
-            salesMan: 'LE VAN A',
-            customerName: 'CHI 5',
-            address: 'Address - Ward - Dis',
-            amount: '30,230,203',
-            discount: 0,
-            check: false
-        },
-        {
-            id: 3,
-            docDate: new Date('2022/11/22'),
-            doNbr: 32326,
-            salesMan: 'LE VAN A',
-            customerName: 'CHI 6',
-            address: 'Address - Ward - Dis',
-            amount: '30,230,203',
-            discount: 0,
-            check: true
-        },
-        {
-            id: 4,
-            docDate: new Date('2022/11/22'),
-            doNbr: 32327,
-            salesMan: 'LE VAN A',
-            customerName: 'CHI 7',
-            address: 'Address - Ward - Dis',
-            amount: '30,230,203',
-            discount: 0,
-            check: false
-        },
-        {
-            id: 5,
-            docDate: new Date('2022/11/22'),
-            doNbr: 32328,
-            salesMan: 'PHAN VAN B',
-            customerName: 'CHI 8',
-            address: 'Address - Ward - Dis',
-            amount: '30,230,203',
-            discount: 2332,
-            check: false
-        },
-        {
-            id: 6,
-            docDate: new Date('2022/11/22'),
-            doNbr: 32329,
-            salesMan: 'PHAN VAN B',
-            customerName: 'CHI 9',
-            address: 'Address - Ward - Dis',
-            amount: '30,230,203',
-            discount: '3,424,234',
-            check: true
-        },
-        {
-            id: 7,
-            docDate: new Date('2022/11/22'),
-            doNbr: 32330,
-            salesMan: 'PHAN VAN B',
-            customerName: 'CHI 10',
-            address: 'Address - Ward - Dis',
-            amount: '30,230,203',
-            discount: 32,
-            check: false
+            text: l('EntityFieldName:OrderService:SalesRequest:ThirdPartyDelivery')
         }
-    ]
+    ];
 
-    var gridProcessDelivery = $('#gridProcessDelivery').dxDataGrid({
-        dataSource: data,
-        keyExpr: "id",
-        showBorders: true,
-        searchPanel: {
-            visible: true
-        },
-        scrolling: {
-            mode: 'standard'
-        },
-        allowColumnReordering: false,
-        rowAlternationEnabled: true,
-        paging:
+    const docStatusStore = [
         {
-            pageSize: pageSize,
+            id: 0,
+            text: l('EntityFieldName:OrderService:SalesRequest:DocStatus.Open')
         },
-        pager: {
-            visible: true,
-            allowedPageSizes: [10, 20, 'all'],
-            showPageSizeSelector: true,
-            showInfo: true,
-            showNavigationButtons: true,
+        {
+            id: 1,
+            text: l('EntityFieldName:OrderService:SalesRequest:DocStatus.Released')
         },
-        columns: [
-            {
-                dataField: 'check',
-                caption: '',
-                width: 50
+        {
+            id: 2,
+            text: l('EntityFieldName:OrderService:SalesRequest:DocStatus.Cancelled')
+        }
+    ];
+
+    /****control*****/
+    const dgProcessDeliveryOrder = $('#dgProcessDeliveryOrder').dxDataGrid(
+        jQuery.extend(dxDataGridConfiguration, {
+            dataSource: deliveryOrderStore,
+            remoteOperations: false,
+            selection: {
+                mode: 'multiple',
             },
-            {
-                dataField: 'id',
-                caption: 'No.',
-                width: 70,
-                alignment: 'center'
+            stateStoring: { //save state in localStorage
+                enabled: false,
+                type: 'localStorage',
+                storageKey: 'dgProcessDeliveryOrder',
             },
-            {
-                dataField: 'docDate',
-                caption: 'DocDate',
-                dataType: 'date',
-                width: 150,
-                alignment: 'center'
-            },
-            {
-                dataField: 'doNbr',
-                caption: 'DO Nbr',
-                width: 100,
-                alignment: 'center'
-            },
-            {
-                dataField: 'salesMan',
-                caption: 'SalesMan',
-                width: 200,
-                alignment: 'center'
-            },
-            {
-                dataField: 'customerName',
-                caption: 'Customer Name',
-                width: 200,
-                alignment: 'center'
-            },
-            {
-                dataField: 'address',
-                caption: 'Address',
-                width: 300,
-                alignment: 'center'
-            },
-            {
-                dataField: 'amount',
-                caption: 'Amount',
-                width: 150,
-                alignment: 'right'
-            },
-            {
-                dataField: 'discount',
-                caption: 'Discount',
-                width: 150,
-                alignment: 'center'
-            },
-            {
-                type: 'buttons',
-                caption: 'Actions',
-                buttons: [
+            toolbar: {
+                items: [
                     {
-                        hint: 'Delivery Fail',
-                        icon: 'fa fa-times'
-                    }, {
-                        hint: 'Confirm',
-                        icon: 'fa fa-check-square-o'
+                        location: 'before',
+                        widget: 'dxButton',
+                        options: {
+                            icon: "fa fa-truck",
+                            text: l("Button.DeliveryAll"),
+                            onClick(e) {
+                                DeliveryAll();
+                            },
+                        },
+                    },
+                    "groupPanel",
+                    'columnChooserButton',
+                    "exportButton",
+                    {
+                        location: 'after',
+                        widget: 'dxButton',
+                        options: {
+                            icon: "import",
+                            elementAttr: {
+                                //id: "import-excel",
+                                class: "import-excel",
+                            },
+                            onClick(e) {
+                                var gridControl = e.element.closest('div.dx-datagrid').parent();
+                                var gridName = gridControl.attr('id');
+                                var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                                if (popup) popup.show();
+                            },
+                        },
+                    },
+                    "searchPanel"
+                ],
+            },
+            columns: [
+                {
+                    caption: l('No.'),
+                    alignment: 'center',
+                    cellTemplate: function (container, options) {
+                        container.text(dgProcessDeliveryOrder.pageIndex() * dgProcessDeliveryOrder.pageSize() + options.rowIndex + 1);
+                    },
+                    allowResizing: false,
+                    fixed: true,
+                    width: 50
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDate'),
+                    dataField: 'docDate',
+                    dataType: 'datetime',
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
+                    dataField: 'docNbr',
+                    dataType: 'string',
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocStatus'),
+                    dataField: 'docStatus',
+                    lookup: {
+                        dataSource: docStatusStore,
+                        displayExpr: "text",
+                        valueExpr: "id"
+                    },
+                    filterValue: 0,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:Employee'),
+                    dataField: 'employeeDisplay',
+                    calculateDisplayValue: "employeeDisplay",
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:BusinessPartner'),
+                    dataField: 'businessPartnerDisplay',
+                    calculateDisplayValue: "businessPartnerDisplay",
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
+                    dataField: 'docTotalAmt',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: true,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt'),
+                    dataField: 'docDiscountAmt',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: true,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:Remark'),
+                    dataField: 'remark',
+                    dataType: 'string',
+                    visible: true,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:Company'),
+                    dataField: 'companyId',
+                    calculateDisplayValue: "company.name",
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocType'),
+                    dataField: 'docType',
+                    lookup: {
+                        dataSource: docTypeStore,
+                        displayExpr: "text",
+                        valueExpr: "id"
+                    },
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt'),
+                    dataField: 'docTotalLineDiscountAmt',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
+                    dataField: 'docTotalLineAmt',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
+                    dataField: 'docTotalLineAmtAfterTax',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType'),
+                    dataField: 'docDiscountType',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc'),
+                    dataField: 'docDiscountPerc',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: false,
+                    width: 200
+                },
+                {
+                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax'),
+                    dataField: 'docTotalAmtAfterTax',
+                    dataType: 'number',
+                    format: ",##0.###",
+                    visible: false,
+                    width: 200
+                },
+
+                {
+                    caption: l("Actions"),
+                    type: 'buttons',
+                    buttons: [
+                        {
+                            text: l('Button.Reject'),
+                            cssClass: 'px-1',
+                            onClick: function (e) {
+                                RejectDelivery(e.row.data.id, false);
+                            }
+                        },
+                        {
+                            text: l('Button.Delivery'),
+                            cssClass: 'px-1',
+                            onClick: function (e) {
+                                RejectDelivery(e.row.data.id, true);
+                            }
+                        },
+                    ],
+                    fixed: true,
+                    fixedPosition: "right",
+                    allowExporting: false,
+                    width: 120
+                },
+            ],
+            summary: {
+                totalItems: [
+                    {
+                        column: "docTotalAmt",
+                        summaryType: "sum",
+                        alignment: "right",
+                        valueFormat: ",##0.###",
+                        displayFormat: `${l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt')}: {0}`
+                    },
+                    {
+                        column: "docDiscountAmt",
+                        summaryType: "sum",
+                        alignment: "right",
+                        valueFormat: ",##0.###",
+                        displayFormat: `${l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt')}: {0}`
                     }
                 ]
             }
-        ],
-    }).dxDataGrid("instance");
+        })).dxDataGrid("instance");
+
+    /****function*****/
+    function RejectDelivery(id, type) {
+        if (type) {
+            abp.message.confirm(l('ConfirmationMessage.Delivery')).then(function (confirmed) {
+                if (confirmed) {
+                    deliveryOrderService.approveDoc(id, { contentType: "application/json" })
+                        .done(result => {
+                            abp.message.success(l('Congratulations'));
+                            dgProcessDeliveryOrder.refresh();
+                        })
+                        .fail(result => {
+                            var message = result.message;
+                            abp.message.error(message);
+                        });
+                }
+            });
+        } else {
+            abp.message.confirm(l('ConfirmationMessage.Reject')).then(function (confirmed) {
+                if (confirmed) {
+                    deliveryOrderService.cancelDoc(id, { contentType: "application/json" })
+                        .done(result => {
+                            abp.message.success(l('Congratulations'));
+                            dgProcessDeliveryOrder.refresh();
+                        })
+                        .fail(result => {
+                            var message = result.message;
+                            abp.message.error(message);
+                        });
+                }
+            });
+        }
+    }
+
+    function DeliveryAll() {
+        abp.message.confirm(l('ConfirmationMessage.DeliveryAll')).then(function (confirmed) {
+            if (confirmed) {
+                alert('coming soon!');
+            }
+        });
+    }
+
+    initImportPopup('', 'ProcessDeliveryOrder_Template', 'dgProcessDeliveryOrder');
 });
