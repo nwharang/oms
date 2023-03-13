@@ -1,11 +1,11 @@
 ﻿$(function () {
     var l = abp.localization.getResource("OMS");
-    var deliveryOrderService = window.dMSpro.oMS.orderService.controllers.deliveries.delivery;
+    var salesOrderService = window.dMSpro.oMS.orderService.controllers.salesOrders.salesOrder;
 
     const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
 
     /****custom store*****/
-    var deliveryOrderStore = new DevExpress.data.CustomStore({
+    var salesOrderStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
             if (loadOptions.filter == undefined) {
@@ -23,7 +23,7 @@
                 }
             });
 
-            deliveryOrderService.getHeaderListDevextremes(args)
+            salesOrderService.getHeaderListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -38,7 +38,7 @@
             if (key == 0) return null;
 
             var d = new $.Deferred();
-            deliveryOrderService.get(key)
+            salesOrderService.get(key)
                 .done(data => {
                     d.resolve(data);
                 });
@@ -77,9 +77,9 @@
     ];
 
     /****control*****/
-    const dgProcessDeliveryOrder = $('#dgProcessDeliveryOrder').dxDataGrid(
+    const dgSalesOrder = $('#dgProcessSOToInvoice').dxDataGrid(
         jQuery.extend(dxDataGridConfiguration, {
-            dataSource: deliveryOrderStore,
+            dataSource: salesOrderStore,
             remoteOperations: false,
             selection: {
                 mode: 'multiple',
@@ -87,7 +87,7 @@
             stateStoring: { //save state in localStorage
                 enabled: false,
                 type: 'localStorage',
-                storageKey: 'dgProcessDeliveryOrder',
+                storageKey: 'dgProcessSOToInvoice',
             },
             toolbar: {
                 items: [
@@ -130,7 +130,7 @@
                     caption: l('No.'),
                     alignment: 'center',
                     cellTemplate: function (container, options) {
-                        container.text(dgProcessDeliveryOrder.pageIndex() * dgProcessDeliveryOrder.pageSize() + options.rowIndex + 1);
+                        container.text(dgSalesOrder.pageIndex() * dgSalesOrder.pageSize() + options.rowIndex + 1);
                     },
                     allowResizing: false,
                     fixed: true,
@@ -311,10 +311,10 @@
         if (type) {
             abp.message.confirm(l('ConfirmationMessage.Delivery')).then(function (confirmed) {
                 if (confirmed) {
-                    deliveryOrderService.approveDoc(id, { contentType: "application/json" })
+                    salesOrderService.approveDoc(id, { contentType: "application/json" })
                         .done(result => {
                             abp.message.success(l('Congratulations'));
-                            dgProcessDeliveryOrder.refresh();
+                            dgSalesOrder.refresh();
                         })
                         .fail(result => {
                             var message = result.message;
@@ -325,10 +325,10 @@
         } else {
             abp.message.confirm(l('ConfirmationMessage.Reject')).then(function (confirmed) {
                 if (confirmed) {
-                    deliveryOrderService.cancelDoc(id, { contentType: "application/json" })
+                    salesOrderService.cancelDoc(id, { contentType: "application/json" })
                         .done(result => {
                             abp.message.success(l('Congratulations'));
-                            dgProcessDeliveryOrder.refresh();
+                            dgSalesOrder.refresh();
                         })
                         .fail(result => {
                             var message = result.message;
@@ -347,5 +347,5 @@
         });
     }
 
-    initImportPopup('', 'ProcessDeliveryOrder_Template', 'dgProcessDeliveryOrder');
+    initImportPopup('', 'ProcessSOToInvoice_Template', 'dgProcessSOToInvoice');
 });

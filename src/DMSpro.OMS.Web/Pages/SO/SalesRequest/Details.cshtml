@@ -67,11 +67,16 @@
                             <span class="">@L["Button.Action"]</span>
                         </button>
                         <div class="dropdown-menu fadeindown">
-                            <button id="SaveButton" class="dropdown-item" type="button">@L["Button.Save"]</button>
+                            @*<button id="SaveButton" class="dropdown-item" type="button">@L["Button.Save"]</button>*@
                             <button id="CloseButton" class="dropdown-item" type="button">@L["Button.Close"]</button>
                             <button class="dropdown-item" type="button">Cancel</button>
                         </div>
                     </div>
+
+                    <button id="SaveButton" type="submit" class="btn btn-sm btn-outline-default waves-effect waves-themed" form="form-container">
+                        <i class="fa fa-check"></i>
+                        @L["Button.Save"].Value
+                    </button>
                 </div>
                 <div class="dx-viewport">
                     <div id="resizable" class="p-2">

@@ -1,4 +1,4 @@
-@page
+﻿@page
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using DMSpro.OMS.OrderService.Permissions
@@ -9,21 +9,40 @@
 @inject IAuthorizationService Authorization
 @inject IPageLayout PageLayout
 @{
-    PageLayout.Content.Title = L["Menu:SOService:ArInvoice"].Value;
-    PageLayout.Content.MenuItemName = OrderServiceMenus.ArHeaders;
+    PageLayout.Content.Title = L["Menu:SOService:ProcessSOToInvoice"].Value;
+    PageLayout.Content.MenuItemName = "OrderService.ProcessSOToInvoice";
 }
 
-@section scripts {
+@section styles {
+    <style>
+        td .dx-link:hover {
+            text-decoration: underline !important;
+        }
+
+        .dx-button-content {
+            padding: 5px 10px !important;
+        }
+
+            .dx-button-content i.dx-icon {
+                font-size: 12px;
+            }
+    </style>
+}
+
+
+@section scripts
+    {
     <script src="/js/devextreme/exceljs.min.js"></script>
     <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/pages/shared/common.isp.js" />
-    <abp-script src="/Pages/SO/ArInvoice/index.js" />
+    <abp-script src="/Pages/SO/ProcessSOToInvoice/index.js" />
 }
+
 
 @section breadcrumb {
     <ol class="breadcrumb page-breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:SOService:GroupMenu:SO"].Value</a></li>
-        <li class="breadcrumb-item active">@L["Menu:SOService:ArInvoice"].Value</li>
+        <li class="breadcrumb-item active">@L["Menu:SOService:ProcessSOToInvoice"].Value</li>
     </ol>
 }
 
@@ -31,13 +50,13 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fa fa-file-alt"></i> @L["Menu:SOService:ArInvoice"].Value
+                <i class="subheader-icon fa fa-file-alt"></i> @L["Menu:SOService:ProcessSOToInvoice"].Value
             </h2>
         </div>
         <div class="panel-container show">
             <div class="panel-content jqvmap-bg-ocean p-0">
                 <div class="dx-viewport p-2">
-                    <div id="dgArInvoiceHeaders"></div>
+                    <div id="dgProcessSOToInvoice"></div>
                 </div>
             </div>
         </div>
