@@ -9,9 +9,6 @@
         showBorders: true,
         cacheEnabled: true,
         focusedRowEnabled: true,
-        searchPanel: {
-            visible: true
-        },
         allowColumnReordering: true,
         rowAlternationEnabled: true,
         allowColumnResizing: true,

@@ -166,7 +166,6 @@ $(function () {
         showRowLines: false,
         showBorders: false,
         errorRowEnabled: false,
-        focusedRowEnabled: true,
         focusedRowIndex: 0,
         filterRow: {
             visible: false

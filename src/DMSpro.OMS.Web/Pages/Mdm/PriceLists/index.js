@@ -371,7 +371,6 @@ $(function () {
                     editorOptions: {
                         searchPanel: true,
                         dataSource: arithmeticOperation,
-                        searchPanel: true,
                         valueExpr: 'id',
                         displayExpr: 'text',
                         paginate: true,

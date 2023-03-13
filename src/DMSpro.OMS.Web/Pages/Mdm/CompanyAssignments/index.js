@@ -192,9 +192,6 @@ $(function () {
         columnResizingMode: 'widget',
         columnMinWidth: 50,
         columnAutoWidth: true,
-
-        columnMinWidth: 50,
-
         columnChooser: {
             enabled: true,
             mode: "select"

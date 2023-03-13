@@ -48,14 +48,12 @@
         showBorders: true,
         focusedRowEnabled: true,
         columnWidth: 100,
-         scrolling: {
-             columnRenderingMode: 'virtual',
-          },
         searchPanel: {
             visible: true
         },
         allowColumnReordering: false,
         scrolling: {
+            columnRenderingMode: 'virtual',
             mode: 'standard'
         },
         paging: {

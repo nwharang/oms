@@ -659,7 +659,6 @@ var loadControl = function (data) {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:IsFree'),
                     dataField: 'isFree',
                     dataType: 'boolean',
-                    width: 120,
                     setCellValue: function (newData, value, currentData) {
                         newData.isFree = value;
                         newData.discountType = 0;

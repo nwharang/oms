@@ -7,7 +7,6 @@
         showBorders: true,
         remoteOperations: true,
         showRowLines: true,
-        showBorders: true,
         cacheEnabled: true,
         allowColumnReordering: true,
         rowAlternationEnabled: true,
