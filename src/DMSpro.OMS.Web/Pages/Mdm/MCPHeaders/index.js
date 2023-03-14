@@ -167,7 +167,7 @@ $(function () {
                         template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                         onClick() {
                             var w = window.open('/Mdm/MCPHeaders/Details', '_blank');
-                            //w.sessionStorage.setItem("MCPModel", null);
+                            w.sessionStorage.removeItem("MCPModel");
                         },
                     },
                     "columnChooserButton",

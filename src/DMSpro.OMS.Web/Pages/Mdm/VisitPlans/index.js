@@ -554,7 +554,7 @@ $(function () {
                     visitPlansService.updateMultiple(ids, getNormalDate(val), { contentType: "application/json" }).done(result => {
                         abp.message.success(l('Congratulations'));
                         popupChangeVisitPlan.hide();
-                        //grid.refresh();
+                        grid.refresh();
                     }).fail(() => { });
                 },
             },
