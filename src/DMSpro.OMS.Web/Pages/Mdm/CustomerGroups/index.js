@@ -182,10 +182,20 @@
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
-                    },
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            //id: "import-excel",
+                            class: "import-excel",
+                        },
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
+                        },
+                    }
                 },
                 "searchPanel"
             ],
@@ -194,7 +204,7 @@
             {
                 type: 'buttons',
                 caption: l("Actions"),
-                width: 100,
+                width: 120,
                 buttons: [
                     {
                         text: "View Details",
@@ -436,8 +446,6 @@
     //        }
     //    }]
     //});
-});
 
-$(window).focus(function () {
-    $('#dgCusGroups').data('dxDataGrid').refresh();
+    initImportPopup('api/mdm-service/customer-groups', 'Customer_Template', 'dgCusGroups');
 });
