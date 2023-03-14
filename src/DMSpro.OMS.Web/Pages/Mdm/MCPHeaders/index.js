@@ -97,7 +97,7 @@ $(function () {
                     confirmDeleteMessage: l("DeleteConfirmationMessage")
                 }
             },
-            remoteOperations: true,
+            //remoteOperations: true,
             export: {
                 enabled: true,
             },
