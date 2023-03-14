@@ -33,7 +33,13 @@ $(function () {
             return deferred.promise();
         },
         insert(values) {
-            return employeeProfileService.create(values, { contentType: "application/json" });
+            const deferred = $.Deferred();
+            employeeProfileService.create(values, { contentType: "application/json" }).done(result => {
+                uploadAvatar(result.data.id);
+                deferred.resolve(result.data);
+            });;
+
+            return deferred.promise();
         },
         update(key, values) {
             return employeeProfileService.update(key, values, { contentType: "application/json" });
@@ -211,10 +217,7 @@ $(function () {
                             {
                                 dataField: 'Avatar',
                                 template: function (data, itemElement) {
-
                                     renderAvatarField(data, itemElement);
-
-
                                 }
                             }
                         ]
@@ -374,6 +377,30 @@ $(function () {
         ]
     }).dxDataGrid("instance");
 
+    function uploadAvatar(employeeProfileId) {
+        if (files.length === 0)
+            return;
+
+        var formData = new FormData();
+        formData.append("file", files[0]);
+
+        $.ajax({
+            type: "POST",
+            url: `${urlUploadFile}?EmployeeProfileId=${employeeProfileId}`,
+            async: true,
+            processData: false,
+            mimeType: 'multipart/form-data',
+            contentType: false,
+            data: formData,
+            success: function (data) {
+                files = [];
+            },
+            error: function (msg) {
+                console.log(msg.responseText.error);
+            },
+        });
+    }
+
     function renderAvatarField(data, itemElement) {
         itemElement.append($("<img>").attr({
             id: "img-avatar",
@@ -381,43 +408,32 @@ $(function () {
             style: "border-radius: 50%",
         }));
         var selectedRowsData = dataGridContainer.getVisibleRows()[rowEditing];
-        getEmployeeImageAvatar(selectedRowsData.data.id).done(fileId => {
-            if (fileId !== "") {
-                getFileAvatar(fileId, function (dataUrl) {
-                    $("#img-avatar").attr("src", dataUrl);
-                });
-            }
-        });
 
+        if (selectedRowsData) {
+            getEmployeeImageAvatar(selectedRowsData.data.id).done(fileId => {
+                if (fileId !== "") {
+                    getFileAvatar(fileId, function (dataUrl) {
+                        $("#img-avatar").attr("src", dataUrl);
+                    });
+                }
+            });
+        }
 
         itemElement.append($("<div>").attr("id", "file-uploader").dxFileUploader({
             selectButtonText: 'Select photo',
             labelText: '',
             accept: 'image/*',
             uploadMethod: 'POST',
-            uploadMode: 'instantly',
+            uploadMode: selectedRowsData ?'instantly':'useButtons',
             onValueChanged(e) {
                 files = e.value;
+                $("#img-avatar").attr("src", URL.createObjectURL(files[0]));
             },
             uploadFile: function (file, progressCallback) {
-                var formData = new FormData();
-                formData.append("file", files[0]);
-                
-                $.ajax({
-                    type: "POST",
-                    url: `${urlUploadFile}?EmployeeProfileId=${selectedRowsData.data.id}`,
-                    async: true,
-                    processData: false,
-                    mimeType: 'multipart/form-data',
-                    contentType:false,
-                    data: formData,
-                    success: function (data) {
-                    },
-                    error: function (msg) {
-                        // handle error
-                        console.log(msg.responseText.error);
-                    },
-                });
+                if (!selectedRowsData)
+                    return;
+
+                uploadAvatar(selectedRowsData.data.id);
             }
         }));
     }
