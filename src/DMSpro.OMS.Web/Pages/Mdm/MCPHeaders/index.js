@@ -216,7 +216,8 @@ $(function () {
                             return {
                                 store: salesOrgHierarchyStore,
                                 paginate: true,
-                                pageSize: pageSizeForLookup
+                                pageSize: pageSizeForLookup,
+                                filter: ["isRoute", "=", true]
                             };
                         },
                         displayExpr: 'name',
