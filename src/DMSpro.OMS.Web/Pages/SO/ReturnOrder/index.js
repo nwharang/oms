@@ -84,11 +84,69 @@ $(function () {
     var gridPurchaseOrders = $('#dgReturnOrderHeader').dxDataGrid(
         jQuery.extend(dxDataGridConfiguration, {
             dataSource: returnOrderHeaderStore,
-            remoteOperations: false,
-            stateStoring: { //save state in localStorage
-                enabled: false,
+            stateStoring: {
+                enabled: true,
                 type: 'localStorage',
                 storageKey: 'dgReturnOrderHeader',
+            },
+            showBorders: true,
+            columnAutoWidth: true,
+            scrolling: {
+                columnRenderingMode: 'virtual',
+            },
+            searchPanel: {
+                visible: true
+            },
+            allowColumnResizing: true,
+            allowColumnReordering: true,
+            paging: {
+                enabled: true,
+                pageSize: pageSize
+            },
+            rowAlternationEnabled: true,
+            filterRow: {
+                visible: true,
+                applyFilter: 'auto',
+            },
+            headerFilter: {
+                visible: false,
+            },
+            columnChooser: {
+                enabled: true,
+                mode: "select"
+            },
+            pager: {
+                visible: true,
+                showPageSizeSelector: true,
+                allowedPageSizes: allowedPageSizes,
+                showInfo: true,
+                showNavigationButtons: true
+            },
+            export: {
+                enabled: true,
+                // formats: ['excel','pdf'],
+                allowExportSelectedData: true,
+            },
+            groupPanel: {
+                visible: true,
+            },
+            selection: {
+                mode: 'multiple',
+            },
+            onExporting(e) {
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('PurchaseRequests');
+
+                DevExpress.excelExporter.exportDataGrid({
+                    component: e.component,
+                    worksheet,
+                    autoFilterEnabled: true,
+                }).then(() => {
+                    workbook.xlsx.writeBuffer().then((buffer) => {
+                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PurchaseRequests.xlsx');
+                    });
+                });
+                e.cancel = true;
             },
             toolbar: {
                 items: [
@@ -99,6 +157,10 @@ $(function () {
                             var newtab = window.open('/SO/ReturnOrder/Details', '_blank');
                             newtab.sessionStorage.removeItem("returnOrderHeaderId");
                         },
+                    },
+                    {
+                        location: 'after',
+                        template: '<div><button type="button" class="btn btn-light btn-sm dropdown-toggle waves-effect waves-themed hvr-icon-pop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height:36px"> <i class="fa fa-gear hvr-icon"></i> <span class="">Action</span>  </button><div class="dropdown-menu fadeindown"> <button class="dropdown-item" type="button">Approve</button></div></div>'
                     },
                     'columnChooserButton',
                     "exportButton",
@@ -228,7 +290,18 @@ $(function () {
                     dataType: 'number',
                     visible: true,
                 },
-            ]
+            ],
+            summary: {
+                totalItems: [{
+                    column: 'docTotalLineAmt',
+                    summaryType: 'sum',
+                    valueFormat: ",##0.###"
+                }, {
+                    column: 'docTotalLineAmtAfterTax',
+                    summaryType: 'sum',
+                    valueFormat: ",##0.###"
+                }],
+            }
         })).dxDataGrid("instance");
 
     initImportPopup('', 'ReturnOrder_Template', 'dgReturnOrders');

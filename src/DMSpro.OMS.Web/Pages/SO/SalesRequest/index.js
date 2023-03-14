@@ -24,28 +24,9 @@
                 });
 
             return deferred.promise();
-        },
-        //byKey: function (key) {
-        //    if (key == 0) return null;
-
-        //    var d = new $.Deferred();
-        //    salesRequestsHeaderService.get(key)
-        //        .done(data => {
-        //            d.resolve(data);
-        //        });
-        //    return d.promise();
-        //},
-        //insert(values) {
-        //    return salesRequestsHeaderService.create(values, { contentType: "application/json" });
-        //},
-        //update(key, values) {
-        //    return salesRequestsHeaderService.update(key, values, { contentType: "application/json" });
-        //},
-        //remove(key) {
-        //    return salesRequestsHeaderService.delete(key);
-        //}
+        }
     });
-     
+
     const docTypeStore = [
         {
             id: 0,
@@ -80,11 +61,69 @@
     $('#dgSalesRequestHeader').dxDataGrid(
         jQuery.extend(dxDataGridConfiguration, {
             dataSource: salesRequestsHeaderStore,
-            remoteOperations: false,
-            stateStoring: { //save state in localStorage
-                enabled: false,
+            stateStoring: {
+                enabled: true,
                 type: 'localStorage',
                 storageKey: 'dgSalesRequestHeader',
+            },
+            showBorders: true,
+            columnAutoWidth: true,
+            scrolling: {
+                columnRenderingMode: 'virtual',
+            },
+            searchPanel: {
+                visible: true
+            },
+            allowColumnResizing: true,
+            allowColumnReordering: true,
+            paging: {
+                enabled: true,
+                pageSize: pageSize
+            },
+            rowAlternationEnabled: true,
+            filterRow: {
+                visible: true,
+                applyFilter: 'auto',
+            },
+            headerFilter: {
+                visible: false,
+            },
+            columnChooser: {
+                enabled: true,
+                mode: "select"
+            },
+            pager: {
+                visible: true,
+                showPageSizeSelector: true,
+                allowedPageSizes: allowedPageSizes,
+                showInfo: true,
+                showNavigationButtons: true
+            },
+            export: {
+                enabled: true,
+                // formats: ['excel','pdf'],
+                allowExportSelectedData: true,
+            },
+            groupPanel: {
+                visible: true,
+            },
+            selection: {
+                mode: 'multiple',
+            },
+            onExporting(e) {
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('PurchaseRequests');
+
+                DevExpress.excelExporter.exportDataGrid({
+                    component: e.component,
+                    worksheet,
+                    autoFilterEnabled: true,
+                }).then(() => {
+                    workbook.xlsx.writeBuffer().then((buffer) => {
+                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PurchaseRequests.xlsx');
+                    });
+                });
+                e.cancel = true;
             },
             toolbar: {
                 items: [
@@ -95,6 +134,10 @@
                             var newtab = window.open('/SO/SalesRequest/Details', '_blank');
                             newtab.sessionStorage.removeItem('SalesRequestHeaderId');
                         },
+                    },
+                    {
+                        location: 'after',
+                        template: '<div><button type="button" class="btn btn-light btn-sm dropdown-toggle waves-effect waves-themed hvr-icon-pop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height:36px"> <i class="fa fa-gear hvr-icon"></i> <span class="">Action</span>  </button><div class="dropdown-menu fadeindown"> <button class="dropdown-item" type="button">Approve</button></div></div>'
                     },
                     'columnChooserButton',
                     "exportButton",
@@ -221,7 +264,24 @@
                     dataType: 'number',
                     visible: true,
                 }
-            ]
+            ],
+            summary: {
+                totalItems: [{
+                    column: 'docTotalLineAmt',
+                    summaryType: 'sum',
+                    valueFormat: ",##0.###",
+                    //customizeText: function (data) {
+                    //    return data.valueText + "đ";
+                    //},
+                }, {
+                    column: 'docTotalLineAmtAfterTax',
+                    summaryType: 'sum',
+                    valueFormat: ",##0.###",
+                    //customizeText: function (data) {
+                    //    return data.valueText + "đ";
+                    //},
+                }],
+            }
         })).dxDataGrid("instance");
 
     initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestHeader');
