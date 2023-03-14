@@ -402,47 +402,6 @@ $(function () {
                 text: l('Download Template'),
                 onClick() {
                     return;
-
-                    const url = '/api/mdm-service/companies/get-excel-template';
-                    fetch(url)
-                        // Retrieve its body as ReadableStream
-                        .then((response) => {
-                            console.log(response);
-                            const reader = response.body.getReader();
-                            console.log(reader);
-                            return new ReadableStream({
-                                start(controller) {
-                                    return pump();
-                                    function pump() {
-                                        return reader.read().then(({ done, value }) => {
-                                            // When no more data needs to be consumed, close the stream
-                                            if (done) {
-                                                controller.close();
-                                                return;
-                                            }
-                                            // Enqueue the next data chunk into our target stream
-                                            controller.enqueue(value);
-                                            return pump();
-                                        });
-                                    }
-                                }
-                            })
-                        })
-                        // Create a new response out of the stream
-                        .then((stream) => new Response(stream))
-                        // Create an object URL for the response
-                        .then((response) => response.blob())
-                        .then((blob) => URL.createObjectURL(blob))
-                        .then((href) => {
-                            const a = document.createElement("a");
-                            document.body.appendChild(a);
-                            a.style = "display: none";
-                            a.href = href;
-                            a.download = 'PurchaseRequests_Template.xlsx';
-                            a.click();
-
-                        });
-
                 },
             },
         }, {

@@ -101,39 +101,7 @@ $(function () {
         }
     });
 
-    function geoLookupEditorTemplate(cellElement, cellInfo) {
-        console.log(cellInfo);
-        switch (cellInfo.item.dataField) {
-            case 'geoLevel1Id':
-                break;
-            case 'geoLevel2Id':
-                break;
-            case 'geoLevel3Id':
-                break;
-            case 'geoLevel4Id':
-                break;
-            default:
-        }
-
-        return $('<div>').dxLookup({
-            dataSource: {
-                store: geoMasterStore,
-                filter: ['level', '=', 0],
-                key: 'id',
-            },
-            value: cellInfo.value,
-            valueExpr: 'id',
-            displayExpr: 'name',
-            searchMode: "contains",
-            searchEnabled: true,
-            searchExpr: 'name',
-            onValueChanged: function (e) {
-                cellInfo.setValue(e.value);
-                console.log(e.value);
-                console.log(e.previousValue);
-            },
-        });
-    }
+    
 
     const gridCompanies = $('#dgCompanies').dxDataGrid({
         dataSource: customStore,

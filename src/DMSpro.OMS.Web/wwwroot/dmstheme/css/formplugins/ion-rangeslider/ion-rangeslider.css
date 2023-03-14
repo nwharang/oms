@@ -234,7 +234,7 @@ Build date: 2018-12-11 23:23:51
 .irs--big .irs-line {
   top: 33px;
   height: 12px;
-  background-color: white;
+  /* background-color: white; */
   background: -webkit-gradient(linear, left top, left bottom, color-stop(-50%, #ddd), color-stop(150%, white));
   background: linear-gradient(to bottom, #ddd -50%, white 150%);
   border: 1px solid #ccc;
@@ -243,7 +243,7 @@ Build date: 2018-12-11 23:23:51
 .irs--big .irs-bar {
   top: 33px;
   height: 12px;
-  background-color: #92bce0;
+  /* background-color: #92bce0; */
   border: 1px solid #428bca;
   background: -webkit-gradient(linear, left top, left bottom, from(#ffffff), color-stop(30%, #428bca), to(#b9d4ec));
   background: linear-gradient(to bottom, #ffffff 0%, #428bca 30%, #b9d4ec 100%);
@@ -991,7 +991,7 @@ h6 small,
   background: linear-gradient(180deg, #0c7ed5 25%, #0a70bd 50%, #9d0ad2 75%, #7908a1 100%);
   color: #2198F3;
   background-clip: text;
-  text-fill-color: transparent;
+  /* text-fill-color: transparent; */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: none; }
