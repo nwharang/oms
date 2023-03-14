@@ -255,13 +255,13 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
-        editing: {
-            mode: "row",
-            allowAdding: false,
-            allowUpdating: abp.auth.isGranted('MdmService.VisitPlans.Edit'),
-            allowDeleting: false,
-            useIcons: true
-        },
+        //editing: {
+        //    mode: "row",
+        //    allowAdding: false,
+        //    allowUpdating: abp.auth.isGranted('MdmService.VisitPlans.Edit'),
+        //    allowDeleting: false,
+        //    useIcons: true
+        //},
         onRowUpdating: function (e) {
             var objectRequire = ['code', 'name'];
             for (var property in e.oldData) {
@@ -303,13 +303,13 @@ $(function () {
             ],
         },
         columns: [
-            {
-                type: 'buttons',
-                caption: l('Actions'),
-                buttons: ['edit'],
-                width: 110,
-                fixedPosition: 'left'
-            },
+            //{
+            //    type: 'buttons',
+            //    caption: l('Actions'),
+            //    buttons: ['edit'],
+            //    width: 110,
+            //    fixedPosition: 'left'
+            //},
             {
                 dataField: 'route.name',
                 caption: l("EntityFieldName:MDMService:VisitPlan:RouteCode"),
@@ -554,7 +554,7 @@ $(function () {
                     visitPlansService.updateMultiple(ids, getNormalDate(val), { contentType: "application/json" }).done(result => {
                         abp.message.success(l('Congratulations'));
                         popupChangeVisitPlan.hide();
-                        //grid.refresh();
+                        grid.refresh();
                     }).fail(() => { });
                 },
             },
