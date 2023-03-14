@@ -35,7 +35,7 @@ $(function () {
         insert(values) {
             const deferred = $.Deferred();
             employeeProfileService.create(values, { contentType: "application/json" }).done(result => {
-                uploadAvatar(result.data.id);
+                //uploadAvatar(result.data.id);
                 deferred.resolve(result.data);
             });;
 

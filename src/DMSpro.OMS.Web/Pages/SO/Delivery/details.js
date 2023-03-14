@@ -19,26 +19,34 @@ const defaultEmptyModel = {
 }
 
 let vatList = {};
-const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
+let companyId = null;
 const linkedSFAId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
 var needSummaryUpdate = false;
 var editingEmptyRow = false;
 
-// get data api getInfoForSo in item service
-var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
-let lastCallDates = Common.getLastAPICallDates();
-itemService.getInfoForSO(companyId,
-    lastCallDates.itemInfo, lastCallDates.customerInfo,
-    lastCallDates.routeInfo, lastCallDates.vendorInfo)
-    .done(async result => {
-        let resultJson = await Common.parseJSON(result);
-        let data = Common.processInitData(resultJson);
-        console.log(data);
-        addListToData(data);
-        loadControl(data);
-    });
+window.onload = async function () {
+    let company = await Common.getCurrentCompany();
+    if (company != null)
+        companyId = company.id;
+    else
+        companyId = '29d43197-c742-90b8-65d8-3a099166f987';
+    // get data api getInfoForSo in item service
+    var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
+    let lastCallDates = Common.getLastAPICallDates();
+    itemService.getInfoForSO(companyId,
+        lastCallDates.itemInfo, lastCallDates.customerInfo,
+        lastCallDates.routeInfo, lastCallDates.vendorInfo)
+        .done(async result => {
+            let resultJson = await Common.parseJSON(result);
+            let data = Common.processInitData(resultJson);
+            console.log(data);
+            addListToData(data);
+            loadControl(data);
+        });
+}
 
 var loadControl = function (data) {
+    debugger
     var l = abp.localization.getResource("OMS"); 
     var deliveryHeaderService = window.dMSpro.oMS.orderService.controllers.deliveries.delivery;
     var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
@@ -280,6 +288,24 @@ var loadControl = function (data) {
                 itemType: 'group',
                 items: [
                     {
+                        dataField: "routeId",
+                        editorType: "dxSelectBox",
+                        editorOptions: {
+                            dataSource: {
+                                store: data.routeList
+                            },
+                            displayExpr: 'name',
+                            valueExpr: 'id'
+                        },
+                        label: {
+                            visible: false,
+                            text: l('Route')
+                        },
+                        validationRules: [{
+                            type: 'required',
+                        }]
+                    }, 
+                    {
                         dataField: "employeeId",
                         editorType: 'dxSelectBox',
                         editorOptions: {
@@ -300,27 +326,6 @@ var loadControl = function (data) {
                             type: 'required',
                         }]
                     },
-                    {
-                        dataField: "routeId",
-                        editorType: "dxSelectBox",
-                        editorOptions: {
-                            dataSource: {
-                                store: salesOrgHierarchyStore,
-                                filter: [['active', '=', true], 'and', ["isRoute", "=", true]],
-                                paginate: true,
-                                pageSize: pageSizeForLookup
-                            },
-                            displayExpr: 'name',
-                            valueExpr: 'id'
-                        },
-                        label: {
-                            visible: false,
-                            text: l('Route')
-                        },
-                        validationRules: [{
-                            type: 'required',
-                        }]
-                    }, 
                     {
                         dataField: "requestDate",
                         editorType: 'dxDateBox',
@@ -1085,5 +1090,9 @@ function addListToData(data) {
     // get vat list
     vatList = Object.keys(data.itemInfo.vat).map(function (key) {
         return data.itemInfo.vat[key];
+    });
+    // get routeL list
+    data.routeList = Object.keys(data.routeInfo.route).map(function (key) {
+        return data.routeInfo.route[key];
     });
 };

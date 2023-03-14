@@ -472,7 +472,14 @@ $(function () {
                 //allowEditing: false,
                 visible: false,
             }
-        ]
+        ],
+        onSelectionChanged: function (e) {
+            var selectedRows = e.component.getSelectedRowsData();
+            if (selectedRows.length > 0) {
+                $('#ChangeVisitPlanButton').prop('disabled',false);
+            }
+            else $('#ChangeVisitPlanButton').prop('disabled', true);
+        }
     }).dxDataGrid('instance');
 
     function getNextDate(arg) {
