@@ -489,7 +489,7 @@
   height: 5px;
   background-color: #f5f5f5;
   border-radius: 3px;
-  z-order: 0;
+  /* z-order: 0; */
   z-index: 95; }
 
 .sw-theme-dots > ul.step-anchor > li {
