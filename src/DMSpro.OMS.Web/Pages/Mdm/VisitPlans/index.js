@@ -188,7 +188,7 @@ $(function () {
     var dgVisitPlans = $('#dgVisitPlans').dxDataGrid({
         key: 'id',
         dataSource: visitPlansStore,
-        remoteOperations: true,
+        //remoteOperations: true,
         showRowLines: true,
         showBorders: true,
         allowColumnReordering: true,
