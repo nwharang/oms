@@ -394,6 +394,7 @@ var loadControl = function (data) {
             },
             onSaved: function (e) {
                 calculatorDocTotal();
+                
                 //var sumDiscountAmt = dgSalesRequestDetails.getTotalSummaryValue('discountAmt');
                 //var sumLineAmt = dgSalesRequestDetails.getTotalSummaryValue('lineAmt');
                 //var sumLineAmtAfterTax = dgSalesRequestDetails.getTotalSummaryValue('lineAmtAfterTax');
@@ -403,7 +404,8 @@ var loadControl = function (data) {
 
                 if (editingEmptyRow) {
                     editingEmptyRow = false;
-                    SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+                    if (SalesRequestDetailsModel.find(x => x.itemId == null) == null)
+                        SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
                     dgSalesRequestDetails.refresh();
                 }
                 //dgSalesRequestDetails.saveEditData();
@@ -428,6 +430,13 @@ var loadControl = function (data) {
                 if (e.parentType === "dataRow" && (e.dataField === "vatId" || e.dataField === "priceAfterTax" || e.dataField === "discountAmt" || e.dataField === "lineAmt" || e.dataField === "lineAmtAfterTax")) {
                     e.editorOptions.disabled = true;
                 }
+
+                //if (e.parentType === 'dataRow' && e.dataField === 'itemId') {
+                //    e.editorOptions.onValueChanged = args => {
+                //        e.setValue(args.value);
+                //        e.component.saveEditData();
+                //    }
+                //}
             },
             editing: {
                 mode: 'cell',
@@ -486,7 +495,7 @@ var loadControl = function (data) {
                         if (!currentData.itemId)
                             editingEmptyRow = true;
 
-                        //dgSalesRequestDetails.saveEditData();
+                        ///dgSalesRequestDetails.saveEditData();
                     },
                     //validationRules: [{ type: 'required', message: '' }],
                     //width: 200
