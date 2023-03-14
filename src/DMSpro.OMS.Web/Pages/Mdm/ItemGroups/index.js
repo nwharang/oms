@@ -96,19 +96,29 @@ $(function () {
             enabled: true,
         },
         onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'ItemGroups.xlsx');
+            if (e.format === 'xlsx') {
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('ItemGroups');
+                DevExpress.excelExporter.exportDataGrid({
+                    component: e.component,
+                    worksheet,
+                    autoFilterEnabled: true,
+                }).then(() => {
+                    workbook.xlsx.writeBuffer().then((buffer) => {
+                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'ItemGroups.xlsx');
+                    });
                 });
-            });
-            e.cancel = true;
+                e.cancel = true;
+            }
+            else if (e.format === 'pdf') {
+                const doc = new jsPDF();
+                DevExpress.pdfExporter.exportDataGrid({
+                    jsPDFDocument: doc,
+                    component: e.component,
+                }).then(() => {
+                    doc.save('ItemGroups.pdf');
+                });
+            }
         },
         headerFilter: {
             visible: true,
@@ -155,10 +165,19 @@ $(function () {
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
-                    },
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            class: "import-excel",
+                        },
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
+                        },
+                    }
                 },
                 "searchPanel"
             ],
@@ -170,9 +189,6 @@ $(function () {
                     //e.editorOptions.disabled = !e.row.inserted;
             }
         },
-        //onEditingStart: function (e) {
-        //    e.component.option('column[4].allowEditing', false);
-        //},
         onRowInserting: function (e) {
             e.data.status = 0;
             if (e.data && e.data.id == 0) {
@@ -181,12 +197,6 @@ $(function () {
         },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
-            //var objectRequire = ['code', 'name', 'type', 'description', 'status'];
-            //for (var property in e.oldData) {
-            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-            //        e.newData[property] = e.oldData[property];
-            //    }
-            //}
         },
         columns: [
             {
@@ -254,8 +264,6 @@ $(function () {
             }
         ]
     }).dxDataGrid('instance');
-});
 
-$(window).focus(function () {
-    $('#gridItemGroups').data('dxDataGrid').refresh();
+    initImportPopup('api/mdm-service/item-groups', 'ItemGroups_Template', 'gridItemGroups');
 });

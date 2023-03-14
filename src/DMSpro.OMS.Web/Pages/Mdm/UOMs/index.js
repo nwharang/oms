@@ -124,12 +124,6 @@ $(function () {
         },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
-            //var objectRequire = ['code', 'name'];
-            //for (var property in e.oldData) {
-            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-            //        e.newData[property] = e.oldData[property];
-            //    }
-            //}
         },
         toolbar: {
             items: [

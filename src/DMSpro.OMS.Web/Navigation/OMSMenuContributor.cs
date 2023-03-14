@@ -148,8 +148,8 @@ public class OMSMenuContributor : IMenuContributor
         AddMenuItemReturnOrderHeaders(context, soMenu);
         AddMenuItemArCreditMemoHeaders(context, soMenu);
         AddMenuItemProcessSalesOrderHeaders(context, soMenu);
-        AddMenuItemProcessDeliveryHeaders(context, soMenu);
-        AddMenuItemProcessSOToInvoice(context, soMenu);
+        //AddMenuItemProcessDeliveryHeaders(context, soMenu);
+        //AddMenuItemProcessSOToInvoice(context, soMenu);
 
 		//maps
         var mapsMenu = AddModuleMapsMenuItem(context);
@@ -397,30 +397,30 @@ public class OMSMenuContributor : IMenuContributor
             )
         );
     }
-    private static void AddMenuItemProcessDeliveryHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-    {
-        parentMenu.AddItem(
-            new ApplicationMenuItem(
-                OrderServiceMenus.DeliveryHeaders,
-                context.GetLocalizer<OMSResource>()["Menu:SOService:ProcessDelivery"],
-                "/SO/ProcessDelivery",
-                icon: "fa fa-archive",
-                requiredPermissionName: OrderServicePermissions.Deliveries.Default
-            )
-        );
-    }
-    private static void AddMenuItemProcessSOToInvoice(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-    {
-        parentMenu.AddItem(
-            new ApplicationMenuItem(
-                OrderServiceMenus.DeliveryHeaders,
-                context.GetLocalizer<OMSResource>()["Menu:SOService:ProcessSOToInvoice"],
-                "/SO/ProcessSOToInvoice",
-                icon: "fa fa-archive",
-                requiredPermissionName: OrderServicePermissions.Deliveries.Default
-            )
-        );
-    }
+    //private static void AddMenuItemProcessDeliveryHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    //{
+    //    parentMenu.AddItem(
+    //        new ApplicationMenuItem(
+    //            OrderServiceMenus.DeliveryHeaders,
+    //            context.GetLocalizer<OMSResource>()["Menu:SOService:ProcessDelivery"],
+    //            "/SO/ProcessDelivery",
+    //            icon: "fa fa-archive",
+    //            requiredPermissionName: OrderServicePermissions.Deliveries.Default
+    //        )
+    //    );
+    //}
+    //private static void AddMenuItemProcessSOToInvoice(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    //{
+    //    parentMenu.AddItem(
+    //        new ApplicationMenuItem(
+    //            OrderServiceMenus.DeliveryHeaders,
+    //            context.GetLocalizer<OMSResource>()["Menu:SOService:ProcessSOToInvoice"],
+    //            "/SO/ProcessSOToInvoice",
+    //            icon: "fa fa-archive",
+    //            requiredPermissionName: OrderServicePermissions.Deliveries.Default
+    //        )
+    //    );
+    //}
     //private static void AddMenuItemDeliveryDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
     //{
     //    parentMenu.AddItem(

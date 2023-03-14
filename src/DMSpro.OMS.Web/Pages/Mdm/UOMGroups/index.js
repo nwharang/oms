@@ -150,19 +150,29 @@ $(function () {
             enabled: true,
         },
         onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+            if (e.format === 'xlsx') {
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('UOMGroups');
+                DevExpress.excelExporter.exportDataGrid({
+                    component: e.component,
+                    worksheet,
+                    autoFilterEnabled: true,
+                }).then(() => {
+                    workbook.xlsx.writeBuffer().then((buffer) => {
+                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'UOMGroups.xlsx');
+                    });
                 });
-            });
-            e.cancel = true;
+                e.cancel = true;
+            }
+            else if (e.format === 'pdf') {
+                const doc = new jsPDF();
+                DevExpress.pdfExporter.exportDataGrid({
+                    jsPDFDocument: doc,
+                    component: e.component,
+                }).then(() => {
+                    doc.save('UOMGroups.pdf');
+                });
+            }
         },
         headerFilter: {
             visible: true,
@@ -197,33 +207,38 @@ $(function () {
         },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
-            //var objectRequire = ['code', 'name'];
-            //for (var property in e.oldData) {
-            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-            //        e.newData[property] = e.oldData[property];
-            //    }
-            //}
         },
-        items: [
-            "groupPanel",
-            {
-                location: 'after',
-                template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                onClick() {
-                    dataGrid.addRow();
+        toolbar: {
+            items: [
+                "groupPanel",
+                {
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        dataGrid.addRow();
+                    },
                 },
-            },
-            'columnChooserButton',
-            "exportButton",
-            {
-                location: 'after',
-                template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                onClick() {
-                    //todo
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            class: "import-excel",
+                        },
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
+                        },
+                    }
                 },
-            },
-            "searchPanel"
-        ],
+                "searchPanel"
+            ],
+        },
         columns: [
             {
                 type: 'buttons',
@@ -346,12 +361,29 @@ $(function () {
                         },
                         onRowUpdating: function (e) {
                             e.newData = Object.assign({}, e.oldData, e.newData);
-                            //var objectRequire = ['uomGroupId', 'altQty', 'altUOMId', 'baseQty', 'baseUOMId', 'active'];
-                            //for (var property in e.oldData) {
-                            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                            //        e.newData[property] = e.oldData[property];
-                            //    }
-                            //}
+                        },
+                        toolbar: {
+                            items: [
+                                "groupPanel",
+                                "addRowButton",
+                                //{
+                                //    location: 'after',
+                                //    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                                //    onClick() {
+                                //        dataGrid.addRow();
+                                //    },
+                                //},
+                                'columnChooserButton',
+                                "exportButton",
+                                {
+                                    location: 'after',
+                                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                                    onClick() {
+                                        //todo
+                                    },
+                                },
+                                "searchPanel"
+                            ],
                         },
                         columns: [
                             {
@@ -440,4 +472,6 @@ $(function () {
             }
         }
     }).dxDataGrid('instance');
+
+    initImportPopup('api/mdm-service/u-oMGroups', 'UOMGroups_Template', 'gridUOMGroups');
 });
