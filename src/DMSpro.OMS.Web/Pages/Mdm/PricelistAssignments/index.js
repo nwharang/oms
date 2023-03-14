@@ -169,19 +169,29 @@ $(function () {
             enabled: true,
         },
         onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+            if (e.format === 'xlsx') {
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('PriceListAssignment');
+                DevExpress.excelExporter.exportDataGrid({
+                    component: e.component,
+                    worksheet,
+                    autoFilterEnabled: true,
+                }).then(() => {
+                    workbook.xlsx.writeBuffer().then((buffer) => {
+                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PriceListAssignment.xlsx');
+                    });
                 });
-            });
-            e.cancel = true;
+                e.cancel = true;
+            }
+            else if (e.format === 'pdf') {
+                const doc = new jsPDF();
+                DevExpress.pdfExporter.exportDataGrid({
+                    jsPDFDocument: doc,
+                    component: e.component,
+                }).then(() => {
+                    doc.save('PriceListAssignment.pdf');
+                });
+            }
         },
         headerFilter: {
             visible: true,
@@ -207,13 +217,13 @@ $(function () {
                 "groupPanel",
                 'columnChooserButton',
                 "exportButton",
-                {
-                    location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
-                    },
-                },
+                //{
+                //    location: 'after',
+                //    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                //    onClick() {
+                //        //todo
+                //    },
+                //},
                 "searchPanel"
             ],
         },

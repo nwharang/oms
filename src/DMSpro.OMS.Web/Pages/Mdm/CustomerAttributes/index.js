@@ -99,19 +99,29 @@ $(function () {
             enabled: true,
         },
         onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+            if (e.format === 'xlsx') {
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('CustomerAttributes');
+                DevExpress.excelExporter.exportDataGrid({
+                    component: e.component,
+                    worksheet,
+                    autoFilterEnabled: true,
+                }).then(() => {
+                    workbook.xlsx.writeBuffer().then((buffer) => {
+                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'CustomerAttributes.xlsx');
+                    });
                 });
-            });
-            e.cancel = true;
+                e.cancel = true;
+            }
+            else if (e.format === 'pdf') {
+                const doc = new jsPDF();
+                DevExpress.pdfExporter.exportDataGrid({
+                    jsPDFDocument: doc,
+                    component: e.component,
+                }).then(() => {
+                    doc.save('CustomerAttributes.pdf');
+                });
+            }
         },
         headerFilter: {
             visible: true,
@@ -144,23 +154,23 @@ $(function () {
                 //},
                 'columnChooserButton',
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                }, 
+                //{
+                //    location: 'after',
+                //    widget: 'dxButton',
+                //    options: {
+                //        icon: "import",
+                //        elementAttr: {
+                //            //id: "import-excel",
+                //            class: "import-excel",
+                //        },
+                //        onClick(e) {
+                //            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //            var gridName = gridControl.attr('id');
+                //            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //            if (popup) popup.show();
+                //        },
+                //    },
+                //}, 
                 "searchPanel"
             ],
         },
@@ -205,7 +215,7 @@ $(function () {
             },
         ],
     }).dxDataGrid("instance");
-    initImportPopup('api/mdm-service/customer-attributes', 'CusAttributes_Template', 'dgCusAttributes');
+    //initImportPopup('api/mdm-service/customer-attributes', 'CusAttributes_Template', 'dgCusAttributes');
     //$("#btnNewCusAttribute").click(function (e) {
     //    if (dataCusAttributes.length < 20) {
     //        gridCusAttribute.addRow();

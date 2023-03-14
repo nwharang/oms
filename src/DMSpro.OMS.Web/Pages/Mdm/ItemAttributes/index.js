@@ -124,12 +124,6 @@ $(function () {
         },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
-            //var objectRequire = ['attrNo', 'attrName', 'hierarchyLevel', 'active', 'isProductCategory'];
-            //for (var property in e.oldData) {
-            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-            //        e.newData[property] = e.oldData[property];
-            //    }
-            //}
         },
         toolbar: {
             items: [
@@ -142,14 +136,14 @@ $(function () {
                 //    },
                 //},
                 'columnChooserButton',
-                "exportButton",
-                {
-                    location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
-                    },
-                },
+                //"exportButton",
+                //{
+                //    location: 'after',
+                //    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                //    onClick() {
+                //        //todo
+                //    },
+                //},
                 "searchPanel"
             ],
         },
