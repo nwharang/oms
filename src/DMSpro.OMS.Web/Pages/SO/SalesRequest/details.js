@@ -851,9 +851,10 @@ var loadControl = function (data) {
 
   //  var headerId = JSON.parse(sessionStorage.getItem('SalesRequestHeaderId'));
     if (SalesRequestHeaderId != null) {
+        $('#CancelButton').show();
         //headerId = JSON.parse(headerId);
         salesRequestService.getHeader(SalesRequestHeaderId)
-            .done(result => { 
+            .done(result => {
                 $('#frmSalesRequestDetails').data('dxForm').option('formData', result);
             });
 

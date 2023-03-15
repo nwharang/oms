@@ -200,6 +200,10 @@ var loadControl = function (data) {
                                 if (SalesOrderDetailsModel.find(x => x.itemId == null) == null)
                                     SalesOrderDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
                                 dgSalesOrderDetails.refresh();
+
+                                var formSalesOrder = $('#frmSalesOrderDetails').data('dxForm');
+                                formSalesOrder.getEditor('routeId').option('disabled', false);
+                                formSalesOrder.getEditor('employeeId').option('disabled', false);
                             }
                         },
                         label: {
@@ -224,10 +228,10 @@ var loadControl = function (data) {
                             valueExpr: 'id',
                             showClearButton: true,
                             disabled: true,
-                            onValueChanged: function (e) {
-                                var formSalesOrder = $('#frmSalesOrderDetails').data('dxForm');
-                                formSalesOrder.getEditor('employeeId').option('disabled', false);
-                            }
+                            //onValueChanged: function (e) {
+                            //    var formSalesOrder = $('#frmSalesOrderDetails').data('dxForm');
+                            //    formSalesOrder.getEditor('employeeId').option('disabled', false);
+                            //}
                         },
                         label: {
                             visible: false,
@@ -868,6 +872,9 @@ var loadControl = function (data) {
     initImportPopup('', 'SalesOrder_Template', 'dgSalesOrderDetails');
 
     if (SalesOrderHeaderId != null) {
+
+        $('#CancelButton').show();
+
         salesOrderService.getHeader(SalesOrderHeaderId)
             .done(result => {
                 $('#frmSalesOrderDetails').data('dxForm').option('formData', result);

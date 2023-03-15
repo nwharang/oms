@@ -192,6 +192,11 @@ var loadControl = function (data) {
     const frmArInvoiceHeaders = $('#frmArInvoiceHeaders').dxForm({
         labelMode: "floating",
         colCount: 4,
+        customizeItem: function (item) {
+            item.editorOptions = {
+                readOnly: true
+            }
+        },
         items: [
             {
                 // col 1
@@ -263,13 +268,13 @@ var loadControl = function (data) {
                             displayExpr: 'name',
                             valueExpr: 'id',
                             showClearButton: true,
-                            onValueChanged: function (e) {
-                                $('.openItemsPopupButton').data('dxButton').option('disabled', false);
-                                //$('#dgArCreditMemoDetails').data('dxDataGrid').addRow();
-                                if (ARCreditMemoDetailsModel.find(x => x.itemId == null) == null)
-                                    ARCreditMemoDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
-                                dgArCreditMemoDetails.refresh();
-                            }
+                            //onValueChanged: function (e) {
+                            //    $('.openItemsPopupButton').data('dxButton').option('disabled', false);
+                            //    //$('#dgArCreditMemoDetails').data('dxDataGrid').addRow();
+                            //    if (ARCreditMemoDetailsModel.find(x => x.itemId == null) == null)
+                            //        ARCreditMemoDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+                            //    dgArCreditMemoDetails.refresh();
+                            //}
                         },
                         label: {
                             visible: false,
@@ -516,15 +521,17 @@ var loadControl = function (data) {
                 //frmArInvoiceHeaders.updateData('docTotalLineAmt', sumLineAmt);
                 //frmArInvoiceHeaders.updateData('docTotalLineAmtAfterTax', sumLineAmtAfterTax);
 
-                if (editingEmptyRow) {
-                    editingEmptyRow = false;
-                    ArInvoiceDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
-                    dgArInvoiceDetails.refresh();
-                }
+                //if (editingEmptyRow) {
+                //    editingEmptyRow = false;
+                //    ArInvoiceDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+                //    dgArInvoiceDetails.refresh();
+                //}
                 //dgArInvoiceDetails.saveEditData();
             },
             onContentReady: function (e) {
                 $('.addNewButton').data('dxButton').option('visible', false);
+                $('.openItemsPopupButton').data('dxButton').option('visible', false);
+                $('.import-excel').data('dxButton').option('visible', false);
                 calculatorDocTotal();
 
                 //var sumDiscountAmt = e.component.getTotalSummaryValue('discountAmt');
@@ -549,9 +556,9 @@ var loadControl = function (data) {
                 //mode: 'batch',
                 //selectTextOnEditStart: true,
                 //startEditAction: 'click',
-                allowAdding: true,
-                allowUpdating: true,
-                allowDeleting: true,
+                allowAdding: false,
+                allowUpdating: false,
+                allowDeleting: false,
                 useIcons: true,
                 texts: {
                     editRow: l("Edit"),
@@ -560,13 +567,13 @@ var loadControl = function (data) {
                 }
             },
             columns: [
-                {
-                    caption: l("Actions"),
-                    type: 'buttons',
-                    width: 120,
-                    buttons: ['edit', 'delete'],
-                    fixedPosition: 'left'
-                },
+                //{
+                //    caption: l("Actions"),
+                //    type: 'buttons',
+                //    width: 120,
+                //    buttons: ['edit', 'delete'],
+                //    fixedPosition: 'left'
+                //},
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:Item'),
                     dataField: 'itemId',
@@ -968,8 +975,8 @@ var loadControl = function (data) {
         arInvoiceService.getDetailListDevextremes({ filter: JSON.stringify(['docId', '=', ArInvoiceHeaderId]) })
             .done(result => {
                 ArInvoiceDetailsModel = result.data;
-                if (ArInvoiceDetailsModel.find(x => x.itemId == null) == null)
-                    ArInvoiceDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+                //if (ArInvoiceDetailsModel.find(x => x.itemId == null) == null)
+                //    ArInvoiceDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
 
                 dgArInvoiceDetails.option('dataSource', ArInvoiceDetailsModel);
                 dgArInvoiceDetails.refresh();
