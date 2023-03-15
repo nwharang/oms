@@ -865,7 +865,7 @@ var Dropzone = function (_Emitter) {
         error: function error(file, message) {
           if (file.previewElement) {
             file.previewElement.classList.add("dz-error");
-            if (typeof message !== "String" && message.error) {
+            if (typeof message !== "string" && message.error) {
               message = message.error;
             }
             for (var _iterator7 = file.previewElement.querySelectorAll("[data-dz-errormessage]"), _isArray7 = true, _i7 = 0, _iterator7 = _isArray7 ? _iterator7 : _iterator7[Symbol.iterator]();;) {

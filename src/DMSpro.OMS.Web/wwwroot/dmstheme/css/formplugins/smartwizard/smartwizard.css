@@ -48,8 +48,8 @@
 .sw-theme-default .sw-toolbar {
   background: #f9f9f9;
   border-radius: 0 !important;
-  padding-left: 10px;
-  padding-right: 10px;
+  /* padding-left: 10px;
+  padding-right: 10px; */
   padding: 10px;
   margin-bottom: 0 !important; }
 

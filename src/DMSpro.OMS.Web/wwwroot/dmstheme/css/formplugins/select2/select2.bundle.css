@@ -1012,12 +1012,14 @@ RESULT:
   border-color: #2198F3; }
 
 .select2-container--default.select2-container--open.select2-container--below .select2-selection--single, .select2-container--default.select2-container--open.select2-container--below .select2-selection--multiple {
+  border-bottom: 0;
   border-bottom-color: transparent;
-  border-bottom: 0; }
+  }
 
 .select2-container--default.select2-container--open.select2-container--above .select2-selection--single, .select2-container--default.select2-container--open.select2-container--above .select2-selection--multiple {
+  border-top: 0;
   border-top-color: transparent;
-  border-top: 0; }
+  }
 
 .select2-container--default.select2-container--focus .select2-selection--single,
 .select2-container--default.select2-container--focus .select2-selection--multiple {

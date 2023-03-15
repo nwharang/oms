@@ -263,7 +263,7 @@ Build date: 2018-12-11 23:23:51
   width: 30px;
   height: 30px;
   border: 1px solid rgba(0, 0, 0, 0.3);
-  background-color: #cbcfd5;
+  /* background-color: #cbcfd5; */
   background: -webkit-gradient(linear, left top, left bottom, from(white), color-stop(30%, #B4B9BE), to(white));
   background: linear-gradient(to bottom, white 0%, #B4B9BE 30%, white 100%);
   -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2), inset 0 0 3px 1px white;
@@ -273,7 +273,7 @@ Build date: 2018-12-11 23:23:51
 .irs--big .irs-handle.state_hover,
 .irs--big .irs-handle:hover {
   border-color: rgba(0, 0, 0, 0.45);
-  background-color: #939ba7;
+  /* background-color: #939ba7; */
   background: -webkit-gradient(linear, left top, left bottom, from(white), color-stop(30%, #919BA5), to(white));
   background: linear-gradient(to bottom, white 0%, #919BA5 30%, white 100%); }
 
@@ -292,7 +292,7 @@ Build date: 2018-12-11 23:23:51
   color: white;
   text-shadow: none;
   padding: 1px 5px;
-  background-color: #428bca;
+  /* background-color: #428bca; */
   background: -webkit-gradient(linear, left top, left bottom, from(#428bca), to(#3071a9));
   background: linear-gradient(to bottom, #428bca 0%, #3071a9 100%);
   border-radius: 3px; }
@@ -312,7 +312,7 @@ Build date: 2018-12-11 23:23:51
 .irs--modern .irs-line {
   top: 25px;
   height: 5px;
-  background-color: #d1d6e0;
+  /* background-color: #d1d6e0; */
   background: -webkit-gradient(linear, left top, left bottom, from(#e0e4ea), to(#d1d6e0));
   background: linear-gradient(to bottom, #e0e4ea 0%, #d1d6e0 100%);
   border: 1px solid #a3adc1;
@@ -322,7 +322,7 @@ Build date: 2018-12-11 23:23:51
 .irs--modern .irs-bar {
   top: 25px;
   height: 5px;
-  background: #20b426;
+  /* background: #20b426; */
   background: -webkit-gradient(linear, left top, left bottom, from(#20b426), to(#18891d));
   background: linear-gradient(to bottom, #20b426 0%, #18891d 100%); }
 
@@ -1085,7 +1085,7 @@ RESULT:
   background-color: #0d8cee; }
 
 .irs--big .irs-bar {
-  background-color: #51aef6;
+  /* background-color: #51aef6; */
   border-color: #2198F3;
   background: -webkit-gradient(linear, left top, left bottom, from(#ffffff), color-stop(30%, #51aef6), to(#2198F3));
   background: linear-gradient(to bottom, #ffffff 0%, #51aef6 30%, #2198F3 100%); }
