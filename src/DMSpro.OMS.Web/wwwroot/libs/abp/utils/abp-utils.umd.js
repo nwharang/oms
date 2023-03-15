@@ -210,7 +210,8 @@
             }
             finally {
                 if (e)
-                    throw e.error;
+                    console.log(e.error);
+                    // throw e.error;
             }
         }
         return ar;
