@@ -290,5 +290,5 @@
             }
         })).dxDataGrid("instance");
 
-    initImportPopup('', 'SalesOrder_Template', 'dgSalesOrderHeader');
+    initImportPopup('api/order-service/sales-orders', 'SalesOrder_Template', 'dgSalesOrderHeader');
 });

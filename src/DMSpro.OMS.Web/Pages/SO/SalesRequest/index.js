@@ -269,20 +269,14 @@
                 totalItems: [{
                     column: 'docTotalLineAmt',
                     summaryType: 'sum',
-                    valueFormat: ",##0.###",
-                    //customizeText: function (data) {
-                    //    return data.valueText + "đ";
-                    //},
+                    valueFormat: ",##0.###"
                 }, {
                     column: 'docTotalLineAmtAfterTax',
                     summaryType: 'sum',
-                    valueFormat: ",##0.###",
-                    //customizeText: function (data) {
-                    //    return data.valueText + "đ";
-                    //},
+                    valueFormat: ",##0.###"
                 }],
             }
         })).dxDataGrid("instance");
 
-    initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestHeader');
+    initImportPopup('api/order-service/sales-requests', 'SalesRequest_Template', 'dgSalesRequestHeader');
 });
