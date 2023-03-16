@@ -116,13 +116,8 @@ var loadControl = function (data) {
     ];
     /****control*****/
 
-    $('#resizable').dxResizable({
-        minHeight: 120,
-        handles: "bottom"
-    }).dxResizable('instance');
-
     // Sales Request herader form
-    const frmSalesRequestDetails = $('#frmSalesRequestDetails').dxForm({ 
+    const frmSalesRequestDetails = $('#frmSalesRequestDetails').dxForm({
         labelMode: "floating",
         colCount: 3,
         items: [
@@ -214,7 +209,7 @@ var loadControl = function (data) {
                             type: 'datetime',
                             value: new Date(),
                             displayFormat: "dd/MM/yyyy HH:mm",
-                           // disabled: true,
+                            // disabled: true,
                         },
                         label: {
                             visible: false,
@@ -377,6 +372,11 @@ var loadControl = function (data) {
         ]
     }).dxForm('instance');
 
+    $('#resizable').dxResizable({
+        minHeight: 120,
+        handles: "bottom"
+    }).dxResizable('instance');
+
     // Sales Request details grid
     const dgSalesRequestDetails = $('#dgSalesRequestDetails').dxDataGrid(
         jQuery.extend(dxDataGridConfiguration, {
@@ -394,13 +394,6 @@ var loadControl = function (data) {
             },
             onSaved: function (e) {
                 calculatorDocTotal();
-                
-                //var sumDiscountAmt = dgSalesRequestDetails.getTotalSummaryValue('discountAmt');
-                //var sumLineAmt = dgSalesRequestDetails.getTotalSummaryValue('lineAmt');
-                //var sumLineAmtAfterTax = dgSalesRequestDetails.getTotalSummaryValue('lineAmtAfterTax');
-                //frmSalesRequestDetails.updateData('docTotalLineDiscountAmt', sumDiscountAmt);
-                //frmSalesRequestDetails.updateData('docTotalLineAmt', sumLineAmt);
-                //frmSalesRequestDetails.updateData('docTotalLineAmtAfterTax', sumLineAmtAfterTax);
 
                 if (editingEmptyRow) {
                     editingEmptyRow = false;
@@ -408,35 +401,15 @@ var loadControl = function (data) {
                         SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
                     dgSalesRequestDetails.refresh();
                 }
-                //dgSalesRequestDetails.saveEditData();
             },
             onContentReady: function (e) {
                 $('.addNewButton').data('dxButton').option('visible', false);
                 calculatorDocTotal();
-
-                //var sumDiscountAmt = e.component.getTotalSummaryValue('discountAmt');
-                //var sumLineAmt = e.component.getTotalSummaryValue('lineAmt');
-                //var sumLineAmtAfterTax = e.component.getTotalSummaryValue('lineAmtAfterTax');
-                //frmSalesRequestDetails.updateData('docTotalLineDiscountAmt', sumDiscountAmt);
-                //frmSalesRequestDetails.updateData('docTotalLineAmt', sumLineAmt);
-                //frmSalesRequestDetails.updateData('docTotalLineAmtAfterTax', sumLineAmtAfterTax);
-
-                //if ($('#frmSalesRequestDetails').data('dxForm').getEditor('businessPartnerId').option('value') != null) {
-                //    if (!e.component.hasEditData())
-                //        e.component.addRow();
-                //}
             },
             onEditorPreparing: function (e) {
                 if (e.parentType === "dataRow" && (e.dataField === "vatId" || e.dataField === "priceAfterTax" || e.dataField === "discountAmt" || e.dataField === "lineAmt" || e.dataField === "lineAmtAfterTax")) {
                     e.editorOptions.disabled = true;
                 }
-
-                //if (e.parentType === 'dataRow' && e.dataField === 'itemId') {
-                //    e.editorOptions.onValueChanged = args => {
-                //        e.setValue(args.value);
-                //        e.component.saveEditData();
-                //    }
-                //}
             },
             editing: {
                 mode: 'cell',
@@ -494,8 +467,6 @@ var loadControl = function (data) {
                         newData.lineAmt = newData.price * currentData.qty - currentData.discountAmt;
                         if (!currentData.itemId)
                             editingEmptyRow = true;
-
-                        ///dgSalesRequestDetails.saveEditData();
                     },
                     //validationRules: [{ type: 'required', message: '' }],
                     //width: 200

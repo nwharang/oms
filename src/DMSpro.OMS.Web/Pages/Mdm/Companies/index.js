@@ -251,10 +251,10 @@ $(function () {
                 editRow: l("Edit"),
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
-            }, 
+            },
         },
         toolbar: {
-            items: [ 
+            items: [
                 "groupPanel",
                 "addRowButton",
                 "columnChooserButton",
