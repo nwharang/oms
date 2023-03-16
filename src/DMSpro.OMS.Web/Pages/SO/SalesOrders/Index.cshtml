@@ -13,6 +13,18 @@
     PageLayout.Content.MenuItemName = OrderServiceMenus.SalesOrderHeaders;
 }
 
+@section styles{
+    <style>
+        .dx-datagrid-headers .dx-datagrid-content {
+            margin: -1px 0 -1px 0px !important;
+        }
+
+        .dx-datagrid-borders .dx-datagrid-rowsview, .dx-datagrid-headers + .dx-datagrid-rowsview {
+            margin: -1px 0 -1px 0px !important;
+        }
+    </style>
+}
+
 @section scripts {
     <abp-script src="/pages/shared/common.isp.js" />
     <script src="/js/devextreme/exceljs.min.js"></script>

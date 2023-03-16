@@ -121,6 +121,11 @@
         const frmReturnOrderDetails = $('#frmReturnOrderDetails').dxForm({
             labelMode: "floating",
             colCount: 3,
+            customizeItem: function (item) {
+                item.editorOptions = {
+                    readOnly: true
+                }
+            },
             items: [
                 {
                     // col 1
@@ -187,11 +192,11 @@
                                 displayExpr: 'name',
                                 valueExpr: 'id',
                                 showClearButton: true,
-                                onValueChanged: function (e) {
-                                    $('.openItemsPopupButton').data('dxButton').option('disabled', false);
-                                    returnOrderDetailModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
-                                    dgReturnOrderDetails.refresh();
-                                }
+                                //onValueChanged: function (e) {
+                                //    $('.openItemsPopupButton').data('dxButton').option('disabled', false);
+                                //    returnOrderDetailModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+                                //    dgReturnOrderDetails.refresh();
+                                //}
                             },
                             label: {
                                 visible: false,
@@ -390,6 +395,8 @@
                 },
                 onContentReady: function (e) {
                     $('.addNewButton').data('dxButton').option('visible', false);
+                    $('.openItemsPopupButton').data('dxButton').option('visible', false);
+                    $('.import-excel').data('dxButton').option('visible', false);
                     calculatorDocTotal();
                 },
                 onEditorPreparing: function (e) {
@@ -399,9 +406,9 @@
                 },
                 editing: {
                     mode: 'cell',
-                    allowAdding: true,
-                    allowUpdating: true,
-                    allowDeleting: true,
+                    allowAdding: false,
+                    allowUpdating: false,
+                    allowDeleting: false,
                     useIcons: true,
                     texts: {
                         editRow: l("Edit"),
@@ -410,13 +417,13 @@
                     }
                 },
                 columns: [
-                    {
-                        caption: l("Actions"),
-                        type: 'buttons',
-                        width: 120,
-                        buttons: ['edit', 'delete'],
-                        fixedPosition: 'left'
-                    },
+                    //{
+                    //    caption: l("Actions"),
+                    //    type: 'buttons',
+                    //    width: 120,
+                    //    buttons: ['edit', 'delete'],
+                    //    fixedPosition: 'left'
+                    //},
                     {
                         caption: l('EntityFieldName:OrderService:SalesRequestDetails:Item'),
                         dataField: 'itemId',
@@ -804,8 +811,8 @@
             returnOrderService.getDetailListDevextremes(args)
                 .done(result => {
                     returnOrderDetailModel = result.data;
-                    if (returnOrderDetailModel.find(x => x.itemId == null) == null)
-                        returnOrderDetailModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+                    //if (returnOrderDetailModel.find(x => x.itemId == null) == null)
+                    //    returnOrderDetailModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
                     gridDetails = $('#dgReturnOrderDetails').data('dxDataGrid')
                     gridDetails.option('dataSource', returnOrderDetailModel);
                     gridDetails.refresh();

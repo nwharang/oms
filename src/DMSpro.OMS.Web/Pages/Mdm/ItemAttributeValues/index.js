@@ -199,7 +199,7 @@ $(function () {
                             class: "import-excel",
                         },
                         onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridControl = e.element.closest('div.dx-treelist');
                             var gridName = gridControl.attr('id');
                             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
                             if (popup) popup.show();

@@ -957,6 +957,7 @@ var loadControl = function (data) {
 
     //  var headerId = JSON.parse(sessionStorage.getItem('ARCreditMemoHeaderId'));
     if (ARCreditMemoHeaderId != null) {
+        $('#CancelButton').show();
         //headerId = JSON.parse(headerId);
         // load data for form
         arCreditMemoService.getHeader(ARCreditMemoHeaderId)

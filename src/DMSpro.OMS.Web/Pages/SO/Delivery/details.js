@@ -47,7 +47,7 @@ window.onload = async function () {
 
 var loadControl = function (data) {
     debugger
-    var l = abp.localization.getResource("OMS"); 
+    var l = abp.localization.getResource("OMS");
     var deliveryHeaderService = window.dMSpro.oMS.orderService.controllers.deliveries.delivery;
     var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
     var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
@@ -200,6 +200,11 @@ var loadControl = function (data) {
     const frmDeliveryDetails = $('#frmDeliveryDetails').dxForm({
         labelMode: "floating",
         colCount: 4,
+        customizeItem: function (item) {
+            item.editorOptions = {
+                readOnly: true
+            }
+        },
         items: [
             {
                 // col 1
@@ -234,23 +239,36 @@ var loadControl = function (data) {
                         }]
                     },
                     {
-                        dataField: "docSource",
-                        editorType: "dxSelectBox",
+                        dataField: "remark",
+                        label: {
+                            visible: false,
+                            text: l('EntityFieldName:OrderService:SalesRequest:Remark')
+                        }
+                    },
+                    {
+                        dataField: "requestDate",
+                        editorType: 'dxDateBox',
                         editorOptions: {
-                            dataSource: docSourceStore,
-                            displayExpr: 'text',
-                            valueExpr: 'id',
-                            showClearButton: true,
-                            value: 0
+                            type: 'datetime',
+                            value: new Date(),
+                            displayFormat: "dd/MM/yyyy HH:mm",
+                            // disabled: true,
                         },
                         label: {
                             visible: false,
-                            text: l('EntityFieldName:OrderService:SalesRequest:DocSource')
+                            text: l('EntityFieldName:OrderService:SalesRequest:RequestDate')
                         },
                         validationRules: [{
                             type: 'required', message: ''
                         }]
-                    },
+                    }
+
+                ]
+            },
+            {
+                // col 2
+                itemType: 'group',
+                items: [
                     {
                         dataField: "businessPartnerId",
                         editorType: 'dxSelectBox',
@@ -259,11 +277,11 @@ var loadControl = function (data) {
                             displayExpr: 'name',
                             valueExpr: 'id',
                             showClearButton: true,
-                            onValueChanged: function (e) {
-                                $('.openItemsPopupButton').data('dxButton').option('disabled', false);
-                                DeliveryDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
-                                dgDeliveryDetails.refresh();
-                            }
+                            //onValueChanged: function (e) {
+                            //    $('.openItemsPopupButton').data('dxButton').option('disabled', false);
+                            //    DeliveryDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+                            //    dgDeliveryDetails.refresh();
+                            //}
                         },
                         label: {
                             visible: false,
@@ -273,20 +291,6 @@ var loadControl = function (data) {
                             type: 'required', message: ''
                         }]
                     },
-                    {
-                        dataField: "remark",
-                        label: {
-                            visible: false,
-                            text: l('EntityFieldName:OrderService:SalesRequest:Remark')
-                        }
-                    },
-                   
-                ]
-            },
-            {
-                // col 2
-                itemType: 'group',
-                items: [
                     {
                         dataField: "routeId",
                         editorType: "dxSelectBox",
@@ -304,7 +308,7 @@ var loadControl = function (data) {
                         validationRules: [{
                             type: 'required',
                         }]
-                    }, 
+                    },
                     {
                         dataField: "employeeId",
                         editorType: 'dxSelectBox',
@@ -327,22 +331,23 @@ var loadControl = function (data) {
                         }]
                     },
                     {
-                        dataField: "requestDate",
-                        editorType: 'dxDateBox',
+                        dataField: "docSource",
+                        editorType: "dxSelectBox",
                         editorOptions: {
-                            type: 'datetime',
-                            value: new Date(),
-                            displayFormat: "dd/MM/yyyy HH:mm",
-                            // disabled: true,
+                            dataSource: docSourceStore,
+                            displayExpr: 'text',
+                            valueExpr: 'id',
+                            showClearButton: true,
+                            value: 0
                         },
                         label: {
                             visible: false,
-                            text: l('EntityFieldName:OrderService:SalesRequest:RequestDate')
+                            text: l('EntityFieldName:OrderService:SalesRequest:DocSource')
                         },
                         validationRules: [{
                             type: 'required', message: ''
                         }]
-                    },
+                    }
                 ]
             },
             {
@@ -432,7 +437,7 @@ var loadControl = function (data) {
                     }
                 ]
             },
-        
+
             {
                 // col 4
                 itemType: 'group',
@@ -521,15 +526,17 @@ var loadControl = function (data) {
                 //frmDeliveryDetails.updateData('docTotalLineAmt', sumLineAmt);
                 //frmDeliveryDetails.updateData('docTotalLineAmtAfterTax', sumLineAmtAfterTax);
 
-                if (editingEmptyRow) {
-                    editingEmptyRow = false;
-                    DeliveryDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
-                    dgDeliveryDetails.refresh();
-                }
+                //if (editingEmptyRow) {
+                //    editingEmptyRow = false;
+                //    DeliveryDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+                //    dgDeliveryDetails.refresh();
+                //}
                 //dgDeliveryDetails.saveEditData();
             },
             onContentReady: function (e) {
                 $('.addNewButton').data('dxButton').option('visible', false);
+                $('.openItemsPopupButton').data('dxButton').option('visible', false);
+                $('.import-excel').data('dxButton').option('visible', false);
                 calculatorDocTotal();
 
                 //var sumDiscountAmt = e.component.getTotalSummaryValue('discountAmt');
@@ -554,9 +561,9 @@ var loadControl = function (data) {
                 //mode: 'batch',
                 //selectTextOnEditStart: true,
                 //startEditAction: 'click',
-                allowAdding: true,
-                allowUpdating: true,
-                allowDeleting: true,
+                allowAdding: false,
+                allowUpdating: false,
+                allowDeleting: false,
                 useIcons: true,
                 texts: {
                     editRow: l("Edit"),
@@ -565,13 +572,6 @@ var loadControl = function (data) {
                 }
             },
             columns: [
-                {
-                    caption: l("Actions"),
-                    type: 'buttons',
-                    width: 120,
-                    buttons: ['edit', 'delete'],
-                    fixedPosition: 'left'
-                },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:Item'),
                     dataField: 'itemId',
@@ -603,8 +603,8 @@ var loadControl = function (data) {
                         newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100;
                         newData.lineAmtAfterTax = newData.priceAfterTax * currentData.qty - currentData.discountAmt;
                         newData.lineAmt = newData.price * currentData.qty - currentData.discountAmt;
-                        if (!currentData.itemId)
-                            editingEmptyRow = true;
+                        //if (!currentData.itemId)
+                        //    editingEmptyRow = true;
 
                         //dgDeliveryDetails.saveEditData();
                     },
@@ -973,8 +973,8 @@ var loadControl = function (data) {
         deliveryHeaderService.getDetailListDevextremes(args)
             .done(result => {
                 DeliveryDetailsModel = result.data;
-                if (DeliveryDetailsModel.find(x => x.itemId == null) == null)
-                    DeliveryDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+                //if (DeliveryDetailsModel.find(x => x.itemId == null) == null)
+                //    DeliveryDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
                 gridDetails = $('#dgDeliveryDetails').data('dxDataGrid')
                 gridDetails.option('dataSource', DeliveryDetailsModel);
                 gridDetails.refresh();
