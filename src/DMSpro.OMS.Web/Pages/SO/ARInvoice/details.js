@@ -19,10 +19,15 @@ const defaultEmptyModel = {
 }
 
 let vatList = {};
-const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
+let companyId = null;
 const linkedSFAId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
 var needSummaryUpdate = false;
 var editingEmptyRow = false;
+
+window.onload = async function () { 
+    let company = await Common.getCurrentCompany();
+    if (company != null)
+        companyId = company.id;
 // get data api getInfoForSo in item service
 var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
 let lastCallDates = Common.getLastAPICallDates();
@@ -36,6 +41,7 @@ itemService.getInfoForSO(companyId,
         addListToData(data);
         loadControl(data);
     });
+}
 
 var loadControl = function (data) {
     var l = abp.localization.getResource("OMS");

@@ -1,9 +1,11 @@
-﻿$(function () {
+﻿$(async function () {
     var l = abp.localization.getResource("OMS");
     var salesOrderService = window.dMSpro.oMS.orderService.controllers.salesOrders.salesOrder;
 
-
-    const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
+    let companyId = null;
+    let company = await Common.getCurrentCompany();
+    if (company != null)
+        companyId = company.id;
 
     /****custom store*****/
     var salesOrderStore = new DevExpress.data.CustomStore({

@@ -52,11 +52,11 @@ $(function () {
                 icon: "map",
                 template: initAddressTab()
             },
-            {
-                title: "Attribute",
-                icon: "check",
-                template: initAttributeTab()
-            },
+            //{
+            //    title: "Attribute",
+            //    icon: "check",
+            //    template: initAttributeTab()
+            //},
             {
                 title: "Contact",
                 icon: "card",
@@ -85,167 +85,189 @@ $(function () {
         formData: cusProfile,
         labelMode: 'floating',
         colCount: 10,
-        items: [
-            {
-                itemType: 'group',
-                colCount: 2,
-                colSpan: 10,
-                items: [
-                    {
-                        itemType: 'group',
-                        caption: 'General',
-                        colSpan: 4,
-                        items: [
-                            {
-                                dataField: 'code',
-                                dataType: 'string',
-                                validationRules: [{ type: 'required' }]
-                            },
-                            {
-                                dataField: 'name',
-                                dataType: 'string',
-                                validationRules: [{ type: 'required' }]
-                            },
-                            {
-                                dataField: 'phone1',
-                                dataType: 'string'
-                            },
-                            {
-                                dataField: 'phone2',
-                                dataType: 'string'
-                            },
-                            {
-                                dataField: 'erpCode',
-                                dataType: 'string'
-                            },
-                            {
-                                dataField: 'active',
-                                editorType: 'dxCheckBox'
-                            }
-                        ]
-                    },
-                    {
-                        itemType: 'group',
-                        caption: 'System Information',
-                        colCount: 2,
-                        colSpan: 6,
-                        items: [
-                            {
-                                itemType: 'group',
-                                items: [
-                                    {
-                                        dataField: 'priceListId',
-                                        editorType: 'dxSelectBox',
-                                        editorOptions: {
-                                            dataSource: {
-                                                store: pricelistLookup,
-                                                paginate: true,
-                                                pageSize: pageSizeForLookup
-                                            },
-                                            displayExpr: 'code',
-                                            valueExpr: 'id'
-                                        },
-                                        validationRules: [{ type: 'required' }]
-                                    },
-                                    {
-                                        dataField: 'license',
-                                        dataType: 'string'
-                                    },
-                                    {
-                                        dataField: 'taxCode',
-                                        dataType: 'string'
-                                    },
-                                    {
-                                        dataField: 'vatName',
-                                        dataType: 'string'
-                                    },
-                                    {
-                                        dataField: 'vatAddress',
-                                        dataType: 'string'
-                                    },
-                                    {
-                                        dataField: 'creditLimit'
-                                    },
-                                    {
-                                        dataField: 'sfaCustomerCode',
-                                        dataType: 'string',
-                                        validationRules: [{ type: 'required' }]
-                                    }
-                                ]
-                            },
-                            {
-                                itemType: 'group',
-                                items: [
-                                    {
-                                        dataField: 'effectiveDate',
-                                        editorType: "dxDateBox",
-                                        validationRules: [{ type: 'required' }]
-                                    },
-                                    {
-                                        dataField: 'endDate',
-                                        editorType: "dxDateBox"
-                                    },
-                                    {
-                                        dataField: 'lastOrderDate',
-                                        editorType: "dxDateBox"
-                                    },
-                                    //{
-                                    //    dataField: 'warehouseId',
-                                    //    editorType: 'dxSelectBox',
-                                    //    editorOptions: {
-                                    //        dataSource: {
-                                    //            store: warehouseLookup,
-                                    //            paginate: true,
-                                    //            pageSize: pageSizeForLookup
-                                    //        },
-                                    //        displayExpr: 'valueCode',
-                                    //        valueExpr: 'id'
-                                    //    }
-                                    //},
-                                    {
-                                        dataField: 'paymentTermId',
-                                        editorType: 'dxSelectBox',
-                                        editorOptions: {
-                                            dataSource: {
-                                                store: systemDataLookup,
-                                                paginate: true,
-                                                pageSize: pageSizeForLookup
-                                            },
-                                            displayExpr: 'valueCode',
-                                            valueExpr: 'id'
-                                        }
-                                    },
-                                    {
-                                        dataField: 'linkedCompanyId',
-                                        editorType: 'dxSelectBox',
-                                        validationRules: [{ type: "required" }],
-                                        editorOptions: {
-                                            dataSource: {
-                                                store: companyData,
-                                                paginate: true,
-                                                pageSize: pageSizeForLookup
-                                            },
-                                            displayExpr: 'name',
-                                            valueExpr: 'id'
-                                        }
-                                    },
-                                    {
-                                        dataField: 'isCompany',
-                                        editorType: 'dxCheckBox'
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                ]
-            }
-        ]
+        onInitialized: function (e) {
+            getItemForm(e.component)
+        }
     });
 
     $('#resizable').dxResizable({
         minHeight: 400,
         handles: "bottom"
     }).dxResizable('instance');
+
+    function getItemForm(dxForm) {
+        var itemsOption = [];
+        cusAttrService.getListDevextremes({})
+            .done(result => {
+                var listCusAttribute = result.data.filter(x => x.active == true);
+                var items = [
+                    {
+                        itemType: 'group',
+                        colCount: 2,
+                        colSpan: 8,
+                        items: [
+                            {
+                                itemType: 'group',
+                                caption: 'General',
+                                colSpan: 4,
+                                items: [
+                                    {
+                                        dataField: 'code',
+                                        dataType: 'string',
+                                        validationRules: [{ type: 'required' }]
+                                    },
+                                    {
+                                        dataField: 'name',
+                                        dataType: 'string',
+                                        validationRules: [{ type: 'required' }]
+                                    },
+                                    {
+                                        dataField: 'phone1',
+                                        dataType: 'string'
+                                    },
+                                    {
+                                        dataField: 'phone2',
+                                        dataType: 'string'
+                                    },
+                                    {
+                                        dataField: 'erpCode',
+                                        dataType: 'string'
+                                    },
+                                    {
+                                        dataField: 'active',
+                                        editorType: 'dxCheckBox'
+                                    }
+                                ]
+                            },
+                            {
+                                itemType: 'group',
+                                caption: 'System Information',
+                                colCount: 2,
+                                colSpan: 4,
+                                items: [
+                                    {
+                                        itemType: 'group',
+                                        items: [
+                                            {
+                                                dataField: 'priceListId',
+                                                editorType: 'dxSelectBox',
+                                                editorOptions: {
+                                                    dataSource: {
+                                                        store: pricelistLookup,
+                                                        paginate: true,
+                                                        pageSize: pageSizeForLookup
+                                                    },
+                                                    displayExpr: 'code',
+                                                    valueExpr: 'id'
+                                                },
+                                                validationRules: [{ type: 'required' }]
+                                            },
+                                            {
+                                                dataField: 'license',
+                                                dataType: 'string'
+                                            },
+                                            {
+                                                dataField: 'taxCode',
+                                                dataType: 'string'
+                                            },
+                                            {
+                                                dataField: 'vatName',
+                                                dataType: 'string'
+                                            },
+                                            {
+                                                dataField: 'vatAddress',
+                                                dataType: 'string'
+                                            },
+                                            {
+                                                dataField: 'creditLimit'
+                                            },
+                                            {
+                                                dataField: 'sfaCustomerCode',
+                                                dataType: 'string',
+                                                validationRules: [{ type: 'required' }]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        itemType: 'group',
+                                        items: [
+                                            {
+                                                dataField: 'effectiveDate',
+                                                editorType: "dxDateBox",
+                                                validationRules: [{ type: 'required' }]
+                                            },
+                                            {
+                                                dataField: 'endDate',
+                                                editorType: "dxDateBox"
+                                            },
+                                            {
+                                                dataField: 'lastOrderDate',
+                                                editorType: "dxDateBox"
+                                            },
+                                            //{
+                                            //    dataField: 'warehouseId',
+                                            //    editorType: 'dxSelectBox',
+                                            //    editorOptions: {
+                                            //        dataSource: {
+                                            //            store: warehouseLookup,
+                                            //            paginate: true,
+                                            //            pageSize: pageSizeForLookup
+                                            //        },
+                                            //        displayExpr: 'valueCode',
+                                            //        valueExpr: 'id'
+                                            //    }
+                                            //},
+                                            {
+                                                dataField: 'paymentTermId',
+                                                editorType: 'dxSelectBox',
+                                                editorOptions: {
+                                                    dataSource: {
+                                                        store: systemDataLookup,
+                                                        paginate: true,
+                                                        pageSize: pageSizeForLookup
+                                                    },
+                                                    displayExpr: 'valueCode',
+                                                    valueExpr: 'id'
+                                                }
+                                            },
+                                            {
+                                                dataField: 'linkedCompanyId',
+                                                editorType: 'dxSelectBox',
+                                                validationRules: [{ type: "required" }],
+                                                editorOptions: {
+                                                    dataSource: {
+                                                        store: companyData,
+                                                        paginate: true,
+                                                        pageSize: pageSizeForLookup
+                                                    },
+                                                    displayExpr: 'name',
+                                                    valueExpr: 'id'
+                                                }
+                                            },
+                                            {
+                                                dataField: 'isCompany',
+                                                editorType: 'dxCheckBox'
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                        ]
+                    }
+                ];
+                listCusAttribute.forEach((i) => {
+                    itemsOption.push(generateAttrOptions(i))
+                })
+                items.push({
+                    itemType: 'group',
+                    cssClass: 'second-group',
+                    caption: 'DMS Attribute',
+                    colSpan: 2,
+                    items: itemsOption
+                })
+                dxForm.option('items', items);
+            });
+    }
 
     function initContactTab() {
         return function () {
@@ -426,6 +448,30 @@ $(function () {
                         },
                     ],
                 })
+        }
+    }
+
+    const dsAttrValue = function (n) {
+        return {
+            store: getCusAttrValue,
+            filter: ['customerAttribute.attrNo', '=', n],
+            paginate: true,
+            pageSize: pageSizeForLookup
+        };
+    }
+
+    function generateAttrOptions(attr) {
+        return {
+            dataField: 'attribute' + attr.attrNo + 'Id',
+            label: {
+                text: attr.attrName
+            },
+            editorType: 'dxSelectBox',
+            editorOptions: {
+                dataSource: dsAttrValue(attr.attrNo),
+                valueExpr: 'id',
+                displayExpr: 'attrValName'
+            }
         }
     }
 });
