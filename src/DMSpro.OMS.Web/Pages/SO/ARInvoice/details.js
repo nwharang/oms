@@ -19,23 +19,30 @@ const defaultEmptyModel = {
 }
 
 let vatList = {};
-const companyId = '29d43197-c742-90b8-65d8-3a099166f987';
+let companyId = null;
 const linkedSFAId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
 var needSummaryUpdate = false;
 var editingEmptyRow = false;
+
 // get data api getInfoForSo in item service
-var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
-let lastCallDates = Common.getLastAPICallDates();
-itemService.getInfoForSO(companyId,
-    lastCallDates.itemInfo, lastCallDates.customerInfo,
-    lastCallDates.routeInfo, lastCallDates.vendorInfo)
-    .done(async result => {
-        let resultJson = await Common.parseJSON(result);
-        let data = Common.processInitData(resultJson);
-        console.log(data);
-        addListToData(data);
-        loadControl(data);
-    });
+window.onload = async function () {
+    let company = await Common.getCurrentCompany();
+    if (company != null)
+        companyId = company.id;
+    else
+        companyId = '29d43197-c742-90b8-65d8-3a099166f987';
+    // get data api getInfoForSo in item service
+    var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
+    let lastCallDates = Common.getLastAPICallDates();
+    itemService.getSOInfo(companyId, new Date(), null)
+        .done(async result => {
+            let resultJson = await Common.parseJSON(result);
+            let data = Common.processInitData(resultJson);
+            console.log(data);
+            addListToData(data);
+            loadControl(data);
+        });
+}
 
 var loadControl = function (data) {
     var l = abp.localization.getResource("OMS");
@@ -1065,33 +1072,42 @@ function appendSelectedItems(selectedItems) {
 function addListToData(data) {
 
     // get customer list
-    data.customerList = Object.keys(data.customerInfo.customer).map(function (key) {
-        return data.customerInfo.customer[key];
+    data.customerList = Object.keys(data.customerDictionary).map(function (key) {
+        return data.customerDictionary[key];
     });
     // get price list
-    data.priceList = Object.keys(data.customerInfo.price).map(function (key) {
-        return data.customerInfo.price[key];
+    data.priceList = Object.keys(data.priceDictionary).map(function (key) {
+        return data.priceDictionary[key];
     });
     // get item list
-    data.itemList = Object.keys(data.itemInfo.item).map(function (key) {
-        data.itemInfo.item[key].qty = 1;
-        return data.itemInfo.item[key];
+    data.itemList = Object.keys(data.item).map(function (key) {
+        data.item[key].qty = 1;
+        return data.item[key];
     });
     // get UOM group list
-    data.uomGroupList = Object.keys(data.itemInfo.uomGroup).map(function (key) {
-        return data.itemInfo.uomGroup[key];
+    data.uomGroupList = Object.keys(data.uomGroup).map(function (key) {
+        return data.uomGroup[key];
     });
     // get UOM list
-    data.uOMList = Object.keys(data.itemInfo.uom).map(function (key) {
-        return data.itemInfo.uom[key];
+    data.uOMList = Object.keys(data.uom).map(function (key) {
+        return data.uom[key];
     });
     // get item group list
-    data.itemGroupList = Object.keys(data.itemInfo.itemGroup).map(function (key) {
-        return data.itemInfo.itemGroup[key];
+    data.itemGroupList = Object.keys(data.itemsInItemGroupsDictionary).map(function (key) {
+        return data.itemsInItemGroupsDictionary[key];
     });
     // get vat list
-    vatList = Object.keys(data.itemInfo.vat).map(function (key) {
-        return data.itemInfo.vat[key];
+    vatList = Object.keys(data.vat).map(function (key) {
+        return data.vat[key];
+    });
+
+    // get route list
+    data.routeList = Object.keys(data.routeDictionary).map(function (key) {
+        return data.routeDictionary[key];
+    });
+    // get employee list
+    data.employeeList = Object.keys(data.customersRoutesItemGroupsDictionary).map(function (key) {
+        return data.customersRoutesItemGroupsDictionary[key];
     });
 };
 
