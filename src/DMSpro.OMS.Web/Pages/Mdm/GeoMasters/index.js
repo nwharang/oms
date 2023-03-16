@@ -61,24 +61,58 @@
         keyExpr: 'id',
         parentIdExpr: 'parentId',
         remoteOperations: true,
+        showRowLines: true,
         showBorders: true,
-        rootValue: null,
-        //expandedRowKeys: [1, 2],
-        //autoExpandAll: true,
+        cacheEnabled: true,
+        autoExpandAll: true,
         focusedRowEnabled: true,
-        allowColumnReordering: false,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
             visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dataTreeContainer',
         },
         paging: {
             enabled: true,
@@ -132,10 +166,33 @@
         },
         toolbar: {
             items: [
+                "groupPanel",
                 {
-                    name: "searchPanel",
-                    location: 'after'
-                }
+                    location: 'after',
+                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
+                    onClick() {
+                        dataTreeContainer.addRow();
+                    },
+                },
+                'columnChooserButton',
+                "exportButton",
+                {
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            class: "import-excel",
+                        },
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-treelist');
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
+                        },
+                    }
+                },
+                "searchPanel"
             ]
         },
         columns: [
@@ -143,7 +200,8 @@
                 caption: l("Actions"),
                 type: 'buttons',
                 width: 120,
-                buttons: ['add', 'edit', 'delete']
+                buttons: ['add', 'edit', 'delete'],
+                fixedPosition: 'left'
             },
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Code"),
@@ -186,32 +244,33 @@
         //    storageKey: 'dataTreeContainer',
         //},
     }).dxTreeList("instance");
+    initImportPopup('api/mdm-service/geo-masters', 'GeoMaster_Template', 'dataTreeContainer');
 
     /****event*****/
-    $("input#Search").on("input", function () {
-        dataTreeContainer.searchByText($(this).val());
-    });
+    //$("input#Search").on("input", function () {
+    //    dataTreeContainer.searchByText($(this).val());
+    //});
 
-    /****button*****/
-    $("#NewGeoMasterButton").click(function () {
-        dataTreeContainer.addRow();
-    });
+    ///****button*****/
+    //$("#NewGeoMasterButton").click(function () {
+    //    dataTreeContainer.addRow();
+    //});
 
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
+    //$("#ExportToExcelButton").click(function (e) {
+    //    e.preventDefault();
 
-        geoMasterService.getDownloadToken().then(
-            function (result) {
-                var url = abp.appPath + 'api/mdm-service/geo-masters/as-excel-file' +
-                    abp.utils.buildQueryString([
-                        { name: 'downloadToken', value: result.token }
-                    ]);
+    //    geoMasterService.getDownloadToken().then(
+    //        function (result) {
+    //            var url = abp.appPath + 'api/mdm-service/geo-masters/as-excel-file' +
+    //                abp.utils.buildQueryString([
+    //                    { name: 'downloadToken', value: result.token }
+    //                ]);
 
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
+    //            var downloadWindow = window.open(url, '_blank');
+    //            downloadWindow.focus();
+    //        }
+    //    )
+    //});
 
     /****function*****/
 

@@ -187,9 +187,13 @@ $(function () {
         columnResizingMode: 'widget',
         columnMinWidth: 50,
         columnAutoWidth: true, 
+        //columnChooser: {
+        //    enabled: true,
+        //    allowSearch: true,
+        //},
         columnChooser: {
             enabled: true,
-            allowSearch: true,
+            mode: "select"
         },
         columnFixing: {
             enabled: true,
