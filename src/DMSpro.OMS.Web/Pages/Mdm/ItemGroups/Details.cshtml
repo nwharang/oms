@@ -43,44 +43,39 @@
         </div>
         <div class="panel-container show">
             <div class="panel-content jqvmap-bg-ocean p-0"  >
-                <abp-card>
-                    <abp-card-body>
-                        <abp-row>
-                            <div style="padding-left:12px" class="buttons-header-grid">
-                                <div class="btn-group">
-                                    <button id="btnActions" type="button" class="btn btn-light btn-sm dropdown-toggle hvr-icon-pop"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fa fa-gear hvr-icon"></i>
-                                        <span class="">Action</span>
-                                    </button>
-                                    <div class="dropdown-menu fadeindown">
-                                        <button id="btnSave" onclick="action(this)" data-type="save" class="dropdown-item" type="button">Save</button>
-                                        <button id="btnReleased" onclick="action(this)" data-type="released" class="dropdown-item" type="button">@L["EntityFieldValue:MDMService:ItemGroup:Status:RELEASED"]</button>
-                                        <button id="btnCancelled" onclick="action(this)" data-type="cancelled" class="dropdown-item" type="button">@L["EntityFieldValue:MDMService:ItemGroup:Status:CANCELLED"]</button>
-                                    </div>
+                 <div style="padding-left:12px" class="buttons-header-grid">
+                    <div class="btn-group">
+                        <button id="btnActions" type="button" class="btn btn-light btn-sm dropdown-toggle hvr-icon-pop"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-gear hvr-icon"></i>
+                            <span class="">Action</span>
+                        </button>
+                        <div class="dropdown-menu fadeindown">
+                            <button id="btnSave" onclick="action(this)" data-type="save" class="dropdown-item" type="button">Save</button>
+                            <button id="btnReleased" onclick="action(this)" data-type="released" class="dropdown-item" type="button">@L["EntityFieldValue:MDMService:ItemGroup:Status:RELEASED"]</button>
+                            <button id="btnCancelled" onclick="action(this)" data-type="cancelled" class="dropdown-item" type="button">@L["EntityFieldValue:MDMService:ItemGroup:Status:CANCELLED"]</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dx-viewport">
+                    <div class="py-1" id="resizable">
+                        <div id="top-section"></div>
+                    </div>
+                    <div class="py-2">
+                        <div id="itemGroupTabpanel">
+                            <div id="tabpanel-container"> </div>
+                            <div class="options">
+                                <div class="option">
+                                    <div id="animation-enabled"></div>
                                 </div>
-                            </div>
-                        </abp-row>
-                        <div class="dx-viewport">
-                            <div class="py-1" id="resizable">
-                                <div id="top-section"></div>
-                            </div>
-                            <div class="py-2">
-                                <div id="itemGroupTabpanel">
-                                    <div id="tabpanel-container"> </div>
-                                    <div class="options">
-                                        <div class="option">
-                                            <div id="animation-enabled"></div>
-                                        </div>
-                                        <div class="option">
-                                            <div id="animation-enabled"></div>
-                                        </div>
-                                    </div>
+                                <div class="option">
+                                    <div id="animation-enabled"></div>
                                 </div>
                             </div>
                         </div>
-                    </abp-card-body>
-                </abp-card>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

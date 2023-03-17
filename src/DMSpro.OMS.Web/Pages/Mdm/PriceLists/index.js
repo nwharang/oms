@@ -419,7 +419,7 @@ $(function () {
             enabled: true,
             template(container, options) {
                 const currentHeaderData = options.data;
-                const dataGridDetail = $('<div>')
+                const dataGridDetail = $(`<div id="grid_${currentHeaderData.id}">`)
                     .dxDataGrid({
                         dataSource: {
                             store: detailStore,
@@ -490,6 +490,14 @@ $(function () {
                             showInfo: true,
                             showNavigationButtons: true
                         },
+                        toolbar: {
+                            items: [
+                                "groupPanel", 
+                                "columnChooserButton",
+                                "exportButton",
+                                "searchPanel"
+                            ],
+                        },
                         columns: [
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:PriceList"),
@@ -550,6 +558,7 @@ $(function () {
                             }
                         ]
                     }).appendTo(container);
+               // initImportPopup('api/mdm-service/price-list-details', 'PriceListDetails_Template', `grid_${currentHeaderData.id}`);
             }
         }
     }).dxDataGrid('instance');

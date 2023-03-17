@@ -300,5 +300,5 @@ $(function () {
     /****button*****/
 
     /****function*****/
-    initImportPopup('api/mdm-service/price-updates', 'PriceUpdates_Template', 'priceUpdateContainer');
+    initImportPopup('api/mdm-service/price-updates', 'PriceUpdateSchedules_Template', 'priceUpdateContainer');
 });

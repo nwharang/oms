@@ -51,6 +51,8 @@ const popupImportContentTemplate = function (e) {
     return content;
 };
 function initImportPopup(url, templateName, controlName) {
+    if ($(`.${controlName}.importPanel`).length > 0) return;
+
     $(`#${controlName}`).parent().append(`<div class="${controlName} importPanel"></div>`);
     $(`#${controlName}`).parent().append(`<div data-target="${controlName}" class="${controlName} popupImport"></div>`);
 
@@ -178,6 +180,12 @@ function initImportPopup(url, templateName, controlName) {
                                             uploader.reset();
                                             panel.hide();
                                             console.log(msg.responseText);
+                                            if (msg.responseText) {
+                                                var parsedResult = JSON.parse(msg.responseText);
+                                                if (parsedResult && parsedResult.error) {
+                                                    abp.message.error(parsedResult.error.message);
+                                                }
+                                            } 
                                         },
                                     });
                                 }

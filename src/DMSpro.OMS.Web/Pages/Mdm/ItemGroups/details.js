@@ -80,7 +80,7 @@ $(function () {
                 e.component.option('items[0].disabled', true);
                 e.component.option('items[1].disabled', true);
                 e.component.option('selectedIndex', 0);
-            }
+            } 
         }
     }).dxTabPanel('instance');
 
@@ -146,7 +146,7 @@ $(function () {
                     },
                     {
                         dataField: 'status',
-                        //editorType: 'dxSelectBox',
+                        editorType: 'dxSelectBox',
                         editorOptions: {
                             searchEnabled: true,
                             items: status,
@@ -315,22 +315,35 @@ function initItemAttributeTab() {
                         "exportButton",
                         {
                             location: 'after',
-                            template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                            onClick() {
-                                //todo
+                            widget: 'dxButton',
+                            options: {
+                                icon: "import",
+                                elementAttr: {
+                                    //id: "import-excel",
+                                    class: "import-excel",
+                                },
+                                onClick(e) {
+                                    var gridControl = e.element.closest('div.dx-datagrid').parent();
+                                    var gridName = gridControl.attr('id');
+                                    var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                                    if (popup) popup.show();
+                                },
                             },
-                        },
+                        }, 
                         'searchPanel'
                     ]
                 },
                 onInitialized: function (e) {
                     getItemAttributeColumns(e.component);
                 },
-                onContentReady: function (e) {
+                onContentReady: function (e) { 
                     if (itemGroup.status != 0) {
                         e.component.option('toolbar.items[0].visible', false);
                         e.component.option('columns[0].visible', false);
+                        e.component.option('toolbar.items[3].visible', false); 
+                        return;
                     }
+                    initImportPopup('api/mdm-service/item-group-attributes', 'ItemGroupAttributes_Template', 'gridItemAttribute');
                 }
             })
     }
@@ -415,7 +428,7 @@ function initListItemTab() {
                         deleteRow: l("Delete"),
                         confirmDeleteMessage: l("DeleteConfirmationMessage")
                     }
-                },
+                }, 
                 onRowInserting: function (e) {
                     if (e.data.rate == null) {
                         e.data.rate = 1
@@ -442,11 +455,21 @@ function initListItemTab() {
                         "exportButton",
                         {
                             location: 'after',
-                            template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                            onClick() {
-                                //todo
+                            widget: 'dxButton',
+                            options: {
+                                icon: "import",
+                                elementAttr: {
+                                    //id: "import-excel",
+                                    class: "import-excel",
+                                },
+                                onClick(e) {
+                                    var gridControl = e.element.closest('div.dx-datagrid').parent();
+                                    var gridName = gridControl.attr('id');
+                                    var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                                    if (popup) popup.show();
+                                },
                             },
-                        },
+                        }, 
                         'searchPanel'
                     ]
                 },
@@ -508,11 +531,15 @@ function initListItemTab() {
                         dataType: 'number'
                     }
                 ],
-                onContentReady: function (e) {
+                onContentReady: function (e) { 
                     if (itemGroup.status != 0) {
-                        e.component.option('toolbar.items[0].visible', false);
+                        e.component.option('toolbar.items[0].visible', false); 
+                        e.component.option('toolbar.items[3].visible', false); 
                         e.component.option('columns[0].visible', false);
+
+                        return;
                     }
+                    initImportPopup('api/mdm-service/item-group-lists', 'ItemGroupLists_Template', 'gridListItem');
                 }
             })
     }

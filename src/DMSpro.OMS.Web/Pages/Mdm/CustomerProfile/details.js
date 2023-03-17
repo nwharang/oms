@@ -358,24 +358,31 @@ $(function () {
                     toolbar: {
                         items: [
                             "groupPanel",
-                            {
-                                location: 'after',
-                                template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                                onClick() {
-                                    $('#dgContact').data('dxDataGrid').addRow()
-                                },
-                            },
-                            'columnChooserButton',
+                            "addRowButton",
+                            "columnChooserButton",
                             "exportButton",
                             {
                                 location: 'after',
-                                template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                                onClick() {
-                                    //todo
+                                widget: 'dxButton',
+                                options: {
+                                    icon: "import",
+                                    elementAttr: {
+                                        //id: "import-excel",
+                                        class: "import-excel",
+                                    },
+                                    onClick(e) {
+                                        var gridControl = e.element.closest('div.dx-datagrid').parent();
+                                        var gridName = gridControl.attr('id');
+                                        var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                                        if (popup) popup.show();
+                                    },
                                 },
-                            },
+                            }, 
                             "searchPanel"
                         ],
+                    },
+                    onContentReady: function (e) {
+                        initImportPopup('api/mdm-service/customer-contacts', 'CustomerContacts_Template', 'dgContact');
                     },
                     columns: [
                         {
@@ -1007,24 +1014,31 @@ function iniAttachmentTab() {
                 toolbar: {
                     items: [
                         "groupPanel",
-                        {
-                            location: 'after',
-                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                            onClick() {
-                                $('#dgAttachment').data('dxDataGrid').addRow()
-                            },
-                        },
-                        'columnChooserButton',
+                        "addRowButton",
+                        "columnChooserButton",
                         "exportButton",
                         {
                             location: 'after',
-                            template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                            onClick() {
-                                //todo
+                            widget: 'dxButton',
+                            options: {
+                                icon: "import",
+                                elementAttr: {
+                                    //id: "import-excel",
+                                    class: "import-excel",
+                                },
+                                onClick(e) {
+                                    var gridControl = e.element.closest('div.dx-datagrid').parent();
+                                    var gridName = gridControl.attr('id');
+                                    var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                                    if (popup) popup.show();
+                                },
                             },
-                        },
+                        }, 
                         "searchPanel"
                     ],
+                },
+                onContentReady: function (e) {
+                    initImportPopup('api/mdm-service/customer-attachments', 'CustomerAttachments_Template', 'dgAttachment');
                 },
                 columns: [
                     {
