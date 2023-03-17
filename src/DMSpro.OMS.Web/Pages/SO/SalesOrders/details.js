@@ -29,7 +29,7 @@ window.onload = async function () {
     if (company != null)
         companyId = company.id;
     // get data api getInfoForSo in item service
-    var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
+    var itemService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
     let lastCallDates = Common.getLastAPICallDates();
     itemService.getSOInfo(companyId, new Date(), null)
         .done(async result => {
