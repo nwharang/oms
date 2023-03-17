@@ -24,24 +24,46 @@ const linkedSFAId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
 var needSummaryUpdate = false;
 var editingEmptyRow = false;
 
-window.onload = async function () {
+//window.onload = async function () {
+//    let company = await Common.getCurrentCompany();
+//    if (company != null)
+//        companyId = company.id;
+//    // get data api getInfoForSo in item service
+//    var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
+//    let lastCallDates = Common.getLastAPICallDates();
+//    itemService.getSOInfo(companyId, new Date(), null)
+//        .done(async result => {
+//            let resultJson = await Common.parseJSON(result);
+//            let data = Common.processInitData(resultJson);
+//            console.log(data);
+//            addListToData(data);
+//            loadControl(data);
+//        });
+//}
+
+$('#resizable').dxResizable({
+    minHeight: 120,
+    handles: "bottom"
+}).dxResizable('instance');
+
+var data = {};
+
+$(async function () {
+
     let company = await Common.getCurrentCompany();
     if (company != null)
         companyId = company.id;
     // get data api getInfoForSo in item service
-    var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
+    var itemService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
     let lastCallDates = Common.getLastAPICallDates();
-    itemService.getSOInfo(companyId, new Date(), null)
+    await itemService.getSOInfo(companyId, new Date(), null)
         .done(async result => {
             let resultJson = await Common.parseJSON(result);
-            let data = Common.processInitData(resultJson);
-            console.log(data);
+            data = Common.processInitData(resultJson);
             addListToData(data);
-            loadControl(data);
+            //loadControl(data);
         });
-}
 
-var loadControl = function (data) {
     var l = abp.localization.getResource("OMS");
     var salesOrderService = window.dMSpro.oMS.orderService.controllers.salesOrders.salesOrder;
 
@@ -113,11 +135,6 @@ var loadControl = function (data) {
         }
     ];
     /****control*****/
-
-    $('#resizable').dxResizable({
-        minHeight: 120,
-        handles: "bottom"
-    }).dxResizable('instance');
 
     // Sales Request herader form
     const frmSalesOrderDetails = $('#frmSalesOrderDetails').dxForm({
@@ -890,6 +907,10 @@ var loadControl = function (data) {
                 gridDetails.refresh();
             });
     }
+});
+
+var loadControl = function (data) {
+    
 };
 
 function removeEmtyDetail(detailList) {
