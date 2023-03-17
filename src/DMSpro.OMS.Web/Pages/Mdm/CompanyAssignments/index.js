@@ -299,6 +299,10 @@ $(function () {
                     searchEnabled: true,
                     searchMode: 'contains'
                 }
+            },
+            {
+                dataField: 'companyIdentityUserAssignment.companyId',
+                caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
             }
         ],
         //onEditorPreparing: function (e) {
