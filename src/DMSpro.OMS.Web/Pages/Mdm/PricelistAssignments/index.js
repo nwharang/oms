@@ -243,7 +243,7 @@ $(function () {
             enabled: true,
             template(container, options) {
                 const currentHeaderData = options.data;
-                const dataGridDetail = $('<div>')
+                const dataGridDetail = $(`<div id="grid_${currentHeaderData.id}">`)
                     .dxDataGrid({
                         dataSource: {
                             store: pricelistAssignmentStore,
@@ -321,6 +321,31 @@ $(function () {
                         onRowInserting: function (e) {
                             e.data.priceListId = options.key
                         },
+                        toolbar: {
+                            items: [
+                                "groupPanel",
+                                "addRowButton",
+                                'columnChooserButton',
+                                "exportButton",
+                                {
+                                    location: 'after',
+                                    widget: 'dxButton',
+                                    options: {
+                                        icon: "import",
+                                        elementAttr: {
+                                            class: "import-excel",
+                                        },
+                                        onClick(e) {
+                                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                                            var gridName = gridControl.attr('id');
+                                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                                            if (popup) popup.show();
+                                        },
+                                    }
+                                },
+                                "searchPanel"
+                            ],
+                        },
                         columns: [
                             {
                                 caption: l("EntityFieldName:MDMService:CustomerGroup:Name"),
@@ -341,6 +366,7 @@ $(function () {
                             }
                         ]
                     }).appendTo(container);
+                initImportPopup('api/mdm-service/pricelist-assignments', 'PricelistAssignments_Template', `grid_${currentHeaderData.id}`);
             }
         }
     }).dxDataGrid('instance');

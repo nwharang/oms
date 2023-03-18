@@ -370,6 +370,16 @@ $(function () {
                 "searchPanel",
             ],
         },
+        onContentReady: function (e) {
+           
+            if (salesOrgHierarchyId) { 
+                initImportPopup('api/mdm-service/customer-group-by-atts', 'CustomerGroupByAtts_Template', 'dgCustomerAttribute');
+                e.component.option('toolbar.items[4].visible', true);
+            }
+            else {
+                e.component.option('toolbar.items[4].visible', false);
+            }
+        },
         columns: [
             {
                 caption: l("Actions"),
@@ -568,6 +578,15 @@ $(function () {
                 },
                 "searchPanel",
             ],
+        },
+        onContentReady: function (e) { 
+            if (salesOrgHierarchyId) {
+                initImportPopup('api/mdm-service/customer-group-by-atts', 'CustomerGroupByAtts_Template', 'dgCustomerAttribute');
+                e.component.option('toolbar.items[4].visible', true);
+            }
+            else {
+                e.component.option('toolbar.items[4].visible', false);
+            }
         },
         columns: [
             {

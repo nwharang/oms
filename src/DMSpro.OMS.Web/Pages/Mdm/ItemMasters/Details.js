@@ -87,7 +87,7 @@ $(function () {
             {
                 title: "Attachment",
                 icon: "attach",
-                template: iniAttachmentTab()
+                template: initAttachmentTab()
             }
         ],
         onInitialized: function (e) {
@@ -417,7 +417,7 @@ $(function () {
                 displayExpr: 'attrValName'
             }
         }
-    }
+    } 
 });
 
 var itemAttachStore = new DevExpress.data.CustomStore({
@@ -457,7 +457,7 @@ var itemAttachStore = new DevExpress.data.CustomStore({
     }
 });
 
-function iniAttachmentTab() {
+function initAttachmentTab() {
     return function () {
         return $('<div id="dgItemAttachment" style="padding-top: 10px">')
             .dxDataGrid({
@@ -569,24 +569,31 @@ function iniAttachmentTab() {
                 toolbar: {
                     items: [
                         "groupPanel",
-                        {
-                            location: 'after',
-                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                            onClick() {
-                                $('#dgItemAttachment').data('dxDataGrid').addRow()
-                            },
-                        },
-                        'columnChooserButton',
+                        "addRowButton",
+                        "columnChooserButton",
                         "exportButton",
                         {
                             location: 'after',
-                            template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                            onClick() {
-                                //todo
+                            widget: 'dxButton',
+                            options: {
+                                icon: "import",
+                                elementAttr: {
+                                    //id: "import-excel",
+                                    class: "import-excel",
+                                },
+                                onClick(e) {
+                                    var gridControl = e.element.closest('div.dx-datagrid').parent();
+                                    var gridName = gridControl.attr('id');
+                                    var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                                    if (popup) popup.show();
+                                },
                             },
-                        },
+                        }, 
                         "searchPanel"
                     ],
+                },
+                onContentReady: function (e) {
+                    initImportPopup('api/mdm-service/item-attachments', 'ItemAttachments_Template', 'dgItemAttachment');
                 },
                 columns: [
                     {
@@ -958,14 +965,8 @@ function initImageTab() {
                 toolbar: {
                     items: [
                         "groupPanel",
-                        {
-                            location: 'after',
-                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                            onClick() {
-                                $('#dgItemImage').data('dxDataGrid').addRow();
-                            },
-                        },
-                        'columnChooserButton',
+                        "addRowButton",
+                        "columnChooserButton",
                         "exportButton",
                         {
                             location: 'after',
@@ -985,6 +986,9 @@ function initImageTab() {
                         },
                         'searchPanel'
                     ]
+                },
+                onContentReady: function (e) { 
+                    initImportPopup('api/mdm-service/item-images', 'ItemImages_Template', 'dgItemImage');
                 },
                 columns: [
                     {
@@ -1224,5 +1228,4 @@ function action(e) {
         });
     }
 
-    initImportPopup('api/mdm-service/item-images', 'ItemImages_Template', 'dgItemImage');
 }
