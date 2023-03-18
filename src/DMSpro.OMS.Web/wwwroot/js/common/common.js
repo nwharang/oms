@@ -14,8 +14,10 @@ class Common {
         }
     };
 
-    static processInitData(data) {
+    static processInitData(rawData) {
         let result = {};
+        let firstKey = Object.keys(rawData)[0];
+        let data = rawData[firstKey];
         let keyList = Object.keys(data);
         for (let i = 0; i < keyList.length; i++) {
             let aKey = keyList[i];
