@@ -163,12 +163,12 @@ $(() => {
                 dataField: 'year',
                 caption: l("EntityFieldName:MDMService:Holiday:Year"),
                 width: 100,
-                validationRules: [{ type: "required" }],
+                validationRules: [{ type: "required" }, { type: "stringLength", max: 4 }],
             },
             {
                 dataField: 'description',
                 caption: l("EntityFieldName:MDMService:Holiday:Description"),
-                validationRules: [{ type: "required" }],
+                validationRules: [{ type: "required" }, { type: "stringLength", max: 255 }],
             },
         ],
         masterDetail: {
@@ -178,7 +178,7 @@ $(() => {
                 $(`<div class="grid-master-detail" id="grid_${currentHeaderData.id}">`)
                     .dxDataGrid({
                         dataSource: new DevExpress.data.CustomStore({
-                            key: 'id', 
+                            key: 'id',
                             load(loadOptions) {
                                 const deferred = $.Deferred();
                                 var args = {};
@@ -315,6 +315,15 @@ $(() => {
                         onInitNewRow: function (e) {
                             e.data.holidayId = options.data.id;
                         },
+                        onEditorPreparing: function (e) {
+                            var component = e.component;
+                            if (e.dataField == "endDate") {
+                                var currentDate = new Date();
+                                currentDate.setDate(currentDate.getDate() + 1);
+                                var startDate = component.option('selectedItem').startDate;
+                                e.editorOptions.min = startDate ? startDate.setDate(startDate.getDate() + 1) : currentDate;
+                            }
+                        },
                         columns: [
                             {
                                 dataField: 'holidayId',
@@ -356,6 +365,7 @@ $(() => {
                             {
                                 dataField: 'description',
                                 caption: l("EntityFieldName:MDMService:HolidayDetail:Description"),
+                                validationRules: [{ type: "required" }, { type: "stringLength", max: 255 }],
                             }],
                     }).appendTo(container);
                 initImportPopup('api/mdm-service/holiday-details', 'HolidayDetails_Template', `grid_${currentHeaderData.id}`);
@@ -363,6 +373,6 @@ $(() => {
         },
     }).dxDataGrid("instance");
 
-    initImportPopup('api/mdm-service/holidays', 'Holidays_Template', 'gridHolidays'); 
+    initImportPopup('api/mdm-service/holidays', 'Holidays_Template', 'gridHolidays');
 
 });
