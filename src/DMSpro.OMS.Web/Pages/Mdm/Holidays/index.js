@@ -97,7 +97,7 @@ $(() => {
         editing: {
             mode: "row",
             allowAdding: abp.auth.isGranted('MdmService.Holidays.Create'),
-            allowUpdating: abp.auth.isGranted('MdmService.Holidays.Edit'),
+            allowUpdating: true,
             allowDeleting: abp.auth.isGranted('MdmService.Holidays.Delete'),
             useIcons: true,
             texts: {
@@ -107,12 +107,7 @@ $(() => {
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['year', 'description'];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            e.newData = Object.assign({}, e.oldData, e.newData);
         },
         dataSource: new DevExpress.data.CustomStore({
             key: 'id',
@@ -151,6 +146,12 @@ $(() => {
         }),
         // keyExpr: 'Id', 
         errorRowEnabled: false,
+        onEditorPreparing: function (e) {
+            if (e.dataField === "year") {
+                e.editorOptions.min = (new Date()).getFullYear();
+                e.editorOptions.max = 2099;
+            }
+        },
         columns: [
             {
                 type: 'buttons',
@@ -161,6 +162,7 @@ $(() => {
             },
             {
                 dataField: 'year',
+                dataType: 'number',
                 caption: l("EntityFieldName:MDMService:Holiday:Year"),
                 width: 100,
                 validationRules: [{ type: "required" }, { type: "stringLength", max: 4 }],
@@ -168,7 +170,7 @@ $(() => {
             {
                 dataField: 'description',
                 caption: l("EntityFieldName:MDMService:Holiday:Description"),
-                validationRules: [{ type: "required" }, { type: "stringLength", max: 255 }],
+                validationRules: [{ type: "required" }, { type: "stringLength", max: 255, message: l1('Message.MaximumLength').replace('{0}', 255) }],
             },
         ],
         masterDetail: {
@@ -201,16 +203,35 @@ $(() => {
                                 return deferred.promise();
                             },
                             insert(values) {
+                                if (values.startDate) {
+                                    values.startDate = removeTimezoneFromDate(values.startDate);
+                                }
+                                if (values.endDate) {
+                                    values.endDate = removeTimezoneFromDate(values.endDate);
+                                }
                                 return holidayDetail.create(values, { contentType: "application/json" });
                             },
                             update(key, values) {
+                                if (values.startDate) {
+                                    values.startDate = removeTimezoneFromDate(new Date(values.startDate));
+                                }
+                                if (values.endDate) {
+                                    values.endDate = removeTimezoneFromDate(new Date(values.endDate));
+                                }
                                 return holidayDetail.update(key, values, { contentType: "application/json" });
                             },
                             remove(key) {
+                                var dxDataGrid = $(`#grid_${currentHeaderData.id}`).data('dxDataGrid');
+                                let rows = dxDataGrid.getVisibleRows();
+                                var row = rows.filter(u => u.key == key)[0];
+                                if (row.data.startDate && new Date(row.data.startDate) <= new Date()) {
+                                    abp.message.info(l1('CanNotDeleteHolidayYearsDetail'));
+                                    return;
+                                }
                                 return holidayDetail.delete(key);
                             },
                         }),
-                        remoteOperations: true,
+                        // remoteOperations: true,
                         export: {
                             enabled: true,
                         },
@@ -315,13 +336,57 @@ $(() => {
                         onInitNewRow: function (e) {
                             e.data.holidayId = options.data.id;
                         },
+                        onRowUpdating: function (e) {
+                            e.newData = Object.assign({}, e.oldData, e.newData);
+                        },
                         onEditorPreparing: function (e) {
-                            var component = e.component;
-                            if (e.dataField == "endDate") {
-                                var currentDate = new Date();
-                                currentDate.setDate(currentDate.getDate() + 1);
-                                var startDate = component.option('selectedItem').startDate;
-                                e.editorOptions.min = startDate ? startDate.setDate(startDate.getDate() + 1) : currentDate;
+                            if (e.dataField == "startDate") {
+                                e.editorOptions.min = new Date();
+                                e.editorOptions.max = new Date(2099, 12, 30);
+
+                                if (e.row && e.row.data.endDate) {
+                                    var maxDate = new Date(e.row.data.endDate);
+                                    maxDate.setDate(maxDate.getDate() - 1); 
+                                    e.editorOptions.max = maxDate;
+                                } 
+
+                                var onValueChanged = e.editorOptions.onValueChanged;
+                                e.editorOptions.onValueChanged = function (e) {
+                                    onValueChanged.call(this, e);
+
+                                    var endDateCell = e.component.element().closest('td').next();
+                                    var endDateDateBox = $(endDateCell).find('div.dx-datebox').data('dxDateBox');
+                                    if (endDateDateBox) {
+                                        var minDate = new Date(e.value);
+                                        minDate.setDate(minDate.getDate() + 1);
+                                        endDateDateBox.option('min', minDate);
+                                    }
+                                }
+                            }
+                            else if (e.dataField == "endDate") {
+                                var minDate = new Date();
+                                minDate.setDate(minDate.getDate() + 1); 
+                                e.editorOptions.min = minDate;
+                                e.editorOptions.max = new Date(2099, 12, 31);
+
+                                if (e.row && e.row.data.startDate) {
+                                    minDate = new Date(e.row.data.startDate);
+                                    minDate.setDate(minDate.getDate() + 1);
+                                    e.editorOptions.min = minDate;
+                                } 
+                                 
+                                var onValueChanged = e.editorOptions.onValueChanged;
+                                e.editorOptions.onValueChanged = function (e) {
+                                    onValueChanged.call(this, e);
+
+                                    var startDateCell = e.component.element().closest('td').prev();
+                                    var startDateDateBox = $(startDateCell).find('div.dx-datebox').data('dxDateBox');
+                                    if (startDateDateBox) {
+                                        var maxDate = new Date(e.value);
+                                        maxDate.setDate(maxDate.getDate() - 1);
+                                        startDateDateBox.option('max', maxDate);
+                                    }
+                                }
                             }
                         },
                         columns: [
@@ -372,7 +437,12 @@ $(() => {
             },
         },
     }).dxDataGrid("instance");
+    function removeTimezoneFromDate(currentDate) {
+        if (!currentDate || (typeof currentDate == "string")) return currentDate;
 
+        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2);
+        return date;
+    }
     initImportPopup('api/mdm-service/holidays', 'Holidays_Template', 'gridHolidays');
 
 });

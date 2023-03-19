@@ -222,16 +222,27 @@ $(function () {
                 items: [
                     {
                         dataField: 'Code',
+                        editorType: 'dxTextBox',
                         validationRules: [{
                             type: 'required',
                             message: '',
-                        }],
+                        },
+                        {
+                            type: "pattern",
+                            pattern: /^[a-zA-Z0-9]*$/,
+                            message: l1('Message.NonSpecialCharacters').replace('{0}', 'Code')
+                        }]
                     },
                     {
                         dataField: 'Name',
                         validationRules: [{
                             type: 'required',
                             message: '',
+                        },
+                        {
+                            type: "stringLength",
+                            max: 100,
+                            message: l1('Message.MaximumLength').replace('{0}', 100)
                         }],
                     }
                 ]
@@ -334,7 +345,7 @@ $(function () {
     });
     $('#SaveButton').dxButton({
         stylingMode: 'contained',
-        type: 'normal', 
+        type: 'normal',
     });
     $('#resizable').dxResizable({
         minHeight: 120,
@@ -521,7 +532,7 @@ $(function () {
                     fixedPosition: "left",
                 },
                 {
-                    caption: l1("EntityFieldName:MDMService:MCPDetail:Customer"),  
+                    caption: l1("EntityFieldName:MDMService:MCPDetail:Customer"),
                     dataField: "customerId",
                     calculateDisplayValue: "customer.name",
                     validationRules: [{ type: "required", message: '' }],
@@ -547,30 +558,30 @@ $(function () {
                 //    allowEditing: false,
                 //},
                 {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:EffectiveDate"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:EffectiveDate"),
                     dataField: "effectiveDate",
                     dataType: "date",
                     format: 'dd/MM/yyyy',
                     validationRules: [{ type: "required", message: '' }],
                 }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:EndDate"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:EndDate"),
                     dataField: "endDate",
                     dataType: "date",
                     format: 'dd/MM/yyyy',
                     validationRules: [{ type: "required", message: '' }],
                 }, {
 
-                    caption: l1("EntityFieldName:MDMService:MCPDetail:Distance"),  
+                    caption: l1("EntityFieldName:MDMService:MCPDetail:Distance"),
                     dataField: "distance",
                     dataType: "number",
                 }, {
 
-                    caption: l("EntityFieldName:MDMService:MCPDetail:VisitOrder"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:VisitOrder"),
                     dataField: "visitOrder",
                     dataType: "number",
                 }, {
 
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Monday"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Monday"),
                     dataField: "monday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -579,7 +590,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Tuesday"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Tuesday"),
                     dataField: "tuesday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -588,7 +599,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Wednesday"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Wednesday"),
                     dataField: "wednesday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -597,7 +608,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Thursday"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Thursday"),
                     dataField: "thursday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -606,7 +617,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Friday"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Friday"),
                     dataField: "friday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -615,7 +626,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Saturday"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Saturday"),
                     dataField: "saturday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -624,7 +635,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Sunday"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Sunday"),
                     dataField: "sunday",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -633,7 +644,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Week1"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Week1"),
                     dataField: "week1",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -642,7 +653,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Week2"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Week2"),
                     dataField: "week2",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -651,7 +662,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Week3"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Week3"),
                     dataField: "week3",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -660,7 +671,7 @@ $(function () {
                             .appendTo(container);
                     },
                 }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Week4"),  
+                    caption: l("EntityFieldName:MDMService:MCPDetail:Week4"),
                     dataField: "week4",
                     dataType: "boolean",
                     cellTemplate(container, options) {
@@ -672,7 +683,7 @@ $(function () {
             ],
         }).dxDataGrid("instance");
 
-   
+
     function getNormalDate(currentDate) {
         if (!currentDate || (typeof currentDate == "string")) return currentDate;
 
@@ -702,6 +713,9 @@ $(function () {
     $('#SaveButton').click(function (e) {
         e.preventDefault();
         var form = $("#top-section").data('dxForm');
+        var valid = form.validate();
+        if (!valid.isValid) return;
+
         var routeId = form.getEditor('Route').option('value');
         var companyId = form.getEditor('Company').option('value');
         var itemGroupId = form.getEditor('ItemGroup').option('value');
@@ -710,33 +724,6 @@ $(function () {
         //var isGPSLocked = form.getEditor('IsGPSLocked').option('value');
         var effectiveDate = form.getEditor('EffectiveDate').option('value');
         var endDate = form.getEditor('EndDate').option('value');
-
-        if (!code || code.trim() == "") {
-            form.getEditor('Code').option('isValid', false);
-            form.getEditor('Code').focus();
-            return;
-        }
-        if (!name || name.trim() == "") {
-            form.getEditor('Name').option('isValid', false);
-            form.getEditor('Name').focus();
-            return;
-        }
-        if (routeId == null) {
-            form.getEditor('Route').option('isValid', false);
-            form.getEditor('Route').focus();
-            return;
-        }
-        if (companyId == null) {
-            form.getEditor('Company').option('isValid', false);
-            form.getEditor('Company').focus();
-            return;
-        }
-       
-        if (effectiveDate == null) {
-            form.getEditor('EffectiveDate').option('isValid', false);
-            form.getEditor('EffectiveDate').focus();
-            return;
-        }
 
         var mcpHeaderDto = {
             routeId,
