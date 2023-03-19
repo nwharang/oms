@@ -66,16 +66,12 @@ div.panel-container.show > div.panel-content.jqvmap-bg-ocean.p-0 > div {
     color: rgb(255 255 255);
 }
 
-.dx-datagrid-headers .dx-datagrid-content {
-    margin: -1px 0 -1px -1px;
-}
-
 .dx-datagrid-scroll-container {
     overflow: hidden;
-    width: calc(100% + 1px);
+    width: calc(100%);
 }
 
-.dx-datagrid-borders .dx-datagrid-rowsview, .dx-datagrid-headers + .dx-datagrid-rowsview, .dx-datagrid-rowsview.dx-datagrid-after-headers {
+.dx-datagrid-rowsview.dx-datagrid-after-headers {
     margin: -1px 0 -1px -1px;
 }
 

@@ -1,6 +1,5 @@
 $(function () {
-    var l = abp.localization.getResource("MdmService");
-    var l1 = abp.localization.getResource("OMS");
+    var l = abp.localization.getResource("OMS");
     var priceUpdateService = window.dMSpro.oMS.mdmService.controllers.priceUpdates.priceUpdate;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
 
@@ -79,45 +78,36 @@ $(function () {
                     d.resolve(data);
                 });
             return d.promise();
-        },
-        insert(values) {
-            return priceListService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return priceListService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return priceListService.delete(key);
         }
     });
 
     const statusStore = [
         {
-            id: 'OPEN',
+            id: 0,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:OPEN')
         },
         {
-            id: 'CONFIRMED',
+            id: 1,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:CONFIRMED')
         },
         {
-            id: 'RELEASED',
+            id: 2,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:RELEASED')
         },
         {
-            id: 'CANCELLED',
+            id: 3,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:CANCELLED')
         },
         {
-            id: 'COMPLETED',
+            id: 4,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:COMPLETED')
         },
         {
-            id: 'FAILED',
+            id: 5,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:FAILED')
         },
         {
-            id: 'INCOMPLETED',
+            id: 6,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:INCOMPLETED')
         }
     ];
@@ -126,7 +116,7 @@ $(function () {
     //Grid Price Update
     const priceUpdateContainer = $('#priceUpdateContainer').dxDataGrid({
         dataSource: priceUpdateStore,
-        remoteOperations: false,
+        remoteOperations: true,
         cacheEnabled: true,
         export: {
             enabled: true,
@@ -212,7 +202,7 @@ $(function () {
                     template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("Button.New.PriceUpdate")}" style="height: 36px;"> <i class="fa fa-plus"></i> <span></span> </button>`,
                     onClick() {
                         var newtab = window.open('/Mdm/PriceUpdates/Details', '_blank');
-                        newtab.sessionStorage.setItem("PriceUpdate", null);
+                        newtab.sessionStorage.removeItem('PriceUpdateId');
                     },
                     visible: abp.auth.isGranted('MdmService.PriceUpdates.Create')
                 },
@@ -243,11 +233,11 @@ $(function () {
                 type: 'buttons',
                 buttons: [
                     {
-                        text: l1('Button.ViewDetail'),
+                        text: l('Button.ViewDetail'),
                         icon: "fieldchooser",
                         onClick: function (e) {
                             var newtab = window.open('/Mdm/PriceUpdates/Details', '_blank');
-                            newtab.sessionStorage.setItem("PriceUpdate", JSON.stringify(e.row.data));
+                            newtab.sessionStorage.setItem("PriceUpdateId", e.row.data.id);
                         }
                     }
                 ],
