@@ -26,22 +26,22 @@ var editingEmptyRow = false;
 
 var data = {};
 
-//window.onload = async function () {
-//    let company = await Common.getCurrentCompany();
-//    if (company != null)
-//        companyId = company.id;
-//    // get data api getInfoForSo in item service
-//    var itemService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
-//    //let lastCallDates = Common.getLastAPICallDates();
-//    itemService.getSOInfo(companyId, new Date(), null)
-//        .done(async result => {
-//            let resultJson = await Common.parseJSON(result);
-//            data = Common.processInitData(resultJson);
-//            console.log(data);
-//            addListToData(data);
-//            loadControl(data);
-//    });
-//}
+// window.onload = async function () {
+//     let company = await Common.getCurrentCompany();
+//     if (company != null)
+//         companyId = company.id;
+//     // get data api getInfoForSo in item service
+//     var salesOrderService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
+//     //let lastCallDates = Common.getLastAPICallDates();
+//     salesOrderService.getSOInfo(companyId, new Date(), null)
+//         .done(async result => {
+//             let resultJson = await Common.parseJSON(result);
+//             data = Common.processInitData(resultJson);
+//             console.log(data);
+//             addListToData(data);
+//             loadControl(data);
+//         });
+// }
 
 $('#resizable').dxResizable({
     minHeight: 120,
@@ -54,19 +54,18 @@ $(async function () {
     if (company != null)
         companyId = company.id;
     // get data api getInfoForSo in item service
-    var itemService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
+    var salesOrderService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
+    var salesRequestService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
     //let lastCallDates = Common.getLastAPICallDates();
-    await itemService.getSOInfo(companyId, new Date(), null)
+    await salesOrderService.getInfoSO({ companyId: companyId })
         .done(async result => {
             let resultJson = await Common.parseJSON(result);
             data = Common.processInitData(resultJson);
-            //console.log(data);
-            addListToData(data);
-            //loadControl(data);
+            console.log(data);
+            await addListToData(data);
+            loadControl(data);
         });
-
     var l = abp.localization.getResource("OMS");
-    var salesRequestService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
 
     const docTypeStore = [
         {
@@ -823,13 +822,14 @@ $(async function () {
             details: removeEmtyDetail(JSON.parse(JSON.stringify(SalesRequestDetailsModel)))
         };
 
-        console.log("Save data: ", salesRequestObject);
+
+        //console.log("Save data: ", salesRequestObject);
 
         if (SalesRequestHeaderId) {
             salesRequestService.updateDoc(SalesRequestHeaderId, salesRequestObject, { contentType: "application/json" })
                 .done(result => {
                     abp.message.success(l('Congratulations'));
-                    console.log(result);
+                    //console.log(result);
                 })
                 .fail(result => {
                     var message = result.message;
@@ -842,13 +842,14 @@ $(async function () {
                     } catch { }
                     abp.message.error(message);
                 })
-        } else
+        } else {
+            //console.log(salesRequestObject);
             salesRequestService.createDoc(salesRequestObject, { contentType: "application/json" })
                 .done(result => {
                     abp.message.success(l('Congratulations'));
                     SalesRequestHeaderId = result.header.id;
                     sessionStorage.setItem('SalesRequestHeaderId', SalesRequestHeaderId);
-                    console.log(result);
+                    //console.log(result);
                 })
                 .fail(result => {
                     var message = result.message;
@@ -861,6 +862,7 @@ $(async function () {
                     } catch { }
                     abp.message.error(message);
                 })
+        }
     });
 
     initImportPopup('', 'SalesRequestDetails_Template', 'dgSalesRequestDetails');
@@ -968,8 +970,7 @@ function appendSelectedItems(selectedItems) {
     $('#dgSalesRequestDetails').data('dxDataGrid').refresh();
     calculatorDocTotal();
 }
-function addListToData(data) {
-
+async function addListToData(data) {
     // get customer list
     data.customerList = Object.keys(data.customerDictionary).map(function (key) {
         return data.customerDictionary[key];
