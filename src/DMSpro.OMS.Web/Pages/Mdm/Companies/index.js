@@ -142,7 +142,7 @@ $(function () {
         showColumnLines: true,
         showRowLines: false,
         rowAlternationEnabled: true,
-        showBorders: false,
+        showBorders: true,
 
         /*keyExpr: "id",*/
         /*Export Excel*/
