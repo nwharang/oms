@@ -24,24 +24,47 @@ const linkedSFAId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
 var needSummaryUpdate = false;
 var editingEmptyRow = false;
 
-window.onload = async function () {
+var data = {};
+
+//window.onload = async function () {
+//    let company = await Common.getCurrentCompany();
+//    if (company != null)
+//        companyId = company.id;
+//    // get data api getInfoForSo in item service
+//    var itemService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
+//    //let lastCallDates = Common.getLastAPICallDates();
+//    itemService.getSOInfo(companyId, new Date(), null)
+//        .done(async result => {
+//            let resultJson = await Common.parseJSON(result);
+//            data = Common.processInitData(resultJson);
+//            console.log(data);
+//            addListToData(data);
+//            loadControl(data);
+//    });
+//}
+
+$('#resizable').dxResizable({
+    minHeight: 120,
+    handles: "bottom"
+}).dxResizable('instance');
+
+$(async function () {
+
     let company = await Common.getCurrentCompany();
     if (company != null)
         companyId = company.id;
     // get data api getInfoForSo in item service
     var itemService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
     //let lastCallDates = Common.getLastAPICallDates();
-    itemService.getSOInfo(companyId, new Date(), null)
+    await itemService.getSOInfo(companyId, new Date(), null)
         .done(async result => {
             let resultJson = await Common.parseJSON(result);
-            let data = Common.processInitData(resultJson);
-            console.log(data);
+            data = Common.processInitData(resultJson);
+            //console.log(data);
             addListToData(data);
-            loadControl(data);
+            //loadControl(data);
         });
-}
 
-var loadControl = function (data) {
     var l = abp.localization.getResource("OMS");
     var salesRequestService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
 
@@ -114,13 +137,8 @@ var loadControl = function (data) {
     ];
     /****control*****/
 
-    $('#resizable').dxResizable({
-        minHeight: 120,
-        handles: "bottom"
-    }).dxResizable('instance');
-
     // Sales Request herader form
-    const frmSalesRequestDetails = $('#frmSalesRequestDetails').dxForm({ 
+    const frmSalesRequestDetails = $('#frmSalesRequestDetails').dxForm({
         labelMode: "floating",
         colCount: 3,
         items: [
@@ -212,7 +230,7 @@ var loadControl = function (data) {
                             type: 'datetime',
                             value: new Date(),
                             displayFormat: "dd/MM/yyyy HH:mm",
-                           // disabled: true,
+                            // disabled: true,
                         },
                         label: {
                             visible: false,
@@ -392,7 +410,7 @@ var loadControl = function (data) {
             },
             onSaved: function (e) {
                 calculatorDocTotal();
-                
+
                 //var sumDiscountAmt = dgSalesRequestDetails.getTotalSummaryValue('discountAmt');
                 //var sumLineAmt = dgSalesRequestDetails.getTotalSummaryValue('lineAmt');
                 //var sumLineAmtAfterTax = dgSalesRequestDetails.getTotalSummaryValue('lineAmtAfterTax');
@@ -847,7 +865,7 @@ var loadControl = function (data) {
 
     initImportPopup('', 'SalesRequestDetails_Template', 'dgSalesRequestDetails');
 
-  //  var headerId = JSON.parse(sessionStorage.getItem('SalesRequestHeaderId'));
+    //var headerId = JSON.parse(sessionStorage.getItem('SalesRequestHeaderId'));
     if (SalesRequestHeaderId != null) {
         $('#CancelButton').show();
         //headerId = JSON.parse(headerId);
@@ -868,7 +886,9 @@ var loadControl = function (data) {
                 gridDetails.refresh();
             });
     }
-};
+});
+
+var loadControl = function (data) { };
 
 function removeEmtyDetail(detailList) {
     var itemEmty = detailList.find(x => !x.itemId);

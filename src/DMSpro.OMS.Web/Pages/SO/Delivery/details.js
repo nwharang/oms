@@ -24,27 +24,33 @@ const linkedSFAId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
 var needSummaryUpdate = false;
 var editingEmptyRow = false;
 
-window.onload = async function () {
-    let company = await Common.getCurrentCompany();
-    if (company != null)
-        companyId = company.id;
-    else
-        companyId = '29d43197-c742-90b8-65d8-3a099166f987';
-    // get data api getInfoForSo in item service
-    var itemService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
-    let lastCallDates = Common.getLastAPICallDates();
-    itemService.getSOInfo(companyId, new Date(), null)
-        .done(async result => {
-            let resultJson = await Common.parseJSON(result);
-            let data = Common.processInitData(resultJson);
-            console.log(data);
-            addListToData(data);
-            loadControl(data);
-        });
-}
+//window.onload = async function () {
+//    let company = await Common.getCurrentCompany();
+//    if (company != null)
+//        companyId = company.id;
+//    else
+//        companyId = '29d43197-c742-90b8-65d8-3a099166f987';
+//    // get data api getInfoForSo in item service
+//    var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
+//    let lastCallDates = Common.getLastAPICallDates();
+//    itemService.getSOInfo(companyId, new Date(), null)
+//        .done(async result => {
+//            let resultJson = await Common.parseJSON(result);
+//            let data = Common.processInitData(resultJson);
+//            console.log(data);
+//            addListToData(data);
+//            loadControl(data);
+//        });
+//}
 
-var loadControl = function (data) {
-    debugger
+$('#resizable').dxResizable({
+    minHeight: 120,
+    handles: "bottom"
+}).dxResizable('instance');
+
+var data = {};
+
+$(async function () {
     var l = abp.localization.getResource("OMS");
     var deliveryHeaderService = window.dMSpro.oMS.orderService.controllers.deliveries.delivery;
     var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
@@ -978,7 +984,9 @@ var loadControl = function (data) {
                 gridDetails.refresh();
             });
     }
-};
+});
+
+var loadControl = function (data) {};
 
 function removeEmtyDetail(detailList) {
     var itemEmty = detailList.find(x => !x.itemId);
