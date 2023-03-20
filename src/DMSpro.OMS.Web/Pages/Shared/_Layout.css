@@ -316,3 +316,21 @@ table.companies > tbody > tr{
 .dx-editor-underlined.dx-texteditor-with-floating-label .dx-texteditor-input, .dx-editor-underlined.dx-texteditor-with-floating-label.dx-lookup .dx-lookup-field, .dx-editor-underlined.dx-texteditor-with-label .dx-texteditor-input, .dx-editor-underlined.dx-texteditor-with-label.dx-lookup .dx-lookup-field {
     padding-top: 18px;
 }
+
+.dx-datagrid-borders > .dx-datagrid-filter-panel, .dx-datagrid-borders > .dx-datagrid-headers {
+    border-top-width: 2px;
+}
+
+.dx-datagrid-borders > .dx-datagrid-headers, .dx-datagrid-borders > .dx-datagrid-rowsview, .dx-datagrid-borders > .dx-datagrid-total-footer {
+    border-left-width: 2px;
+    border-right-width: 2px;
+}
+
+.dx-treelist-borders > .dx-treelist-filter-panel, .dx-treelist-borders > .dx-treelist-headers {
+    border-top-width: 2px;
+}
+
+.dx-treelist-borders > .dx-treelist-headers, .dx-treelist-borders > .dx-treelist-rowsview, .dx-treelist-borders > .dx-treelist-total-footer {
+    border-left-width: 2px;
+    border-right-width: 2px;
+}
