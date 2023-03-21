@@ -871,22 +871,29 @@ $(async function () {
     if (SalesRequestHeaderId != null) {
         $('#CancelButton').show();
         //headerId = JSON.parse(headerId);
-        salesRequestService.getHeader(SalesRequestHeaderId)
+        salesRequestService.getDoc(SalesRequestHeaderId)
             .done(result => {
-                $('#frmSalesRequestDetails').data('dxForm').option('formData', result);
-            });
+                $('#frmSalesRequestDetails').data('dxForm').option('formData', result.header);
 
-        const args = {};
-        args.filter = JSON.stringify(['docId', '=', SalesRequestHeaderId])
-        salesRequestService.getDetailListDevextremes(args)
-            .done(result => {
-                SalesRequestDetailsModel = result.data;
+                SalesRequestDetailsModel = result.details;
                 if (SalesRequestDetailsModel.find(x => x.itemId == null) == null)
                     SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
                 gridDetails = $('#dgSalesRequestDetails').data('dxDataGrid')
                 gridDetails.option('dataSource', SalesRequestDetailsModel);
                 gridDetails.refresh();
             });
+
+        //const args = {};
+        //args.filter = JSON.stringify(['docId', '=', SalesRequestHeaderId])
+        //salesRequestService.getDetailListDevextremes(args)
+        //    .done(result => {
+        //        SalesRequestDetailsModel = result.data;
+        //        if (SalesRequestDetailsModel.find(x => x.itemId == null) == null)
+        //            SalesRequestDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+        //        gridDetails = $('#dgSalesRequestDetails').data('dxDataGrid')
+        //        gridDetails.option('dataSource', SalesRequestDetailsModel);
+        //        gridDetails.refresh();
+        //    });
     }
 });
 

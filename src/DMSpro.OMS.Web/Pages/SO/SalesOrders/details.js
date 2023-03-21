@@ -54,17 +54,26 @@ $(async function () {
     if (company != null)
         companyId = company.id;
     // get data api getInfoForSo in item service
-    var itemService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
+    var salesOrderService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
     let lastCallDates = Common.getLastAPICallDates();
-    await itemService.getSOInfo(companyId, new Date(), null)
+    await salesOrderService.getInfoSO({ companyId: companyId })
         .done(async result => {
             let resultJson = await Common.parseJSON(result);
             data = Common.processInitData(resultJson);
-            addListToData(data);
-            //loadControl(data);
+            await addListToData(data);
+            loadControl(data);
         });
-
     var l = abp.localization.getResource("OMS");
+
+    //await itemService.getInfoSO(companyId, new Date(), null)
+    //    .done(async result => {
+    //        let resultJson = await Common.parseJSON(result);
+    //        data = Common.processInitData(resultJson);
+    //        addListToData(data);
+    //        //loadControl(data);
+    //    });
+
+    //var l = abp.localization.getResource("OMS");
     var salesOrderService = window.dMSpro.oMS.orderService.controllers.salesOrders.salesOrder;
 
     const docTypeStore = [
@@ -890,16 +899,11 @@ $(async function () {
 
         $('#CancelButton').show();
 
-        salesOrderService.getHeader(SalesOrderHeaderId)
+        salesOrderService.getDoc(SalesOrderHeaderId)
             .done(result => {
-                $('#frmSalesOrderDetails').data('dxForm').option('formData', result);
-            });
+                $('#frmSalesOrderDetails').data('dxForm').option('formData', result.header);
 
-        const args = {};
-        args.filter = JSON.stringify(['docId', '=', SalesOrderHeaderId])
-        salesOrderService.getDetailListDevextremes(args)
-            .done(result => {
-                SalesOrderDetailsModel = result.data;
+                SalesOrderDetailsModel = result.details;
                 if (SalesOrderDetailsModel.find(x => x.itemId == null) == null)
                     SalesOrderDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
                 gridDetails = $('#dgSalesOrderDetails').data('dxDataGrid')
