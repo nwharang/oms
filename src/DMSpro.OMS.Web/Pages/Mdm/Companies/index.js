@@ -110,7 +110,7 @@ $(function () {
         showColumnLines: true,
         showRowLines: false,
         rowAlternationEnabled: true,
-        showBorders: false,
+        showBorders: true,
 
         /*keyExpr: "id",*/
         /*Export Excel*/
@@ -155,9 +155,13 @@ $(function () {
         columnResizingMode: 'widget',
         columnMinWidth: 50,
         columnAutoWidth: true, 
+        //columnChooser: {
+        //    enabled: true,
+        //    allowSearch: true,
+        //},
         columnChooser: {
             enabled: true,
-            allowSearch: true,
+            mode: "select"
         },
         columnFixing: {
             enabled: true,
@@ -215,10 +219,10 @@ $(function () {
                 editRow: l("Edit"),
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
-            }, 
+            },
         },
         toolbar: {
-            items: [ 
+            items: [
                 "groupPanel",
                 "addRowButton",
                 "columnChooserButton",

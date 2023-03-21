@@ -313,11 +313,21 @@ function initItemAttributeTab() {
                         "exportButton",
                         {
                             location: 'after',
-                            template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                            onClick() {
-                                //todo
+                            widget: 'dxButton',
+                            options: {
+                                icon: "import",
+                                elementAttr: {
+                                    //id: "import-excel",
+                                    class: "import-excel",
+                                },
+                                onClick(e) {
+                                    var gridControl = e.element.closest('div.dx-datagrid').parent();
+                                    var gridName = gridControl.attr('id');
+                                    var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                                    if (popup) popup.show();
+                                },
                             },
-                        },
+                        }, 
                         'searchPanel'
                     ]
                 },
@@ -328,7 +338,9 @@ function initItemAttributeTab() {
                     if (customerGroup.status == 1 || customerGroup.status == 'RELEASED') {
                         e.component.option('toolbar.items[0].visible', false);
                         e.component.option('columns[0].visible', false);
+                        return;
                     }
+                    initImportPopup('api/mdm-service/customer-group-by-atts', 'CustomerGroupByAtts_Template', 'dgCustomerAttribute');
                 }
             })
     }
@@ -428,15 +440,25 @@ function initListCustomerTab() {
                                 $('#dgListCustomer').data('dxDataGrid').addRow();
                             },
                         },
-                        'columnChooserButton',
+                        "columnChooserButton",
                         "exportButton",
                         {
                             location: 'after',
-                            template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                            onClick() {
-                                //todo
+                            widget: 'dxButton',
+                            options: {
+                                icon: "import",
+                                elementAttr: {
+                                    //id: "import-excel",
+                                    class: "import-excel",
+                                },
+                                onClick(e) {
+                                    var gridControl = e.element.closest('div.dx-datagrid').parent();
+                                    var gridName = gridControl.attr('id');
+                                    var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                                    if (popup) popup.show();
+                                },
                             },
-                        },
+                        }, 
                         'searchPanel'
                     ]
                 },
@@ -481,7 +503,9 @@ function initListCustomerTab() {
                     if (customerGroup.status == 1 || customerGroup.status == 'RELEASED') {
                         e.component.option('toolbar.items[0].visible', false);
                         e.component.option('columns[0].visible', false);
+                        return;
                     }
+                    initImportPopup('api/mdm-service/customer-group-by-lists', 'CustomerGroupByLists_Template', 'dgListCustomer');
                 }
             })
     }

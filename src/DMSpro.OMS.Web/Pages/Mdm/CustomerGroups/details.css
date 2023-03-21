@@ -50,15 +50,7 @@ div.dx-button-content
 i.dx-icon.fa {
     margin-right: 2px;
 }
-
-.dx-button-mode-contained {
-    border-radius: 0;
-}
-
-.dx-toolbar-text-auto-hide .dx-button .dx-button-content,
-div.dx-toolbar-after div.dx-button-content {
-    padding: 6px;
-}
+ 
 
 div.dx-toolbar-items-container
 div.dx-button-content {

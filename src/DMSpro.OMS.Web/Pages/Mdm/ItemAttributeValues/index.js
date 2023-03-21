@@ -186,7 +186,7 @@ $(function () {
                     template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                     onClick() {
                         dataTreeContainer.addRow();
-                    },
+                    }
                 },
                 'columnChooserButton',
                 "exportButton",
@@ -203,7 +203,7 @@ $(function () {
                             var gridName = gridControl.attr('id');
                             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
                             if (popup) popup.show();
-                        },
+                        }
                     }
                 },
                 "searchPanel"

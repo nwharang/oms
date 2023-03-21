@@ -5,7 +5,7 @@ var userService = window.dMSpro.oMS.identityService.controllers.identityUsers.id
 $(function () {
     var l = abp.localization.getResource("MdmService");
 
-    var assignmentStore = new DevExpress.data.CustomStore({  
+    var assignmentStore = new DevExpress.data.CustomStore({
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -20,7 +20,7 @@ $(function () {
 
                     console.log(result.data);
                     //result.data.forEach(x => x.companyName = "x");
-                    
+
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -31,14 +31,14 @@ $(function () {
             return deferred.promise();
         },
         insert(values) {
-            
+
             return assignmentService.create({
                 companyId: values.companyIdentityUserAssignment.companyId,
                 identityUserId: values.companyIdentityUserAssignment.identityUserId,
             }, { contentType: "application/json" });
         },
         update(key, values) {
-            
+
             return assignmentService.update(key.companyIdentityUserAssignment.id,
                 {
                     companyId: values.company.id,
@@ -46,7 +46,7 @@ $(function () {
                 }, { contentType: "application/json" });
         },
         remove(key) {
-            
+
             return assignmentService.delete(key.companyIdentityUserAssignment.id);
         },
         byKey: function (key) {
@@ -61,7 +61,7 @@ $(function () {
         }
     });
 
-    var companyStore = new DevExpress.data.CustomStore({ 
+    var companyStore = new DevExpress.data.CustomStore({
         key: 'id',
         useDefaultSearch: true,
         load(loadOptions) {
@@ -74,7 +74,7 @@ $(function () {
             });
             console.log(args)
             companyService.getListDevextremes(args)
-                .done(result => { 
+                .done(result => {
                     console.log(result.data);
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -97,7 +97,7 @@ $(function () {
         }
     });
 
-    var userStore = new DevExpress.data.CustomStore({ 
+    var userStore = new DevExpress.data.CustomStore({
         key: 'id',
         useDefaultSearch: true,
         load: function (loadOptions) {
@@ -107,7 +107,7 @@ $(function () {
                 if (i in loadOptions && isNotEmpty(loadOptions[i]))
                     params[i] = JSON.stringify(loadOptions[i]);
             });
-           
+
             userService.getListDevextremes(params)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -119,7 +119,7 @@ $(function () {
             return deferred.promise();
         },
         byKey: function (key) {
-            if (key == 0) return null; 
+            if (key == 0) return null;
             var d = new $.Deferred();
             userService.getIdentityUser(key)
                 .done(data => {
@@ -128,17 +128,17 @@ $(function () {
             return d.promise();
         }
     });
-     
+
     function selectBoxEditorTemplate(cellElement, cellInfo) {
         return $('<div>').dxLookup({
             valueExpr: "id",
             displayExpr: "name",
             dataSource: new DevExpress.data.DataSource({
-                store: companyStore, 
+                store: companyStore,
                 paginate: true,
                 pageSize: pageSizeForLookup
-            }), 
-            searchEnabled: true, 
+            }),
+            searchEnabled: true,
             searchMode: 'contains',
             searchExpr: ['name'],
             onValueChanged(data) {
@@ -147,7 +147,7 @@ $(function () {
         });
     }
     var gridComAssignments = $('#dgComAssignments').dxDataGrid({
-        dataSource: assignmentStore, 
+        dataSource: assignmentStore,
         editing: {
             mode: "row",
             allowAdding: abp.auth.isGranted('MdmService.CustomerAssignments.Create'),
@@ -159,7 +159,7 @@ $(function () {
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
-        }, 
+        },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
@@ -185,9 +185,9 @@ $(function () {
             e.cancel = true;
         },
         showRowLines: true,
-        showBorders: true, 
+        showBorders: true,
         //focusedRowEnabled: true, 
-        allowColumnReordering: true, 
+        allowColumnReordering: true,
         allowColumnResizing: true,
         columnResizingMode: 'widget',
         columnMinWidth: 50,
@@ -212,7 +212,7 @@ $(function () {
         searchPanel: {
             visible: true
         },
-       
+
         stateStoring: { //save state in localStorage
             enabled: true,
             type: 'localStorage',
@@ -228,25 +228,28 @@ $(function () {
             allowedPageSizes: allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
-        }, 
+        },
         toolbar: {
             items: [
                 "groupPanel",
-                {
-                    location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        gridComAssignments.addRow();
-                    },
-                },
-
-                'columnChooserButton',
+                "addRowButton",
+                "columnChooserButton",
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            //id: "import-excel",
+                            class: "import-excel",
+                        },
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
+                        },
                     },
                 },
                 "searchPanel"
@@ -274,7 +277,7 @@ $(function () {
                         };
                     },
                     displayExpr: 'userName',
-                    valueExpr: 'id', 
+                    valueExpr: 'id',
                     searchEnabled: true,
                     searchMode: 'contains',
                     minSearchLength: 2,
@@ -284,11 +287,11 @@ $(function () {
             {
                 dataField: 'companyIdentityUserAssignment.companyId',
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
-                validationRules: [{ type: "required" }], 
-                calculateDisplayValue:"company.name",
+                validationRules: [{ type: "required" }],
+                calculateDisplayValue: "company.name",
                 //editCellTemplate: selectBoxEditorTemplate,
-                lookup: { 
-                    dataSource : { 
+                lookup: {
+                    dataSource: {
                         store: companyStore,
                         paginate: true,
                         pageSize: pageSizeForLookup,
@@ -304,16 +307,7 @@ $(function () {
                 dataField: 'companyIdentityUserAssignment.companyId',
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
             }
-        ],
-        //onEditorPreparing: function (e) {
-        //    if (e.dataField == "companyId" && e.parentType == "dataRow") {
-        //        //e.value = e.row.data.companyName; 
-        //        e.editorOptions.dataSource = {
-        //            pageSize: 30,
-        //            paginate: true,
-        //            store: companyStore
-        //        }; 
-        //    }
-        //}
+        ]
     }).dxDataGrid("instance");
+    initImportPopup('api/mdm-service/company-identity-user-assignments', 'CompanyAssignments_Template', 'dgComAssignments');
 });

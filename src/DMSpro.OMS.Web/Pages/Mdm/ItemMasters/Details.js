@@ -6,6 +6,7 @@ if (item != null) {
 
 var itemTypeService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
 var uOMGroupService = window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGroup;
+var uOMGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail;
 var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 var itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
 var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
@@ -13,6 +14,7 @@ var itemImageService = window.dMSpro.oMS.mdmService.controllers.itemImages.itemI
 var itemAttachService = window.dMSpro.oMS.mdmService.controllers.itemAttachments.itemAttachment;
 var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
 var vATService = window.dMSpro.oMS.mdmService.controllers.vATs.vAT;
+
 
 var urlUploadFileImage = `${abp.appPath}api/mdm-service/item-images`;
 var urlGetFileImage = `${abp.appPath}api/mdm-service/item-images/get-file`;
@@ -25,6 +27,7 @@ var urlGetFileAttachment = `${abp.appPath}api/mdm-service/item-attachments/get-f
 var itemAttachment = [];
 var attachmentId = '';
 var attachment = [];
+var valueUOMGroupId = null;
 
 $(function () {
     DevExpress.config({
@@ -84,7 +87,7 @@ $(function () {
             {
                 title: "Attachment",
                 icon: "attach",
-                template: iniAttachmentTab()
+                template: initAttachmentTab()
             }
         ],
         onInitialized: function (e) {
@@ -183,6 +186,7 @@ $(function () {
                                         cssClass: 'uomGroup',
                                         colSpan: 2,
                                         editorType: 'dxSelectBox',
+                                        calculateDisplayValue: 'uomGroup.code',
                                         editorOptions: {
                                             dataSource: {
                                                 store: getUOMGroups,
@@ -190,7 +194,21 @@ $(function () {
                                                 pageSize: pageSizeForLookup
                                             },
                                             valueExpr: 'id',
-                                            displayExpr: 'code'
+                                            displayExpr: 'code',
+                                            showClearButton: true,
+                                            onValueChanged: function (e) {
+                                                valueUOMGroupId = e.value;
+                                                var form = $('#top-section').data('dxForm');
+                                                form.getEditor('inventoryUOMId').option('disabled', false);
+                                                form.getEditor('purUOMId').option('disabled', false);
+                                                form.getEditor('salesUOMId').option('disabled', false);
+
+
+                                                //console.log(valueUOMGroupId);
+                                                //form.getEditor('inventoryUOMId').getDataSource().reload();
+                                                //form.getEditor('purUOMId').getDataSource().reload();
+                                                //form.getEditor('salesUOMId').getDataSource().reload();
+                                            }
                                         }
                                     },
                                     {
@@ -283,13 +301,16 @@ $(function () {
                                                 validationRules: [{ type: 'required' }],
                                                 editorType: 'dxSelectBox',
                                                 editorOptions: {
-                                                    dataSource: {
-                                                        store: getUOMs,
+                                                    datasource: {
+                                                        store: getUOMGroupsDetail,
+                                                        filter: ['uomGroupId', '=', valueUOMGroupId],
                                                         paginate: true,
-                                                        pageSize: pageSizeForLookup
+                                                        pagesize: pageSizeForLookup
                                                     },
-                                                    valueExpr: 'id',
-                                                    displayExpr: 'code'
+                                                    valueExpr: 'altUOMId',
+                                                    displayExpr: 'altUOM.name',
+                                                    showClearButton: true,
+                                                    disabled: true
                                                 }
                                             },
                                             {
@@ -299,12 +320,15 @@ $(function () {
                                                 editorType: 'dxSelectBox',
                                                 editorOptions: {
                                                     dataSource: {
-                                                        store: getUOMs,
+                                                        store: getUOMGroupsDetail,
+                                                        filter: ['uomGroupId', '=', valueUOMGroupId],
                                                         paginate: true,
                                                         pageSize: pageSizeForLookup
                                                     },
-                                                    valueExpr: 'id',
-                                                    displayExpr: 'code'
+                                                    valueExpr: 'altUOMId',
+                                                    displayExpr: 'altUOM.name',
+                                                    showClearButton: true,
+                                                    disabled: true
                                                 }
                                             },
                                             {
@@ -314,12 +338,15 @@ $(function () {
                                                 editorType: 'dxSelectBox',
                                                 editorOptions: {
                                                     dataSource: {
-                                                        store: getUOMs,
+                                                        store: getUOMGroupsDetail,
+                                                        filter: ['uomGroupId', '=', valueUOMGroupId],
                                                         paginate: true,
                                                         pageSize: pageSizeForLookup
                                                     },
-                                                    valueExpr: 'id',
-                                                    displayExpr: 'code'
+                                                    valueExpr: 'altUOMId',
+                                                    displayExpr: 'altUOM.name',
+                                                    showClearButton: true,
+                                                    disabled: true
                                                 }
                                             },
                                             {
@@ -390,7 +417,7 @@ $(function () {
                 displayExpr: 'attrValName'
             }
         }
-    }
+    } 
 });
 
 var itemAttachStore = new DevExpress.data.CustomStore({
@@ -430,7 +457,7 @@ var itemAttachStore = new DevExpress.data.CustomStore({
     }
 });
 
-function iniAttachmentTab() {
+function initAttachmentTab() {
     return function () {
         return $('<div id="dgItemAttachment" style="padding-top: 10px">')
             .dxDataGrid({
@@ -542,24 +569,31 @@ function iniAttachmentTab() {
                 toolbar: {
                     items: [
                         "groupPanel",
-                        {
-                            location: 'after',
-                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                            onClick() {
-                                $('#dgItemAttachment').data('dxDataGrid').addRow()
-                            },
-                        },
-                        'columnChooserButton',
+                        "addRowButton",
+                        "columnChooserButton",
                         "exportButton",
                         {
                             location: 'after',
-                            template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                            onClick() {
-                                //todo
+                            widget: 'dxButton',
+                            options: {
+                                icon: "import",
+                                elementAttr: {
+                                    //id: "import-excel",
+                                    class: "import-excel",
+                                },
+                                onClick(e) {
+                                    var gridControl = e.element.closest('div.dx-datagrid').parent();
+                                    var gridName = gridControl.attr('id');
+                                    var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                                    if (popup) popup.show();
+                                },
                             },
-                        },
+                        }, 
                         "searchPanel"
                     ],
+                },
+                onContentReady: function (e) {
+                    initImportPopup('api/mdm-service/item-attachments', 'ItemAttachments_Template', 'dgItemAttachment');
                 },
                 columns: [
                     {
@@ -654,12 +688,37 @@ var getUOMGroups = new DevExpress.data.CustomStore({
                 });
             });
         return deferred.promise();
+    }
+});
+
+var getUOMGroupsDetail = new DevExpress.data.CustomStore({
+    key: 'id',
+    //loadMode: 'raw',
+    //cacheRawData: true,
+    load(loadOptions) {
+        const deferred = $.Deferred();
+        const args = {};
+
+        requestOptions.forEach((i) => {
+            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                args[i] = JSON.stringify(loadOptions[i]);
+            }
+        });
+        uOMGroupDetailService.getListDevextremes(args)
+            .done(result => {
+                deferred.resolve(result.data, {
+                    totalCount: result.totalCount,
+                    summary: result.summary,
+                    groupCount: result.groupCount,
+                });
+            });
+        return deferred.promise();
     },
     byKey: function (key) {
         if (key == 0) return null;
 
         var d = new $.Deferred();
-        uOMGroupService.get(key)
+        uOMGroupDetailService.get(key)
             .done(data => {
                 d.resolve(data);
             });
@@ -906,14 +965,8 @@ function initImageTab() {
                 toolbar: {
                     items: [
                         "groupPanel",
-                        {
-                            location: 'after',
-                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                            onClick() {
-                                $('#dgItemImage').data('dxDataGrid').addRow();
-                            },
-                        },
-                        'columnChooserButton',
+                        "addRowButton",
+                        "columnChooserButton",
                         "exportButton",
                         {
                             location: 'after',
@@ -933,6 +986,9 @@ function initImageTab() {
                         },
                         'searchPanel'
                     ]
+                },
+                onContentReady: function (e) { 
+                    initImportPopup('api/mdm-service/item-images', 'ItemImages_Template', 'dgItemImage');
                 },
                 columns: [
                     {
@@ -1172,5 +1228,4 @@ function action(e) {
         });
     }
 
-    initImportPopup('api/mdm-service/item-images', 'ItemImages_Template', 'dgItemImage');
 }

@@ -1,9 +1,6 @@
 $(function () {
     var l = abp.localization.getResource("MdmService");
-	var salesChannelService = window.dMSpro.oMS.mdmService.controllers.salesChannels.salesChannel;
-    var isNotEmpty = function (value) {
-        return value !== undefined && value !== null && value !== '';
-    }
+    var salesChannelService = window.dMSpro.oMS.mdmService.controllers.salesChannels.salesChannel;
 
     //Custom store - for load, update, delete
     var customStore = new DevExpress.data.CustomStore({
@@ -48,7 +45,7 @@ $(function () {
             mode: "row",
             allowAdding: abp.auth.isGranted('MdmService.SalesChannels.Create'),
             allowUpdating: abp.auth.isGranted('MdmService.SalesChannels.Edit'),
-            allowDeleting: abp.auth.isGranted('MdmService.SalesChannels.Delete'),
+            allowDeleting: false,//abp.auth.isGranted('MdmService.SalesChannels.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -122,6 +119,14 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
+        onInitNewRow(e) {
+            e.data.active = true;
+        },
+        onEditorPreparing(e) {
+            if (e.dataField === 'code' && e.row && !e.row.isNewRow) {
+                e.editorOptions.disabled = true;
+            }
+        },
         toolbar: {
             items: [
                 "groupPanel",
@@ -152,7 +157,7 @@ $(function () {
             {
                 type: 'buttons',
                 caption: l("Actions"),
-                width: 110,
+                width: 120,
                 buttons: ['edit', 'delete'],
                 fixedPosition: 'left'
             },
@@ -160,61 +165,53 @@ $(function () {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:SalesChannel:Code"),
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                editorOptions: {
+                    maxLength: 20
+                },
+                validationRules: [{ type: "required" }],
+                width: 250
             },
             {
                 dataField: 'name',
                 caption: l("EntityFieldName:MDMService:SalesChannel:Name"),
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                editorOptions: {
+                    maxLength: 100
+                },
+                validationRules: [{ type: "required" }],
+                minWidth: 250
             },
             {
                 dataField: 'description',
                 caption: l("EntityFieldName:MDMService:SalesChannel:Description"),
                 dataType: 'string',
+                minWidth: 250
             },
             {
                 dataField: 'active',
                 caption: l("EntityFieldName:MDMService:SalesChannel:Active"),
-                //validationRules: [{ type: "required" }],
-                width: 110,
+                width: 120,
                 alignment: 'center',
                 dataType: 'boolean',
                 cellTemplate(container, options) {
                     $('<div>')
                         .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
                         .appendTo(container);
+                },
+                setCellValue(newData, value) {
+                    const deferred = $.Deferred();
+                    abp.message.confirm(l('ConfirmationMessage.ChangeValue')).then(function (confirmed) {
+                        if (confirmed) {
+                            deferred.resolve(newData.active = value);
+                        } else {
+                            deferred.resolve(newData.active = !value);
+                        }
+                    });
+                    return deferred.promise();
                 }
             }
         ],
     }).dxDataGrid("instance");
 
-    //$("input#Search").on("input", function () {
-    //    gridSalesChannels.searchByText($(this).val());
-    //});
-
-    //$("#btnNewSalesChannel").click(function (e) {
-    //    gridSalesChannels.addRow();
-    //});
-
-    //$("#ExportToExcelButton").click(function (e) {
-    //    e.preventDefault();
-
-    //    salesChannelService.getDownloadToken().then(
-    //        function(result){
-    //                var input = getFilter();
-    //                var url =  abp.appPath + 'api/mdm-service/sales-channels/as-excel-file' +
-    //                    abp.utils.buildQueryString([
-    //                        { name: 'downloadToken', value: result.token },
-    //                        { name: 'filterText', value: input.filterText },
-    //                        { name: 'code', value: input.code },
-    //                        { name: 'name', value: input.name }
-    //                        ]);
-
-    //                var downloadWindow = window.open(url, '_blank');
-    //                downloadWindow.focus();
-    //        }
-    //    )
-    //});
     initImportPopup('api/mdm-service/sales-channels', 'SalesChannels_Template', 'dgSalesChannels');
 });

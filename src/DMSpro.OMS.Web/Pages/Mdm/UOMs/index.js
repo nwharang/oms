@@ -125,6 +125,11 @@ $(function () {
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
+        onEditorPreparing: function (e) {
+            if (e.dataField == 'code' && e.value != null) {
+                e.editorOptions.disabled = true;
+            }
+        },
         toolbar: {
             items: [
                 "groupPanel",
@@ -145,8 +150,8 @@ $(function () {
                             var gridName = gridControl.attr('id');
                             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
                             if (popup) popup.show();
-                        },
-                    },
+                        }
+                    }
                 },
                 "searchPanel",
             ],

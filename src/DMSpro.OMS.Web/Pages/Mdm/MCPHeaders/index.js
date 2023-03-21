@@ -1,4 +1,5 @@
 ﻿var l = abp.localization.getResource("MdmService");
+var l1 = abp.localization.getResource("OMS");
 $(function () {
     var mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
     var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;

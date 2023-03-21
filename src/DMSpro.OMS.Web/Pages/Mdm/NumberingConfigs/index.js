@@ -1,7 +1,7 @@
 var numberingConfigService = window.dMSpro.oMS.mdmService.controllers.numberingConfigs.numberingConfig;
 var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 
     var numberingConfigStore = new DevExpress.data.CustomStore({
         key: "id",

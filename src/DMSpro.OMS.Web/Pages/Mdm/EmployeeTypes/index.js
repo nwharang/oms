@@ -153,10 +153,20 @@ $(function () {
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
-                    },
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            //id: "import-excel",
+                            class: "import-excel",
+                        },
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
+                        }
+                    }
                 },
                 "searchPanel"
             ],
@@ -169,13 +179,13 @@ $(function () {
                 buttons: ['edit', 'delete'],
                 fixedPosition: 'left'
             },
-            {
-                caption: l("EntityFieldName:MDMService:SystemData:Code"),
-                dataField: "code",
-                //validationRules: [{ type: "required" }],
-                visible: false,
-                allowEditing: false
-            },
+            //{
+            //    caption: l("EntityFieldName:MDMService:SystemData:Code"),
+            //    dataField: "code",
+            //    //validationRules: [{ type: "required" }],
+            //    visible: false,
+            //    allowEditing: false
+            //},
             {
                 caption: l("EntityFieldName:MDMService:SystemData:Name"),
                 dataField: "name",
@@ -195,6 +205,7 @@ $(function () {
             }
         ]
     }).dxDataGrid("instance");
+    initImportPopup('api/mdm-service/system-datas', 'EmployeeTypes_Template', 'dataGridContainer');
 
     /****event*****/
     //$("input#Search").on("input", function () {

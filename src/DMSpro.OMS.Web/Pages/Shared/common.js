@@ -51,6 +51,8 @@ const popupImportContentTemplate = function (e) {
     return content;
 };
 function initImportPopup(url, templateName, controlName) {
+    if ($(`.${controlName}.importPanel`).length > 0) return;
+
     $(`#${controlName}`).parent().append(`<div class="${controlName} importPanel"></div>`);
     $(`#${controlName}`).parent().append(`<div data-target="${controlName}" class="${controlName} popupImport"></div>`);
 
@@ -62,12 +64,12 @@ function initImportPopup(url, templateName, controlName) {
             showIndicator: true,
             showPane: true,
             //shading: true,
-            hideOnOutsideClick: false 
+            hideOnOutsideClick: false
         });
     }
-    if ($(`div.${controlName}.popupImport`).length > 0) { 
+    if ($(`div.${controlName}.popupImport`).length > 0) {
         var l = abp.localization.getResource("MdmService");
-        var popupImport =  $(`div.${controlName}.popupImport`).dxPopup({
+        var popupImport = $(`div.${controlName}.popupImport`).dxPopup({
             width: 400,
             height: 300,
             //container: '#import-excel',
@@ -141,10 +143,13 @@ function initImportPopup(url, templateName, controlName) {
                         var uploader = $(`div.${controlName}[name=excelUploader]`).data('dxFileUploader');
                         var files = uploader.option('value');
                         if (files.length > 0) {
+                            var extension = `.${files[0].name.split('.').pop()}`;
+                            if (uploader.option('allowedFileExtensions').indexOf(extension) == -1) return;
+
                             abp.message.confirm(abp.localization.getResource("OMS")('ConfirmationMessage.UploadExcelFile').replace('{0}', `"${files[0].name}"`), ' ').then(function (answer) {
                                 if (answer) {
                                     var requestUrl = '';
-                                     
+
                                     var importType = $(`div.${controlName}[name=sbImportTypes]`).data('dxSelectBox').option('value');
                                     if (importType == 'I') {
                                         requestUrl = `${abp.appPath + url}/insert-from-excel`;
@@ -152,7 +157,7 @@ function initImportPopup(url, templateName, controlName) {
 
                                     var formData = new FormData();
                                     formData.append("file", files[0]);
-                                    
+
                                     var panel = $(`div.${controlName}.importPanel`).data('dxLoadPanel');
                                     panel.show();
 
@@ -165,12 +170,12 @@ function initImportPopup(url, templateName, controlName) {
                                         contentType: false,
                                         processData: false,
                                         success: function (data) {
-                                            uploader.reset(); 
-                                            popupImport.hide(); 
+                                            uploader.reset();
+                                            popupImport.hide();
                                             panel.hide();
 
                                             if ($(`#${controlName}`).data('dxDataGrid'))
-                                                $(`#${controlName}`).data('dxDataGrid').refresh(); 
+                                                $(`#${controlName}`).data('dxDataGrid').refresh();
                                             else if ($(`#${controlName}`).data('dxTreeList'))
                                                 $(`#${controlName}`).data('dxTreeList').refresh();
                                         },
@@ -178,11 +183,17 @@ function initImportPopup(url, templateName, controlName) {
                                             uploader.reset();
                                             panel.hide();
                                             console.log(msg.responseText);
+                                            if (msg.responseText) {
+                                                var parsedResult = JSON.parse(msg.responseText);
+                                                if (parsedResult && parsedResult.error) {
+                                                    abp.message.error(parsedResult.error.message);
+                                                }
+                                            }
                                         },
                                     });
                                 }
                             });
-                        } 
+                        }
                     },
                 },
             },

@@ -2,13 +2,12 @@
     var l = abp.localization.getResource("MdmService");
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
 
+    var isFirstLoad = true;
+
     /****custom store*****/
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
-        //parentId: 'parentId',
         load(loadOptions) {
-            console.log(loadOptions);
-
             const deferred = $.Deferred();
             const args = {};
 
@@ -52,40 +51,70 @@
 
     /****control*****/
     //TreeList - GeoMaster
-    const dataTreeContainer = $('#dataTreeContainer').dxTreeList({
-        dataSource: {
-            store: geoMasterStore,
-            paginate: true,
-            pageSize: 10,
-        },
+    const tlGeoMaster = $('#tlGeoMaster').dxTreeList({
+        dataSource: geoMasterStore,
         keyExpr: 'id',
         parentIdExpr: 'parentId',
-        remoteOperations: true,
+        remoteOperations: false,
+        showRowLines: true,
         showBorders: true,
-        rootValue: null,
-        //expandedRowKeys: [1, 2],
-        //autoExpandAll: true,
+        cacheEnabled: true,
+        autoExpandAll: false,
         focusedRowEnabled: true,
-        allowColumnReordering: false,
+        allowColumnReordering: true,
         rowAlternationEnabled: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
         columnAutoWidth: true,
-        columnHidingEnabled: true,
-        errorRowEnabled: false,
         filterRow: {
             visible: true
+        },
+        groupPanel: {
+            visible: true,
         },
         searchPanel: {
             visible: true
         },
-        scrolling: {
-            mode: 'standard'
+        columnMinWidth: 50,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        export: {
+            enabled: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                });
+            });
+            e.cancel = true;
+        },
+        headerFilter: {
+            visible: true,
+        },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'tlGeoMaster',
         },
         paging: {
             enabled: true,
             pageSize: pageSize
         },
         pager: {
-            visible: true,
+            visible: false,
             showPageSizeSelector: true,
             allowedPageSizes: allowedPageSizes,
             showInfo: true,
@@ -93,9 +122,14 @@
         },
         editing: {
             mode: 'row',
-            allowAdding: abp.auth.isGranted('MdmService.GeoMasters.Create'),
+            allowAdding: function (e) {
+                if (abp.auth.isGranted('MdmService.GeoMasters.Create')) {
+                    return e.row.level < 4;
+                }
+                return false;
+            },
             allowUpdating: abp.auth.isGranted('MdmService.GeoMasters.Edit'),
-            allowDeleting: abp.auth.isGranted('MdmService.GeoMasters.Delete'),
+            allowDeleting: false,//abp.auth.isGranted('MdmService.GeoMasters.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -105,7 +139,11 @@
         },
         onEditorPreparing(e) {
             if (e.dataField === 'parentId' && e.editorOptions.value == 0) {
-                e.editorOptions.value = '';//dataTreeContainer.getKeyByRowIndex(0); //dataTreeContainer.getRootNode().children[0].key;
+                e.editorOptions.value = '';//tlGeoMaster.getKeyByRowIndex(0); //tlGeoMaster.getRootNode().children[0].key;
+            }
+
+            if (e.dataField === 'code' && e.row && !e.row.isNewRow) {
+                e.editorOptions.disabled = true;
             }
         },
         onInitNewRow(e) {
@@ -130,12 +168,40 @@
                 }
             }
         },
+        onContentReady: function (e) {
+            if (isFirstLoad && localStorage.getItem("tlGeoMaster") == null) {
+                e.component.forEachNode(node => {
+                    if (node.level < 1) {
+                        // Expand if condition is met
+                        e.component.expandRow(node.key);
+                    }
+                });
+                isFirstLoad = false;
+            }
+        },
         toolbar: {
             items: [
+                "groupPanel",
+                "addRowButton",
+                "columnChooserButton",
+                "exportButton",
                 {
-                    name: "searchPanel",
-                    location: 'after'
-                }
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            class: "import-excel",
+                        },
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-treelist');
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
+                        },
+                    }
+                },
+                "searchPanel"
             ]
         },
         columns: [
@@ -143,16 +209,23 @@
                 caption: l("Actions"),
                 type: 'buttons',
                 width: 120,
-                buttons: ['add', 'edit', 'delete']
+                buttons: ['add', 'edit', 'delete'],
+                fixedPosition: 'left'
             },
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Code"),
                 dataField: "code",
+                editorOptions: {
+                    maxLength: 10
+                },
                 validationRules: [{ type: "required" }]
             },
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Name"),
                 dataField: "name",
+                editorOptions: {
+                    maxLength: 100
+                },
                 validationRules: [{ type: "required" }]
             },
             {
@@ -163,56 +236,40 @@
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
-                            //filter: options.data ? ["!", ["parentId", "=", options.data.parentId]] : null,
+                            filter: [["isDeleted", "=", "false"], "and", ["level", "<", 4], "and", ["!", ["name", "=", options.data ? options.data.name : null]]],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
                     },
                     displayExpr: 'name',
-                    valueExpr: 'id',
-                }
+                    valueExpr: 'id'
+                },
+                editorOptions: {
+                    showClearButton: true
+                },
+                //setCellValue: function (newData, value, curValue) {
+                //    this.defaultSetCellValue(newData, value);
+
+                //    var d = new $.Deferred();
+                //    geoMasterService.get(value)
+                //        .done(data => {
+                //            d.resolve(newData.level = data.level + 1);
+                //        });
+                //    return d.promise();
+                //}
             },
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Level"),
                 dataField: "level",
-                alignment: 'left',
-                allowEditing: false
+                alignment: 'center',
+                allowEditing: false,
+                width: 150
             }
         ],
-        //stateStoring: { //save state in localStorage
-        //    enabled: true,
-        //    type: 'localStorage',
-        //    storageKey: 'dataTreeContainer',
-        //},
     }).dxTreeList("instance");
 
     /****event*****/
-    $("input#Search").on("input", function () {
-        dataTreeContainer.searchByText($(this).val());
-    });
-
     /****button*****/
-    $("#NewGeoMasterButton").click(function () {
-        dataTreeContainer.addRow();
-    });
-
-    $("#ExportToExcelButton").click(function (e) {
-        e.preventDefault();
-
-        geoMasterService.getDownloadToken().then(
-            function (result) {
-                var url = abp.appPath + 'api/mdm-service/geo-masters/as-excel-file' +
-                    abp.utils.buildQueryString([
-                        { name: 'downloadToken', value: result.token }
-                    ]);
-
-                var downloadWindow = window.open(url, '_blank');
-                downloadWindow.focus();
-            }
-        )
-    });
-
     /****function*****/
-
+    initImportPopup('api/mdm-service/geo-masters', 'GeoMaster_Template', 'tlGeoMaster');
 });

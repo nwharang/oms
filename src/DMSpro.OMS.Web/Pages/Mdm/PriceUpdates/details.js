@@ -1,15 +1,18 @@
+var PriceUpdateId = sessionStorage.getItem('PriceUpdateId');
+var PriceUpdateModel = [];
+
 $(function () {
-    var l = abp.localization.getResource("MdmService");
-    var l1 = abp.localization.getResource("OMS");
+    var l = abp.localization.getResource("OMS");
     var priceUpdateService = window.dMSpro.oMS.mdmService.controllers.priceUpdates.priceUpdate;
     var priceUpdateDetailService = window.dMSpro.oMS.mdmService.controllers.priceUpdateDetails.priceUpdateDetail;
     var priceListDetailService = window.dMSpro.oMS.mdmService.controllers.priceListDetails.priceListDetail;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
     var itemMasterService = window.dMSpro.oMS.mdmService.controllers.items.item;
 
-    //get data from sessionStorage
-    var PriceUpdateModel = JSON.parse(sessionStorage.getItem("PriceUpdate"));
-    var stateMode = "home";
+    var previousCode = "";
+    var previousDescription = "";
+    var previousPriceListId = "";
+    var previousEffectiveDate = "";
 
     /****custom store*****/
     var priceUpdateDetailStore = new DevExpress.data.CustomStore({
@@ -17,9 +20,9 @@ $(function () {
         load(loadOptions) {
 
             if (loadOptions.filter == undefined) {
-                loadOptions.filter = ['priceUpdateId', '=', PriceUpdateModel ? PriceUpdateModel.id : null];
+                loadOptions.filter = ['priceUpdateId', '=', PriceUpdateId];
             } else {
-                loadOptions.filter = [['priceUpdateId', '=', PriceUpdateModel ? PriceUpdateModel.id : null], 'and', loadOptions.filter];
+                loadOptions.filter = [['priceUpdateId', '=', PriceUpdateId], 'and', loadOptions.filter];
             }
 
             const deferred = $.Deferred();
@@ -88,12 +91,17 @@ $(function () {
         byKey: function (key) {
             if (key == 0) return null;
 
-            var filter = JSON.stringify(['priceListDetail.id', '=', key]);
+            //var d = new $.Deferred();
+            //priceListDetailService.get(key)
+            //    .done(data => {
+            //        d.resolve(data);
+            //    });
+            //return d.promise();
 
             var d = new $.Deferred();
-            priceListDetailService.getListDevextremes({ filter: filter })
+            priceListDetailService.getListDevextremes({ filter: JSON.stringify(['id', '=', key]) })
                 .done(result => {
-                    d.resolve(result.data);
+                    d.resolve(result.data[0]);
                 });
             return d.promise();
         }
@@ -178,31 +186,31 @@ $(function () {
 
     const statusStore = [
         {
-            id: 'OPEN',
+            id: 0,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:OPEN')
         },
         {
-            id: 'CONFIRMED',
+            id: 1,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:CONFIRMED')
         },
         {
-            id: 'RELEASED',
+            id: 2,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:RELEASED')
         },
         {
-            id: 'CANCELLED',
+            id: 3,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:CANCELLED')
         },
         {
-            id: 'COMPLETED',
+            id: 4,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:COMPLETED')
         },
         {
-            id: 'FAILED',
+            id: 5,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:FAILED')
         },
         {
-            id: 'INCOMPLETED',
+            id: 6,
             text: l('EntityFieldValue:MDMService:PriceUpdate:Status:INCOMPLETED')
         }
     ];
@@ -211,15 +219,9 @@ $(function () {
 
     //Form - Price Update
     var priceUpdateForm = $('#priceUpdateForm').dxForm({
-        formData: {
-            code: PriceUpdateModel && PriceUpdateModel.code,
-            description: PriceUpdateModel && PriceUpdateModel.description,
-            priceListId: PriceUpdateModel && PriceUpdateModel.priceListId,
-            effectiveDate: PriceUpdateModel && PriceUpdateModel.effectiveDate,
-            status: PriceUpdateModel ? PriceUpdateModel.status : 'OPEN'
-        },
+        formData: PriceUpdateModel,
         labelMode: "floating",
-        colCount: 4,
+        colCount: 5,
         items: [
             {
                 dataField: "code",
@@ -266,7 +268,8 @@ $(function () {
                     text: l('EntityFieldName:MDMService:PriceUpdate:EffectiveDate')
                 },
                 editorOptions: {
-                    type: 'datetime'
+                    type: 'datetime',
+                    /*min: new Date()*/
                 },
                 validationRules: [{
                     type: 'required',
@@ -278,8 +281,12 @@ $(function () {
                     visible: false,
                     text: l('EntityFieldName:MDMService:PriceUpdate:Status')
                 },
+                editorType: 'dxSelectBox',
                 editorOptions: {
-                    readOnly: true
+                    readOnly: true,
+                    dataSource: statusStore,
+                    displayExpr: 'text',
+                    valueExpr: 'id'
                 },
                 validationRules: [{
                     type: 'required',
@@ -291,7 +298,7 @@ $(function () {
     //DataGrid - Price Update Detail
     var priceUpdateDetailContainer = $('#priceUpdateDetailContainer').dxDataGrid({
         dataSource: priceUpdateDetailStore,
-        remoteOperations: false,
+        remoteOperations: true,
         export: {
             enabled: true,
             // allowExportSelectedData: true,
@@ -342,7 +349,6 @@ $(function () {
         //scrolling: {
         //    mode: 'standard'
         //},
-
         stateStoring: { //save state in localStorage
             enabled: true,
             type: 'localStorage',
@@ -374,32 +380,34 @@ $(function () {
         toolbar: {
             items: [
                 "groupPanel",
-                {
-                    location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        if (PriceUpdateModel != null)
-                            priceUpdateDetailContainer.addRow();
-                    }
-                },
+                "addRowButton",
                 'columnChooserButton',
                 "exportButton",
                 {
                     location: 'after',
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                    onClick() {
-                        //todo
-                    },
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            class: "import-excel",
+                        },
+                        onClick(e) {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
+                        },
+                    }
                 },
                 "searchPanel"
             ],
         },
         onInitNewRow(e) {
-            if (PriceUpdateModel == null || (PriceUpdateModel && PriceUpdateModel.status == 'CANCELLED')) {
+            if (PriceUpdateModel == null || (PriceUpdateModel && PriceUpdateModel.status == 3)) {
                 window.setTimeout(function () { e.component.cancelEditData(); }, 0);
             }
             //e.data.status = 'OPEN';
-            e.data.priceUpdateId = PriceUpdateModel.id;
+            e.data.priceUpdateId = PriceUpdateId;
         },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
@@ -417,7 +425,7 @@ $(function () {
             {
                 caption: l('EntityFieldName:MDMService:PriceListDetail:PriceList'),
                 dataField: 'priceListDetailId',
-                calculateDisplayValue: "priceListDetail.itemId",
+                /*calculateDisplayValue: "item.name",*/
                 validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource() {
@@ -433,29 +441,38 @@ $(function () {
                         }
                         return null;
                     },
-                    valueExpr: "priceListDetail.id"
+                    valueExpr: "id"
                 },
-                setCellValue: function (rowData, value) {
-                    rowData.priceListDetailId = value;
+                setCellValue: function (newData, value, currentData) {
+                    newData.priceListDetailId = value;
 
-                    var filter = JSON.stringify(['priceListDetail.id', '=', value]);
                     var d = new $.Deferred();
-                    priceListDetailService.getListDevextremes({ filter: filter })
+                    priceListDetailService.getListDevextremes({ filter: JSON.stringify(['id', '=', value]) })
                         .done(result => {
-                            d.resolve(rowData.priceBeforeUpdate = result.data[0].priceListDetail.price);
+                            d.resolve(newData.priceBeforeUpdate = result.data[0].price);
                         });
                     return d.promise();
-                }
+                },
+                minWidth: 200
             },
             {
-                caption: l1('EntityFieldName:MDMService:PriceListDetail:PriceBeforeUpdate'),
+                caption: l('EntityFieldName:MDMService:PriceListDetail:PriceBeforeUpdate'),
                 dataField: 'priceBeforeUpdate',
-                allowEditing: false
+                dataType: 'number',
+                format: ",##0.###",
+                allowEditing: false,
+                width: 200
             },
             {
                 caption: l('EntityFieldName:MDMService:PriceListDetail:Price'),
                 validationRules: [{ type: "required" }],
                 dataField: 'newPrice',
+                dataType: 'number',
+                format: ",##0.###",
+                editorOptions: {
+                    format: '#,##0.##',
+                },
+                width: 200
             },
             {
                 dataField: 'priceUpdateId',
@@ -464,31 +481,32 @@ $(function () {
         ]
     }).dxDataGrid("instance");
 
+
     /****event*****/
     $("#form-container").on("submit", function (e) {
         e.preventDefault();
 
         if (!priceUpdateForm.validate().isValid) {
-            abp.message.warn(l1('WarnMessage.RequiredField'));
+            abp.message.warn(l('WarnMessage.RequiredField'));
             return;
         }
 
         var data = priceUpdateForm.option('formData');
 
-        if (stateMode == 'add') {
+        if (PriceUpdateId == null) {
             priceUpdateService.create(data, { contentType: "application/json" })
                 .done(result => {
                     abp.message.success(l('Congratulations'));
-                    priceUpdateIdIdFilter = result.id;
-                    sessionStorage.setItem("PriceUpdate", JSON.stringify(result));
+                    PriceUpdateId = result.id;
+                    PriceUpdateModel = result;
                     LoadData();
                 })
                 .fail(() => { });
-        } else if (stateMode == 'edit') {
-            priceUpdateService.update(PriceUpdateModel.id, data, { contentType: "application/json" })
+        } else {
+            priceUpdateService.update(PriceUpdateId, data, { contentType: "application/json" })
                 .done(result => {
                     abp.message.success(l('Congratulations'));
-                    sessionStorage.setItem("PriceUpdate", JSON.stringify(result));
+                    PriceUpdateModel = result;
                     LoadData();
                 });
         }
@@ -498,29 +516,27 @@ $(function () {
     $("#CloseButton").click(function (e) {
         e.preventDefault();
 
-        abp.message.confirm(l1('ConfirmationMessage.UnSavedAndLeave'), l1('ConfirmationMessage.UnSavedAndLeaveTitle')).then(function (confirmed) {
-            if (confirmed) {
-                window.close();
-            }
-        });
+        if (previousCode != PriceUpdateModel.code || previousDescription != PriceUpdateModel.description || previousPriceListId != PriceUpdateModel.priceListId || previousEffectiveDate != PriceUpdateModel.effectiveDate) {
+            abp.message.confirm(l('ConfirmationMessage.UnSavedAndLeave'), l('ConfirmationMessage.UnSavedAndLeaveTitle')).then(function (confirmed) {
+                if (confirmed) {
+                    window.close();
+                }
+            });
+        } else {
+            window.close();
+        }
     });
 
     $("#CancelButton").click(function (e) {
         e.preventDefault();
 
         var dataForm = priceUpdateForm.option('formData');
-        var data = {
-            code: dataForm.code,
-            description: dataForm.description,
-            priceListId: dataForm.priceListId,
-            effectiveDate: dataForm.effectiveDate,
-            status: 'CANCELLED'
-        };
 
+        dataForm.status = 3;
 
-        abp.message.confirm(l1('ConfirmationMessage.Cancel')).then(function (confirmed) {
+        abp.message.confirm(l('ConfirmationMessage.Cancel')).then(function (confirmed) {
             if (confirmed) {
-                priceUpdateService.update(PriceUpdateModel.id, data, { contentType: "application/json" })
+                priceUpdateService.update(PriceUpdateModel.id, dataForm, { contentType: "application/json" })
                     .done(result => {
                         abp.message.success(l('Congratulations'));
                         sessionStorage.setItem("PriceUpdate", JSON.stringify(result));
@@ -532,23 +548,34 @@ $(function () {
 
     /****function*****/
     function LoadData() {
-        PriceUpdateModel = JSON.parse(sessionStorage.getItem("PriceUpdate"));
-        if (PriceUpdateModel == null) {
-            stateMode = 'add';
-            $('#CancelButton').prop('disabled', true);
-        } else {
-            stateMode = 'edit';
-            priceUpdateIdIdFilter = PriceUpdateModel.id;
+        priceUpdateDetailContainer.option("editing.allowAdding", false);
+        if (PriceUpdateId != null) {
+            priceUpdateService.get(PriceUpdateId, { contentType: "application/json" })
+                .done(result => {
+                    previousCode = result.code;
+                    previousDescription = result.description;
+                    previousPriceListId = result.priceListId;
+                    previousEffectiveDate = result.effectiveDate;
 
-            if (PriceUpdateModel && PriceUpdateModel.status == 'CANCELLED') {
-                priceUpdateForm.option('formData', PriceUpdateModel);
-                priceUpdateForm.option('disabled', true);
-                $('#SaveButton, #CancelButton').prop('disabled', true);
-            } else {
-                $('#SaveButton, #CancelButton').prop('disabled', false);
-            }
+                    PriceUpdateModel = result;
+                    priceUpdateForm.option('formData', PriceUpdateModel);
+
+                    if (PriceUpdateModel.status == 3) {
+                        priceUpdateForm.option('disabled', true);
+                        priceUpdateDetailContainer.option("editing.allowUpdating", false);
+                        $('#SaveButton, #CancelButton').prop('disabled', true);
+                    } else {
+                        priceUpdateDetailContainer.option("editing.allowAdding", true);
+                        $('#SaveButton, #CancelButton').prop('disabled', false);
+                    }
+                });
+        } else {
+            priceUpdateForm.option('formData', { status: 0 });
+            $('#CancelButton').prop('disabled', true);
         }
     }
 
     LoadData();
+
+    initImportPopup('api/mdm-service/price-update-details', 'PriceUpdateScheduleDetails_Template', 'priceUpdateDetailContainer');
 });

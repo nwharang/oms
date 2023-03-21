@@ -33,32 +33,34 @@
     <div id="panel-1" class="panel">
         <div class="panel-hdr">
             <h2 class="ui-sortable-handle">
-                <i class="subheader-icon fa fa-info-circle"></i> @L["Page.Title.PriceUpdateDetails"].Value
+                <i class="subheader-icon fal fal fa-window"></i>
             </h2>
         </div>
         <div class="panel-container show">
-            <div class="panel-content jqvmap-bg-ocean p-0" style="min-height: 330px;">
-                <div class="buttons-header-grid pl-2">
-                    <button id="SaveButton" type="submit" class="btn btn-sm btn-outline-default waves-effect waves-themed" form="form-container">
-                        <i class="fa fa-check"></i>
-                        @L1["Button.Save"].Value
-                    </button>
-                    <button id="CloseButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                        <i class="fa fa-times"></i>
-                        <span>@L1["Button.Close"].Value</span>
-                    </button>
-                    <button id="CancelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
-                        <i class="fa fa-times"></i>
-                        <span>@L1["Button.Cancel"].Value</span>
-                    </button>
-                </div>
-                <div class="dx-viewport p-2">
-                    <form id="form-container">
-                        <div id="priceUpdateForm"></div>
-                    </form>
-                </div>
-                <div class="dx-viewport border-top p-2">
-                    <div id="priceUpdateDetailContainer"></div>
+            <div class="panel-content jqvmap-bg-ocean p-0">
+                <div class="dx-viewport">
+                    <div class="buttons-header-grid pl-2">
+                        <button id="SaveButton" type="submit" class="btn btn-sm btn-outline-default waves-effect waves-themed" form="form-container">
+                            <i class="fa fa-check"></i>
+                            @L1["Button.Save"].Value
+                        </button>
+                        <button id="CancelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                            <i class="fa fa-times"></i>
+                            <span>@L1["Button.Cancel"].Value</span>
+                        </button>
+                        <button id="CloseButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                            <i class="fa fa-times"></i>
+                            <span>@L1["Button.Close"].Value</span>
+                        </button>
+                    </div>
+                    <div class="py-2" >
+                        <form id="form-container">
+                            <div id="priceUpdateForm"></div>
+                        </form>
+                    </div>
+                    <div class="border-top p-2 py-2">
+                        <div id="priceUpdateDetailContainer"></div>
+                    </div>
                 </div>
             </div>
         </div>

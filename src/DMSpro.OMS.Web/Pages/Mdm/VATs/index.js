@@ -46,7 +46,7 @@ $(function () {
             mode: "row",
             allowAdding: abp.auth.isGranted('MdmService.VATs.Create'),
             allowUpdating: abp.auth.isGranted('MdmService.VATs.Edit'),
-            allowDeleting: abp.auth.isGranted('MdmService.VATs.Delete'),
+            allowDeleting: false,//abp.auth.isGranted('MdmService.VATs.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -120,6 +120,14 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
+        onInitNewRow(e) {
+            e.data.rate = 1;
+        },
+        onEditorPreparing(e) {
+            if (e.dataField === 'code' && e.row && !e.row.isNewRow) {
+                e.editorOptions.disabled = true;
+            }
+        },
         toolbar: {
             items: [
                 "groupPanel",
@@ -158,62 +166,38 @@ $(function () {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:VAT:Code"),
                 dataType: 'string',
+                editorOptions: {
+                    maxLength: 20
+                },
                 validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'name',
                 caption: l("EntityFieldName:MDMService:VAT:Name"),
                 dataType: 'string',
+                editorOptions: {
+                    maxLength: 100
+                },
                 validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'rate',
                 caption: l("EntityFieldName:MDMService:VAT:Rate") + " %",
-                width: 200,
                 dataType: 'number',
-                validationRules: [{ type: "required" }]
+                editorOptions: {
+                    min: 1,
+                    format: "#0'%'",
+                    inputAttr: {
+                        maxLength: 6
+                    }
+                },
+                format: "#0'%'",
+                alignment: 'center',
+                validationRules: [{ type: "required" }],
+                width: 150
             },
-            //{
-            //    dataField: 'inactive',
-            //    caption: l("Active"),
-            //    width: 90,
-            //    alignment: 'center',
-            //    cellTemplate(container, options) {
-            //        $('<div>')
-            //            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-            //            .appendTo(container);
-            //    },
-            //}
         ],
     }).dxDataGrid("instance");
 
-    //$("input#Search").on("input", function () {
-    //    gridVATs.searchByText($(this).val());
-    //});
-
-    //$("#btnNewVAT").click(function (e) {
-    //    gridVATs.addRow();
-    //});
-
-    //$("#ExportToExcelButton").click(function (e) {
-    //    e.preventDefault();
-
-    //    vATService.getDownloadToken().then(
-    //        function(result){
-    //                var input = getFilter();
-    //                var url =  abp.appPath + 'api/mdm-service/v-aTs/as-excel-file' +
-    //                    abp.utils.buildQueryString([
-    //                        { name: 'downloadToken', value: result.token },
-    //                        { name: 'filterText', value: input.filterText },
-    //                        { name: 'name', value: input.name },
-    //                        { name: 'rateMin', value: input.rateMin },
-    //                        { name: 'rateMax', value: input.rateMax }
-    //                        ]);
-
-    //                var downloadWindow = window.open(url, '_blank');
-    //                downloadWindow.focus();
-    //        }
-    //    )
-    //});
     initImportPopup('api/mdm-service/v-aTs', 'Vats_Template', 'dgVATs');
 });
