@@ -1,5 +1,5 @@
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 	var customerInZoneService = window.dMSpro.oMS.mdmService.controllers.customerInZones.customerInZone;
 	
         var lastNpIdId = '';

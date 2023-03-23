@@ -1,4 +1,4 @@
-﻿var l = abp.localization.getResource("MdmService");
+﻿var l = abp.localization.getResource("OMS");
 function masterDetailTemplate(_, masterDetailOptions) {
     return $('<div>').dxTabPanel({
         items: [{

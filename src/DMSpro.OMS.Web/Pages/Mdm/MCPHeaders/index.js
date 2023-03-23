@@ -1,4 +1,4 @@
-﻿var l = abp.localization.getResource("MdmService");
+﻿var l = abp.localization.getResource("OMS");
 var l1 = abp.localization.getResource("OMS");
 $(function () {
     var mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;

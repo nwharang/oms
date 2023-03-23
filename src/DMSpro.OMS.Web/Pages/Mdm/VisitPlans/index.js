@@ -1,6 +1,6 @@
 ﻿
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
     var visitPlansService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
     var mcpHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
     var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;

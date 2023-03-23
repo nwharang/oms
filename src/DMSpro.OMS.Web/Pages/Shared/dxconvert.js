@@ -1,6 +1,6 @@
 ﻿
 // language
-var l = abp.localization.getResource("MdmService"); 
+var l = abp.localization.getResource("OMS"); 
 
 // global variable
 var rowKeys = [];

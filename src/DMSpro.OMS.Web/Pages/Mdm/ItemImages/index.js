@@ -1,5 +1,5 @@
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 	var itemImageService = window.dMSpro.oMS.mdmService.controllers.itemImages.itemImage;
 	
         var lastNpIdId = '';

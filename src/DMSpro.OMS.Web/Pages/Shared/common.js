@@ -27,7 +27,7 @@ function pad(num, size) {
 
 const popupImportContentTemplate = function (e) {
     var controlName = e.closest('div.popupImport').attr('data-target');
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
     const content = $('<div />');
     content.append(
         $(`<div class="${controlName}" name="sbImportTypes">`).dxSelectBox({
@@ -68,7 +68,7 @@ function initImportPopup(url, templateName, controlName) {
         });
     }
     if ($(`div.${controlName}.popupImport`).length > 0) {
-        var l = abp.localization.getResource("MdmService");
+        var l = abp.localization.getResource("OMS");
         var popupImport = $(`div.${controlName}.popupImport`).dxPopup({
             width: 400,
             height: 300,

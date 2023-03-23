@@ -3,7 +3,7 @@ var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
 var userService = window.dMSpro.oMS.identityService.controllers.identityUsers.identityUserCustom;
 
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 
     var assignmentStore = new DevExpress.data.CustomStore({
         load(loadOptions) {

@@ -17,7 +17,7 @@ using Volo.Abp.OpenIddict.Pro.Web.Menus;
 using Volo.Saas.Host.Navigation;
 using DMSpro.OMS.MdmService.Permissions;
 using DMSpro.OMS.MdmService.Web.Menus;
-using DMSpro.OMS.MdmService.Localization;
+using DMSpro.OMS.Localization;
 using DMSpro.OMS.MdmService;
 using Volo.Abp.Features;
 using System.Collections.Generic;
@@ -30,6 +30,7 @@ using DMSpro.OMS.OrderService.Permissions;
 using Volo.Saas.Localization;
 using Volo.Saas.Host;
 using DMSpro.OMS.InventoryService.Web.Menus;
+using DMSpro.OMS.InventoryService;
 
 namespace DMSpro.OMS.Web.Navigation;
 
@@ -523,7 +524,7 @@ public class OMSMenuContributor : IMenuContributor
 			InventoryServicePermissions.GroupName,
 			context.GetLocalizer<OMSResource>()["Menu:InventoryService:GroupMenu:Inventory"],
 			icon: "fa fa-bookmark"
-        );
+		).RequireFeatures(InventoryFeatures.Enable);
 
 		context.Menu.Items.AddIfNotContains(moduleMenu);
 
@@ -570,13 +571,13 @@ public class OMSMenuContributor : IMenuContributor
                icon: "fa fa-list-ol",
                requiredPermissionName: InventoryServicePermissions.INItemTrackings.Default
            ));
-        moduleMenu.AddItem(new ApplicationMenuItem(
-               InventoryServiceMenus.Prefix,
-               context.GetLocalizer<OMSResource>()["Menu:InventoryService:InventoryAdjustment"],
-               "/Inventories/InventoryAdjustment",
-               icon: "fa fa-adjust"
-           //requiredPermissionName: InventoryServicePermissions.InventoryAdjustment.Default
-           ));
+        // moduleMenu.AddItem(new ApplicationMenuItem(
+        //        InventoryServiceMenus.Prefix,
+        //        context.GetLocalizer<OMSResource>()["Menu:InventoryService:InventoryAdjustment"],
+        //        "/Inventories/InventoryAdjustment",
+        //        icon: "fa fa-adjust"
+        //    //requiredPermissionName: InventoryServicePermissions.InventoryAdjustment.Default
+        //    ));
         //var myGroup = context.AddGroup(InventoryServicePermissions.GroupName, L("Permission:InventoryService"));
         //context.Menu.AddItem(InventoryServicePermissions.GroupName, L("Permission:InventoryService"));
         //Define your own permissions here. Example:
@@ -732,7 +733,7 @@ public class OMSMenuContributor : IMenuContributor
     private static ApplicationMenuItem AddModuleMdmMenuItem(MenuConfigurationContext context)
 	{
 		//InventoryServiceMenus.Prefix;
-		//MdmServiceResource
+		//OMSResource
 		//InventoryFeatures.Enable;
 
         var moduleMenu = new ApplicationMenuItem(
@@ -749,7 +750,7 @@ public class OMSMenuContributor : IMenuContributor
 	{
 		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
 			   MdmServiceMenus.Administration,
-			   context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:GroupMenu:Administration"],
+			   context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:Administration"],
 			   null,
 			   icon: "fa fa-cogs"
 		   )
@@ -762,7 +763,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.SystemData,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:SystemData"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:SystemData"],
 				"/Mdm/SystemDatas",
 				icon: "fa fa-database",
 				requiredPermissionName: MdmServicePermissions.SystemData.Default
@@ -773,7 +774,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.SystemConfig,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:SystemConfigs"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:SystemConfigs"],
 		//		"/SystemConfigs",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.SystemConfig.Default
@@ -783,7 +784,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.NumberingConfig,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:NumberingConfigs"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:NumberingConfigs"],
 				"/Mdm/NumberingConfigs",
 				icon: "fa fa-file-code-o",
 				requiredPermissionName: MdmServicePermissions.NumberingConfigs.Default
@@ -795,7 +796,7 @@ public class OMSMenuContributor : IMenuContributor
 	{
 		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
 			   MdmServiceMenus.Geographical,
-			   context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:GroupMenu:Geographical"],
+			   context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:Geographical"],
 			   null,
 			   icon: "fa fa-map-pin"
            )
@@ -807,7 +808,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.GeoMasters,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:GeoMasters"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:GeoMasters"],
 				"/Mdm/GeoMasters",
 				icon: "fa fa-map",
 				requiredPermissionName: MdmServicePermissions.GeoMasters.Default
@@ -849,7 +850,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.CompanyMaster,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CompanyProfiles"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:CompanyProfiles"],
 				"/Mdm/Companies",
 				icon: "fa fa-id-card-o",
 				requiredPermissionName: MdmServicePermissions.CompanyMasters.Default
@@ -859,7 +860,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.VATs,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:VATs"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:VATs"],
 				"/Mdm/VATs",
 				icon: "fa fa-file-alt",
 				requiredPermissionName: MdmServicePermissions.VATs.Default
@@ -869,7 +870,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.SalesChannels,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:SalesChannels"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:SalesChannels"],
 				"/Mdm/SalesChannels",
 				icon: "fa fa-file-alt",
 				requiredPermissionName: MdmServicePermissions.SalesChannels.Default
@@ -879,7 +880,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.CompanyIdentityUserAssignments,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CompanyIdentityUserAssignments"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:CompanyIdentityUserAssignments"],
                 "/Mdm/CompanyAssignments",
 				icon: "fa fa-user",
 				requiredPermissionName: MdmServicePermissions.CompanyIdentityUserAssignments.Default
@@ -919,7 +920,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.UOMs,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:UOMs"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:UOMs"],
 				"/Mdm/UOMs",
 				icon: "fa fa-cube",
 				requiredPermissionName: MdmServicePermissions.UOMs.Default
@@ -929,7 +930,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.UOMGroups,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:UOMGroups"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:UOMGroups"],
 				"/Mdm/UOMGroups",
 				icon: "fa fa-cubes",
 				requiredPermissionName: MdmServicePermissions.UOMGroups.Default
@@ -939,7 +940,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//   new ApplicationMenuItem(
 		//	   MdmServiceMenus.UOMGroupDetails,
-		//	   context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:UOMGroupDetails"],
+		//	   context.GetLocalizer<OMSResource>()["Menu:MdmService:UOMGroupDetails"],
 		//	   "/Mdm/UOMGroupDetails",
 		//	   icon: "fa fa-file-alt",
 		//	   requiredPermissionName: MdmServicePermissions.UOMGroupDetails.Default
@@ -949,7 +950,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.ItemAttributes,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:ItemAttributes"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemAttributes"],
                 "/Mdm/ItemAttributes",
 				icon: "fa fa-indent",
 				requiredPermissionName: MdmServicePermissions.ItemAttributes.Default
@@ -959,7 +960,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.ItemAttributeValues,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:ItemAttributeValues"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemAttributeValues"],
                 "/Mdm/ItemAttributeValues",
 				icon: "fa fa-check",
 				requiredPermissionName: MdmServicePermissions.ItemAttributeValues.Default
@@ -979,7 +980,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.ItemImages,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:ItemImages"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemImages"],
   //              "/Mdm/ItemImages",
 		//		icon: "fa fa-file-image-o",
 		//		requiredPermissionName: MdmServicePermissions.Items.Default
@@ -989,7 +990,7 @@ public class OMSMenuContributor : IMenuContributor
 		//parentMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.ItemAttachments,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:ItemAttachments"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemAttachments"],
   //              "/Mdm/ItemAttachments",
 		//		icon: "fa fa-paperclip",
 		//		requiredPermissionName: MdmServicePermissions.Items.Default
@@ -999,7 +1000,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.ItemGroups,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:ItemGroups"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemGroups"],
 				"/Mdm/ItemGroups",
 				icon: "fa fa-object-group",
 				requiredPermissionName: MdmServicePermissions.ItemGroups.Default
@@ -1009,7 +1010,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.ItemGroupAttributes,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:ItemGroupAttrs"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemGroupAttrs"],
   //              "/Mdm/ItemGroupAttrs",
 		//		icon: "fa fa-clone",
 		//		requiredPermissionName: MdmServicePermissions.ItemGroups.Default
@@ -1019,7 +1020,7 @@ public class OMSMenuContributor : IMenuContributor
 		//parentMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.ItemGroupLists,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:ItemGroupLists"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemGroupLists"],
   //              "/Mdm/ItemGroupLists",
 		//		icon: "fa fa-list-alt",
 		//		requiredPermissionName: MdmServicePermissions.ItemGroups.Default
@@ -1029,7 +1030,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.PriceLists,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:PriceLists"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceLists"],
 				"/Mdm/PriceLists",
 				icon: "fa fa-money",
 				requiredPermissionName: MdmServicePermissions.PriceLists.Default
@@ -1039,7 +1040,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.PriceListDetails,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:PriceListDetails"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceListDetails"],
 		//		"/Mdm/PriceListDetails",
 		//		icon: "fa fa-list",
 		//		requiredPermissionName: MdmServicePermissions.PriceListDetails.Default
@@ -1049,7 +1050,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.PriceUpdateDefs,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:PriceUpdates"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceUpdates"],
 				"/Mdm/PriceUpdates",
 				icon: "fa fa-pencil-square-o",
 				requiredPermissionName: MdmServicePermissions.PriceUpdates.Default
@@ -1059,7 +1060,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.PriceUpdateDetails,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:PriceUpdateDetails"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceUpdateDetails"],
 		//		"/Mdm/PriceUpdateDetails",
 		//		icon: "fa fa-info-circle",
 		//		requiredPermissionName: MdmServicePermissions.PriceUpdateDetails.Default
@@ -1069,7 +1070,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.PriceListAssignments,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:PriceListAssignments"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceListAssignments"],
 				"/Mdm/PricelistAssignments",
 				icon: "fa fa-table",
 				requiredPermissionName: MdmServicePermissions.PriceListAssignments.Default
@@ -1081,7 +1082,7 @@ public class OMSMenuContributor : IMenuContributor
 	{
 		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
 			   MdmServiceMenus.SalesOrganizations,
-			   context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:GroupMenu:SalesOrganization"],
+			   context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:SalesOrganization"],
 			   null,
 			   icon: "fa fa-sitemap"
            )
@@ -1103,7 +1104,7 @@ public class OMSMenuContributor : IMenuContributor
         groupMenu.AddItem(
             new ApplicationMenuItem(
                 "MdmService.SalesOrganizations.EmployeeTypes",
-                context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:EmployeeTypes"],
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:EmployeeTypes"],
                 "/Mdm/EmployeeTypes",
                 icon: "fa fa-users"
             ).RequireFeatures(MdmFeatures.EmployeeProfiles)
@@ -1112,7 +1113,7 @@ public class OMSMenuContributor : IMenuContributor
         groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.WorkingPositions,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:WorkingPositions"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:WorkingPositions"],
 				"/Mdm/WorkingPositions",
 				icon: "fa fa-archive",
 				requiredPermissionName: MdmServicePermissions.WorkingPositions.Default
@@ -1122,7 +1123,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.EmployeeProfiles,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:EmployeeProfiles"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:EmployeeProfiles"],
 				"/Mdm/EmployeeProfiles",
 				icon: "fa fa-user",
 				requiredPermissionName: MdmServicePermissions.EmployeeProfiles.Default
@@ -1132,7 +1133,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.EmployeeImages,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:EmployeeImages"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:EmployeeImages"],
 		//		"/Mdm/EmployeeImages",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.EmployeeProfiles.Default
@@ -1142,7 +1143,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.EmployeeAttachments,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:EmployeeAttachments"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:EmployeeAttachments"],
 		//		"/Mdm/EmployeeAttachments",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.EmployeeProfiles.Default
@@ -1152,7 +1153,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.SalesOrgHeaders,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:SalesOrganization"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:SalesOrganization"],
                 "/Mdm/SalesOrganization",
 				icon: "fa fa-check-square",
 				requiredPermissionName: MdmServicePermissions.SalesOrgHeaders.Default
@@ -1162,7 +1163,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.SalesOrgHierarchies,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:SalesOrgHierarchies"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:SalesOrgHierarchies"],
 		//		"/Mdm/SalesOrgHierarchies",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.SalesOrgHierarchies.Default
@@ -1172,7 +1173,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.SalesOrgEmpAssignments,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:SalesOrgEmpAssignments"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:SalesOrgEmpAssignments"],
 		//		"/Mdm/SalesOrgEmpAssignments",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.SalesOrgEmpAssignments.Default
@@ -1192,7 +1193,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.CustomerInZones,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CustomerInZone"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerInZone"],
 		//		"/Mdm/CustomerInZones",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: 
@@ -1202,7 +1203,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.EmployeeInZones,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:EmployeeInZone"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:EmployeeInZone"],
 		//		"/Mdm/EmployeeInZones",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.EmployeeInZones.Default
@@ -1214,7 +1215,7 @@ public class OMSMenuContributor : IMenuContributor
 	{
 		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
 			   MdmServiceMenus.Customers,
-			   context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:Customer"],
+			   context.GetLocalizer<OMSResource>()["Menu:MdmService:Customer"],
 			   null,
 			   icon: "fa fa-user-secret"
            )
@@ -1236,7 +1237,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 		   new ApplicationMenuItem(
 			   MdmServiceMenus.CustomerAttributeDefs,
-			   context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CustomerAttributes"],
+			   context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerAttributes"],
 			   "/Mdm/CustomerAttributes",
 			   icon: "fa fa-id-card",
 			   requiredPermissionName: MdmServicePermissions.CustomerAttributes.Default
@@ -1246,7 +1247,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.CusAttributeValues,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CusAttributeValues"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:CusAttributeValues"],
                 "/Mdm/CusAttributeValues",
 				icon: "fa fa-check-square",
 				requiredPermissionName: MdmServicePermissions.CusAttributeValues.Default
@@ -1266,7 +1267,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.CustomerContacts,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CustomerContacts"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerContacts"],
 		//		"/Mdm/CustomerContacts",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.Customers.Default
@@ -1276,7 +1277,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.CustomerAttachments,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CustomerAttachments"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerAttachments"],
 		//		"/Mdm/CustomerAttachments",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.Customers.Default
@@ -1286,7 +1287,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.Vendors,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:Vendors"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:Vendors"],
 				"/Mdm/Vendors",
 				icon: "fa fa-user-secret",
 				requiredPermissionName: MdmServicePermissions.Vendors.Default
@@ -1296,7 +1297,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 		   new ApplicationMenuItem(
 			   MdmServiceMenus.CustomerAssignments,
-			   context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CustomerAssignments"],
+			   context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerAssignments"],
 			   "/Mdm/CustomerAssignments",
 			   icon: "fa fa-tasks",
 			   requiredPermissionName: MdmServicePermissions.CustomerAssignments.Default
@@ -1306,7 +1307,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.CustomerGroupDefs,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CustomerGroups"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerGroups"],
 				"/Mdm/CustomerGroups",
 				icon: "fa fa-list-alt",
 				requiredPermissionName: MdmServicePermissions.CustomerGroups.Default
@@ -1316,7 +1317,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.CustomerGroupByAtts,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CustomerGroupsByAtt"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerGroupsByAtt"],
 		//		"/Mdm/CustomerGroupByAtts",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.CustomerGroupByAtts.Default
@@ -1326,7 +1327,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.CustomerGroupByLists,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CustomerGroupsByList"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerGroupsByList"],
 		//		"/Mdm/CustomerGroupByLists",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.CustomerGroupByLists.Default
@@ -1336,7 +1337,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.CustomerGroupByGeos,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:CustomerGroupsByGeo"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerGroupsByGeo"],
 		//		"/Mdm/CustomerGroupByGeos",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.CustomerGroupByGeos.Default
@@ -1348,7 +1349,7 @@ public class OMSMenuContributor : IMenuContributor
 	{
 		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
 			   MdmServiceMenus.RouteAndMCP,
-			   context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:RouteAndMCP"],
+			   context.GetLocalizer<OMSResource>()["Menu:MdmService:RouteAndMCP"],
 			   null,
 			   icon: "fa fa-calendar"
            )
@@ -1366,7 +1367,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.HolidayDefs,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:Holidays"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:Holidays"],
 				"/Mdm/Holidays",
 				icon: "fa fa-calendar-check-o",
 				requiredPermissionName: MdmServicePermissions.Holidays.Default
@@ -1376,7 +1377,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.HolidayDetails,
-		//		context.GetLocalizer<MdmServiceResource>()["Page.Title.HolidayDetails"],
+		//		context.GetLocalizer<OMSResource>()["Page.Title.HolidayDetails"],
 		//		"/Mdm/HolidayDetails",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.HolidayDetails.Default
@@ -1386,7 +1387,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.Routes,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:Routes"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:Routes"],
 		//		"/Mdm/Routes",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.Routes.Default
@@ -1406,7 +1407,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.MCPDetails,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:MCPDetails"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:MCPDetails"],
 		//		"/Mdm/MCPDetails",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.MCPDetails.Default
@@ -1416,7 +1417,7 @@ public class OMSMenuContributor : IMenuContributor
 		groupMenu.AddItem(
 			new ApplicationMenuItem(
 				MdmServiceMenus.VisitPlans,
-				context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:VisitPlans"],
+				context.GetLocalizer<OMSResource>()["Menu:MdmService:VisitPlans"],
 				"/Mdm/VisitPlans",
 				icon: "fa fa-calendar-check-o",
 				requiredPermissionName: MdmServicePermissions.VisitPlans.Default
@@ -1426,7 +1427,7 @@ public class OMSMenuContributor : IMenuContributor
 		//groupMenu.AddItem(
 		//	new ApplicationMenuItem(
 		//		MdmServiceMenus.RouteAssignments,
-		//		context.GetLocalizer<MdmServiceResource>()["Menu:MdmService:RouteAssignments"],
+		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:RouteAssignments"],
 		//		"/Mdm/RouteAssignments",
 		//		icon: "fa fa-file-alt",
 		//		requiredPermissionName: MdmServicePermissions.RouteAssignments.Default

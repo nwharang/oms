@@ -1,6 +1,6 @@
 ﻿$(function () {
     // language texts
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 
     var dataSales = [
         {

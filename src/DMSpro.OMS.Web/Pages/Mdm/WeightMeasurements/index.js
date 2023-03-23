@@ -1,5 +1,5 @@
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
     var weightMeasurementService = window.dMSpro.oMS.mdmService.controllers.weightMeasurements.weightMeasurement;
     var isNotEmpty = function (value) {
         return value !== undefined && value !== null && value !== '';

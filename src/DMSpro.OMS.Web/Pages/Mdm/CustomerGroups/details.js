@@ -1,4 +1,4 @@
-﻿//var l = abp.localization.getResource("MdmService");
+﻿//var l = abp.localization.getResource("OMS");
 var l = abp.localization.getResource("OMS");
 const customerGroup = JSON.parse(sessionStorage.getItem('customerGroup'));
 if (customerGroup != null) {

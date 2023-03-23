@@ -1,4 +1,4 @@
-﻿var l = abp.localization.getResource("MdmService");
+﻿var l = abp.localization.getResource("OMS");
 var model = JSON.parse(sessionStorage.getItem("model"));
 console.log(model);
 document.title = `PO - ${model.DocNbr} | OMS`;

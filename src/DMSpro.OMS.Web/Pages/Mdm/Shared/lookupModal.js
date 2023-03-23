@@ -3,7 +3,7 @@ var abp = abp || {};
 abp.modals.navigationPropertyLookup = function () {
     var initModal = function (publicApi, args) {
 
-        var l = abp.localization.getResource("MdmService");
+        var l = abp.localization.getResource("OMS");
 
         $("#NavigationPropertyLookupTableModal #LookupTable").DataTable(abp.libs.datatables.normalizeConfiguration({
             processing: true,

@@ -1,5 +1,5 @@
 ﻿$(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 
     const dataGridContainer = $('#dataGridContainer').dxDataGrid({
         dataSource: inventoryDatas,

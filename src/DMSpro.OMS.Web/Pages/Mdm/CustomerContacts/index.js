@@ -1,5 +1,5 @@
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 	
     var customerContactService = window.dMSpro.oMS.mdmService.controllers.customerContacts.customerContact;
 	

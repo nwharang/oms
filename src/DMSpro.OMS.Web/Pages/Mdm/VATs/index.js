@@ -1,5 +1,5 @@
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
     var vATService = window.dMSpro.oMS.mdmService.controllers.vATs.vAT;
 
     //Custom store - for load, update, delete

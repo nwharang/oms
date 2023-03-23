@@ -1,5 +1,5 @@
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
     var salesChannelService = window.dMSpro.oMS.mdmService.controllers.salesChannels.salesChannel;
 
     //Custom store - for load, update, delete

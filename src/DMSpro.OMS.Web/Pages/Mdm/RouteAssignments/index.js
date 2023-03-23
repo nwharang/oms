@@ -1,5 +1,5 @@
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 	var routeAssignmentService = window.dMSpro.oMS.mdmService.controllers.routeAssignments.routeAssignment;
 	
         var lastNpIdId = '';

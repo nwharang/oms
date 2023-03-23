@@ -1,5 +1,5 @@
 ﻿$(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
     var workingPositionService = window.dMSpro.oMS.mdmService.controllers.workingPositions.workingPosition;
 
     /****custom store*****/

@@ -2,9 +2,9 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Mvc.Localization;
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
-@using DMSpro.OMS.MdmService.Localization
+@using DMSpro.OMS.Localization
 @using DMSpro.OMS.MdmService.Web.Menus
-@inject IHtmlLocalizer<MdmServiceResource> L
+@inject IHtmlLocalizer<OMSResource> L
 @inject IPageLayout PageLayout
 @{
     PageLayout.Content.Title = L["Page.Title.Routes"].Value;

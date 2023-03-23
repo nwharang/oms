@@ -1,6 +1,6 @@
 var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 
     const status = [
         {

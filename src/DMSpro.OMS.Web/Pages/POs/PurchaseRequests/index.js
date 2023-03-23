@@ -26,7 +26,7 @@ var products = [{
 }];
 
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
     var gridPurchaseRequests = $('#gridPurchaseRequests').dxDataGrid({
         dataSource: [{
             Vendor: "IDP",

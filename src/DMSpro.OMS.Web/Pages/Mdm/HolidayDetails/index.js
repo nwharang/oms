@@ -1,5 +1,5 @@
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 	var holidayDetailService = window.dMSpro.oMS.mdmService.controllers.holidayDetails.holidayDetail;
 	
     var lastNpIdId = '';

@@ -1,5 +1,5 @@
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 	var cusAttributesValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributesValues.cusAttributesValue;
 
     var dataCusAttributesValues = [

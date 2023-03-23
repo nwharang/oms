@@ -1,5 +1,5 @@
 ﻿$(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
     var customerGroupService = window.dMSpro.oMS.mdmService.controllers.customerGroups.customerGroup;
 
     var GroupModes = [

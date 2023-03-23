@@ -1,4 +1,4 @@
-﻿var l = abp.localization.getResource("MdmService");
+﻿var l = abp.localization.getResource("OMS");
 const priceList = JSON.parse(sessionStorage.getItem('priceList'));
 document.title = `Price List Detail - ${priceList.code} | OMS`;
 

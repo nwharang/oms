@@ -1,5 +1,5 @@
 $(function () {
-    var l = abp.localization.getResource("MdmService");
+    var l = abp.localization.getResource("OMS");
 	var currencyService = window.dMSpro.oMS.mdmService.controllers.currencies.currency;
 	
     var dataCurrencies = [
