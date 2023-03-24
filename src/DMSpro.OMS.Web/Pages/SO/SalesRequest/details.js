@@ -933,6 +933,7 @@ function calculatorDocTotal() {
     if (docDiscountType == 0) {
         formSalesRequest.updateData('docDiscountAmt', docDiscountAmt);
         formSalesRequest.getEditor('docDiscountAmt').option('disabled', false);
+        formSalesRequest.getEditor('docDiscountPerc').option('disabled', true);
         formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
         formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
     }
@@ -940,6 +941,7 @@ function calculatorDocTotal() {
         var _docDiscountAmt = docTotalLineAmt * docDiscountPerc;
         formSalesRequest.updateData('docDiscountAmt', _docDiscountAmt);
         formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+        formSalesRequest.getEditor('docDiscountPerc').option('disabled', false);
         formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
         formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
     }
@@ -947,6 +949,7 @@ function calculatorDocTotal() {
         var _docDiscountAmt = docTotalLineAmtAfterTax * docDiscountPerc;
         formSalesRequest.updateData('docDiscountAmt', _docDiscountAmt);
         formSalesRequest.getEditor('docDiscountAmt').option('disabled', true);
+        formSalesRequest.getEditor('docDiscountPerc').option('disabled', false);
         formSalesRequest.updateData('docTotalAmt', docTotalLineAmt - _docDiscountAmt);
         formSalesRequest.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
     }

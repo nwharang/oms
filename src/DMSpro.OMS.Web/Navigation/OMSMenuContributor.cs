@@ -524,7 +524,7 @@ public class OMSMenuContributor : IMenuContributor
 			InventoryServicePermissions.GroupName,
 			context.GetLocalizer<OMSResource>()["Menu:InventoryService:GroupMenu:Inventory"],
 			icon: "fa fa-bookmark"
-		).RequireFeatures(InventoryFeatures.Enable);
+		);
 
 		context.Menu.Items.AddIfNotContains(moduleMenu);
 

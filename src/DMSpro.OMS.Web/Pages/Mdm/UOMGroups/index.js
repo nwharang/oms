@@ -3,7 +3,9 @@ var uomGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDet
 var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 $(function () {
     var l = abp.localization.getResource("OMS");
-
+    let detailDataSrc // Local varible for condition check
+    let editingComponent; // Local varible for close unfinish editor
+    let isEditing = false // Editing but not adding
     var groupStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
@@ -208,16 +210,10 @@ $(function () {
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
+
         toolbar: {
             items: [
-                "groupPanel",
-                {
-                    location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        dataGrid.addRow();
-                    },
-                },
+                'addRowButton',
                 'columnChooserButton',
                 "exportButton",
                 {
@@ -268,11 +264,12 @@ $(function () {
                 ]
             }
         ],
+
         masterDetail: {
             enabled: true,
-            template(container, options) { 
+            template(container, options) {
                 const currentHeaderData = options.data;
-                const dataGridDetail = $(`<div id="grid_${currentHeaderData.id}">`)
+                const dataGridDetail = $('<div>')
                     .dxDataGrid({
                         dataSource: {
                             store: detailStore,
@@ -353,14 +350,117 @@ $(function () {
                                 confirmDeleteMessage: l("DeleteConfirmationMessage")
                             }
                         },
-                        onInitNewRow: function (e) {
-                            e.data.active = true;
+                        onInitNewRow: async function (e) {
+                            // Get cache of DataSource , do not change
+                            detailDataSrc = this.getDataSource()._items
+                            // If there prev open add new row to header , cancel unfinished edit , use to check if editing ?
+                            if (editingComponent)
+                                editingComponent.cancelEditData()
+                            // Assign this edit to local varible for future close 
+                            editingComponent = e.component
+
+                            // Check if record exist
+                            let isRecord = detailDataSrc.length >= 1
+
+                            // No record
+                            if (!isRecord)
+                                e.data = {
+                                    ...e.data,
+                                    altQty: 1,
+                                    baseQty: 1,
+                                    isBase: true
+                                }
+
+                            // Record already exists
+                            if (isRecord) {
+                                e.data = {
+                                    ...e.data,
+                                    baseUOMId: detailDataSrc[0].baseUOMId,
+                                    altQty: 1,
+                                }
+                            }
+                            e.data.active = true
                         },
                         onRowInserting: function (e) {
                             e.data.uomGroupId = options.key
                         },
-                        onRowUpdating: function (e) {
+                        onEditCanceled: (e) => {
+                            editingComponent = undefined
+                            isEditing = false
+                        },
+
+                        onRowUpdating: (e) => {
                             e.newData = Object.assign({}, e.oldData, e.newData);
+                            editingComponent = undefined
+                            isEditing = false
+                        },
+                        onEditingStart: (e) => {
+                            if (editingComponent)
+                                editingComponent.cancelEditData()
+                            // Assign this edit to local varible for future close 
+                            editingComponent = e.component
+                            isEditing = true
+                        },
+                        onContentReady: (e) => {
+                            let data = e.component.getDataSource().items();
+                            let foundedData = data.find(e => e.altUOMId === e.baseUOMId)?.id
+                            if (data.length > 1 && foundedData) {
+                                let component = e.component
+                                component.getCellElement(component.getRowIndexByKey(foundedData), 0).html('').css('height', '42px')
+                            }
+                        },
+                        onEditorPreparing: (e) => {
+                            let isFirstRow = detailDataSrc?.length < 1
+                            let isBase = e.row?.data.baseUOMId === e.row?.data.altUOMId;
+                            // Disable cell base on folowing arrays
+                            let firstUomDetailDisableField = ["altQty", "baseQty", "baseUOMId", "active"]
+                            let addNewUomDetailDisableField = ["altQty", "baseUOMId"]
+                            let editBaseRowUOMDetailDisableField = ["altQty", "baseQty", "baseUOMId", "active"]
+                            let editRowUOMDetailDisableField = ["altQty", "baseUOMId"]
+
+                            // disable action cell on baseUOM row
+                            // if not adding then return
+                            if (!editingComponent || e.row?.rowType != "data") return
+                            // On edit cell but not adding
+                            if (isEditing) {
+                                isBase ? disableCell(e, editBaseRowUOMDetailDisableField.indexOf(e.dataField) > -1) : disableCell(e, editRowUOMDetailDisableField.indexOf(e.dataField) > -1)
+                                if (e.dataField === "altUOMId" && isBase) {
+                                    e.editorOptions.onValueChanged = (v) => {
+                                        e.component.cellValue(e.component.getRowIndexByKey(e.row.key), 'altUOMId', v.value)
+                                        e.component.cellValue(e.component.getRowIndexByKey(e.row.key), 'baseUOMId', v.value)
+                                    }
+                                }
+                            }
+
+                            // On first add new row
+                            if (isFirstRow && !isEditing) {
+                                disableCell(e, firstUomDetailDisableField.indexOf(e.dataField) > -1)
+                                if (e.dataField === "altUOMId") {
+                                    e.editorOptions.onValueChanged = (v) => {
+                                        e.component.cellValue(e.component.getRowIndexByKey(e.row.key), 'altUOMId', v.value)
+                                        e.component.cellValue(e.component.getRowIndexByKey(e.row.key), 'baseUOMId', v.value)
+                                    }
+                                }
+                            }
+
+                            // On add new row but not first time
+                            if (!isFirstRow && !isEditing) {
+                                disableCell(e, addNewUomDetailDisableField.indexOf(e.dataField) > -1)
+                            }
+
+
+                        },
+                        onEditorPrepared: (e) => {
+                            // if (isBase && e.row?.rowType != "data")
+
+                            if (!editingComponent || e.row?.rowType != "data") return
+                            let isFirstRow = detailDataSrc?.length < 1
+
+                            if (!isFirstRow && e.dataField === "altUOMId") {
+                                selectBox = e.editorElement.dxSelectBox('instance')
+                                // Fillter BASEUOMID option in cell selection , if it exists
+                                selectBox.getDataSource().loadOptions().filter = ['id', "<>", e.row?.data?.baseUOMId || 0]
+                            }
                         },
                         toolbar: {
                             items: [
@@ -370,19 +470,10 @@ $(function () {
                                 "exportButton",
                                 {
                                     location: 'after',
-                                    widget: 'dxButton',
-                                    options: {
-                                        icon: "import",
-                                        elementAttr: {
-                                            class: "import-excel",
-                                        },
-                                        onClick(e) {
-                                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                                            var gridName = gridControl.attr('id');
-                                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                                            if (popup) popup.show();
-                                        },
-                                    }
+                                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                                    onClick() {
+                                        //todo
+                                    },
                                 },
                                 "searchPanel"
                             ],
@@ -417,7 +508,10 @@ $(function () {
                                 editorType: 'dxSelectBox',
                                 calculateDisplayValue: 'altUOM.code',
                                 lookup: {
-                                    dataSource: getUOMs,
+                                    dataSource: {
+                                        store: getUOMs,
+                                        filter: []
+                                    },
                                     valueExpr: 'id',
                                     displayExpr: 'code',
                                     paginate: true,
@@ -471,10 +565,22 @@ $(function () {
                             }
                         ]
                     }).appendTo(container);
-                initImportPopup('api/mdm-service/u-oMGroup-details', 'UOMGroupDetails_Template', `grid_${currentHeaderData.id}`);
             }
         }
     }).dxDataGrid('instance');
 
     initImportPopup('api/mdm-service/u-oMGroups', 'UOMGroups_Template', 'gridUOMGroups');
+
+    /**
+     * Disable editing cell base on condition
+     * @param {Element} e 
+     * @param {Boolean} arg 
+     */
+    let disableCell = (e, arg) => {
+        if (arg) {
+            let element = e.editorElement
+            e.editorOptions.disabled = true
+            element.parent().css('backgroundColor', "#e2e8f0")
+        }
+    }
 });
