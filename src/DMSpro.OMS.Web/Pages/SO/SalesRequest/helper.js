@@ -309,9 +309,9 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
             repaintChangesOnly: true,
             editing: {
                 mode: 'batch',
-                allowAdding: !docStatus,
-                allowUpdating: !docStatus,
-                allowDeleting: !docStatus,
+                allowAdding: true,
+                allowUpdating: true,
+                allowDeleting: true,
                 useIcons: true,
                 texts: {
                     editRow: l("Edit"),
@@ -650,12 +650,11 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                 ],
             },
             onContentReady: (e) => {
-                if (!form.dxForm('instance').option('formData').businessPartnerId || (form.dxForm('instance').option('formData').businessPartnerId && !grid.dxDataGrid('instance').hasEditData())) {
+                if (!form.dxForm('instance').option('formData').businessPartnerId) {
                     grid.dxDataGrid('instance').option('disabled', true)
                     $('#businessPartnerId').dxSelectBox('instance').option('disabled', false)
-
                 }
-                if (form.dxForm('instance').option('formData').businessPartnerId && grid.dxDataGrid('instance').hasEditData()) {
+                if (form.dxForm('instance').option('formData').businessPartnerId && (grid.dxDataGrid('instance').hasEditData() || grid.dxDataGrid('instance').getDataSource().items().length > 0)) {
                     grid.dxDataGrid('instance').option('disabled', false)
                     $('#businessPartnerId').dxSelectBox('instance').option('disabled', true)
                 }
