@@ -1,6 +1,24 @@
 ﻿$(async function () {
+    let salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
+    let notify = ({ type = "success", position = "bottom right", message = "Message Placeholder" }) => DevExpress.ui.notify({
+        message,
+        height: 45,
+        width: 250,
+        minWidth: 250,
+        type,
+        displayTime: 5000,
+        animation: {
+            show: {
+                type: 'fade', duration: 400, from: 0, to: 1,
+            },
+            hide: { type: 'fade', duration: 40, to: 0 },
+        },
+    }, {
+        position
+    })
     var l = abp.localization.getResource("OMS");
     let { salesRequestsHeaderStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
+    let currentSelectedDoc = new Map()
     const InfoSO = await store().getInfoSO()
     const { renderPopup } = helper(InfoSO)
     let gridSalesRequests = $('#dgSalesRequestHeader').dxDataGrid({
@@ -79,8 +97,34 @@
                     },
                 },
                 {
+                    widget: "dxDropDownButton",
                     location: 'after',
-                    template: '<div><button type="button" class="btn btn-light btn-sm dropdown-toggle waves-effect waves-themed hvr-icon-pop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height:36px"> <i class="fa fa-gear hvr-icon"></i> <span class="">Action</span>  </button><div class="dropdown-menu fadeindown"> <button class="dropdown-item" type="button">Approve</button></div></div>'
+                    options: {
+                        icon: 'preferences',
+                        text: 'Actions',
+                        width: 120,
+                        items: [
+                            {
+                                text: "Approve",
+                                icon: "check",
+                                onClick() {
+                                    let array = []
+                                    currentSelectedDoc.forEach((e, k) => {
+                                        if (e) array.push(k)
+                                    })
+                                    salesRequestsHeaderService.createListSODoc(array)
+                                        .done(() => {
+                                            notify({ type: 'success', message: `${array.length} SRs Approved` })
+                                            $('#dgSalesRequestHeader').dxDataGrid('instance').getDataSource().reload()
+                                        }
+                                        ).fail(() => {
+                                            notify({ type: 'error', message: "SRs Approve Failed" })
+                                        })
+                                }
+                            },
+                        ]
+                    },
+
                 },
                 'columnChooserButton',
                 "exportButton",
@@ -104,6 +148,42 @@
             ],
         },
         columns: [
+            {
+                cssClass: "text-center",
+                headerCellTemplate(container) {
+                    $('<div>').dxCheckBox({
+                        onValueChanged: (e) => {
+                            $('.actionCheckboxFormControl').each(function () {
+                                let id = $(this).attr('id')
+                                if (e.value) {
+                                    $(this).dxCheckBox('instance').option('value', e.value)
+                                    currentSelectedDoc.set(id, true)
+                                }
+                                else {
+                                    $(this).dxCheckBox('instance').option('value', e.value)
+
+                                }
+                            })
+                        }
+                    }).appendTo(container)
+                },
+                cellTemplate(container, option) {
+                    let disabled = Boolean(option.data.docStatus)
+                    $('<div>').dxCheckBox({
+                        elementAttr: {
+                            class: Boolean(option.data.docStatus) ? 'disabledActionCheckboxFormControl' : "actionCheckboxFormControl",
+                            id: option.data.id
+                        },
+                        disabled,
+                        onValueChanged: (e) => {
+                            currentSelectedDoc.set(e.element.attr('id'), e.value)
+                        }
+                    }).appendTo(container)
+                },
+                fixed: true,
+                fixedPosition: "left",
+                allowExporting: false,
+            },
             {
                 caption: l("Actions"),
                 type: 'buttons',
@@ -268,6 +348,17 @@
                 summaryType: 'sum',
                 valueFormat: ",##0.###",
             }],
+        },
+        onContentReady: (e) => {
+            currentSelectedDoc.clear()
+            $('.disabledActionCheckboxFormControl').each(function () {
+                let id = $(this).attr('id')
+                currentSelectedDoc.set(id, false)
+            })
+            $('.actionCheckboxFormControl').each(function () {
+                let id = $(this).attr('id')
+                currentSelectedDoc.set(id, false)
+            })
         }
     }).dxDataGrid("instance");
     initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestHeader');

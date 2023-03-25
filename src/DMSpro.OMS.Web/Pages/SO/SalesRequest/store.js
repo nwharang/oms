@@ -24,6 +24,11 @@ let store = () => {
                         itemList.push(data.item[key]);
                     }
                 })
+                let uOMList = []
+                Object.keys(data.uom).forEach((key) => {
+                    if (validUOM.find(e => e.uomId === key))
+                        uOMList.push(data.uom[key]);
+                })
                 return {
                     companyId,
                     salesOrderStore: {
@@ -32,10 +37,10 @@ let store = () => {
                             return { id: key, value: data.priceDictionary[key] };
                         }),
                         itemList,
+                        uOMList,
                         uomGroupList: Object.keys(data.uomGroup).map(function (key) {
                             return data.uomGroup[key];
                         }),
-                        uOMList: Object.keys(data.uom).map((key) => data.uom[key]),
                         itemGroupList: Object.keys(data.itemsInItemGroupsDictionary).map((key) => data.itemsInItemGroupsDictionary[key]),
                         uomGroupWithDetailsDictionary: Object.keys(data.uomGroupWithDetailsDictionary).map((key) => data.uomGroupWithDetailsDictionary[key])
                     },
