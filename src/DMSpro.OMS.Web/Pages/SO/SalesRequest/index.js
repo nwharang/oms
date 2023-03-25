@@ -1,142 +1,13 @@
-﻿// Search "Fix Late" to find where to fix
-let startTime = Date.now();
-let startTimeLoger = false
-$(async function () {
+﻿$(async function () {
     var l = abp.localization.getResource("OMS");
-    // Store
-    // Local variables
-    console.clear()
     let { salesRequestsHeaderStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
     const InfoSO = await store().getInfoSO()
     const { renderPopup } = helper(InfoSO)
-    console.log("API and Store done load", Date.now() - startTime, "ms");
-
     let gridSalesRequests = $('#dgSalesRequestHeader').dxDataGrid({
         dataSource: { store: salesRequestsHeaderStore },
-        // editing: {
-        //     mode: 'popup',
-        //     allowAdding: true, // Fix Late
-        //     allowUpdating: true, // Fix Late
-        //     useIcons: true,
-        //     texts: {
-        //         editRow: l("Edit"),
-        //     },
-        //     popup: {
-        //         title: 'Sale Request',
-        //         showTitle: true,
-        //         height: '95%',
-        //         width: '95%',
-        //         hideOnOutsideClick: true,
-        //         dragEnabled: false,
-        //         toolbarItems: [
-        //             {
-        //                 widget: "dxButton",
-        //                 location: "center",
-        //                 toolbar: "bottom",
-        //                 options: {
-        //                     icon: "chevronprev",
-        //                     disabled: Boolean(currentHeaderData.id),
-        //                     onClick: function (e) {
-        //                         salesRequestsHeaderService.getPrevDoc(currentHeaderData.id)
-        //                     }
-        //                 }
-        //             },
-        //             {
-        //                 widget: "dxButton",
-        //                 location: "center",
-        //                 toolbar: "bottom",
-        //                 options: {
-        //                     icon: "chevronnext",
-        //                     disabled: Boolean(currentHeaderData.id),
-        //                     onClick: function (e) {
-        //                         salesRequestsHeaderService.getNextDoc(currentHeaderData.id)
-        //                     }
-        //                 }
-        //             },
-        //             {
-        //                 widget: "dxDropDownButton",
-        //                 location: "after",
-        //                 toolbar: "bottom",
-        //                 items: [
-        //                     {
-        //                         badge: "Approve",
-        //                     },
-        //                     {
-        //                         badge: "Disapprove",
-        //                     }
-        //                 ]
-        //             },
-        //             {
-        //                 widget: 'dxButton',
-        //                 location: "after",
-        //                 toolbar: "bottom",
-        //                 options: {
-        //                     disabled: false, // Condition here
-        //                     text: 'Save',
-        //                     onClick() {
-        //                         detailsDataGrids.saveEditData()
-        //                     }
-        //                 }
-        //             },
-        //             {
-        //                 widget: "dxButton",
-        //                 location: "after",
-        //                 toolbar: "bottom",
-        //                 options: {
-        //                     text: "Cancel",
-        //                     onClick: function (e) {
-        //                         gridSalesRequests.cancelEditData()
-        //                     }
-        //                 },
-        //             },
-        //         ],
-        //     },
-        // form: {
-        //     labelMode: "floatting",
-        //     colCount: 3,
-        //     onFieldDataChanged: () => {
-        //         console.log("fieldDataChanged");
-        //     },
-        //     items: [
-        //         {
-        //             itemType: "group",
-        //             caption: 'Documentation',
-        //             items: [{
-        //                 dataField: "docNbr",
-        //                 dataType: 'string'
-        //             }, "docType", "docSource", "remark", "businessPartnerId", "requestDate"]
-        //         },
-        //         {
-        //             itemType: "group",
-        //             caption: 'Alternative Minimum Tax',
-        //             items: ["docTotalLineDiscountAmt", "docTotalLineAmt", "docTotalLineAmtAfterTax", "docTotalAmt", "docTotalAmtAfterTax"]
-        //         },
-        //         {
-        //             itemType: "group",
-        //             caption: 'Discount Information',
-        //             items: ["docDiscountType", "docDiscountPerc", "docDiscountAmt"]
-        //         },
-        //         {
-        //             itemType: "group",
-        //             colSpan: 3,
-        //             template: (data, itemElement) => {
-        //                 // If don't have partner ID => Not render
-        //                 let store = currentHeaderData.id ? salesRequestsHeaderService.getDoc(currentHeaderData.id) : null
-        //                 if (store)
-        //                     store.done(({ header, details }) => {
-        //                         renderDetailForm(details, itemElement, header)
-        //                     })
-        //                 else
-        //                     renderDetailForm(null, itemElement, detailsHeaderData)
-        //             }
-        //         }
-        //     ]
-        // }
-
-        // },
         showRowLines: true,
         showBorders: true,
-        // cacheEnabled: true,
+        cacheEnabled: true,
         columnAutoWidth: true,
         searchPanel: {
             visible: true
@@ -162,7 +33,6 @@ $(async function () {
         },
         export: {
             enabled: true,
-            // formats: ['excel','pdf'],
             allowExportSelectedData: true,
         },
         onExporting(e) {
@@ -179,10 +49,6 @@ $(async function () {
                 });
             });
             e.cancel = true;
-        },
-        onContentReady: () => {
-            !startTimeLoger ? console.log("First grid ready in", Date.now() - startTime, "ms") : "";
-            startTimeLoger = true;
         },
         headerFilter: {
             visible: true,
@@ -246,7 +112,6 @@ $(async function () {
                         text: l('Button.ViewDetail'),
                         icon: "fieldchooser",
                         onClick: function (e) {
-                            // create Popup
                             renderPopup(e.row.data.id)
                         }
                     }

@@ -1,17 +1,49 @@
 let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
     let salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
     let { discountTypeStore, transactionTypeStore, docTypeStore, docSourceStore, docStatusStore } = store()
-    let popup, form, grid;
+    let gridInitialized = false, popup, form, grid;
     // Local Store
     let savedFormData = {}
-    let currentData = { header: {}, details: {} }
+    let currentData = { header: {}, details: [] }
     let comingData = { next: {}, previous: {} }
-    let gridInitialized = false;
-    let formInitialized = false;
     let compareObject = (obj1, obj2) => {
         return JSON.stringify(obj1) === JSON.stringify(obj2)
     }
-    function recalulateDocTotal() {
+    let loadNavigationButton = (docId) => {
+        if (docId) {
+            salesRequestsHeaderService.getPrevDoc(docId).done(data => {
+                comingData.previous = data
+                // Incase user cancel popup before data or button loaded
+                try {
+                    $('#prevDocButton').dxButton('instance').option("disabled", !Boolean(comingData.previous))
+                } catch (e) { }
+            })
+            salesRequestsHeaderService.getNextDoc(docId).done(data => {
+                comingData.next = data
+                // Incase user cancel popup before data or button loaded
+                try {
+                    $('#nextDocButton').dxButton('instance').option("disabled", !Boolean(comingData.next))
+                } catch (e) { }
+            })
+        }
+    }
+    let notify = ({ type = "success", position = "bottom right", message = "Message Placeholder" }) => DevExpress.ui.notify({
+        message,
+        height: 45,
+        width: 250,
+        minWidth: 250,
+        type,
+        displayTime: 5000,
+        animation: {
+            show: {
+                type: 'fade', duration: 400, from: 0, to: 1,
+            },
+            hide: { type: 'fade', duration: 40, to: 0 },
+        },
+    }, {
+        position
+    })
+    let recalulateDocTotal = () => {
         let formInstance = form.dxForm('instance')
         let gridInstance = grid.dxDataGrid('instance')
         if (!formInstance || !gridInstance || !gridInstance.getDataSource()) return
@@ -47,12 +79,11 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                 formInstance.updateData('docTotalAmt', noNegative(docTotalLineAmt, _docDiscountAmt));
                 formInstance.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
                 break;
-
         }
     }
     function renderForm(e, { header = {}, details = [] }, docId) {
         let defaultNewHeader = {
-            requestDate: new Date().toISOString(),
+            requestDate: new Date().toString(),
             docTotalLineDiscountAmt: 0,
             docTotalLineAmt: 0,
             docTotalLineAmtAfterTax: 0,
@@ -72,13 +103,22 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                 ...defaultNewHeader,
                 ...header,
             },
-            readOnly: Boolean(header.docStatus),
+            disabled: Boolean(header.docStatus),
             colCount: 3,
             items: [
                 {
                     itemType: "group",
                     caption: 'Documentation',
                     items: [
+                        {
+                            label: {
+                                text: l('EntityFieldName:OrderService:SalesRequest:DocNbr')
+                            },
+                            dataField: "docNbr",
+                            editorOptions: {
+                                disabled: true,
+                            },
+                        },
                         {
                             label: {
                                 text: l('EntityFieldName:OrderService:SalesRequest:DocType')
@@ -101,7 +141,7 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                             editorOptions: {
                                 dataSource: docSourceStore,
                                 displayExpr: "text",
-                                valueExpr: "id"
+                                valueExpr: "id",
                             },
                         },
                         {
@@ -121,7 +161,9 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                                 displayExpr: 'name',
                                 valueExpr: 'id',
                                 searchEnabled: true,
-                                disabled: details.length > 0
+                                elementAttr: {
+                                    id: "businessPartnerId",
+                                }
                             },
                             validationRules: [{ type: 'required' }],
 
@@ -131,7 +173,7 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                             editorType: 'dxDateBox',
                             editorOptions: {
                                 displayFormat: "dd-MM-yyyy",
-                                min: new Date().toISOString().slice(0, 10),
+                                min: new Date().toString(),
                                 dateOutOfRangeMessage: "Date is out of range",
                                 disabled: true,
                             },
@@ -211,7 +253,8 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                             editorOptions: {
                                 format: '##0.## %',
                                 min: 0,
-                                max: 1
+                                max: 1,
+                                disabled: true,
                             }
                         },
                         {
@@ -240,22 +283,19 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                     itemType: "group",
                     colSpan: 3,
                     template: (e, itemElement) => {
-                        // TODO : If don't have partner ID => Not render
-                        console.log(e);
                         renderDetailForm(details, itemElement, docId, Boolean(header.docStatus))
                     }
                 }
             ],
-            onEditorPrepared: (e) => {
-                if (e.row.rowType === 'data')
-                    formInitialized = true
-            },
             onFieldDataChanged: (e) => {
                 // compare 2 objects to disable/enable save button
-                if (formInitialized) {
-                    if (!form?.dxForm('instance') || !grid?.dxDataGrid('instance')) return
-                    $('#saveButtonPopup').dxButton('instance').option('disabled', compareObject(savedFormData, formInstance.option('formData')))
+                if (!form?.dxForm('instance') || !grid?.dxDataGrid('instance')) return
+                $('#saveButtonPopup').dxButton('instance').option('disabled', compareObject(savedFormData, formInstance.option('formData')))
+                setTimeout(() => {
                     recalulateDocTotal()
+                }, 200)
+                if (e.dataField == 'businessPartnerId' && e.value) {
+                    grid.dxDataGrid('instance').option('disabled', false)
                 }
             }
         })
@@ -264,14 +304,14 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
         form.appendTo(e)
     }
     function renderDetailForm(detailsData, itemElement, docId, docStatus) {
-        grid = $('<div id="detailsDataGrids">').css('padding', '0.5rem').dxDataGrid({
+        grid = $('<div id="detailsDataGrids">').css('padding', '0.5rem').css('overflow-y', 'hidden').css('max-height', '50vh').dxDataGrid({
             dataSource: detailsData || [],
             repaintChangesOnly: true,
             editing: {
                 mode: 'batch',
                 allowAdding: !docStatus,
                 allowUpdating: !docStatus,
-                allowDeleting: false,
+                allowDeleting: !docStatus,
                 useIcons: true,
                 texts: {
                     editRow: l("Edit"),
@@ -341,23 +381,26 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                     fixed: true,
                     fixedPosition: 'left',
                     lookup: {
-                        dataSource: salesOrderStore.itemList,
+                        dataSource: {
+                            store: salesOrderStore.itemList,
+                        },
                         displayExpr: (e) => e.code + ' - ' + e.name,
                         valueExpr: "id"
                     },
                     setCellValue: function (newData, value, currentData) {
-                        var selectedItem = salesOrderStore.itemList.find(i => i.id == value);
-                        var vat = vatList.find(i => i.id == selectedItem.vatId);
-
-                        newData.itemId = value;
-                        newData.uomGroupId = selectedItem.uomGroupId;
-                        newData.vatId = selectedItem.vatId;
-                        newData.taxRate = vat.rate;
-                        newData.uomId = selectedItem.salesUomId;
-                        newData.price = selectedItem.basePrice;
-                        newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100;
-                        newData.lineAmtAfterTax = newData.priceAfterTax * currentData.qty - currentData.discountAmt;
-                        newData.lineAmt = newData.price * currentData.qty - currentData.discountAmt;
+                        let selectedItem = salesOrderStore.itemList.find(i => i.id == value);
+                        let vat = vatList.find(i => i.id == selectedItem.vatId);
+                        if (selectedItem) {
+                            newData.itemId = value;
+                            newData.uomGroupId = selectedItem.uomGroupId;
+                            newData.vatId = selectedItem.vatId;
+                            newData.taxRate = vat.rate;
+                            newData.uomId = selectedItem.salesUomId;
+                            newData.price = selectedItem.basePrice;
+                            newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100;
+                            newData.lineAmtAfterTax = newData.priceAfterTax * currentData.qty - currentData.discountAmt;
+                            newData.lineAmt = newData.price * currentData.qty - currentData.discountAmt;
+                        }
                     },
                 },
                 {
@@ -368,7 +411,20 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                         dataSource: salesOrderStore.uOMList,
                         displayExpr: "name",
                         valueExpr: "id"
-                    }
+                    },
+                    setCellValue: function (newData, value, currentData) {
+                        let customerId = form.dxForm('instance').getEditor('businessPartnerId').option('value');
+                        let customer = salesOrderStore.customerList.find(x => x.id == customerId);
+                        let price = salesOrderStore.priceList.find(x => x.id == customer.priceListId + '|' + currentData.itemId + '|' + value)?.value || 0;
+                        let priceAfterTax = price + (price * currentData.taxRate) / 100;
+                        let lineAmtAfterTax = priceAfterTax * currentData.qty - currentData.discountAmt;
+                        let lineAmt = price * currentData.qty - currentData.discountAmt;
+                        newData.uomId = value;
+                        newData.price = price;
+                        newData.priceAfterTax = priceAfterTax;
+                        newData.lineAmtAfterTax = lineAmtAfterTax;
+                        newData.lineAmt = lineAmt;
+                    },
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:IsFree'),
@@ -593,11 +649,23 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                     },
                 ],
             },
+            onContentReady: (e) => {
+                if (!form.dxForm('instance').option('formData').businessPartnerId || (form.dxForm('instance').option('formData').businessPartnerId && !grid.dxDataGrid('instance').hasEditData())) {
+                    grid.dxDataGrid('instance').option('disabled', true)
+                    $('#businessPartnerId').dxSelectBox('instance').option('disabled', false)
+
+                }
+                if (form.dxForm('instance').option('formData').businessPartnerId && grid.dxDataGrid('instance').hasEditData()) {
+                    grid.dxDataGrid('instance').option('disabled', false)
+                    $('#businessPartnerId').dxSelectBox('instance').option('disabled', true)
+                }
+            },
             onInitNewRow: (e) => {
                 e.data = {
+                    ...e.data,
                     isFree: false,
                     price: 0,
-                    qty: 0,
+                    qty: 1,
                     priceAfterTax: 0,
                     discountType: 0,
                     discountAmt: 0,
@@ -610,7 +678,7 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
             onOptionChanged: () => {
                 if (gridInitialized) {
                     if (grid?.dxDataGrid('instance') && form?.dxForm('instance')) {
-                        $('#saveButtonPopup').dxButton('instance').option('disabled', !gridInstance.hasEditData())
+                        $('#saveButtonPopup').dxButton('instance').option('disabled', !grid?.dxDataGrid('instance').hasEditData())
                     }
                 }
             },
@@ -633,26 +701,12 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
 
         })
         gridInstance = grid.dxDataGrid('instance')
-        if (docId) {
-            salesRequestsHeaderService.getPrevDoc(docId).done(data => {
-                comingData.previous = data
-                // Incase user cancel popup before data or button loaded
-                try {
-                    $('#prevDocButton').dxButton('instance').option("disabled", !Boolean(comingData.previous))
-                } catch (e) { }
-            })
-            salesRequestsHeaderService.getNextDoc(docId).done(data => {
-                comingData.next = data
-                // Incase user cancel popup before data or button loaded
-                try {
-                    $('#nextDocButton').dxButton('instance').option("disabled", !Boolean(comingData.next))
-                } catch (e) { }
-            })
-        }
+        loadNavigationButton(docId)
         grid.appendTo(itemElement)
     }
     return {
-        renderPopup: (docId) => {
+        renderPopup: async (docId) => {
+            currentData = docId ? await salesRequestsHeaderService.getDoc(docId) : { header: {}, details: {} }
             popup = $('<div id="popup">').dxPopup({
                 title: 'Sale Request',
                 showTitle: true,
@@ -661,7 +715,6 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                 hideOnOutsideClick: false,
                 dragEnabled: false,
                 contentTemplate: async (e) => {
-                    currentData = docId ? await salesRequestsHeaderService.getDoc(docId) : { header: {}, details: {} }
                     renderForm(e, currentData, docId)
                 },
                 toolbarItems: [
@@ -677,8 +730,12 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                             },
                             disabled: true,
                             onClick: function (e) {
-                                docId = comingData.previous;
-
+                                docId = comingData.previous.header.id;
+                                form.dxForm("instance").option("formData", comingData.previous.header)
+                                grid.dxDataGrid("instance").option('dataSource', comingData.previous.details)
+                                form.dxForm('instance').option("disabled", Boolean(comingData.previous.header.docStatus))
+                                grid.dxDataGrid('instance').option("disabled", Boolean(comingData.previous.header.docStatus))
+                                loadNavigationButton(docId)
                             }
                         }
                     },
@@ -694,7 +751,13 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                             },
                             disabled: true,
                             onClick: function (e) {
-                                docId = comingData.next.id;
+                                docId = comingData.next.header.id;
+                                form.dxForm("instance").option("formData", comingData.next.header)
+                                grid.dxDataGrid("instance").option('dataSource', comingData.next.details)
+                                form.dxForm('instance').option("disabled", Boolean(comingData.next.header.docStatus))
+                                grid.dxDataGrid('instance').option("disabled", Boolean(comingData.next.header.docStatus))
+                                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", Boolean(comingData.next.header.docStatus))
+                                loadNavigationButton(docId)
                             }
                         }
                     },
@@ -705,19 +768,46 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                         options: {
                             icon: 'preferences',
                             text: 'Actions',
+                            disabled: Boolean(currentData.header.docStatus),
                             width: 120,
+                            elementAttr: {
+                                id: "actionButtonDetailsPanel",
+                            },
                             items: [
                                 {
                                     text: "Approve",
                                     icon: "check",
                                     onClick: () => {
-                                        // currentData.header.docType
-                                        console.log(salesRequestsHeaderService.createListSODoc([docId]))
+                                        if (docId)
+                                            salesRequestsHeaderService.createListSODoc([docId])
+                                                .done(() => {
+                                                    notify({ type: 'success', message: "SR Approved" })
+                                                    form.dxForm('instance').option("disabled", true)
+                                                    grid.dxDataGrid('instance').option("disabled", true)
+                                                    $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", true)
+                                                }
+                                                ).fail(() => {
+                                                    notify({ type: 'error', message: "SR Approve Failed" })
+                                                    popup.dxPopup('instance').repaint()
+                                                }
+                                                )
                                     }
                                 },
                                 {
                                     text: "Reject",
                                     icon: "close",
+                                    onClick: () => DevExpress.ui.dialog.confirm("<i> Do you wish to continue this action?</i>", "Rejecting Sale Request")
+                                        .done((e) => {
+                                            if (e) {
+                                                salesRequestsHeaderService.cancelDoc(docId)
+                                                    .done(() => {
+                                                        notify({ type: 'success', message: "SR Rejected" })
+                                                        form.dxForm('instance').option("disabled", true)
+                                                        grid.dxDataGrid('instance').option("disabled", true)
+                                                    })
+                                                    .fail(() => notify({ type: 'error', message: "SR Reject Failed" }))
+                                            }
+                                        })
                                 }
                             ]
                         },
@@ -737,17 +827,22 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                                 grid.dxDataGrid('instance').saveEditData().then(() => {
                                     currentData.header = form.dxForm('instance').option('formData');
                                     currentData.details = grid.dxDataGrid('instance').getDataSource().items().filter(detail => detail.itemId)
+                                    currentData.header.requestDate = new Date().toString();;
                                     if (currentData.details.length < 1) {
                                         return
                                     }
-                                    // Get doc statue information then do all below stuff
-                                    // Then If !DocId then Create new
                                     if (docId && currentData.header && currentData.details.length > 0)
                                         salesRequestsHeaderService.updateDoc(docId, currentData)
-                                            .done(() => { })
+                                            .done(() => notify({ type: 'success', message: "SR Updated" }))
+                                            .fail(() => notify({ type: 'error', message: "SR Update Failed" }))
                                     else
                                         salesRequestsHeaderService.createDoc(currentData)
-                                    // ortherwise update doc
+                                            .done((data) => {
+                                                notify({ type: 'success', message: "SR Created" })
+                                                docId = data.header.id
+                                                loadNavigationButton(docId)
+                                            })
+                                            .fail(() => notify({ type: 'error', message: "SR Create Failed" }))
                                 })
                             }
                         }
@@ -761,6 +856,7 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                             icon: "return",
                             onClick: function () {
                                 popup.dxPopup('instance').dispose()
+                                $('#dgSalesRequestHeader').dxDataGrid('instance').getDataSource().reload()
                             }
                         },
                     },

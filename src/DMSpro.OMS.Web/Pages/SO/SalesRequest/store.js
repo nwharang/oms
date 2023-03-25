@@ -7,6 +7,23 @@ let store = () => {
             let companyId = (await Common.getCurrentCompany()).id
             return await salesOrderService.getInfoSO({ companyId }, new Date()).then(async result => {
                 data = (await Common.parseJSON(result)).soInfo;
+                let validUOM = Object.keys(data.priceDictionary).map(e => {
+                    key = e.split("|")
+                    return {
+                        priceListId: key[0],
+                        itemId: key[1],
+                        uomId: key[2],
+                        value: data.priceDictionary[key]
+                    }
+                })
+                itemList = []
+                Object.keys(data.item).forEach((key) => {
+                    // if not in uom valid group then no data return
+                    if (validUOM.find(e => e.itemId === key)) {
+                        data.item[key].qty = 1;
+                        itemList.push(data.item[key]);
+                    }
+                })
                 return {
                     companyId,
                     salesOrderStore: {
@@ -14,13 +31,13 @@ let store = () => {
                         priceList: Object.keys(data.priceDictionary).map(function (key) {
                             return { id: key, value: data.priceDictionary[key] };
                         }),
-                        itemList: Object.keys(data.item).map((key) => {
-                            data.item[key].qty = 1;
-                            return data.item[key];
+                        itemList,
+                        uomGroupList: Object.keys(data.uomGroup).map(function (key) {
+                            return data.uomGroup[key];
                         }),
-                        uomGroupList: Object.keys(data.uomGroup).map((key) => data.uomGroup[key]),
                         uOMList: Object.keys(data.uom).map((key) => data.uom[key]),
                         itemGroupList: Object.keys(data.itemsInItemGroupsDictionary).map((key) => data.itemsInItemGroupsDictionary[key]),
+                        uomGroupWithDetailsDictionary: Object.keys(data.uomGroupWithDetailsDictionary).map((key) => data.uomGroupWithDetailsDictionary[key])
                     },
                     vatList: Object.keys(data.vat).map((key) => data.vat[key])
                 }
