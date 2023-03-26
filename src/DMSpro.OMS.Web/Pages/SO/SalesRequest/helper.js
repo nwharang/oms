@@ -706,7 +706,8 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
     return {
         renderPopup: async (docId) => {
             currentData = docId ? await salesRequestsHeaderService.getDoc(docId) : { header: {}, details: {} }
-            popup = $('<div id="popup">').dxPopup({
+            if (!popup) popup = $('<div id="#popup">')
+            popup.dxPopup({
                 title: 'Sale Request',
                 showTitle: true,
                 height: '95%',
@@ -854,17 +855,17 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                             text: "Exit",
                             icon: "return",
                             onClick: function () {
-                                popup.dxPopup('instance').dispose()
+                                popup.dxPopup('instance').hide()
                                 $('#dgSalesRequestHeader').dxDataGrid('instance').getDataSource().reload()
                             }
                         },
                     },
                 ],
-                onDisposing: () => {
+                onHiding: () => {
                     gridInitialized = false
-                    formInitialized = false
                 }
-            }).appendTo('body')
+            })
+            popup.appendTo('body')
             popup.dxPopup('instance').show()
         },
 
