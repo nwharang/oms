@@ -90,6 +90,9 @@ $(function () {
     // get UOMs
     var getUOMs = new DevExpress.data.CustomStore({
         key: "id",
+        loadMode: "raw",
+        cacheRawData: true,
+        useDefaultSearch: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -108,15 +111,6 @@ $(function () {
                 });
             return deferred.promise();
         },
-        byKey: function (key) {
-            if (key == 0) return null;
-            var d = new $.Deferred();
-            uomService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                })
-            return d.promise();
-        }
     });
 
     const dataGrid = $('#gridUOMGroups').dxDataGrid({
@@ -516,6 +510,9 @@ $(function () {
                                     displayExpr: 'code',
                                     paginate: true,
                                     pageSize: pageSizeForLookup
+                                },
+                                editorOptions: {
+                                    searchEnabled: true
                                 }
                             },
                             {
@@ -549,6 +546,9 @@ $(function () {
                                     displayExpr: 'code',
                                     paginate: true,
                                     pageSize: pageSizeForLookup
+                                },
+                                editorOptions: {
+                                    searchEnabled: true
                                 }
                             },
                             {
