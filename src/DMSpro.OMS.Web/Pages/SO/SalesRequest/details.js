@@ -57,6 +57,8 @@ $(async function () {
     var salesOrderService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
     var salesRequestService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
     //let lastCallDates = Common.getLastAPICallDates();
+    await console.log("dsfdsf");
+
     await salesOrderService.getInfoSO({ companyId: companyId })
         .done(async result => {
             let resultJson = await Common.parseJSON(result);

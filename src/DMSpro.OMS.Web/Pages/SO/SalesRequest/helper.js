@@ -1,4 +1,6 @@
 let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
+    console.log("helper.js");
+    console.log(salesOrderStore);
     let salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
     let { discountTypeStore, transactionTypeStore, docTypeStore, docSourceStore, docStatusStore } = store()
     let gridInitialized = false, popup, form, grid;

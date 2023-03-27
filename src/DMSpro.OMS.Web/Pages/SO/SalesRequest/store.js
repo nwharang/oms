@@ -1,10 +1,12 @@
 let store = () => {
+    console.log("store.js");
     var salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
     let salesOrderService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     return {
         getInfoSO: async () => {
-            let companyId = (await Common.getCurrentCompany()).id
+            let companyId = (await Common.getCurrentCompany()).id;
+            console.log(companyId);
             return await salesOrderService.getInfoSO({ companyId }, new Date()).then(async result => {
                 data = (await Common.parseJSON(result)).soInfo;
                 let validUOM = Object.keys(data.priceDictionary).map(e => {
@@ -48,6 +50,7 @@ let store = () => {
                 }
             })
         },
+
         salesRequestsHeaderStore: new DevExpress.data.CustomStore({
             key: 'id',
             sort: [

@@ -17,9 +17,9 @@
         position
     })
     var l = abp.localization.getResource("OMS");
-    let { salesRequestsHeaderStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
-    let currentSelectedDoc = new Map()
-    const InfoSO = await store().getInfoSO()
+    let { salesRequestsHeaderStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore, getInfoSO } = store()
+    let currentSelectedDoc = new Map();
+    const InfoSO = await getInfoSO()
     const { renderPopup } = helper(InfoSO)
     let gridSalesRequests = $('#dgSalesRequestHeader').dxDataGrid({
         dataSource: { store: salesRequestsHeaderStore },

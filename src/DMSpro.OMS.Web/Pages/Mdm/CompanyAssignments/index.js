@@ -17,10 +17,8 @@ $(function () {
 
             assignmentService.getListDevextremes(args)
                 .done(result => {
-
-                    console.log(result.data);
+                    //console.log(result.data);
                     //result.data.forEach(x => x.companyName = "x");
-
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -31,17 +29,17 @@ $(function () {
             return deferred.promise();
         },
         insert(values) {
-
             return assignmentService.create({
                 companyId: values.companyIdentityUserAssignment.companyId,
                 identityUserId: values.companyIdentityUserAssignment.identityUserId,
             }, { contentType: "application/json" });
         },
         update(key, values) {
-
+            // console.log(key);
+            // console.log(values);
             return assignmentService.update(key.companyIdentityUserAssignment.id,
                 {
-                    companyId: values.company.id,
+                    companyId: values.companyIdentityUserAssignment.companyId,
                     identityUserId: values.companyIdentityUserAssignment.identityUserId
                 }, { contentType: "application/json" });
         },
@@ -75,7 +73,7 @@ $(function () {
             console.log(args)
             companyService.getListDevextremes(args)
                 .done(result => {
-                    console.log(result.data);
+                    //console.log(result.data);
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -129,23 +127,24 @@ $(function () {
         }
     });
 
-    function selectBoxEditorTemplate(cellElement, cellInfo) {
-        return $('<div>').dxLookup({
-            valueExpr: "id",
-            displayExpr: "name",
-            dataSource: new DevExpress.data.DataSource({
-                store: companyStore,
-                paginate: true,
-                pageSize: pageSizeForLookup
-            }),
-            searchEnabled: true,
-            searchMode: 'contains',
-            searchExpr: ['name'],
-            onValueChanged(data) {
-                //cellInfo.setValue(data.value);
-            },
-        });
-    }
+    // function selectBoxEditorTemplate(cellElement, cellInfo) {
+    //     return $('<div>').dxLookup({
+    //         valueExpr: "id",
+    //         displayExpr: "name",
+    //         dataSource: new DevExpress.data.DataSource({
+    //             store: companyStore,
+    //             paginate: true,
+    //             pageSize: pageSizeForLookup
+    //         }),
+    //         searchEnabled: true,
+    //         searchMode: 'contains',
+    //         searchExpr: ['name'],
+    //         onValueChanged(data) {
+    //             //cellInfo.setValue(data.value);
+    //         },
+    //     });
+    // }
+
     var gridComAssignments = $('#dgComAssignments').dxDataGrid({
         dataSource: assignmentStore,
         editing: {
@@ -213,11 +212,11 @@ $(function () {
             visible: true
         },
 
-        stateStoring: { //save state in localStorage
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dgComAssignments',
-        },
+        // stateStoring: { //save state in localStorage
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'dgComAssignments',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -288,7 +287,7 @@ $(function () {
                 dataField: 'companyIdentityUserAssignment.companyId',
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
                 validationRules: [{ type: "required" }],
-                calculateDisplayValue: "company.name",
+                //calculateDisplayValue: "company.name",
                 //editCellTemplate: selectBoxEditorTemplate,
                 lookup: {
                     dataSource: {
