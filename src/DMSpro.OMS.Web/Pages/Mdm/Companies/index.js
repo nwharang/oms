@@ -1,14 +1,14 @@
 ﻿var l = abp.localization.getResource("OMS");
 var l1 = abp.localization.getResource("OMS");
 $(function () {
-    
+
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
 
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
-        //loadMode: 'raw',
-        //cacheRawData: true,
+        loadMode: 'raw',
+        cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const argsGeo = {};
@@ -28,14 +28,6 @@ $(function () {
                 });
 
             return deferred.promise();
-        },
-        byKey: function (key) {
-            var d = new $.Deferred();
-            geoMasterService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
         },
     });
 
@@ -101,12 +93,12 @@ $(function () {
         }
     });
 
-    
+
 
     const gridCompanies = $('#dgCompanies').dxDataGrid({
         dataSource: customStore,
         remoteOperations: true,
-
+        repaintChangesOnly: true,
         showColumnLines: true,
         showRowLines: false,
         rowAlternationEnabled: true,
@@ -154,7 +146,7 @@ $(function () {
         allowColumnResizing: true,
         columnResizingMode: 'widget',
         columnMinWidth: 50,
-        columnAutoWidth: true, 
+        columnAutoWidth: true,
         //columnChooser: {
         //    enabled: true,
         //    allowSearch: true,
@@ -186,9 +178,9 @@ $(function () {
         //},
 
         stateStoring: { //save state in localStorage
-           enabled: true,
-           type: 'localStorage',
-           storageKey: 'dgCompanies',
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgCompanies',
         },
 
         paging: {
@@ -239,11 +231,11 @@ $(function () {
                         onClick(e) {
                             var gridControl = e.element.closest('div.dx-datagrid').parent();
                             var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup'); 
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
                             if (popup) popup.show();
                         },
                     },
-                }, 
+                },
                 "searchPanel",
             ],
         },
@@ -267,7 +259,7 @@ $(function () {
                 fixedPosition: "left",
                 formItem: {
                     visible: false
-                },  
+                },
             },
             {
                 dataField: 'code',
@@ -290,7 +282,7 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel0Id"),
                 formItem: {
                     visible: false
-                },  
+                },
             },
             {
                 dataField: "geoLevel0Id",
@@ -298,7 +290,7 @@ $(function () {
                 visible: false,
                 formItem: {
                     visible: true,
-                },  
+                },
                 //calculateDisplayValue: "geoLevel0.name", // provides display values
                 //calculateCellValue: function (rowData) {
                 //    return rowData.geoLevel0.name;
@@ -402,14 +394,14 @@ $(function () {
                     //        filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
                     //    };
                     //},
-                     dataSource(options) {
-                         return {
-                             store: geoMasterStore,
-                             filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
-                             paginate: true,
-                             pageSize: pageSizeForLookup
-                         };
-                     },
+                    dataSource(options) {
+                        return {
+                            store: geoMasterStore,
+                            filter: options.data ? ['parentId', '=', options.data.geoLevel1Id] : ['level', '=', 2],
+                            paginate: true,
+                            pageSize: pageSizeForLookup
+                        };
+                    },
                     valueExpr: 'id',
                     displayExpr: 'name',
                     //lookup: {
@@ -455,7 +447,7 @@ $(function () {
                 calculateDisplayValue: "geoLevel4.name",
                 formItem: {
                     visible: false,
-                }, 
+                },
                 //width: 110,
                 lookup: {
                     dataSource(options) {
@@ -580,42 +572,36 @@ $(function () {
             {
                 dataField: 'effectiveDate',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:EffectiveDate"),
-                //width: 110,
                 dataType: 'date',
                 visible: false,
             },
             {
                 dataField: 'endDate',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:EndDate"),
-                //width: 90,
                 dataType: 'date',
                 visible: false,
             },
             {
                 dataField: 'latitude',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Latitude"),
-                //width: 110,
                 dataType: 'string',
                 visible: false,
             },
             {
                 dataField: 'longitude',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Longitude"),
-                //width: 110,
                 dataType: 'string',
                 visible: false,
             },
             {
                 dataField: 'contactName',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:ContactName"),
-                //width: 110,
                 dataType: 'string',
                 visible: false,
             },
             {
                 dataField: 'contactPhone',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:ContactPhone"),
-                //width: 110,
                 dataType: 'string',
                 visible: false,
             }
@@ -674,7 +660,7 @@ $(function () {
     //var url = `${abp.appPath}api/mdm-service/companies/insert-from-excel`;
 
     //const popupContentTemplate = function () {
-        
+
     //    const content = $('<div />');
     //    content.append(
     //        $('<div>').dxSelectBox({
@@ -768,7 +754,7 @@ $(function () {
     //                            a.click();
 
     //                        });
-                           
+
     //                            },
     //        },
     //    }, {
@@ -800,9 +786,9 @@ $(function () {
     //                            // handle error
     //                            console.log(msg.responseText.error);
     //                        },
-                            
+
     //                    });
-                        
+
     //                }
     //            },
     //        },
@@ -810,5 +796,5 @@ $(function () {
     //    ],
     //}).dxPopup('instance');
     /*thanhhq*/
-    initImportPopup('api/mdm-service/companies', 'Company_Template', 'dgCompanies'); 
+    initImportPopup('api/mdm-service/companies', 'Company_Template', 'dgCompanies');
 });
