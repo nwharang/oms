@@ -6,8 +6,8 @@ let store = () => {
     return {
         getInfoSO: async () => {
             let companyId = (await Common.getCurrentCompany()).id;
-            console.log(companyId);
             return await salesOrderService.getInfoSO({ companyId }, new Date()).then(async result => {
+                console.log(companyId);
                 data = (await Common.parseJSON(result)).soInfo;
                 let validUOM = Object.keys(data.priceDictionary).map(e => {
                     key = e.split("|")
