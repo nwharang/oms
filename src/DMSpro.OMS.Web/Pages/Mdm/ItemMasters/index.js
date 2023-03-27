@@ -580,7 +580,7 @@
             e.data.isInventoriable = true;
             e.data.isPurchasable = true;
             e.data.isSaleable = true;
-            e.data.itemType = 'I';
+            e.data.itemTypeId = '5b5c2587-e1e8-2083-1ba9-3a09f04363e2';
         },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
