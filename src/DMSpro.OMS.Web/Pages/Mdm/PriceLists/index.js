@@ -287,13 +287,21 @@ $(function () {
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
+        onEditorPreparing: (e) => {
+            if (e.row?.rowType != "data" && !Boolean(e.dataField) && e.parentType != 'dataRow' && !e.row?.isNewRow) return
+            const items = e.component.getDataSource().items();
+            if (["action", 'name', 'code'].indexOf(e.dataField) === -1 && items.length < 1)
+                e.editorOptions.disabled = true
+            if (e.dataField == 'basePriceListId')
+                e.editorOptions.disabled = true
+        },
         onEditorPrepared: function (e) {
-            if (e.dataField == 'basePriceListId' && e.parentType == 'dataRow' && e.row.isNewRow) {
+            if (e.row?.rowType == "data" && Boolean(e.dataField) && e.parentType == 'dataRow' && e.row.isNewRow) {
                 const items = e.component.getDataSource().items();
                 const value = e.component.option("value");
-                if (!value) {
-                    $('.fieldBasePrice > div.dx-selectbox').data('dxSelectBox').option('value', items[0].id);
-                }
+                if (e.dataField == 'basePriceListId' && !value)
+                    $('.fieldBasePrice > div.dx-selectbox').data('dxSelectBox').option('value', items.find(e => e.isFirstPriceList).id)
+
             }
         },
         toolbar: {
@@ -364,12 +372,23 @@ $(function () {
                     cssClass: 'fieldBasePrice',
                     editorType: 'dxSelectBox',
                     calculateDisplayValue: 'basePriceList.code',
+                    elementAttr: {
+                        class: "basePriceListSelectBox",
+                    },
                     lookup: {
                         //dataSource: getPriceList,
                         dataSource: {
                             store: getPriceList,
                             paginate: true,
                             pageSize: pageSizeForLookup
+                        },
+                        valueExpr: 'id',
+                        displayExpr: 'code'
+                    },
+                    editorOptions: {
+                        dataSource: {
+                            store: getPriceList,
+                            filter: ["isFirstPriceList", "=", true],
                         },
                         valueExpr: 'id',
                         displayExpr: 'code'
@@ -491,7 +510,7 @@ $(function () {
                         },
                         toolbar: {
                             items: [
-                                "groupPanel", 
+                                "groupPanel",
                                 "columnChooserButton",
                                 "exportButton",
                                 "searchPanel"
@@ -557,7 +576,7 @@ $(function () {
                             }
                         ]
                     }).appendTo(container);
-               // initImportPopup('api/mdm-service/price-list-details', 'PriceListDetails_Template', `grid_${currentHeaderData.id}`);
+                // initImportPopup('api/mdm-service/price-list-details', 'PriceListDetails_Template', `grid_${currentHeaderData.id}`);
             }
         }
     }).dxDataGrid('instance');
