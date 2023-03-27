@@ -331,6 +331,9 @@
             form: {
                 labelMode: "outside",
                 colCount: 3,
+                elementAttr: {
+                    class: "p-3 mx-auto"
+                },
                 items: [
                     // Image Placeholder
                     {
@@ -448,6 +451,7 @@
                         tabs: [
                             {
                                 title: 'UOM',
+                                colCount: 2,
                                 items: [
                                     {
                                         dataField: 'uomGroupId',
