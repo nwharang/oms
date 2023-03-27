@@ -20,7 +20,7 @@
     let { salesRequestsHeaderStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore, getInfoSO } = store()
     let currentSelectedDoc = new Map();
     const InfoSO = await getInfoSO()
-    const { renderPopup } = helper(InfoSO)
+    const { renderPopup } = await helper(InfoSO)
     let gridSalesRequests = $('#dgSalesRequestHeader').dxDataGrid({
         dataSource: { store: salesRequestsHeaderStore },
         showRowLines: true,
