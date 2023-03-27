@@ -121,7 +121,7 @@ $(function () {
             showNavigationButtons: true
         },
         onInitNewRow(e) {
-            e.data.rate = 1;
+            e.data.rate = 0;
         },
         onEditorPreparing(e) {
             if (e.dataField === 'code' && e.row && !e.row.isNewRow) {
@@ -185,7 +185,8 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:VAT:Rate") + " %",
                 dataType: 'number',
                 editorOptions: {
-                    min: 1,
+                    min: 0,
+                    max : 100,
                     format: "#0'%'",
                     inputAttr: {
                         maxLength: 6

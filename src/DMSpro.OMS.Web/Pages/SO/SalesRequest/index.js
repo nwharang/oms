@@ -1,142 +1,31 @@
-﻿// Search "Fix Late" to find where to fix
-let startTime = Date.now();
-let startTimeLoger = false
-$(async function () {
+﻿$(async function () {
+    let salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
+    let notify = ({ type = "success", position = "bottom right", message = "Message Placeholder" }) => DevExpress.ui.notify({
+        message,
+        height: 45,
+        width: 250,
+        minWidth: 250,
+        type,
+        displayTime: 5000,
+        animation: {
+            show: {
+                type: 'fade', duration: 400, from: 0, to: 1,
+            },
+            hide: { type: 'fade', duration: 40, to: 0 },
+        },
+    }, {
+        position
+    })
     var l = abp.localization.getResource("OMS");
-    // Store
-    // Local variables
-    console.clear()
     let { salesRequestsHeaderStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
+    let currentSelectedDoc = new Map()
     const InfoSO = await store().getInfoSO()
     const { renderPopup } = helper(InfoSO)
-    console.log("API and Store done load", Date.now() - startTime, "ms");
-
     let gridSalesRequests = $('#dgSalesRequestHeader').dxDataGrid({
         dataSource: { store: salesRequestsHeaderStore },
-        // editing: {
-        //     mode: 'popup',
-        //     allowAdding: true, // Fix Late
-        //     allowUpdating: true, // Fix Late
-        //     useIcons: true,
-        //     texts: {
-        //         editRow: l("Edit"),
-        //     },
-        //     popup: {
-        //         title: 'Sale Request',
-        //         showTitle: true,
-        //         height: '95%',
-        //         width: '95%',
-        //         hideOnOutsideClick: true,
-        //         dragEnabled: false,
-        //         toolbarItems: [
-        //             {
-        //                 widget: "dxButton",
-        //                 location: "center",
-        //                 toolbar: "bottom",
-        //                 options: {
-        //                     icon: "chevronprev",
-        //                     disabled: Boolean(currentHeaderData.id),
-        //                     onClick: function (e) {
-        //                         salesRequestsHeaderService.getPrevDoc(currentHeaderData.id)
-        //                     }
-        //                 }
-        //             },
-        //             {
-        //                 widget: "dxButton",
-        //                 location: "center",
-        //                 toolbar: "bottom",
-        //                 options: {
-        //                     icon: "chevronnext",
-        //                     disabled: Boolean(currentHeaderData.id),
-        //                     onClick: function (e) {
-        //                         salesRequestsHeaderService.getNextDoc(currentHeaderData.id)
-        //                     }
-        //                 }
-        //             },
-        //             {
-        //                 widget: "dxDropDownButton",
-        //                 location: "after",
-        //                 toolbar: "bottom",
-        //                 items: [
-        //                     {
-        //                         badge: "Approve",
-        //                     },
-        //                     {
-        //                         badge: "Disapprove",
-        //                     }
-        //                 ]
-        //             },
-        //             {
-        //                 widget: 'dxButton',
-        //                 location: "after",
-        //                 toolbar: "bottom",
-        //                 options: {
-        //                     disabled: false, // Condition here
-        //                     text: 'Save',
-        //                     onClick() {
-        //                         detailsDataGrids.saveEditData()
-        //                     }
-        //                 }
-        //             },
-        //             {
-        //                 widget: "dxButton",
-        //                 location: "after",
-        //                 toolbar: "bottom",
-        //                 options: {
-        //                     text: "Cancel",
-        //                     onClick: function (e) {
-        //                         gridSalesRequests.cancelEditData()
-        //                     }
-        //                 },
-        //             },
-        //         ],
-        //     },
-        // form: {
-        //     labelMode: "floatting",
-        //     colCount: 3,
-        //     onFieldDataChanged: () => {
-        //         console.log("fieldDataChanged");
-        //     },
-        //     items: [
-        //         {
-        //             itemType: "group",
-        //             caption: 'Documentation',
-        //             items: [{
-        //                 dataField: "docNbr",
-        //                 dataType: 'string'
-        //             }, "docType", "docSource", "remark", "businessPartnerId", "requestDate"]
-        //         },
-        //         {
-        //             itemType: "group",
-        //             caption: 'Alternative Minimum Tax',
-        //             items: ["docTotalLineDiscountAmt", "docTotalLineAmt", "docTotalLineAmtAfterTax", "docTotalAmt", "docTotalAmtAfterTax"]
-        //         },
-        //         {
-        //             itemType: "group",
-        //             caption: 'Discount Information',
-        //             items: ["docDiscountType", "docDiscountPerc", "docDiscountAmt"]
-        //         },
-        //         {
-        //             itemType: "group",
-        //             colSpan: 3,
-        //             template: (data, itemElement) => {
-        //                 // If don't have partner ID => Not render
-        //                 let store = currentHeaderData.id ? salesRequestsHeaderService.getDoc(currentHeaderData.id) : null
-        //                 if (store)
-        //                     store.done(({ header, details }) => {
-        //                         renderDetailForm(details, itemElement, header)
-        //                     })
-        //                 else
-        //                     renderDetailForm(null, itemElement, detailsHeaderData)
-        //             }
-        //         }
-        //     ]
-        // }
-
-        // },
         showRowLines: true,
         showBorders: true,
-        // cacheEnabled: true,
+        cacheEnabled: true,
         columnAutoWidth: true,
         searchPanel: {
             visible: true
@@ -162,7 +51,6 @@ $(async function () {
         },
         export: {
             enabled: true,
-            // formats: ['excel','pdf'],
             allowExportSelectedData: true,
         },
         onExporting(e) {
@@ -179,10 +67,6 @@ $(async function () {
                 });
             });
             e.cancel = true;
-        },
-        onContentReady: () => {
-            !startTimeLoger ? console.log("First grid ready in", Date.now() - startTime, "ms") : "";
-            startTimeLoger = true;
         },
         headerFilter: {
             visible: true,
@@ -213,8 +97,34 @@ $(async function () {
                     },
                 },
                 {
+                    widget: "dxDropDownButton",
                     location: 'after',
-                    template: '<div><button type="button" class="btn btn-light btn-sm dropdown-toggle waves-effect waves-themed hvr-icon-pop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height:36px"> <i class="fa fa-gear hvr-icon"></i> <span class="">Action</span>  </button><div class="dropdown-menu fadeindown"> <button class="dropdown-item" type="button">Approve</button></div></div>'
+                    options: {
+                        icon: 'preferences',
+                        text: 'Actions',
+                        width: 120,
+                        items: [
+                            {
+                                text: "Approve",
+                                icon: "check",
+                                onClick() {
+                                    let array = []
+                                    currentSelectedDoc.forEach((e, k) => {
+                                        if (e) array.push(k)
+                                    })
+                                    salesRequestsHeaderService.createListSODoc(array)
+                                        .done(() => {
+                                            notify({ type: 'success', message: `${array.length} SRs Approved` })
+                                            $('#dgSalesRequestHeader').dxDataGrid('instance').getDataSource().reload()
+                                        }
+                                        ).fail(() => {
+                                            notify({ type: 'error', message: "SRs Approve Failed" })
+                                        })
+                                }
+                            },
+                        ]
+                    },
+
                 },
                 'columnChooserButton',
                 "exportButton",
@@ -239,6 +149,42 @@ $(async function () {
         },
         columns: [
             {
+                cssClass: "text-center",
+                headerCellTemplate(container) {
+                    $('<div>').dxCheckBox({
+                        onValueChanged: (e) => {
+                            $('.actionCheckboxFormControl').each(function () {
+                                let id = $(this).attr('id')
+                                if (e.value) {
+                                    $(this).dxCheckBox('instance').option('value', e.value)
+                                    currentSelectedDoc.set(id, true)
+                                }
+                                else {
+                                    $(this).dxCheckBox('instance').option('value', e.value)
+
+                                }
+                            })
+                        }
+                    }).appendTo(container)
+                },
+                cellTemplate(container, option) {
+                    let disabled = Boolean(option.data.docStatus)
+                    $('<div>').dxCheckBox({
+                        elementAttr: {
+                            class: Boolean(option.data.docStatus) ? 'disabledActionCheckboxFormControl' : "actionCheckboxFormControl",
+                            id: option.data.id
+                        },
+                        disabled,
+                        onValueChanged: (e) => {
+                            currentSelectedDoc.set(e.element.attr('id'), e.value)
+                        }
+                    }).appendTo(container)
+                },
+                fixed: true,
+                fixedPosition: "left",
+                allowExporting: false,
+            },
+            {
                 caption: l("Actions"),
                 type: 'buttons',
                 buttons: [
@@ -246,7 +192,6 @@ $(async function () {
                         text: l('Button.ViewDetail'),
                         icon: "fieldchooser",
                         onClick: function (e) {
-                            // create Popup
                             renderPopup(e.row.data.id)
                         }
                     }
@@ -403,6 +348,17 @@ $(async function () {
                 summaryType: 'sum',
                 valueFormat: ",##0.###",
             }],
+        },
+        onContentReady: (e) => {
+            currentSelectedDoc.clear()
+            $('.disabledActionCheckboxFormControl').each(function () {
+                let id = $(this).attr('id')
+                currentSelectedDoc.set(id, false)
+            })
+            $('.actionCheckboxFormControl').each(function () {
+                let id = $(this).attr('id')
+                currentSelectedDoc.set(id, false)
+            })
         }
     }).dxDataGrid("instance");
     initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestHeader');

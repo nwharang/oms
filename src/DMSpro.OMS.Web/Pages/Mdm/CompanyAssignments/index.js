@@ -303,10 +303,6 @@ $(function () {
                     searchMode: 'contains'
                 }
             },
-            {
-                dataField: 'companyIdentityUserAssignment.companyId',
-                caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
-            }
         ]
     }).dxDataGrid("instance");
     initImportPopup('api/mdm-service/company-identity-user-assignments', 'CompanyAssignments_Template', 'dgComAssignments');
