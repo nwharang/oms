@@ -1,56 +1,9 @@
-let store = () => {
-    console.log("store.js");
-    var salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
+let salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
     let salesOrderService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
-    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+    let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+    
+let store = () => {
     return {
-        getInfoSO: async () => {
-            let companyId = (await Common.getCurrentCompany()).id;
-            return await salesOrderService.getInfoSO({ companyId }, new Date()).then(async result => {
-                console.log(companyId);
-                data = (await Common.parseJSON(result)).soInfo;
-                let validUOM = Object.keys(data.priceDictionary).map(e => {
-                    key = e.split("|")
-                    return {
-                        priceListId: key[0],
-                        itemId: key[1],
-                        uomId: key[2],
-                        value: data.priceDictionary[key]
-                    }
-                })
-                itemList = []
-                Object.keys(data.item).forEach((key) => {
-                    // if not in uom valid group then no data return
-                    if (validUOM.find(e => e.itemId === key)) {
-                        data.item[key].qty = 1;
-                        itemList.push(data.item[key]);
-                    }
-                })
-                let uOMList = []
-                Object.keys(data.uom).forEach((key) => {
-                    if (validUOM.find(e => e.uomId === key))
-                        uOMList.push(data.uom[key]);
-                })
-                return {
-                    companyId,
-                    salesOrderStore: {
-                        customerList: Object.keys(data.customerDictionary).map((key) => data.customerDictionary[key]),
-                        priceList: Object.keys(data.priceDictionary).map(function (key) {
-                            return { id: key, value: data.priceDictionary[key] };
-                        }),
-                        itemList,
-                        uOMList,
-                        uomGroupList: Object.keys(data.uomGroup).map(function (key) {
-                            return data.uomGroup[key];
-                        }),
-                        itemGroupList: Object.keys(data.itemsInItemGroupsDictionary).map((key) => data.itemsInItemGroupsDictionary[key]),
-                        uomGroupWithDetailsDictionary: Object.keys(data.uomGroupWithDetailsDictionary).map((key) => data.uomGroupWithDetailsDictionary[key])
-                    },
-                    vatList: Object.keys(data.vat).map((key) => data.vat[key])
-                }
-            })
-        },
-
         salesRequestsHeaderStore: new DevExpress.data.CustomStore({
             key: 'id',
             sort: [
@@ -157,4 +110,51 @@ let store = () => {
             }
         ],
     }
+}
+
+let getInfoSO = async () => {
+    let companyId = (await Common.getCurrentCompany()).id;
+    return await salesOrderService.getInfoSO({ companyId }, new Date()).then(async result => {
+        console.log(companyId);
+        data = (await Common.parseJSON(result)).soInfo;
+        let validUOM = Object.keys(data.priceDictionary).map(e => {
+            key = e.split("|")
+            return {
+                priceListId: key[0],
+                itemId: key[1],
+                uomId: key[2],
+                value: data.priceDictionary[key]
+            }
+        })
+        itemList = []
+        Object.keys(data.item).forEach((key) => {
+            // if not in uom valid group then no data return
+            if (validUOM.find(e => e.itemId === key)) {
+                data.item[key].qty = 1;
+                itemList.push(data.item[key]);
+            }
+        })
+        let uOMList = []
+        Object.keys(data.uom).forEach((key) => {
+            if (validUOM.find(e => e.uomId === key))
+                uOMList.push(data.uom[key]);
+        })
+        return {
+            companyId,
+            salesOrderStore: {
+                customerList: Object.keys(data.customerDictionary).map((key) => data.customerDictionary[key]),
+                priceList: Object.keys(data.priceDictionary).map(function (key) {
+                    return { id: key, value: data.priceDictionary[key] };
+                }),
+                itemList,
+                uOMList,
+                uomGroupList: Object.keys(data.uomGroup).map(function (key) {
+                    return data.uomGroup[key];
+                }),
+                itemGroupList: Object.keys(data.itemsInItemGroupsDictionary).map((key) => data.itemsInItemGroupsDictionary[key]),
+                uomGroupWithDetailsDictionary: Object.keys(data.uomGroupWithDetailsDictionary).map((key) => data.uomGroupWithDetailsDictionary[key])
+            },
+            vatList: Object.keys(data.vat).map((key) => data.vat[key])
+        }
+    })
 }

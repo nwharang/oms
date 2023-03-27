@@ -1,4 +1,4 @@
-let helper = async ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
+let helper = ({ companyId, salesOrderStore, vatList }) => {
     console.log("helper.js");
     console.log(salesOrderStore);
     let salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
