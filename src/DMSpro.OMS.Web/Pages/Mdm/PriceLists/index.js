@@ -75,6 +75,15 @@ $(function () {
                     d.resolve(data);
                 })
             return d.promise();
+        },
+        insert(values) {
+            return priceListDetailsService.create(values, { contentType: 'application/json' });
+        },
+        update(key, values) {
+            return priceListDetailsService.update(key, values, { contentType: 'application/json' });
+        },
+        remove(key) {
+            return priceListDetailsService.delete(key);
         }
     });
 
@@ -380,14 +389,10 @@ $(function () {
                     dataField: 'arithmeticOperation',
                     caption: l("EntityFieldName:MDMService:PriceList:ArithmeticOperation"),
                     cssClass: 'fieldOperation',
-                    editorType: 'dxSelectBox',
-                    editorOptions: {
-                        searchPanel: true,
+                    lookup: {
                         dataSource: arithmeticOperation,
                         valueExpr: 'id',
-                        displayExpr: 'text',
-                        paginate: true,
-                        pageSize: pageSizeForLookup
+                        displayExpr: 'text'
                     },
                     width: 180
                 },
@@ -402,14 +407,10 @@ $(function () {
                     dataField: 'arithmeticFactorType',
                     caption: l("EntityFieldName:MDMService:PriceList:ArithmeticFactorType"),
                     cssClass: 'fieldFactorType',
-                    editorType: 'dxSelectBox',
-                    editorOptions: {
+                    lookup: {
                         dataSource: arithmeticFactorType,
-                        searchEnabled: true,
                         valueExpr: 'id',
-                        displayExpr: 'text',
-                        paginate: true,
-                        pageSize: pageSizeForLookup
+                        displayExpr: 'text'
                     },
                     width: 200
                 }
@@ -426,6 +427,12 @@ $(function () {
                             paginate: true,
                             pageSize: pageSize,
                         },
+                        // editing: {
+                        //     mode: 'row',
+                        //     allowUpdating: true,
+                        //     //allowDeleting: true,
+                        //     allowAdding: true,
+                        // },
                         remoteOperations: true,
                         showRowLines: true,
                         showBorders: true,
@@ -473,11 +480,11 @@ $(function () {
                         headerFilter: {
                             visible: true,
                         },
-                        stateStoring: {
-                            enabled: true,
-                            type: 'localStorage',
-                            storageKey: 'dgPriceListDetails' + options.key,
-                        },
+                        // stateStoring: {
+                        //     enabled: true,
+                        //     type: 'localStorage',
+                        //     storageKey: 'dgPriceListDetails' + options.key,
+                        // },
                         paging: {
                             enabled: true,
                             pageSize: pageSize
@@ -491,6 +498,7 @@ $(function () {
                         },
                         toolbar: {
                             items: [
+                                //"addRowButton",
                                 "groupPanel", 
                                 "columnChooserButton",
                                 "exportButton",
