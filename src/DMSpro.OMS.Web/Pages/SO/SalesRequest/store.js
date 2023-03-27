@@ -50,7 +50,9 @@ let store = () => {
         },
         salesRequestsHeaderStore: new DevExpress.data.CustomStore({
             key: 'id',
-            // usedefaultSearch: true,
+            sort: [
+                { selector: "requestDate", desc: false }
+            ],
             load(loadOptions) {
                 const deferred = $.Deferred();
                 const args = {};
