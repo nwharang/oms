@@ -6,6 +6,13 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
     let savedFormData = {}
     let currentData = { header: {}, details: [] }
     let comingData = { next: {}, previous: {} }
+    let genStoreForDropDownBox = (data) => new DevExpress.data.CustomStore({
+        labelMode: 'raw',
+        key: 'id',
+        load() {
+            return data
+        }
+    })
     let compareObject = (obj1, obj2) => {
         return JSON.stringify(obj1) === JSON.stringify(obj2)
     }
@@ -381,15 +388,62 @@ let helper = ({ companyId = "", salesOrderStore = {}, vatList = {} }) => {
                     fixed: true,
                     fixedPosition: 'left',
                     lookup: {
-                        dataSource: {
-                            store: salesOrderStore.itemList,
-                        },
-                        displayExpr: (e) => e.code + ' - ' + e.name,
-                        valueExpr: "id"
+                        dataSource: salesOrderStore.itemList,
+                        displayExpr(e) { return e.code + ' - ' + e.name },
+                        valueExpr: "id",
+                    },
+                    editCellTemplate: (cellElement, cellInfo) => {
+                        return $('<div>').dxDropDownBox({
+                            dataSource: salesOrderStore.itemList,
+                            value: cellInfo.value,
+                            valueExpr: "id",
+                            displayExpr(e) { return e.code + ' - ' + e.name },
+                            width: '500px',
+                            placeholder: 'Select a value...',
+                            contentTemplate: (e) => {
+                                let content = $('<div>').dxDataGrid({
+                                    dataSource: genStoreForDropDownBox(salesOrderStore.itemList),
+                                    hoverStateEnabled: true,
+                                    scrolling: { mode: 'virtual' },
+                                    height: 250,
+                                    selection: { mode: 'single' },
+                                    selectedRowKeys: [cellInfo.value],
+                                    focusedRowEnabled: true,
+                                    focusedRowKey: cellInfo.value,
+                                    filterRow: {
+                                        visible: true,
+                                        applyFilter: 'auto',
+                                    },
+                                    columns: [
+                                        {
+                                            dataField: 'code'
+                                        },
+                                        {
+                                            dataField: 'name'
+                                        },
+                                    ],
+                                    onSelectionChanged(selectionChangedArgs) {
+                                        e.component.option('value', selectionChangedArgs.selectedRowKeys[0]);
+                                        cellInfo.setValue(selectionChangedArgs.selectedRowKeys[0]);
+                                        if (selectionChangedArgs.selectedRowKeys.length > 0) {
+                                            e.component.close();
+                                        }
+                                    },
+                                })
+                                e.component.on('valueChanged', (args) => {
+                                    content.dxDataGrid('instance').selectRows(args.value, false);
+                                    e.component.close();
+                                    setTimeout(() => {
+                                        recalulateDocTotal()
+                                    }, 200)
+                                });
+                                return content
+                            }
+                        })
                     },
                     setCellValue: function (newData, value, currentData) {
                         let selectedItem = salesOrderStore.itemList.find(i => i.id == value);
-                        let vat = vatList.find(i => i.id == selectedItem.vatId);
+                        let vat = vatList.find(i => i.id == selectedItem?.vatId);
                         if (selectedItem) {
                             newData.itemId = value;
                             newData.uomGroupId = selectedItem.uomGroupId;

@@ -22,14 +22,31 @@
         .dx-datagrid-borders .dx-datagrid-rowsview, .dx-datagrid-headers + .dx-datagrid-rowsview {
             margin: -1px 0 -1px 0px !important;
         }
+        .dx-datagrid-rowsview .dx-data-row .dx-cell-modified.dx-cell-modified::after, .dx-datagrid-rowsview .dx-data-row .dx-cell-modified.dx-datagrid-invalid::after {
+            border : 1px solid transparent
+        }
+        .dx-datagrid-rowsview .dx-data-row .dx-cell-modified .dx-highlight-outline::after {
+            border-color: rgba(0, 0, 0, 0.175);
+        }
+        .dx-col-fixed.dx-cell-focus-disabled[role="columnheader"]{
+            background-color : #2b4c81 !important;
+        }
+
+        .dx-gridbase-container > .dx-datagrid-rowsview.dx-scrollable > .dx-scrollable-wrapper {
+            padding-bottom : 1rem;
+        }
+        .dx-checkbox-icon {
+            border : 1px solid rgba(0, 0, 0, 0.4); 
+        }
     </style>
 }
-
 @section scripts {
     <abp-script src="/pages/shared/common.isp.js" />
     <script src="/js/devextreme/exceljs.min.js"></script>
     <script src="/js/devextreme/filesaver.min.js"></script>
+    <abp-script src="/Pages/SO/SalesOrders/store.js" />
     <abp-script src="/Pages/SO/SalesOrders/index.js" />
+    <abp-script src="/Pages/SO/SalesOrders/helper.js" />
 
 }
 

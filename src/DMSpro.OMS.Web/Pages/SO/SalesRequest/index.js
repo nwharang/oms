@@ -185,17 +185,20 @@
                 allowExporting: false,
             },
             {
-                caption: l("Actions"),
                 type: 'buttons',
+                width: 75,
                 buttons: [
                     {
                         text: l('Button.ViewDetail'),
-                        icon: "fieldchooser",
+                        icon: "info",
                         onClick: function (e) {
                             renderPopup(e.row.data.id)
                         }
                     }
                 ],
+                headerCellTemplate: (container) => {
+                    container.css('cursor', 'auto')
+                },
                 fixed: true,
                 fixedPosition: "left",
                 allowExporting: false,
@@ -245,18 +248,17 @@
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:RequestDate'),
                 dataField: 'requestDate',
-                dataType: 'datetime',
-                format: 'M/d/yyyy, HH:mm',
+                dataType: 'date',
                 validationRules: [{ type: 'required' }],
+                sortOrder: "desc",
+                format: 'dd/MM/yyyy',
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocDate'),
                 dataField: 'docDate',
-                dataType: 'datetime',
-                format: 'M/d/yyyy, HH:mm',
+                dataType: 'date',
                 validationRules: [{ type: 'required' }],
-                visible: false,
-
+                format: 'dd/MM/yyyy',
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocStatus'),

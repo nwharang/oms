@@ -388,6 +388,10 @@
                                 dataField: 'manageItemBy',
                                 validationRules: [{ type: 'required' }],
                                 editorType: 'dxSelectBox',
+                                editorOptions: {
+                                    disabled: true,
+                                    value: 0
+                                }
                             },
                             {
                                 dataField: 'expiredType',
@@ -725,7 +729,7 @@
                 lookup: {
                     dataSource: manageItem,
                     valueExpr: "id",
-                    displayExpr: "text"
+                    displayExpr: "text",
                 },
                 visible: false,
             },
