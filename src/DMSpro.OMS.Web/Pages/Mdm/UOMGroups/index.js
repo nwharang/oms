@@ -92,7 +92,6 @@ $(function () {
         key: "id",
         loadMode: "raw",
         cacheRawData: true,
-        useDefaultSearch: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -420,7 +419,8 @@ $(function () {
                                 isBase ? disableCell(e, editBaseRowUOMDetailDisableField.indexOf(e.dataField) > -1) : disableCell(e, editRowUOMDetailDisableField.indexOf(e.dataField) > -1)
                                 if (e.dataField === "altUOMId" && isBase) {
                                     e.editorOptions.onValueChanged = (v) => {
-                                        e.component.cellValue(e.component.getRowIndexByKey(e.row.key), 'altUOMId', v.value)
+                                        // e.component.cellValue(e.component.getRowIndexByKey(e.row.key), 'altUOMId', v.value)
+                                        e.setValue(v.value)
                                         e.component.cellValue(e.component.getRowIndexByKey(e.row.key), 'baseUOMId', v.value)
                                     }
                                 }
@@ -502,18 +502,12 @@ $(function () {
                                 editorType: 'dxSelectBox',
                                 calculateDisplayValue: 'altUOM.code',
                                 lookup: {
-                                    dataSource: {
-                                        store: getUOMs,
-                                        filter: []
-                                    },
+                                    dataSource: getUOMs,
                                     valueExpr: 'id',
                                     displayExpr: 'code',
                                     paginate: true,
                                     pageSize: pageSizeForLookup
                                 },
-                                editorOptions: {
-                                    searchEnabled: true
-                                }
                             },
                             {
                                 caption: '=',
@@ -547,9 +541,6 @@ $(function () {
                                     paginate: true,
                                     pageSize: pageSizeForLookup
                                 },
-                                editorOptions: {
-                                    searchEnabled: true
-                                }
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:Active"),
