@@ -53,9 +53,15 @@
     //TreeList - GeoMaster
     const tlGeoMaster = $('#tlGeoMaster').dxTreeList({
         dataSource: geoMasterStore,
+        remoteOperations: {
+            filtering: true,
+            sorting: true,
+            grouping: true,
+          },
         keyExpr: 'id',
         parentIdExpr: 'parentId',
-        remoteOperations: false,
+        rootValue: null,
+        // remoteOperations: true,
         showRowLines: true,
         showBorders: true,
         cacheEnabled: true,
@@ -105,21 +111,21 @@
             visible: true,
         },
         stateStoring: {
-            enabled: true,
+            enabled: false,
             type: 'localStorage',
             storageKey: 'tlGeoMaster',
         },
-        paging: {
-            enabled: true,
-            pageSize: pageSize
-        },
-        pager: {
-            visible: false,
-            showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
-            showInfo: true,
-            showNavigationButtons: true
-        },
+        // paging: {
+        //     enabled: true,
+        //     pageSize: 10
+        // },
+        // pager: {
+        //     visible: true,
+        //     showPageSizeSelector: true,
+        //     allowedPageSizes: [10, 20,50],
+        //     showInfo: true,
+        //     showNavigationButtons: true
+        // },
         editing: {
             mode: 'row',
             allowAdding: function (e) {
@@ -227,36 +233,6 @@
                     maxLength: 100
                 },
                 validationRules: [{ type: "required" }]
-            },
-            {
-                caption: l("EntityFieldName:MDMService:GeoMaster:ParentName"),
-                dataField: "parentId",
-                calculateDisplayValue: "parent.name",
-                lookup: {
-                    dataSource(options) {
-                        return {
-                            store: geoMasterStore,
-                            filter: [["isDeleted", "=", "false"], "and", ["level", "<", 4], "and", ["!", ["name", "=", options.data ? options.data.name : null]]],
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    displayExpr: 'name',
-                    valueExpr: 'id'
-                },
-                editorOptions: {
-                    showClearButton: true
-                },
-                //setCellValue: function (newData, value, curValue) {
-                //    this.defaultSetCellValue(newData, value);
-
-                //    var d = new $.Deferred();
-                //    geoMasterService.get(value)
-                //        .done(data => {
-                //            d.resolve(newData.level = data.level + 1);
-                //        });
-                //    return d.promise();
-                //}
             },
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Level"),
