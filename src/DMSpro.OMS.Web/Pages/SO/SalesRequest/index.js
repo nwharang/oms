@@ -52,7 +52,7 @@
             },
             export: {
                 enabled: true,
-                allowExportSelectedData: true,
+                // allowExportSelectedData: true,
             },
             onExporting(e) {
                 const workbook = new ExcelJS.Workbook();
@@ -132,22 +132,22 @@
                     },
                     'columnChooserButton',
                     "exportButton",
-                    {
-                        location: 'after',
-                        widget: 'dxButton',
-                        options: {
-                            icon: "import",
-                            elementAttr: {
-                                class: "import-excel",
-                            },
-                            onClick(e) {
-                                var gridControl = e.element.closest('div.dx-datagrid').parent();
-                                var gridName = gridControl.attr('id');
-                                var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                                if (popup) popup.show();
-                            },
-                        },
-                    },
+                    // {
+                    //     location: 'after',
+                    //     widget: 'dxButton',
+                    //     options: {
+                    //         icon: "import",
+                    //         elementAttr: {
+                    //             class: "import-excel",
+                    //         },
+                    //         onClick(e) {
+                    //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                    //             var gridName = gridControl.attr('id');
+                    //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                    //             if (popup) popup.show();
+                    //         },
+                    //     },
+                    // },
                     "searchPanel"
                 ],
             },
@@ -366,6 +366,6 @@
             },
         }).dxDataGrid("instance");
         initChooseItemsPopup([...InfoSO.salesOrderStore.itemList].map(e => { e.isFree = false; return e }))
-        initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestHeader');
+        // initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestHeader');
     })
 });

@@ -27,9 +27,6 @@ var dxDataGridConfiguration = {
     groupPanel: {
         visible: true,
     },
-    headerFilter: {
-        visible: true,
-    },
     searchPanel: {
         visible: true
     },
@@ -83,24 +80,6 @@ var dxDataGridConfiguration = {
             },
 
             "columnChooserButton",
-            "exportButton",
-            {
-                location: 'after',
-                widget: 'dxButton',
-                options: {
-                    icon: "import",
-                    elementAttr: {
-                        //id: "import-excel",
-                        class: "import-excel",
-                    },
-                    onClick(e) {
-                        var gridControl = e.element.closest('div.dx-datagrid').parent();
-                        var gridName = gridControl.attr('id');
-                        var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                        if (popup) popup.show();
-                    },
-                },
-            },
             "searchPanel",
         ],
     }
@@ -113,7 +92,7 @@ function initChooseItemsPopup(items) {
 
     var dgItems = $('#dgItems').dxDataGrid(jQuery.extend(dxDataGridConfiguration, {
         dataSource: items,
-        stateStoring: { //save state in localStorage
+        stateStoring: {
             // enabled: true,
             type: 'localStorage',
             storageKey: 'dgItems',
@@ -121,6 +100,9 @@ function initChooseItemsPopup(items) {
         editing: {
             mode: 'cell',
             allowUpdating: true,
+        },
+        headerFilter: {
+            visible: false,
         },
         selection: {
             mode: 'multiple',
@@ -139,26 +121,7 @@ function initChooseItemsPopup(items) {
                             );
                     },
                 },
-                //"groupPanel",
                 "columnChooserButton",
-                //"exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
                 "searchPanel",
             ],
         },
@@ -208,14 +171,6 @@ function initChooseItemsPopup(items) {
                 dataField: 'isFree',
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:IsFree'),
                 dataType: 'boolean',
-                editorOptions: {
-                    iconSize: '1.5rem',
-                    // onValueChanged: (e) => {
-                    // if (e.value)
-                    // console.log(e);
-                    // dgItems.getDataSource().insert()
-                    // }
-                },
                 width: 100,
             },
             {
@@ -236,10 +191,10 @@ function initChooseItemsPopup(items) {
         showTitle: true,
         title: l('Popup.Title.ChooseItems'),
         visible: false,
-        dragEnabled: true,
+        dragEnabled: false,
         hideOnOutsideClick: false,
         showCloseButton: true,
-        resizeEnabled: true,
+        resizeEnabled: false,
         position: {
             at: 'center',
             my: 'center',
@@ -248,6 +203,7 @@ function initChooseItemsPopup(items) {
         onShowing: function (e) {
             var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
             $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
+            dgItems.deselectAll()
         },
         onResize: function (e) {
             var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
