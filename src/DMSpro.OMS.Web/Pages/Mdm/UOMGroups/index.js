@@ -401,6 +401,10 @@ $(function () {
                                 let component = e.component
                                 component.getCellElement(component.getRowIndexByKey(foundedData), 0).html('').css('height', '42px')
                             }
+                            if (data.length > 0 && foundedData) {
+                                let component = e.component
+                                component.getCellElement(component.getRowIndexByKey(foundedData), 'active').html('').css('height', '42px')
+                            }
                         },
                         onEditorPreparing: (e) => {
                             let isFirstRow = detailDataSrc?.length < 1
@@ -455,6 +459,8 @@ $(function () {
                                 // Fillter BASEUOMID option in cell selection , if it exists
                                 selectBox.getDataSource().loadOptions().filter = ['id', "<>", e.row?.data?.baseUOMId || 0]
                             }
+                            if (isFirstRow && e.dataField === "active")
+                                e.component.getCellElement(e.component.getRowIndexByKey(e.row.key), 'active').html('').css('height', '42px')
                         },
                         toolbar: {
                             items: [
