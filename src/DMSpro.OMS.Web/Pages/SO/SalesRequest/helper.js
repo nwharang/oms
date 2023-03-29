@@ -282,6 +282,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                         allowDeleting: true,
                     }
                     grid.dxDataGrid('instance').option('editing', newEditingOption)
+                    $('#addNewDetailButton').dxButton('instance').option('visible', true)
                 }
                 if (!form?.dxForm('instance') || !grid?.dxDataGrid('instance')) return
                 $('#saveButtonPopup').dxButton('instance').option('disabled', compareObject(savedFormData, formInstance.option('formData')))
@@ -345,9 +346,6 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                 allowColumnDragging: false,
                 visible: false,
             },
-            headerFilter: {
-                visible: true,
-            },
             stateStoring: {
                 enabled: true,
                 type: 'localStorage',
@@ -355,12 +353,19 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
             },
             toolbar: {
                 items: [{
-                    name: "addRowButton",
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'add',
+                        visible: false,
+                        elementAttr: {
+                            id: 'addNewDetailButton'
+                        }
+                    },
                     onClick(e) {
                         $("#popupItems").dxPopup('instance').show()
                     }
 
-                }, "revertButton", "columnChooserButton", "searchPanel",]
+                }, "revertButton", "columnChooserButton",]
             },
             columns: [
                 {
