@@ -11,6 +11,7 @@
     var vatService = window.dMSpro.oMS.mdmService.controllers.vATs.vAT;
     let disableColumn = ["inventoryUOMId", "purUOMId", "salesUOMId"]
     /****custom store*****/
+    let defaultItemType;
     let getUOMsGroupDetaiArr
     var getVATs = new DevExpress.data.CustomStore({
         key: 'id',
@@ -52,6 +53,7 @@
 
             itemTypeService.getListDevextremes(args)
                 .done(result => {
+                    defaultItemType = result
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -60,16 +62,6 @@
                 });
             return deferred.promise();
         },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            itemTypeService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
     });
     var getUOMs = new DevExpress.data.CustomStore({
         key: 'id',
@@ -323,15 +315,16 @@
             popup: {
                 title: 'Item Info',
                 showTitle: true,
-                height: '95%',
-                width: '95%',
-                hideOnOutsideClick: true,
+                height: '99%',
+                width: '99%',
+                hideOnOutsideClick: false,
                 dragEnabled: false,
             },
             form: {
                 labelMode: "outside",
-                colCount: 3,
+                colCount: 6,
                 elementAttr: {
+                    id: 'formGridAddItemMaster',
                     class: "p-3 mx-auto"
                 },
                 items: [
@@ -377,10 +370,16 @@
                                 // label: l('ERPCode'),
                                 dataType: 'string'
                             },
+                            {
+                                dataField: 'active',
+                                dataType: 'boolean',
+                                editorType: 'dxCheckBox'
+                            }
                         ]
                     },
                     // System properties
                     {
+                        caption: "MANAGEMENT",
                         itemType: 'group',
                         colSpan: 2,
                         items: [
@@ -389,11 +388,36 @@
                                 validationRules: [{ type: 'required' }],
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
-                                    disabled: true,
-                                    value: 0
+                                    onSelectionChanged: (e) => {
+                                        let formInstance = $("#formGridAddItemMaster").dxForm('instance')
+                                        let expiredValue = $('#expiredValue').dxNumberBox('instance')
+                                        let issueMethod = $('#issueMethod').dxSelectBox('instance')
+                                        if (formInstance && formInstance.getEditor('expiredType') && expiredValue && issueMethod) {
+                                            switch (e.selectedItem.id) {
+                                                case 0:
+                                                    formInstance.getEditor('expiredType').option('readOnly', true)
+                                                    expiredValue.option('readOnly', true)
+                                                    issueMethod.option('value', 0)
+                                                    break;
+                                                case 1:
+                                                    formInstance.getEditor('expiredType').option('readOnly', false)
+                                                    expiredValue.option('readOnly', false)
+                                                    issueMethod.option('value', 0)
+                                                    break;
+                                                case 2:
+                                                    formInstance.getEditor('expiredType').option('readOnly', true)
+                                                    expiredValue.option('readOnly', true)
+                                                    issueMethod.option('value', 1)
+                                                    break;
+                                                default:
+                                                    return;
+                                            }
+                                        }
+                                    }
                                 }
                             },
                             {
+                                name: 'expiredType',
                                 dataField: 'expiredType',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
@@ -401,25 +425,35 @@
                                     searchEnabled: true,
                                     displayExpr: 'text',
                                     valueExpr: 'id',
-                                    disabled: true
+                                    readOnly: true,
+                                    // disabled: true
                                 }
                             },
                             {
+                                name: 'expiredValue',
                                 dataField: 'expiredValue',
-                                dataType: 'number',
+                                editorType: 'dxNumberBox',
                                 editorOptions: {
-                                    disabled: true
+                                    elementAttr: {
+                                        id: 'expiredValue'
+                                    },
+                                    readOnly: true,
+                                    format: '#,##0.##',
                                 }
                             },
                             {
+                                name: 'issueMethod',
                                 dataField: 'issueMethod',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
                                     items: issueMethod,
+                                    elementAttr: {
+                                        id: 'issueMethod'
+                                    },
                                     searchEnabled: true,
                                     displayExpr: 'text',
                                     valueExpr: 'id',
-                                    disabled: true
+                                    value: 0
                                 }
                             },
                         ]
@@ -427,6 +461,7 @@
                     },
                     {
                         itemType: 'group',
+                        caption: 'OPTIONS',
                         colSpan: 1,
                         items: [
                             {
@@ -449,68 +484,58 @@
                     },
                     // Tabs Groups
                     {
-                        itemType: 'tabbed',
-                        colCount: 2,
+                        caption: 'OPTIONS',
+                        itemType: 'group',
                         colSpan: 3,
-                        tabs: [
+                        items: [
                             {
-                                title: 'UOM',
-                                colCount: 2,
-                                items: [
-                                    {
-                                        dataField: 'uomGroupId',
-                                        editorType: 'dxSelectBox',
-                                    },
-                                    {
-                                        dataField: 'inventoryUOMId',
-                                        validationRules: [{ type: 'required' }],
-                                        editorType: 'dxSelectBox',
-                                    },
-                                    {
-                                        dataField: 'purUOMId',
-                                        validationRules: [{ type: 'required' }],
-                                        editorType: 'dxSelectBox',
-                                    },
-                                    {
-                                        dataField: 'salesUOMId',
-                                        validationRules: [{ type: 'required' }],
-                                        editorType: 'dxSelectBox',
-                                    },
-                                    {
-                                        dataField: 'vatId',
-                                        validationRules: [{ type: 'required' }],
-                                        editorType: 'dxSelectBox',
-                                        editorOptions: {
-                                            dataSource: {
-                                                store: getVATs,
-                                                paginate: true,
-                                            },
-                                            valueExpr: 'id',
-                                            displayExpr: 'code'
-                                        }
-                                    },
-                                    {
-                                        dataField: 'basePrice',
-                                        validationRules: [{ type: 'required' }]
-                                    },
-                                    {
-                                        dataField: 'active',
-                                        dataType: 'boolean',
-                                        editorType: 'dxCheckBox'
-                                    }
-                                ]
+                                dataField: 'uomGroupId',
+                                editorType: 'dxSelectBox',
                             },
-                            // DMS Attributes
                             {
-                                title: 'ATTRIBUTE',
-                                colCount: 2,
-                                items: getAttrOptions()
-                            }
+                                dataField: 'inventoryUOMId',
+                                validationRules: [{ type: 'required' }],
+                                editorType: 'dxSelectBox',
+                            },
+                            {
+                                dataField: 'purUOMId',
+                                validationRules: [{ type: 'required' }],
+                                editorType: 'dxSelectBox',
+                            },
+                            {
+                                dataField: 'salesUOMId',
+                                validationRules: [{ type: 'required' }],
+                                editorType: 'dxSelectBox',
+                            },
+                            {
+                                dataField: 'vatId',
+                                validationRules: [{ type: 'required' }],
+                                editorType: 'dxSelectBox',
+                                editorOptions: {
+                                    dataSource: {
+                                        store: getVATs,
+                                        paginate: true,
+                                    },
+                                    valueExpr: 'id',
+                                    displayExpr: 'code'
+                                }
+                            },
+                            {
+                                dataField: 'basePrice',
+                                editorOptions: {
+                                    format: '#,##0.##',
+                                },
+                                validationRules: [{ type: 'required' }]
+                            },
                         ],
-
                     },
-
-
+                    {
+                        caption: 'ATTRIBUTE',
+                        itemType: 'group',
+                        colSpan: 3,
+                        items: getAttrOptions()
+                        // DMS Attributes
+                    },
                 ]
             },
         },
@@ -584,7 +609,9 @@
             e.data.isInventoriable = true;
             e.data.isPurchasable = true;
             e.data.isSaleable = true;
-            e.data.itemTypeId = '5b5c2587-e1e8-2083-1ba9-3a09f04363e2';
+            e.data.manageItemBy = 0
+            e.data.itemTypeId = defaultItemType.data.find(e => e.code == 'MD02' && e.valueCode == "I").id;
+            // getItemTypes.
         },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
@@ -751,7 +778,7 @@
                 dataType: 'number',
                 visible: false,
                 editorOptions: {
-                    disabled: true
+                    // disabled: true
                 }
             },
             {
@@ -770,7 +797,7 @@
                 validationRules: [{ type: "required" }],
                 visible: false,
                 editorOptions: {
-                    disabled: true
+                    readOnly: true
                 },
                 lookup: {
                     dataSource(options) {
@@ -1099,8 +1126,7 @@
     let disableCell = (e, arg) => {
         if (arg) {
             let element = e.editorElement
-            e.editorOptions.disabled = true
-            element.parent().css('backgroundColor', "#e2e8f0")
+            e.editorOptions.readOnly = true
         }
     }
 
@@ -1154,7 +1180,7 @@
                 // https://source.unsplash.com/random/ for testing image size
                 // /images/default-avatar-image.jpg for default image size
                 src: dataUrl || "/images/default-avatar-image.jpg",
-                style: "object-fit:contain;object-position:center center;max-height:200px;max-width:200px;cursor:pointer;border-radius:50%",
+                style: "object-fit:contain;object-position:center center;max-height:150px;max-width:150px;cursor:pointer;border-radius:50%",
             }))
             itemElement.append($("<div>").addClass('mt-3 w-75').attr("id", "file-uploader").dxFileUploader({
                 accept: 'image/*',

@@ -9,34 +9,6 @@ var dxDataGridConfiguration = {
     showRowLines: true,
     rowAlternationEnabled: true,
     showBorders: true,
-    export: {
-        enabled: true,
-    },
-    onExporting: function (e) {
-        if (e.format === 'xlsx') {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Data.xlsx');
-                });
-            });
-            e.cancel = true;
-        }
-        else if (e.format === 'pdf') {
-            const doc = new jsPDF();
-            DevExpress.pdfExporter.exportDataGrid({
-                jsPDFDocument: doc,
-                component: e.component,
-            }).then(() => {
-                doc.save('Deliveries.pdf');
-            });
-        }
-    },
     allowColumnReordering: true,
     allowColumnResizing: true,
     columnResizingMode: 'widget',
@@ -100,7 +72,7 @@ var dxDataGridConfiguration = {
                 options: {
                     disabled: true,
                     icon: "checklist",
-                    elementAttr: { 
+                    elementAttr: {
                         class: "openItemsPopupButton",
                     },
                     onClick(e) {
@@ -140,18 +112,19 @@ function initChooseItemsPopup(items) {
             </div>`);
 
     var dgItems = $('#dgItems').dxDataGrid(jQuery.extend(dxDataGridConfiguration, {
-        dataSource: items, 
+        dataSource: items,
         stateStoring: { //save state in localStorage
-            enabled: true,
+            // enabled: true,
             type: 'localStorage',
             storageKey: 'dgItems',
-        }, 
+        },
         editing: {
             mode: 'cell',
-            allowUpdating: false,
+            allowUpdating: true,
         },
         selection: {
             mode: 'multiple',
+            showCheckBoxesMode: 'always',
         },
         toolbar: {
             items: [
@@ -190,28 +163,34 @@ function initChooseItemsPopup(items) {
             ],
         },
         onCellClick: function (e) {
-            if (e.columnIndex == 1) {
-                e.event.preventDefault();
-                e.event.stopPropagation();
-                return false;
-            }
+            e.event.preventDefault();
+            e.event.stopPropagation();
         },
+        // onSelectionChanged: function (e) {
+        //     var selectedRowsData = e.component.getSelectedRowsData();
+        // },
         columns: [
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
                 dataField: 'qty',
                 width: 100,
                 dataType: 'number',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .dxTextBox({
-                            value: options.value,
-                            onValueChanged: function (e) {
-                                options.data.qty = e.value;
-                            }
-                        })
-                        .appendTo(container);
+                editorOptions: {
+                    min: 0,
+                    value: 1,
                 }
+                // cellTemplate(container, options) {
+                //     $('<div>')
+                //         .dxNumberBox({
+                //             value: options.value,
+                //             min: 0,
+                //             value: 1,
+                //             onValueChanged: function (e) {
+                //                 options.data.qty = e.value;
+                //             }
+                //         })
+                //         .appendTo(container);
+                // }
             },
             {
                 dataField: 'code',
@@ -226,6 +205,20 @@ function initChooseItemsPopup(items) {
                 allowEditing: false
             },
             {
+                dataField: 'isFree',
+                caption: l('EntityFieldName:OrderService:SalesRequestDetails:IsFree'),
+                dataType: 'boolean',
+                editorOptions: {
+                    iconSize: '1.5rem',
+                    // onValueChanged: (e) => {
+                    // if (e.value)
+                    // console.log(e);
+                    // dgItems.getDataSource().insert()
+                    // }
+                },
+                width: 100,
+            },
+            {
                 dataField: 'inventory',
                 caption: l("Inventory"),
                 dataType: 'number',
@@ -233,10 +226,7 @@ function initChooseItemsPopup(items) {
                 allowEditing: false
             }
         ],
-        onSelectionChanged: function (e) {
-            var selectedRowsData = e.component.getSelectedRowsData();
-            $('#numSelectedItems').text(l('Popup.Title.SelectedItems').replace('{0}', selectedRowsData.length));
-        }
+
     })).dxDataGrid("instance");
 
     const popupItems = $('#popupItems').dxPopup({

@@ -1,7 +1,7 @@
 let salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
-    let salesOrderService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
-    let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
-    
+let salesOrderService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
+let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+
 let store = () => {
     return {
         salesRequestsHeaderStore: new DevExpress.data.CustomStore({

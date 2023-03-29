@@ -24,20 +24,25 @@
         .dx-col-fixed.dx-cell-focus-disabled[role="columnheader"]{
             background-color : #2b4c81 !important;
         }
-
-        .dx-gridbase-container > .dx-datagrid-rowsview.dx-scrollable > .dx-scrollable-wrapper {
-            padding-bottom : 1rem;
-        }
         .dx-checkbox-icon {
             border : 1px solid rgba(0, 0, 0, 0.4); 
         }
+        #resizeBox {
+            overflow: hidden;
+        }
+        .priceTotalStyleBox input.dx-texteditor-input{
+            font-size: 1.5rem !important;
+            line-height: 1.5rem;
+            color : #000
+        }
+
     </style>
 }
 
 @section scripts {
-    <abp-script src="/pages/shared/common.isp.js" />
     <script src="/js/devextreme/exceljs.min.js"></script>
     <script src="/js/devextreme/filesaver.min.js"></script>
+    <abp-script src="/pages/shared/common.isp.js" />
     <abp-script src="/Pages/SO/SalesRequest/store.js" />
     <abp-script src="/Pages/SO/SalesRequest/helper.js" />
     <abp-script src="/Pages/SO/SalesRequest/index.js" />
