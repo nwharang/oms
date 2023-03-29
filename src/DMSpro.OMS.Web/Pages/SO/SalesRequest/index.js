@@ -92,7 +92,10 @@
                 items: [
                     "groupPanel",
                     {
-                        template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("Button.New.SalesRequest")}" style="height: 36px;"> <i class="fa fa-plus"></i> <span></span> </button>`,
+                        widget: "dxButton",
+                        options: {
+                            icon: 'add',
+                        },
                         onClick(e) {
                             renderPopup()
                         },
@@ -246,15 +249,15 @@
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequest:RequestDate'),
                     dataField: 'requestDate',
-                    dataType: 'datetime',
-                    format: 'M/d/yyyy, HH:mm',
+                    dataType: 'date',
+                    format: 'dd/MM/yyyy',
                     validationRules: [{ type: 'required' }],
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequest:DocDate'),
                     dataField: 'docDate',
-                    dataType: 'datetime',
-                    format: 'M/d/yyyy, HH:mm',
+                    dataType: 'date',
+                    format: 'dd/MM/yyyy',
                     validationRules: [{ type: 'required' }],
                     visible: false,
 
@@ -278,23 +281,23 @@
                     validationRules: [{ type: 'required' }],
                     allowEditing: false,
                 },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
-                    dataField: 'docTotalLineAmt',
-                    dataType: 'number',
-                    visible: true,
-                    validationRules: [{ type: 'required' }],
-                    allowEditing: false,
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
-                    dataField: 'docTotalLineAmtAfterTax',
-                    dataType: 'number',
-                    width: 100,
-                    visible: true,
-                    validationRules: [{ type: 'required' }],
-                    allowEditing: false,
-                },
+                // {
+                //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
+                //     dataField: 'docTotalLineAmt',
+                //     dataType: 'number',
+                //     visible: true,
+                //     validationRules: [{ type: 'required' }],
+                //     allowEditing: false,
+                // },
+                // {
+                //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
+                //     dataField: 'docTotalLineAmtAfterTax',
+                //     dataType: 'number',
+                //     width: 100,
+                //     visible: true,
+                //     validationRules: [{ type: 'required' }],
+                //     allowEditing: false,
+                // },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
                     dataField: 'docTotalAmt',
@@ -360,7 +363,7 @@
                     let id = $(this).attr('id')
                     currentSelectedDoc.set(id, false)
                 })
-            }
+            },
         }).dxDataGrid("instance");
         initChooseItemsPopup([...InfoSO.salesOrderStore.itemList].map(e => { e.isFree = false; return e }))
         initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestHeader');
