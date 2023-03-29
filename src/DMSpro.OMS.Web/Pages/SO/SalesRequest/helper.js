@@ -1,9 +1,10 @@
+
 let preLoad = getInfoSO();
 
 
 let helper = ({ companyId, salesOrderStore, vatList }) => {
     let salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
-    let { discountTypeStore, transactionTypeStore, docTypeStore, docSourceStore, docStatusStore } = store()
+    let { discountTypeStore, transactionTypeStore, docStatusStore } = store()
     let gridInitialized = false, popup, form, grid;
     // Local Store
     let savedFormData = {}
@@ -125,7 +126,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                 break;
         }
     }
-    function renderForm(e, { header = {}, details = [] }, docId) {
+    function renderForm(e, { header, details }, docId) {
         let defaultNewHeader = {
             requestDate: new Date().toString(),
             docTotalLineDiscountAmt: 0,
@@ -141,6 +142,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
             remark: "",
             companyId,
         }
+        if (!header) header = {}
         let formContainer = $('<div class="w-100 h-100 position-relative d-flex flex-column">').appendTo(e)
         form = $('<div id="form-container">').dxForm({
             labelMode: "floatting",
@@ -300,6 +302,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
 
     }
     function renderDetailForm(detailsData, itemElement, docId, docStatus) {
+        if (!detailsData) detailsData = []
         grid = $('<div id="detailsDataGrids" class="flex-grow-1">').css('padding', '0.5rem').css('margin-bottom', '-2rem').css('overflow-y', 'hidden').dxDataGrid({
             dataSource: genStoreUpsert(detailsData) || [],
             repaintChangesOnly: true,
@@ -750,7 +753,9 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
     }
     return {
         renderPopup: async (docId) => {
-            currentData = docId ? await salesRequestsHeaderService.getDoc(docId) : { header: {}, details: [] }
+            if (docId)
+                currentData = await salesRequestsHeaderService.getDoc(docId)
+            else currentData = { header: {}, details: [] }
             if (!popup) popup = $('<div id="popup">')
             popup.dxPopup({
                 title: `Sale Request - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[currentData.header.docStatus || 0].text}`,
@@ -759,7 +764,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                 width: "99%",
                 hideOnOutsideClick: false,
                 dragEnabled: false,
-                contentTemplate: async (e) => {
+                contentTemplate: (e) => {
                     renderForm(e, currentData, docId)
                 },
                 toolbarItems: [

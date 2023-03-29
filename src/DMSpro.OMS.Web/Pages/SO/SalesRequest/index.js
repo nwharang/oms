@@ -192,8 +192,8 @@
                         {
                             text: l('Button.ViewDetail'),
                             icon: "fieldchooser",
-                            onClick: function (e) {
-                                renderPopup(e.row.data.id)
+                            onClick: async function (e) {
+                                await renderPopup(e.row.data.id)
                             }
                         }
                     ],
