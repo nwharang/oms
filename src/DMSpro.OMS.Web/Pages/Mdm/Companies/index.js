@@ -7,8 +7,8 @@ $(function () {
 
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
+        //loadMode: 'raw',
+        //cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const argsGeo = {};
@@ -28,6 +28,16 @@ $(function () {
                 });
 
             return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            geoMasterService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
         },
     });
 
@@ -205,8 +215,17 @@ $(function () {
             popup: {
                 title: l("Page:Title:CompanyProfiles"),
                 showTitle: true,
-                height: 720
+                width: "95%",
+                height: "95%"
             },
+            // popup: {
+            //     title: 'Customer Info',
+            //     showTitle: true,
+            //     width: "95%",
+            //     height: "95%",
+            //     hideOnOutsideClick: true,
+            //     dragEnabled: false,
+            // },
             texts: {
                 editRow: l("Edit"),
                 deleteRow: l("Delete"),
@@ -291,7 +310,7 @@ $(function () {
                 formItem: {
                     visible: true,
                 },
-                //calculateDisplayValue: "geoLevel0.name", // provides display values
+                calculateDisplayValue: "geoLevel0.name", // provides display values
                 //calculateCellValue: function (rowData) {
                 //    return rowData.geoLevel0.name;
                 //},
@@ -313,26 +332,27 @@ $(function () {
                             pageSize: pageSizeForLookup
                         };
                     },
-                    //lookup: {
-                    //    valueExpr: 'id',
-                    //    displayExpr: 'name',
-                    //    dataSource(options) {
-                    //        return {
-                    //            store: geoMasterStore,
-                    //            filter: ['level', '=', 0],
-                    //            paginate: true,
-                    //        };
-                    //    },
-                    //},
                 },
                 //editCellTemplate: geoLookupEditorTemplate,
                 dataType: 'string',
+                showInColumnChooser: false
+            },
+            
+            {
+                dataField: "geoLevel1.name",
+                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel1Id"),
+                formItem: {
+                    visible: false
+                },
+                visible: true,
+                showInColumnChooser: true
             },
             {
                 dataField: "geoLevel1Id",
                 caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel1Id"),
-                calculateDisplayValue: "geoLevel1.name",
+                calculateDisplayValue: "geoLevel1Id",
                 //width: 110,
+                visible: false,
                 setCellValue(rowData, value) {
                     rowData.geoLevel1Id = value;
                     rowData.geoLevel2Id = null;
@@ -342,12 +362,6 @@ $(function () {
                 lookup: {
                     valueExpr: 'id',
                     displayExpr: 'name',
-
-                    //store: DevExpress.data.AspNet.createStore({
-                    //    key: "id",
-                    //    loadUrl: "api/mdm-service/companies/GetListDevextremes"
-                    //})
-
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
@@ -355,33 +369,24 @@ $(function () {
                             paginate: true,
                         };
                     },
-                    //lookup: {
-                    //    valueExpr: 'id',
-                    //    displayExpr: 'name',
-                    //    dataSource(options) {
-                    //        return {
-                    //            store: geoMasterStore,
-                    //            filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : ['level', '=', 1],
-                    //            paginate: true,
-                    //        };
-                    //    },
-                    //},
-                    // dataSource(options) {
-                    //     return {
-                    //         store: geoMasterStore,
-                    //         filter: options.data ? ['parentId', '=', options.data.geoLevel0Id] : ['level', '=', 1],
-                    //         paginate: true,
-                    //         pageSize: pageSizeForLookup
-                    //     };
-                    // },
+                    
                 },
                 dataType: 'string',
+                showInColumnChooser: false
+            },
+            {
+                dataField: "geoLevel2.name",
+                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel2Id"),
+                formItem: {
+                    visible: false
+                },
             },
             {
                 dataField: "geoLevel2Id",
                 caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel2Id"),
                 calculateDisplayValue: "geoLevel2.name",
                 //width: 110,
+                visible: false,
                 setCellValue(rowData, value) {
                     rowData.geoLevel2Id = value;
                     rowData.geoLevel3Id = null;
@@ -416,12 +421,21 @@ $(function () {
                     //},
                 },
                 dataType: 'string',
+                showInColumnChooser: false
+            },
+            {
+                dataField: "geoLevel3.name",
+                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel3Id"),
+                formItem: {
+                    visible: false
+                },
             },
             {
                 dataField: "geoLevel3Id",
                 caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel3Id"),
                 calculateDisplayValue: "geoLevel3.name",
                 //width: 110,
+                visible: false,
                 setCellValue(rowData, value) {
                     rowData.geoLevel3Id = value;
                     rowData.geoLevel4Id = null;
@@ -439,30 +453,39 @@ $(function () {
                     displayExpr: 'name',
                 },
                 dataType: 'string',
+                showInColumnChooser: false
             },
-            {
-                dataField: "geoLevel4Id",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel4Id"),
-                visible: false,
-                calculateDisplayValue: "geoLevel4.name",
-                formItem: {
-                    visible: false,
-                },
-                //width: 110,
-                lookup: {
-                    dataSource(options) {
-                        return {
-                            store: geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : ['level', '=', 4],
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    valueExpr: 'id',
-                    displayExpr: 'name',
-                },
-                dataType: 'string',
-            },
+            // {
+            //     dataField: "geoLevel4.name",
+            //     caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel4Id"),
+            //     formItem: {
+            //         visible: false
+            //     },
+            // },
+            // {
+            //     dataField: "geoLevel4Id",
+            //     caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel4Id"),
+            //     visible: false,
+            //     calculateDisplayValue: "geoLevel4.name",
+            //     formItem: {
+            //         visible: false,
+            //     },
+            //     //width: 110,
+            //     lookup: {
+            //         dataSource(options) {
+            //             return {
+            //                 store: geoMasterStore,
+            //                 filter: options.data ? ['parentId', '=', options.data.geoLevel3Id] : ['level', '=', 4],
+            //                 paginate: true,
+            //                 pageSize: pageSizeForLookup
+            //             };
+            //         },
+            //         valueExpr: 'id',
+            //         displayExpr: 'name',
+            //     },
+            //     dataType: 'string',
+            //     showInColumnChooser: false
+            // },
 
             //#region 
             {
