@@ -207,24 +207,24 @@ $(function () {
         toolbar: {
             items: [
                 'addRowButton',
-                'columnChooserButton',
+                //'columnChooserButton',
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    }
-                },
+                // {
+                //     location: 'after',
+                //     widget: 'dxButton',
+                //     options: {
+                //         icon: "import",
+                //         elementAttr: {
+                //             class: "import-excel",
+                //         },
+                //         onClick(e) {
+                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //             var gridName = gridControl.attr('id');
+                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //             if (popup) popup.show();
+                //         },
+                //     }
+                // },
                 "searchPanel"
             ],
         },
@@ -277,20 +277,20 @@ $(function () {
                         allowColumnResizing: true,
                         columnResizingMode: 'widget',
                         columnAutoWidth: true,
-                        filterRow: {
-                            visible: true
-                        },
-                        groupPanel: {
-                            visible: true,
-                        },
+                        // filterRow: {
+                        //     visible: true
+                        // },
+                        // groupPanel: {
+                        //     visible: true,
+                        // },
                         searchPanel: {
                             visible: true
                         },
                         columnMinWidth: 50,
-                        columnChooser: {
-                            enabled: true,
-                            mode: "select"
-                        },
+                        // columnChooser: {
+                        //     enabled: true,
+                        //     mode: "select"
+                        // },
                         columnFixing: {
                             enabled: true,
                         },
@@ -312,25 +312,25 @@ $(function () {
                             });
                             e.cancel = true;
                         },
-                        headerFilter: {
-                            visible: true,
-                        },
+                        // headerFilter: {
+                        //     visible: true,
+                        // },
                         stateStoring: {
                             enabled: true,
                             type: 'localStorage',
                             storageKey: 'dgUOMGroupDetails' + options.key,
                         },
-                        paging: {
-                            enabled: true,
-                            pageSize: pageSize
-                        },
-                        pager: {
-                            visible: true,
-                            showPageSizeSelector: true,
-                            allowedPageSizes: allowedPageSizes,
-                            showInfo: true,
-                            showNavigationButtons: true
-                        },
+                        // paging: {
+                        //     enabled: true,
+                        //     pageSize: pageSize
+                        // },
+                        // pager: {
+                        //     visible: true,
+                        //     showPageSizeSelector: true,
+                        //     allowedPageSizes: allowedPageSizes,
+                        //     showInfo: true,
+                        //     showNavigationButtons: true
+                        // },
                         editing: {
                             mode: "row",
                             allowAdding: abp.auth.isGranted('MdmService.UOMGroupDetails.Create'),
@@ -464,17 +464,17 @@ $(function () {
                         },
                         toolbar: {
                             items: [
-                                "groupPanel",
+                                //"groupPanel",
                                 "addRowButton",
-                                'columnChooserButton',
-                                "exportButton",
-                                {
-                                    location: 'after',
-                                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
-                                    onClick() {
-                                        //todo
-                                    },
-                                },
+                                //'columnChooserButton',
+                                //"exportButton",
+                                // {
+                                //     location: 'after',
+                                //     template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
+                                //     onClick() {
+                                //         //todo
+                                //     },
+                                // },
                                 "searchPanel"
                             ],
                         },
