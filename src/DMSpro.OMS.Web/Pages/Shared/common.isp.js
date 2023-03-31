@@ -30,17 +30,17 @@ var dxDataGridConfiguration = {
     searchPanel: {
         visible: true
     },
-    paging: {
-        enabled: true,
-        pageSize: pageSize
-    },
-    pager: {
-        visible: true,
-        showPageSizeSelector: true,
-        allowedPageSizes: allowedPageSizes,
-        showInfo: true,
-        showNavigationButtons: true
-    },
+    // paging: {
+    //     enabled: true,
+    //     pageSize: pageSize
+    // },
+    // pager: {
+    //     visible: true,
+    //     showPageSizeSelector: true,
+    //     allowedPageSizes: allowedPageSizes,
+    //     showInfo: true,
+    //     showNavigationButtons: true
+    // },
     toolbar: {
         items: [
             //"groupPanel",
@@ -139,8 +139,7 @@ function initChooseItemsPopup(items) {
                 width: 100,
                 dataType: 'number',
                 editorOptions: {
-                    min: 0,
-                    value: 1,
+                    min: 1,
                 }
                 // cellTemplate(container, options) {
                 //     $('<div>')

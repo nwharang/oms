@@ -86,10 +86,10 @@ let store = () => {
                 id: 1,
                 text: l('EntityFieldName:OrderService:SalesRequest:DiscountBeforeTax')
             },
-            {
-                id: 2,
-                text: l('EntityFieldName:OrderService:SalesRequest:DiscountAfterTax')
-            }
+            // {
+            //     id: 2,
+            //     text: l('EntityFieldName:OrderService:SalesRequest:DiscountAfterTax')
+            // }
         ],
         transactionTypeStore: [
             {
@@ -115,7 +115,6 @@ let store = () => {
 let getInfoSO = async () => {
     let companyId = (await Common.getCurrentCompany()).id;
     return await salesOrderService.getInfoSO({ companyId }, new Date()).then(async result => {
-        console.log(companyId);
         data = (await Common.parseJSON(result)).soInfo;
         let validUOM = Object.keys(data.priceDictionary).map(e => {
             key = e.split("|")
