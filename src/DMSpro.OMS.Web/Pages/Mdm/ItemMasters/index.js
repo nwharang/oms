@@ -397,7 +397,6 @@
                                                 case 0:
                                                     formInstance.getEditor('expiredType').option('readOnly', true)
                                                     expiredValue.option('readOnly', true)
-                                                    issueMethod.option('value', 0)
                                                     break;
                                                 case 1:
                                                     formInstance.getEditor('expiredType').option('readOnly', false)
@@ -450,6 +449,7 @@
                                     elementAttr: {
                                         id: 'issueMethod'
                                     },
+                                    showClearButton: true,
                                     searchEnabled: true,
                                     displayExpr: 'text',
                                     valueExpr: 'id',

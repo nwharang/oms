@@ -1,18 +1,11 @@
-let preLoad
-try {
-    preLoad = getInfoSO();
-} catch (error) {
-    console.log(error);
-}
+let preLoad = getInfoSO()
 
-
+let currentData = {}, isDocOpen
 let helper = ({ companyId, salesOrderStore, vatList }) => {
     let salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
     let { discountTypeStore, transactionTypeStore, docStatusStore } = store()
     let gridInitialized = false, popup, form, grid;
     // Local Store
-    let savedFormData = {}
-    let currentData = {}
     let comingData = { next: {}, previous: {} }
     let genStoreForDropDownBox = (data) => new DevExpress.data.CustomStore({
         labelMode: 'raw',
@@ -21,43 +14,6 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
             return data
         }
     })
-    let genStoreUpsert = (data) => new DevExpress.data.CustomStore({
-        // data : Array[]
-        labelMode: 'raw',
-        key: 'id',
-        load() {
-            return data
-        },
-        insert({ id, arg, incomingData }) {
-            // incomingData : Object
-            // arg isFree
-            let foundItem = data.find(item => item?.id === id && item.isFree === arg)
-            if (foundItem) {
-                foundItem.qty += incomingData.qty
-                foundItem.price += incomingData.price
-                foundItem.priceAfterTax += incomingData.priceAfterTax
-                foundItem.lineAmtAfterTax += incomingData.lineAmtAfterTax
-                foundItem.lineAmt += incomingData.lineAmt
-            } else {
-                data.push(incomingData)
-            }
-            return data
-        },
-        update(id, newData) {
-            let foundItem = data.find(item => item?.id === id)
-            foundItem = newData
-            return data
-        },
-        remove(id) {
-            let foundItemIndex = data.findIndex(item => item?.id === id)
-            data.splice(foundItemIndex, 1)
-            return data
-        }
-    })
-
-    let compareObject = (obj1, obj2) => {
-        return JSON.stringify(obj1) === JSON.stringify(obj2)
-    }
     let loadNavigationButton = (docId) => {
         if (docId) {
             salesRequestsHeaderService.getPrevDoc(docId).done(data => {
@@ -76,6 +32,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
             })
         }
     }
+
     let notify = ({ type = "success", position = "bottom left", message = "Message Placeholder" }) => DevExpress.ui.notify({
         message,
         height: 45,
@@ -92,53 +49,12 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
     }, {
         position
     })
-    let recalulateDocTotal = () => {
-        let formInstance = form.dxForm('instance')
-        let gridInstance = grid.dxDataGrid('instance')
-        if (!formInstance || !gridInstance || !gridInstance.getDataSource()) return
-        let { docDiscountType, docDiscountPerc, docDiscountAmt } = formInstance.option('formData')
-        let docTotalLineDiscountAmt = gridInstance.getTotalSummaryValue('docTotalLineDiscountAmt')
-        let docTotalLineAmt = gridInstance.getTotalSummaryValue('docTotalLineAmt')
-        let docTotalLineAmtAfterTax = gridInstance.getTotalSummaryValue('docTotalLineAmtAfterTax')
-        formInstance.updateData('docTotalLineDiscountAmt', docTotalLineDiscountAmt)
-        formInstance.updateData('docTotalLineAmt', docTotalLineAmt)
-        formInstance.updateData('docTotalLineAmtAfterTax', docTotalLineAmtAfterTax)
-        let noNegative = (a, b) => a - b <= 0 ? 0 : a - b
-        switch (docDiscountType) {
-            case 0:
-                formInstance.updateData('docDiscountAmt', docDiscountAmt);
-                formInstance.getEditor('docDiscountPerc').option('disabled', true);
-                formInstance.getEditor('docDiscountAmt').option('disabled', false);
-                formInstance.updateData('docTotalAmt', noNegative(docTotalLineAmt, docDiscountAmt));
-                formInstance.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
-                break;
-            case 1:
-                var _docDiscountAmt = docTotalLineAmt * docDiscountPerc;
-                formInstance.updateData('docDiscountAmt', _docDiscountAmt);
-                formInstance.getEditor('docDiscountAmt').option('disabled', true);
-                formInstance.getEditor('docDiscountPerc').option('disabled', false);
-                formInstance.updateData('docTotalAmt', noNegative(docTotalLineAmt, _docDiscountAmt));
-                formInstance.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
-                break;
-            case 2:
-                var _docDiscountAmt = docTotalLineAmtAfterTax * docDiscountPerc;
-                formInstance.updateData('docDiscountAmt', _docDiscountAmt);
-                formInstance.getEditor('docDiscountAmt').option('disabled', true);
-                formInstance.getEditor('docDiscountPerc').option('disabled', false);
-                formInstance.updateData('docTotalAmt', noNegative(docTotalLineAmt, _docDiscountAmt));
-                formInstance.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - _docDiscountAmt);
-                break;
-        }
-    }
     function renderForm(e, { header, details }, docId) {
         let defaultNewHeader = {
             requestDate: new Date().toString(),
             docTotalLineDiscountAmt: 0,
             docTotalLineAmt: 0,
             docTotalLineAmtAfterTax: 0,
-            docDiscountType: 0,
-            docDiscountPerc: 0,
-            docDiscountAmt: 0,
             docTotalAmt: 0,
             docTotalAmtAfterTax: 0,
             docSource: 0,
@@ -193,9 +109,8 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                             editorType: 'dxDateBox',
                             editorOptions: {
                                 displayFormat: "dd-MM-yyyy",
-                                min: new Date().toString(),
                                 dateOutOfRangeMessage: "Date is out of range",
-                                disabled: true,
+                                readOnly: true,
                             },
                             validationRules: [{ type: 'required' }],
                         },
@@ -224,17 +139,29 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                 displayExpr: 'text',
                                 valueExpr: 'id',
                                 searchEnabled: true,
+                                showClearButton: true,
                             },
                         },
                         {
                             dataField: "docDiscountPerc",
                             editorType: 'dxNumberBox',
                             editorOptions: {
-                                format: '##0.## %',
+                                format: '#0.00',
                                 min: 0,
-                                max: 1,
-                                disabled: true,
-                            }
+                                max: 100,
+                                readOnly: true,
+                                onValueChanged: () => {
+                                    setTimeout(() => {
+                                        recalulateDocTotal()
+                                    }, 200)
+                                }
+                            },
+                            customizeText: function (cellInfo) {
+                                if (cellInfo.value)
+                                    return cellInfo.value + " %";
+                            },
+                            format: '#0.00',
+                            width: 100,
                         },
                         {
                             dataField: "docDiscountAmt",
@@ -242,11 +169,16 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                             editorOptions: {
                                 format: '#,##0.##',
                                 min: 0,
-                                value: 0
+                                value: 0,
+                                onValueChanged: () => {
+                                    setTimeout(() => {
+                                        recalulateDocTotal()
+                                    }, 200)
+                                }
                             }
                         },
                         {
-                            dataField: "docTotalLineAmtAfterTax",
+                            dataField: "docTotalAmt",
                             editorType: 'dxNumberBox',
                             editorOptions: {
                                 readOnly: true,
@@ -284,12 +216,36 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     grid.dxDataGrid('instance').option('editing', newEditingOption)
                     $('#addNewDetailButton').dxButton('instance').option('visible', true)
                 }
-                if (!form?.dxForm('instance') || !grid?.dxDataGrid('instance')) return
-                $('#saveButtonPopup').dxButton('instance').option('disabled', compareObject(savedFormData, formInstance.option('formData')))
-                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", !compareObject(savedFormData, formInstance.option('formData')))
-                setTimeout(() => {
-                    recalulateDocTotal()
-                }, 200)
+            },
+            onContentReady: (e) => {
+                let openState = !Boolean(currentData.header.docStatus)
+                let docDiscountType = e.component.getEditor('docDiscountType')
+                let docDiscountPerc = e.component.getEditor('docDiscountPerc')
+                let docDiscountAmt = e.component.getEditor('docDiscountAmt')
+                if (openState)
+                    switch (docDiscountType.option('value')) {
+                        case 0:
+                            docDiscountPerc.option('readOnly', true)
+                            docDiscountAmt.option('readOnly', false)
+                            break;
+                        case 1:
+                        case 2:
+                            docDiscountPerc.option('readOnly', false)
+                            docDiscountAmt.option('readOnly', true)
+                            break;
+                        default:
+                            docDiscountPerc.option('readOnly', false)
+                            docDiscountAmt.option('readOnly', false)
+                            break;
+                    }
+                docDiscountType.option('onSelectionChanged', () => {
+                    docDiscountPerc.option('value', 0)
+                    docDiscountAmt.option('value', 0)
+                    setTimeout(() => {
+                        recalulateDocTotal()
+                    }, 200)
+                })
+
             }
         })
         let formInstance = form.dxForm('instance')
@@ -297,6 +253,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
         let resizeBox = $('<div>').dxResizable({
             handles: "bottom",
             maxHeight: 320, // 20 rem
+            height: 176,
             minHeight: 32,
             elementAttr: {
                 id: "resizeBox",
@@ -309,7 +266,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
     function renderDetailForm(detailsData, itemElement, docId, docStatus) {
         if (!detailsData) detailsData = []
         grid = $('<div id="detailsDataGrids" class="flex-grow-1">').css('padding', '0.5rem').css('margin-bottom', '-2rem').css('overflow-y', 'hidden').dxDataGrid({
-            dataSource: genStoreUpsert(detailsData) || [],
+            dataSource: detailsData || [],
             repaintChangesOnly: true,
             editing: {
                 mode: 'batch',
@@ -323,7 +280,6 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                 newRowPosition: 'last'
             },
             showRowLines: true,
-            // cacheEnabled: true,
             columnAutoWidth: true,
             showColumnLines: true,
             showRowLines: true,
@@ -331,13 +287,8 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                 visible: true
             },
             allowColumnResizing: true,
-            // allowColumnReordering: true,
             rowAlternationEnabled: true,
             columnResizingMode: 'widget',
-            filterRow: {
-                visible: true,
-                applyFilter: 'auto',
-            },
             columnChooser: {
                 enabled: true,
                 mode: "select"
@@ -347,7 +298,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                 visible: false,
             },
             stateStoring: {
-                enabled: true,
+                // enabled: true,
                 type: 'localStorage',
                 storageKey: 'dgSalesRequestDetails',
             },
@@ -371,12 +322,23 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                 {
                     type: 'buttons',
                     caption: l('Actions'),
-                    buttons: ['edit', 'delete'],
+                    buttons: [{
+                        name: 'delete',
+                        onClick(e) {
+                            let index = currentData.details.findIndex(v => v.itemId == e.row?.data.itemId)
+                            if (index > -1)
+                                currentData.details.splice(index, 1)
+                            e.component.refresh().done(() => {
+                                setTimeout(() => {
+                                    recalulateDocTotal()
+                                }, 200)
+                            })
+                        }
+                    }],
                     width: 75,
                     fixed: true,
                     fixedPosition: 'left',
                     allowFiltering: false,
-
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:Item'),
@@ -432,12 +394,13 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                     setTimeout(() => {
                                         recalulateDocTotal()
                                     }, 200)
+
                                 });
                                 return content
                             }
                         })
                     },
-                    setCellValue: function (newData, value, currentData) {
+                    setCellValue: function (newData, value, currentRowData) {
                         let selectedItem = salesOrderStore.itemList.find(i => i.id == value);
                         let vat = vatList.find(i => i.id == selectedItem?.vatId);
                         if (selectedItem) {
@@ -448,8 +411,8 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                             newData.uomId = selectedItem.salesUomId;
                             newData.price = selectedItem.basePrice;
                             newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100;
-                            newData.lineAmtAfterTax = newData.priceAfterTax * currentData.qty - currentData.docDiscountAmt;
-                            newData.lineAmt = newData.price * currentData.qty - currentData.docDiscountAmt;
+                            newData.lineAmtAfterTax = newData.priceAfterTax * currentRowData.qty - currentRowData.discountAmt;
+                            newData.lineAmt = newData.price * currentRowData.qty - currentRowData.discountAmt;
                         }
                     },
                 },
@@ -457,18 +420,17 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:UOM'),
                     dataField: 'uomId',
                     lookup: {
-
                         dataSource: salesOrderStore.uOMList,
                         displayExpr: "name",
                         valueExpr: "id"
                     },
-                    setCellValue: function (newData, value, currentData) {
+                    setCellValue: function (newData, value, currentRowData) {
                         let customerId = form.dxForm('instance').getEditor('businessPartnerId').option('value');
                         let customer = salesOrderStore.customerList.find(x => x.id == customerId);
-                        let price = salesOrderStore.priceList.find(x => x.id == customer.priceListId + '|' + currentData.itemId + '|' + value)?.value || 0;
-                        let priceAfterTax = price + (price * currentData.taxRate) / 100;
-                        let lineAmtAfterTax = priceAfterTax * currentData.qty - currentData.docDiscountAmt;
-                        let lineAmt = price * currentData.qty - currentData.docDiscountAmt;
+                        let price = salesOrderStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + value)?.value || 0;
+                        let priceAfterTax = price + (price * currentRowData.taxRate) / 100;
+                        let lineAmtAfterTax = priceAfterTax * currentRowData.qty - currentRowData.discountAmt;
+                        let lineAmt = price * currentRowData.qty - currentRowData.discountAmt;
                         newData.uomId = value;
                         newData.price = price;
                         newData.priceAfterTax = priceAfterTax;
@@ -484,8 +446,8 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     setCellValue: (newData, value, currentRowData) => {
                         newData.isFree = value;
                         if (value) {
-                            newData.docDiscountType = 0
-                            newData.docDiscountAmt = 0
+                            newData.discountType = 0
+                            newData.discountAmt = 0
                             newData.lineAmt = 0
                             newData.lineAmtAfterTax = 0
                         }
@@ -495,8 +457,8 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                 thisData = detailsData?.find(e => e.id === currentRowData.id)
                             newData.price = thisData?.price || 0
                             newData.priceAfterTax = thisData?.priceAfterTax || 0
-                            newData.docDiscountType = thisData?.docDiscountType || 0
-                            newData.docDiscountAmt = thisData?.docDiscountAmt || 0
+                            newData.discountType = thisData?.discountType || 0
+                            newData.discountAmt = thisData?.discountAmt || 0
                             newData.lineAmt = thisData?.lineAmt || 0
                             newData.lineAmtAfterTax = thisData?.lineAmtAfterTax || 0
                         }
@@ -518,11 +480,11 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     },
                     format: '#,##0.##',
                     validationRules: [{ type: 'required', message: '' }],
-                    setCellValue: function (newData, value, currentData) {
+                    setCellValue: function (newData, value, currentRowData) {
                         newData.price = value;
-                        newData.priceAfterTax = value + (value * currentData.taxRate) / 100;
-                        newData.lineAmt = value * currentData.qty - currentData.docDiscountAmt;
-                        newData.lineAmtAfterTax = newData.priceAfterTax * currentData.qty - currentData.docDiscountAmt;
+                        newData.priceAfterTax = value + (value * currentRowData.taxRate) / 100;
+                        newData.lineAmt = value * currentRowData.qty - currentRowData.discountAmt;
+                        newData.lineAmtAfterTax = newData.priceAfterTax * currentRowData.qty - currentRowData.discountAmt;
                     },
                 },
                 {
@@ -549,82 +511,107 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
                     dataField: 'qty',
                     dataType: 'number',
-                    setCellValue: function (newData, value, currentData) {
+                    setCellValue: function (newData, value, currentRowData) {
                         newData.qty = value;
-                        newData.lineAmt = value * currentData.price - currentData.docDiscountAmt;
-                        newData.lineAmtAfterTax = currentData.priceAfterTax * value - currentData.docDiscountAmt;
+                        newData.lineAmt = value * currentRowData.price - currentRowData.discountAmt;
+                        newData.lineAmtAfterTax = currentRowData.priceAfterTax * value - currentRowData.discountAmt;
                     },
-                    validationRules: [
-                        {
-                            type: 'required', message: ''
-                        },
-                        {
-                            type: 'pattern',
-                            message: 'Quantity can not be Negative!',
-                            pattern: /^\d*[1-9]\d*$/,
-                        }
-                    ],
+                    validationRules: [{ type: 'required', message: '' }],
+                    editorOptions: {
+                        min: 1
+                    }
                 },
-
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountType'),
-                    dataField: 'docDiscountType',
+                    dataField: 'discountType',
+                    setCellValue: (newData, value, currentRowData) => {
+                        newData.discountType = value;
+                        switch (newData.discountType) {
+                            case 0:
+                                newData.discountAmt = 0;
+                                newData.discountPerc = null
+                                break;
+                            case 1:
+                                newData.discountAmt = null
+                                newData.discountPerc = 0
+                                break;
+                            case 2:
+                                newData.discountAmt = null
+                                newData.discountPerc = 0
+                                break;
+
+                            default:
+                                break;
+                        }
+                    },
                     lookup: {
                         dataSource: discountTypeStore,
                         displayExpr: 'text',
-                        valueExpr: 'id'
+                        valueExpr: 'id',
                     },
-                    // editorOptions: {
-                    //     onSelectionChanged: (e) => {
-                    //         console.log(e.value);
-                    //         switch (e.value) {
-                    //             case value:
-
-                    //                 break;
-
-                    //             default:
-                    //                 break;
-                    //         }
-                    //     }
-                    // }
+                    editorType: 'dxSelectBox',
+                    editorOptions: {
+                        dataSource: discountTypeStore,
+                        displayExpr: 'text',
+                        valueExpr: 'id',
+                        showClearButton: true,
+                    }
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountPerc'),
-                    dataField: 'docDiscountPerc',
-                    dataType: 'number',
+                    dataField: 'discountPerc',
+                    // dataType: 'number',
+                    editorType: 'dxNumberBox',
                     editorOptions: {
-                        format: '#0.00 %',
+                        format: '#0.00',
+                        min: 0,
+                        max: 100,
                     },
-                    format: '#0.00 %',
+                    customizeText: function (cellInfo) {
+                        if (cellInfo.value)
+                            return cellInfo.value + " %";
+                    },
+                    format: '#0.00',
                     width: 100,
-                    setCellValue: function (newData, value, currentData) {
-                        newData.docDiscountPerc = value;
-                        switch (currentData.docDiscountType) {
-                            case 1:
-                                newData.docDiscountAmt = currentData.price * value;
-                                newData.lineAmt = currentData.qty * currentData.price - newData.docDiscountAmt;
-                                newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.docDiscountAmt;
+                    setCellValue: function (newData, value, currentRowData) {
+                        newData.discountPerc = value;
+                        newData.discountAmt = null
+                        switch (currentRowData.discountType) {
+                            case 1: // 
+                                var discountAmt = value * currentRowData.qty * currentRowData.price / 100
                                 break;
                             case 2:
-                                newData.docDiscountAmt = currentData.priceAfterTax * value;
-                                newData.lineAmt = currentData.qty * currentData.price - newData.docDiscountAmt;
-                                newData.lineAmtAfterTax = currentData.priceAfterTax * currentData.qty - newData.docDiscountAmt;
+                                var discountAmt = value * currentRowData.qty * currentRowData.priceAfterTax / 100
                                 break;
-                            default:
-                                newData.docDiscountPerc = 0;
-                                newData.docDiscountAmt = 0;
                         }
+                        newData.lineDiscountAmt = discountAmt;
+                        newData.lineAmt = currentRowData.qty * currentRowData.price - discountAmt;
+                        newData.lineAmtAfterTax = currentRowData.priceAfterTax * currentRowData.qty - discountAmt;
                     },
+
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountAmt'),
-                    dataField: 'docDiscountAmt',
-                    dataType: 'number',
+                    dataField: 'discountAmt',
+                    editorType: 'dxNumberBox',
                     editorOptions: {
                         format: '#,##0.##',
+                        min: 0,
                     },
                     format: '#,##0.##',
                     width: 100,
+                    setCellValue: function (newData, value, currentRowData) {
+                        newData.discountAmt = value;
+                        newData.discountPerc = null;
+                        switch (currentRowData.discountType) {
+                            case 0:
+                                newData.lineDiscountAmt = value;
+                                newData.lineAmt = currentRowData.qty * currentRowData.price - value;
+                                newData.lineAmtAfterTax = currentRowData.priceAfterTax * currentRowData.qty - value;
+                                break;
+
+                        }
+                    },
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineAmt'),
@@ -633,7 +620,6 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     editorOptions: {
                         format: '#,##0.##',
                     },
-                    allowEditing: false,
                     format: '#,##0.##',
                 },
                 {
@@ -657,17 +643,6 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     validationRules: [{ type: 'required', message: '' }],
                     width: 150,
                 },
-                // {
-                //     caption: l('EntityFieldName:OrderService:SalesRequestDetails:Warehouse'),
-                //     dataField: 'warehouseId',
-                //     visible: false
-                // },
-                // {
-                //     caption: l('EntityFieldName:OrderService:SalesRequestDetails:WarehouseLocation'),
-                //     dataField: 'warehouseLocationId',
-                //     visible: false
-                // },
-
             ],
             summary: {
                 recalculateWhileEditing: true,
@@ -689,14 +664,14 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                         valueFormat: '#,##0.##',
                     },
                     {
-                        column: 'docDiscountAmt',
-                        name: "docTotalLineDiscountAmt",
+                        column: 'lineAmt',
+                        name: "docTotalLineAmt",
                         summaryType: 'sum',
                         valueFormat: '#,##0.##',
                     },
                     {
-                        column: 'lineAmt',
-                        name: "docTotalLineAmt",
+                        column: 'lineDiscountAmt',
+                        name: "docTotalLineDiscountAmt",
                         summaryType: 'sum',
                         valueFormat: '#,##0.##',
                     },
@@ -709,9 +684,17 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                 ],
             },
             onContentReady: async (e) => {
-                setTimeout(() => {
-                    recalulateDocTotal()
-                }, 200)
+                if (!Boolean(currentData.header.docStatus)) {
+                    if (form.dxForm('instance').getEditor('businessPartnerId').option('value'))
+                        $('#addNewDetailButton').dxButton('instance').option('visible', true)
+                    else {
+                        $('#addNewDetailButton').dxButton('instance').option('visible', false)
+                    }
+                }
+                if (grid.dxDataGrid('instance').hasEditData())
+                    setTimeout(() => {
+                        recalulateDocTotal()
+                    }, 200)
             },
             onInitNewRow: (e) => {
                 e.data = {
@@ -720,18 +703,14 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     price: 0,
                     qty: 1,
                     priceAfterTax: 0,
-                    docDiscountType: 0,
-                    docDiscountAmt: 0,
-                    docDiscountPerc: 0,
                     lineAmt: 0,
                     lineAmtAfterTax: 0,
                     transactionType: 0,
                 }
             },
-            onOptionChanged: () => {
+            onOptionChanged: (e) => {
                 if (gridInitialized) {
                     if (grid?.dxDataGrid('instance') && form?.dxForm('instance')) {
-                        $('#saveButtonPopup').dxButton('instance').option('disabled', !grid?.dxDataGrid('instance').hasEditData())
                         $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", grid?.dxDataGrid('instance').hasEditData())
 
                     }
@@ -742,18 +721,20 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
             },
             onEditorPreparing: (e) => {
                 if (e.row?.rowType != 'data') return
-                e.editorOptions.onValueChanged = (v) => {
-                    e.setValue(v.value)
-                    setTimeout(() => {
-                        recalulateDocTotal()
-                    }, 200)
-                }
-            },
-            onEditorPrepared: (e) => {
-                if (e.row?.rowType === "data")
-                    gridInitialized = true
+                let discountType = e.row.data.discountType
+                if (e.dataField == "discountAmt")
+                    e.cancel = discountType == 0 ? false : true
+                if (e.dataField == "discountPerc")
+                    e.cancel = discountType > 0 ? false : true
 
-            },
+                // e.editorOptions.onValueChanged = (v) => {
+                //     e.setValue(v.value)
+                //     setTimeout(() => {
+                //         recalulateDocTotal()
+                //     }, 200)
+                // }
+
+            }
         })
         gridInstance = grid.dxDataGrid('instance')
         loadNavigationButton(docId)
@@ -764,6 +745,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
             if (docId)
                 currentData = await salesRequestsHeaderService.getDoc(docId)
             else currentData = { header: {}, details: [] }
+            isDocOpen = !Boolean(currentData.header.docStatus)
             if (!popup) popup = $('<div id="popup">')
             popup.dxPopup({
                 title: `Sale Request - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[currentData.header.docStatus || 0].text}`,
@@ -796,6 +778,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                 }
                                 docId = comingData.previous.header.id;
                                 form.dxForm("instance").option("formData", comingData.previous.header)
+                                savedFormData = { ...form.dxForm('instance').option('formData') }
                                 grid.dxDataGrid("instance").option('dataSource', comingData.previous.details)
                                 form.dxForm('instance').option("readOnly", Boolean(comingData.previous.header.docStatus))
                                 grid.dxDataGrid('instance').option("editing", newEditingOption)
@@ -825,6 +808,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                 }
                                 docId = comingData.next.header.id;
                                 form.dxForm("instance").option("formData", comingData.next.header)
+                                savedFormData = { ...form.dxForm('instance').option('formData') }
                                 grid.dxDataGrid("instance").option('dataSource', comingData.next.details)
                                 form.dxForm('instance').option("readOnly", Boolean(comingData.next.header.docStatus))
                                 grid.dxDataGrid('instance').option("editing", newEditingOption)
@@ -864,6 +848,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                                     form.dxForm('instance').option("readOnly", true)
                                                     grid.dxDataGrid('instance').option("editing", newEditingOption)
                                                     $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", true)
+                                                    $('#saveButtonPopup').dxButton('instance').option('disabled', true);
                                                     popup.dxPopup('instance').option("title", `Sale Request - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[1].text}`)
                                                 })
                                                 .fail(() => {
@@ -890,6 +875,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                                         notify({ type: 'success', message: "SR Rejected" })
                                                         form.dxForm('instance').option("readOnly", true)
                                                         grid.dxDataGrid('instance').option("editing", newEditingOption)
+                                                        $('#saveButtonPopup').dxButton('instance').option('disabled', true);
                                                         popup.dxPopup('instance').option("title", `Sale Request - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[2].text}`)
                                                     })
                                                     .fail(() => {
@@ -914,10 +900,8 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                 id: 'saveButtonPopup'
                             },
                             onClick() {
-                                setTimeout(() => {
-                                    recalulateDocTotal()
-                                }, 200)
-                                grid.dxDataGrid('instance').saveEditData().then(() => {
+                                $('#saveButtonPopup').dxButton('instance').option('disabled', true);
+                                grid.dxDataGrid('instance').saveEditData().then((e) => {
                                     currentData.header = form.dxForm('instance').option('formData');
                                     currentData.details = grid.dxDataGrid('instance').getDataSource().items().filter(detail => detail.itemId)
                                     currentData.header.requestDate = new Date().toString();;
@@ -926,20 +910,24 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                     }
                                     if (docId && currentData.header && currentData.details.length > 0)
                                         salesRequestsHeaderService.updateDoc(docId, currentData)
-                                            .done(() => notify({ type: 'success', message: "Updated SR" }))
-                                            .fail(() => notify({ type: 'error', message: "SR Update Failed" }))
+                                            .done(() => {
+                                                notify({ type: 'success', message: "Updated SR" })
+                                            })
+                                            .fail(() => {
+                                                notify({ type: 'error', message: "SR Update Failed" })
+                                                $('#saveButtonPopup').dxButton('instance').option('disabled', false);
+                                            })
                                     else
                                         salesRequestsHeaderService.createDoc(currentData)
                                             .done((data) => {
                                                 notify({ type: 'success', message: "SR Created" })
-                                                $('#saveButtonPopup').dxButton('instance').option('disabled', true)
                                                 docId = data.header.id
                                                 popup.dxPopup('instance').option("title", `Sale Request - #${docId ? data.header.docNbr : "New"} - ${docStatusStore[data.header.docStatus || 0].text}`)
                                                 loadNavigationButton(docId)
                                             })
                                             .fail(() => {
                                                 notify({ type: 'error', message: "SR Create Failed" })
-                                                $('#saveButtonPopup').dxButton('instance').option('disabled', false)
+                                                $('#saveButtonPopup').dxButton('instance').option('disabled', false);
                                             })
 
                                 })
@@ -963,48 +951,128 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                 onHiding: () => {
                     gridInitialized = false
                 },
-                onContentReady: () => {
-                    if (docId)
+                onContentReady: (e) => {
+                    if (docId && !Boolean(currentData.header.docStatus)) { // Open
                         $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
-                    else
+                    }
+                    else {
                         $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", true)
+                    }
                 }
             })
             popup.appendTo('body')
             popup.dxPopup('instance').show()
         },
-
     }
 }
-let appendSelectedItems = (selectedItems) => {
+function appendSelectedItems(selectedItems) {
+    let gridInstance = $("#detailsDataGrids").dxDataGrid('instance')
+    // let items = [...gridInstance.getDataSource().items()]
+    // let items = currentData.details || [] // Array[] || []
+    if (!currentData.details) currentData.details = []
     preLoad.then((data) => {
         selectedItems.forEach((u) => {
             let priceAfterTax = u.basePrice + (u.basePrice * data.vatList.find(x => x.id == u.vatId).rate) / 100;
-            let lineAmtAfterTax = (priceAfterTax * parseInt(u.qty)) - 0;
-            let gridInstance = $("#detailsDataGrids").dxDataGrid('instance')
-            let store = $("#detailsDataGrids").dxDataGrid('instance').getDataSource().store()
-            store.insert({
-                id: u.id, arg: u.isFree, incomingData: {
+            let lineAmtAfterTax = (priceAfterTax * parseInt(u.qty));
+            let lineAmt = u.basePrice * u.qty
+            // let store = $("#detailsDataGrids").dxDataGrid('instance').getDataSource().store()
+            let foundItem = currentData.details.find(item => item?.itemId === u.id && item.isFree === u.isFree)
+            if (foundItem) {
+                foundItem.qty += u.qty
+                foundItem.lineAmtAfterTax += lineAmtAfterTax
+                foundItem.lineAmt += lineAmt
+            } else {
+                currentData.details.push({
                     isFree: u.isFree,
                     id: u.id,
                     itemId: u.id,
                     vatId: u.vatId,
                     taxRate: data.vatList.find(x => x.id == u.vatId).rate,
-                    uomId: u.salesUomId,
+                    uomId: u.invUomId,
                     price: u.basePrice,
                     qty: parseInt(u.qty),
                     priceAfterTax: priceAfterTax,
                     lineAmtAfterTax: !u.isFree ? lineAmtAfterTax : 0,
-                    lineAmt: !u.isFree ? u.basePrice * parseInt(u.qty) - 0 : 0,
-                    docDiscountAmt: 0,
-                    docDiscountPerc: 0,
-                    docDiscountType: 0,
+                    lineAmt: !u.isFree ? u.basePrice * parseInt(u.qty) : 0,
                     transactionType: 0,
                     uomGroupId: u.uomGroupId
-                }
-            })
-                .then(() => $("#detailsDataGrids").data('dxDataGrid').refresh())
-
+                })
+            }
         })
     })
+    gridInstance.refresh(true)
+    setTimeout(() => {
+        recalulateDocTotal()
+    }, 200)
+}
+
+// isSave
+// isNotSave
+function debounce(func, delay) {
+    let debounceTimer
+    return function () {
+        const context = this
+        const args = arguments
+        clearTimeout(debounceTimer)
+        debounceTimer = setTimeout(() => {
+            func.apply(context, args)
+        }, delay)
+    }
+}
+
+function recalulateDocTotal() {
+    let formInstance = $("#form-container").dxForm('instance')
+    let gridInstance = $("#detailsDataGrids").dxDataGrid('instance')
+    if (!formInstance || !gridInstance) return
+    if (gridInstance.hasEditData()) {
+        debounce(gridInstance.saveEditData(), 250)
+    }
+    let { docDiscountType, docDiscountPerc = 0, docDiscountAmt } = formInstance.option('formData')
+    let docTotalLineDiscountAmt = gridInstance.getTotalSummaryValue('docTotalLineDiscountAmt') || 0
+    let docTotalLineAmt = gridInstance.getTotalSummaryValue('docTotalLineAmt') || 0
+    let docTotalLineAmtAfterTax = gridInstance.getTotalSummaryValue('docTotalLineAmtAfterTax') || 0
+    let totalDiscountAmt = docTotalLineDiscountAmt + docDiscountAmt
+    formInstance.updateData('docTotalLineDiscountAmt', docTotalLineDiscountAmt)
+    formInstance.updateData('docTotalLineAmt', docTotalLineAmt)
+    formInstance.updateData('docTotalLineAmtAfterTax', docTotalLineAmtAfterTax)
+    formInstance.updateData('totalDiscountAmt', totalDiscountAmt);
+    switch (docDiscountType) {
+        case 0:
+            formInstance.updateData('docDiscountAmt', docDiscountAmt);
+            formInstance.getEditor('docDiscountPerc').option('readOnly', true);
+            formInstance.getEditor('docDiscountAmt').option('readOnly', false);
+            formInstance.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
+            formInstance.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
+            break;
+        case 1:
+            var discountAmt = docDiscountPerc * docTotalLineAmt / 100
+            formInstance.updateData('docDiscountAmt', 0);
+            formInstance.getEditor('docDiscountAmt').option('readOnly', true);
+            formInstance.getEditor('docDiscountPerc').option('readOnly', false);
+            formInstance.updateData('docTotalAmt', docTotalLineAmt - discountAmt);
+            formInstance.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - discountAmt);
+            break;
+        case 2:
+            var discountAmt = docDiscountPerc * docTotalLineAmtAfterTax / 100
+            formInstance.updateData('docDiscountAmt', 0);
+            formInstance.getEditor('docDiscountAmt').option('readOnly', true);
+            formInstance.getEditor('docDiscountPerc').option('readOnly', false);
+            formInstance.updateData('docTotalAmt', docTotalLineAmt - discountAmt);
+            formInstance.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - discountAmt);
+            break;
+        default:
+            formInstance.getEditor('docDiscountAmt').option('readOnly', true);
+            formInstance.getEditor('docDiscountPerc').option('readOnly', true);
+            formInstance.getEditor('docDiscountAmt').option('value', 0);
+            formInstance.getEditor('docDiscountPerc').option('value', 0);
+            formInstance.updateData('docTotalAmt', docTotalLineAmt);
+            formInstance.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax);
+            break;
+    }
+    if (currentData.details.length > 0) {
+        $('#saveButtonPopup').dxButton('instance').option('disabled', false);
+        formInstance.getEditor('businessPartnerId').option('readOnly', true);
+    } else {
+        formInstance.getEditor('businessPartnerId').option('readOnly', false);
+    }
 }
