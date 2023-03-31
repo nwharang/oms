@@ -134,7 +134,7 @@ $(function () {
             items: [
                 "groupPanel",
                 "addRowButton",
-                "columnChooserButton",
+                // "columnChooserButton",
                 "exportButton",
                 // {
                 //     location: 'after',

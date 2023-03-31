@@ -301,15 +301,15 @@ $(function () {
             const items = e.component.getDataSource().items();
             if (["action", 'name', 'code'].indexOf(e.dataField) === -1 && items.length < 1)
                 e.editorOptions.disabled = true
-            if (e.dataField == 'basePriceListId')
-                e.editorOptions.disabled = true
+            // if (e.dataField == 'basePriceListId')
+            //     e.editorOptions.disabled = true
         },
         onEditorPrepared: function (e) {
             if (e.row?.rowType == "data" && Boolean(e.dataField) && e.parentType == 'dataRow' && e.row.isNewRow) {
                 const items = e.component.getDataSource().items();
                 const value = e.component.option("value");
-                if (e.dataField == 'basePriceListId' && !value)
-                    $('.fieldBasePrice > div.dx-selectbox').data('dxSelectBox').option('value', items.find(e => e.isFirstPriceList).id)
+                // if (e.dataField == 'basePriceListId' && !value)
+                //     $('.fieldBasePrice > div.dx-selectbox').data('dxSelectBox').option('value', items.find(e => e.isFirstPriceList).id)
 
             }
         },
@@ -394,14 +394,14 @@ $(function () {
                         valueExpr: 'id',
                         displayExpr: 'code'
                     },
-                    editorOptions: {
-                        dataSource: {
-                            store: getPriceList,
-                            filter: ["isFirstPriceList", "=", true],
-                        },
-                        valueExpr: 'id',
-                        displayExpr: 'code'
-                    },
+                    // editorOptions: {
+                    //     dataSource: {
+                    //         store: getPriceList,
+                    //         filter: ["isFirstPriceList", "=", true],
+                    //     },
+                    //     valueExpr: 'id',
+                    //     displayExpr: 'code'
+                    // },
                     width: 200
                 },
                 {
