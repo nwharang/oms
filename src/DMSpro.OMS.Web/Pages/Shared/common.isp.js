@@ -137,22 +137,18 @@ function initChooseItemsPopup(items) {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
                 dataField: 'qty',
                 width: 100,
-                dataType: 'number',
-                editorOptions: {
-                    min: 1,
+                cellTemplate(container, options) {
+                    $('<div>')
+                        .dxNumberBox({
+                            value: options.value,
+                            min: 0,
+                            value: 1,
+                            onValueChanged: function (e) {
+                                options.data.qty = e.value;
+                            }
+                        })
+                        .appendTo(container);
                 }
-                // cellTemplate(container, options) {
-                //     $('<div>')
-                //         .dxNumberBox({
-                //             value: options.value,
-                //             min: 0,
-                //             value: 1,
-                //             onValueChanged: function (e) {
-                //                 options.data.qty = e.value;
-                //             }
-                //         })
-                //         .appendTo(container);
-                // }
             },
             {
                 dataField: 'code',
