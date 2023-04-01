@@ -1,6 +1,4 @@
-﻿// Known issues : When edit RO with requestDate before Mar 24th , will respond with error "Customer is not valid"
-$(async function () {
-    let salesOrdersHeaderService = window.dMSpro.oMS.orderService.controllers.salesOrders.salesOrder;
+﻿$(async function () {
     let notify = ({ type = "success", position = "bottom right", message = "Message Placeholder" }) => DevExpress.ui.notify({
         message,
         height: 45,
@@ -17,12 +15,11 @@ $(async function () {
     }, {
         position
     })
-    let l = abp.localization.getResource("OMS");
-    let { mainStore, employeeProfileStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
-    let currentSelectedDoc = new Map()
-    const InfoSO = await store().getInfoSO()
-    const { renderPopup } = helper(InfoSO)
-    let mainDataGrid = $('#dgSalesOrderHeader').dxDataGrid({
+
+    var l = abp.localization.getResource("OMS");
+    let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
+    let currentSelectedDoc = new Map();
+    let mainGrid = $('#dgSalesOrderHeader').dxDataGrid({
         dataSource: { store: mainStore },
         showRowLines: true,
         showBorders: true,
@@ -52,7 +49,7 @@ $(async function () {
         },
         export: {
             enabled: true,
-            allowExportSelectedData: true,
+            // allowExportSelectedData: true,
         },
         onExporting(e) {
             const workbook = new ExcelJS.Workbook();
@@ -73,7 +70,7 @@ $(async function () {
             visible: true,
         },
         stateStoring: {
-            enabled: true,
+            // enabled: true,
             type: 'localStorage',
             storageKey: 'dgSalesOrderHeader',
         },
@@ -92,9 +89,14 @@ $(async function () {
             items: [
                 "groupPanel",
                 {
-                    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("Button.New.SalesRequest")}" style="height: 36px;"> <i class="fa fa-plus"></i> <span></span> </button>`,
+                    widget: "dxButton",
+                    options: {
+                        icon: 'add',
+                    },
                     onClick(e) {
-                        renderPopup()
+                        preLoad.then((data) => {
+                            helper(data).renderPopup()
+                        })
                     },
                 },
                 {
@@ -113,7 +115,7 @@ $(async function () {
                                     currentSelectedDoc.forEach((e, k) => {
                                         if (e) array.push(k)
                                     })
-                                    salesOrdersHeaderService.createListDODoc(array)
+                                    mainService.createListDODoc(array)
                                         .done(() => {
                                             notify({ type: 'success', message: `${array.length} SRs Approved` })
                                             $('#dgSalesOrderHeader').dxDataGrid('instance').getDataSource().reload()
@@ -129,22 +131,22 @@ $(async function () {
                 },
                 'columnChooserButton',
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
+                // {
+                //     location: 'after',
+                //     widget: 'dxButton',
+                //     options: {
+                //         icon: "import",
+                //         elementAttr: {
+                //             class: "import-excel",
+                //         },
+                //         onClick(e) {
+                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //             var gridName = gridControl.attr('id');
+                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //             if (popup) popup.show();
+                //         },
+                //     },
+                // },
                 "searchPanel"
             ],
         },
@@ -186,20 +188,20 @@ $(async function () {
                 allowExporting: false,
             },
             {
+                caption: l("Actions"),
                 type: 'buttons',
-                width: 75,
                 buttons: [
                     {
                         text: l('Button.ViewDetail'),
-                        icon: "info",
+                        icon: "fieldchooser",
                         onClick: function (e) {
-                            renderPopup(e.row.data.id)
+                            preLoad.then((data) => {
+                                helper(data).renderPopup(e.row.data.id)
+                            })
+
                         }
                     }
                 ],
-                headerCellTemplate: (container) => {
-                    container.css('cursor', 'auto')
-                },
                 fixed: true,
                 fixedPosition: "left",
                 allowExporting: false,
@@ -207,6 +209,20 @@ $(async function () {
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
                 dataField: 'docNbr',
+                dataType: 'string',
+                validationRules: [{ type: 'required' }],
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
+                dataField: 'routeId',
+                calculateDisplayValue: "routeDisplay",
+                dataType: 'string',
+                validationRules: [{ type: 'required' }],
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
+                dataField: 'employeeId',
+                calculateDisplayValue: "employeeDisplay",
                 dataType: 'string',
                 validationRules: [{ type: 'required' }],
             },
@@ -240,58 +256,23 @@ $(async function () {
                 editorType: 'dxSelectBox',
                 dataField: 'businessPartnerId',
                 validationRules: [{ type: 'required' }],
-                lookup: {
-                    dataSource: InfoSO.salesOrderStore.customerList,
-                    displayExpr: 'name',
-                    valueExpr: 'id',
-                },
-            },
-            {
-                caption: l('Route'),
-                dataField: "routeId",
-                editorType: "dxSelectBox",
-                lookup: {
-                    dataSource: {
-                        store: InfoSO.salesOrderStore.routeList
-                    },
-                    displayExpr: 'name',
-                    valueExpr: 'id'
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            {
-                caption: l('Employee'),
-                dataField: "employeeId",
-                editorType: 'dxSelectBox',
-                lookup: {
-                    dataSource: {
-                        store: InfoSO.salesOrderStore.employeeList,
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    },
-                    displayExpr: 'code',
-                    valueExpr: 'id'
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
+                calculateDisplayValue: "businessPartnerDisplay"
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:RequestDate'),
                 dataField: 'requestDate',
                 dataType: 'date',
-                validationRules: [{ type: 'required' }],
-                sortOrder: "desc",
                 format: 'dd/MM/yyyy',
+                validationRules: [{ type: 'required' }],
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocDate'),
                 dataField: 'docDate',
                 dataType: 'date',
-                validationRules: [{ type: 'required' }],
                 format: 'dd/MM/yyyy',
+                validationRules: [{ type: 'required' }],
+                visible: false,
+
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocStatus'),
@@ -312,23 +293,23 @@ $(async function () {
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
             },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
-                dataField: 'docTotalLineAmt',
-                dataType: 'number',
-                visible: true,
-                validationRules: [{ type: 'required' }],
-                allowEditing: false,
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
-                dataField: 'docTotalLineAmtAfterTax',
-                dataType: 'number',
-                width: 100,
-                visible: true,
-                validationRules: [{ type: 'required' }],
-                allowEditing: false,
-            },
+            // {
+            //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
+            //     dataField: 'docTotalLineAmt',
+            //     dataType: 'number',
+            //     visible: true,
+            //     validationRules: [{ type: 'required' }],
+            //     allowEditing: false,
+            // },
+            // {
+            //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
+            //     dataField: 'docTotalLineAmtAfterTax',
+            //     dataType: 'number',
+            //     width: 100,
+            //     visible: true,
+            //     validationRules: [{ type: 'required' }],
+            //     allowEditing: false,
+            // },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
                 dataField: 'docTotalAmt',
@@ -394,7 +375,10 @@ $(async function () {
                 let id = $(this).attr('id')
                 currentSelectedDoc.set(id, false)
             })
-        }
+        },
     }).dxDataGrid("instance");
-    initImportPopup('api/order-service/sales-orders', 'SalesOrder_Template', 'dgSalesOrderHeader');
+    preLoad.then((data) => {
+        initChooseItemsPopup([...data.mainStore.itemList].map(e => { e.isFree = false; return e }))
+    })
+    // initImportPopup('', 'SalesRequest_Template', 'dgSalesOrderHeader');
 })

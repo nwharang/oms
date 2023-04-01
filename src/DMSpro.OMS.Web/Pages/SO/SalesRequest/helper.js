@@ -840,9 +840,9 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                                 .done(() => {
                                                     let newEditingOption = {
                                                         ...grid.dxDataGrid('instance').option("editing"),
-                                                        allowAdding: true,
-                                                        allowUpdating: true,
-                                                        allowDeleting: true,
+                                                        allowAdding: false,
+                                                        allowUpdating: false,
+                                                        allowDeleting: false,
                                                     }
                                                     notify({ type: 'success', message: "SR Approved" })
                                                     form.dxForm('instance').option("readOnly", true)
@@ -868,9 +868,9 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                                     .done(() => {
                                                         let newEditingOption = {
                                                             ...grid.dxDataGrid('instance').option("editing"),
-                                                            allowAdding: true,
-                                                            allowUpdating: true,
-                                                            allowDeleting: true,
+                                                            allowAdding: false,
+                                                            allowUpdating: false,
+                                                            allowDeleting: false,
                                                         }
                                                         notify({ type: 'success', message: "SR Rejected" })
                                                         form.dxForm('instance').option("readOnly", true)
@@ -913,6 +913,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                             .done((data) => {
                                                 currentData = data
                                                 grid.dxDataGrid('instance').option('dataSource', data.details)
+                                                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
                                                 grid.dxDataGrid('instance').refresh()
                                                 notify({ type: 'success', message: "Updated SR" })
                                             })
@@ -928,7 +929,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                                 grid.dxDataGrid('instance').option('dataSource', data.details)
                                                 grid.dxDataGrid('instance').refresh()
                                                 notify({ type: 'success', message: "SR Created" })
-
+                                                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
                                                 popup.dxPopup('instance').option("title", `Sale Request - #${docId ? data.header.docNbr : "New"} - ${docStatusStore[data.header.docStatus || 0].text}`)
                                                 loadNavigationButton(docId)
                                             })
