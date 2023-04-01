@@ -1,326 +1,336 @@
-﻿$(function () {
+﻿$(async function () {
+    let notify = ({ type = "success", position = "bottom right", message = "Message Placeholder" }) => DevExpress.ui.notify({
+        message,
+        height: 45,
+        width: 250,
+        minWidth: 250,
+        type,
+        displayTime: 5000,
+        animation: {
+            show: {
+                type: 'fade', duration: 400, from: 0, to: 1,
+            },
+            hide: { type: 'fade', duration: 40, to: 0 },
+        },
+    }, {
+        position
+    })
+
     var l = abp.localization.getResource("OMS");
-    var arInvoiceService = window.dMSpro.oMS.orderService.controllers.arInvoices.arInvoice;
+    let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
+    let currentSelectedDoc = new Map();
+    let mainGrid = $('#dgArInvoiceHeaders').dxDataGrid({
+        dataSource: { store: mainStore },
+        showRowLines: true,
+        showBorders: true,
+        cacheEnabled: true,
+        columnAutoWidth: true,
+        searchPanel: {
+            visible: true
+        },
+        allowColumnResizing: true,
+        allowColumnReordering: true,
+        rowAlternationEnabled: true,
+        columnResizingMode: 'widget',
+        filterRow: {
+            visible: true,
+            applyFilter: 'auto',
+        },
 
-    /****custom store*****/
-    var arInvoiceHeaderStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        groupPanel: {
+            visible: true,
+        },
+        export: {
+            enabled: true,
+            // allowExportSelectedData: true,
+        },
+        onExporting(e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('PurchaseRequests');
 
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PurchaseRequests.xlsx');
+                });
             });
-
-            arInvoiceService.getHeaderListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
+            e.cancel = true;
         },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            arInvoiceService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
-
-    const docTypeStore = [
-        {
-            id: 0,
-            text: l('EntityFieldName:OrderService:SalesRequest:PreOrder')
+        headerFilter: {
+            visible: true,
         },
-        {
-            id: 1,
-            text: l('EntityFieldName:OrderService:SalesRequest:VanSales')
+        stateStoring: {
+            // enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgArInvoiceHeaders',
         },
-        {
-            id: 2,
-            text: l('EntityFieldName:OrderService:SalesRequest:ThirdPartyDelivery')
-        }
-    ];
-
-    const docStatusStore = [
-        {
-            id: 0,
-            text: l('EntityFieldName:OrderService:SalesRequest:DocStatus.Open')
+        paging: {
+            enabled: true,
+            pageSize: 10
         },
-        {
-            id: 1,
-            text: l('EntityFieldName:OrderService:SalesRequest:DocStatus.Released')
+        pager: {
+            visible: true,
+            showPageSizeSelector: true,
+            allowedPageSizes: [10, 50, 100],
+            showInfo: true,
+            showNavigationButtons: true
         },
-        {
-            id: 2,
-            text: l('EntityFieldName:OrderService:SalesRequest:DocStatus.Cancelled')
-        }
-    ];
-
-    /****control*****/
-    const dgArInvoiceHeaders = $('#dgArInvoiceHeaders').dxDataGrid(
-        jQuery.extend(dxDataGridConfiguration, {
-            dataSource: arInvoiceHeaderStore,
-            stateStoring: {
-                enabled: true,
-                type: 'localStorage',
-                storageKey: 'dgArInvoiceHeaders',
-            },
-            showBorders: true,
-            columnAutoWidth: true,
-            scrolling: {
-                columnRenderingMode: 'virtual',
-            },
-            searchPanel: {
-                visible: true
-            },
-            allowColumnResizing: true,
-            allowColumnReordering: true,
-            paging: {
-                enabled: true,
-                pageSize: pageSize
-            },
-            rowAlternationEnabled: true,
-            filterRow: {
-                visible: true,
-                applyFilter: 'auto',
-            },
-            headerFilter: {
-                visible: false,
-            },
-            columnChooser: {
-                enabled: true,
-                mode: "select"
-            },
-            pager: {
-                visible: true,
-                showPageSizeSelector: true,
-                allowedPageSizes: allowedPageSizes,
-                showInfo: true,
-                showNavigationButtons: true
-            },
-            export: {
-                enabled: true,
-                // formats: ['excel','pdf'],
-                allowExportSelectedData: true,
-            },
-            groupPanel: {
-                visible: true,
-            },
-            selection: {
-                mode: 'multiple',
-            },
-            onExporting(e) {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('PurchaseRequests');
-
-                DevExpress.excelExporter.exportDataGrid({
-                    component: e.component,
-                    worksheet,
-                    autoFilterEnabled: true,
-                }).then(() => {
-                    workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PurchaseRequests.xlsx');
-                    });
-                });
-                e.cancel = true;
-            },
-            toolbar: {
-                items: [
-                    "groupPanel",
-                    //{
-                    //    template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("Button.New.SalesRequest")}" style="height: 36px;"> <i class="fa fa-plus"></i> <span></span> </button>`,
-                    //    onClick() {
-                    //        var newtab = window.open('/SO/ArInvoice/Details', '_blank');
-                    //        newtab.sessionStorage.removeItem("ArInvoiceHeaderId");
-                    //    },
-                    //},
-                    {
-                        location: 'after',
-                        template: '<div><button type="button" class="btn btn-light btn-sm dropdown-toggle waves-effect waves-themed hvr-icon-pop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height:36px"> <i class="fa fa-gear hvr-icon"></i> <span class="">Action</span>  </button><div class="dropdown-menu fadeindown"> <button class="dropdown-item" type="button">Create Credit Memo</button></div></div>'
+        toolbar: {
+            items: [
+                "groupPanel",
+                {
+                    widget: "dxDropDownButton",
+                    location: 'after',
+                    options: {
+                        icon: 'preferences',
+                        text: 'Actions',
+                        width: 200,
+                        items: [
+                            {
+                                text: "Create AR Credit Memo",
+                                icon: "check",
+                                onClick() {
+                                    let array = []
+                                    currentSelectedDoc.forEach((e, k) => {
+                                        if (e) array.push(k)
+                                    })
+                                    mainService.createListARCrMemoDoc(array)
+                                        .done(() => {
+                                            notify({ type: 'success', message: `Created ${array.length} Memo` })
+                                            $('#dgArInvoiceHeaders').dxDataGrid('instance').getDataSource().reload()
+                                        }
+                                        ).fail(() => {
+                                            notify({ type: 'error', message: "Create Failed" })
+                                        })
+                                }
+                            },
+                        ]
                     },
-                    'columnChooserButton',
-                    "exportButton",
-                    //{
-                    //    location: 'after',
-                    //    widget: 'dxButton',
-                    //    options: {
-                    //        icon: "import",
-                    //        elementAttr: {
-                    //            //id: "import-excel",
-                    //            class: "import-excel",
-                    //        },
-                    //        onClick(e) {
-                    //            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                    //            var gridName = gridControl.attr('id');
-                    //            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                    //            if (popup) popup.show();
-                    //        },
-                    //    },
-                    //},
-                    "searchPanel"
-                ],
-            },
-            columns: [
-                {
-                    caption: l("Actions"),
-                    type: 'buttons',
-                    buttons: [
-                        {
-                            text: l('Button.ViewDetail'),
-                            icon: "fieldchooser",
-                            onClick: function (e) {
-                                var newtab = window.open('/SO/ArInvoice/Details', '_blank');
-                                newtab.sessionStorage.setItem("ArInvoiceHeaderId", e.row.data.id);
-                            }
-                        }
-                    ],
-                    fixed: true,
-                    fixedPosition: "left",
-                    allowExporting: false,
-                    width: 120
+
                 },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
-                    dataField: 'docNbr',
-                    dataType: 'string',
-                    width: 200
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:Company'),
-                    dataField: 'companyId',
-                    calculateDisplayValue: "company.name",
-                    width: 200
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocType'),
-                    dataField: 'docType',
-                    lookup: {
-                        dataSource: docTypeStore,
-                        displayExpr: "text",
-                        valueExpr: "id"
-                    },
-                    width: 200
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDate'),
-                    dataField: 'docDate',
-                    dataType: 'datetime',
-                    width: 200
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:Remark'),
-                    dataField: 'remark',
-                    dataType: 'string',
-                    width: 200
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocStatus'),
-                    dataField: 'docStatus',
-                    dataType: 'string',
-                    lookup: {
-                        dataSource: docStatusStore,
-                        displayExpr: "text",
-                        valueExpr: "id"
-                    },
-                    width: 200
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt'),
-                    dataField: 'docTotalLineDiscountAmt',
-                    dataType: 'number',
-                    format: ",##0.###",
-                    visible: true,
-                    width: 200
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
-                    dataField: 'docTotalLineAmt',
-                    dataType: 'number',
-                    format: ",##0.###",
-                    visible: true,
-                    width: 200
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
-                    dataField: 'docTotalLineAmtAfterTax',
-                    dataType: 'number',
-                    format: ",##0.###",
-                    visible: true,
-                    width: 200
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType'),
-                    dataField: 'docDiscountType',
-                    dataType: 'number',
-                    format: ",##0.###",
-                    visible: true,
-                    width: 200
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc'),
-                    dataField: 'docDiscountPerc',
-                    dataType: 'number',
-                    format: ",##0.###",
-                    visible: true,
-                    width: 200
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt'),
-                    dataField: 'docDiscountAmt',
-                    dataType: 'number',
-                    format: ",##0.###",
-                    visible: true,
-                    width: 200
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
-                    dataField: 'docTotalAmt',
-                    dataType: 'number',
-                    format: ",##0.###",
-                    visible: true,
-                    width: 200
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax'),
-                    dataField: 'docTotalAmtAfterTax',
-                    dataType: 'number',
-                    format: ",##0.###",
-                    visible: true,
-                    width: 200
-                }
+                'columnChooserButton',
+                "exportButton",
+                "searchPanel"
             ],
-            summary: {
-                totalItems: [{
-                    column: 'docTotalLineAmt',
-                    summaryType: 'sum',
-                    valueFormat: ",##0.###"
-                }, {
-                    column: 'docTotalLineAmtAfterTax',
-                    summaryType: 'sum',
-                    valueFormat: ",##0.###"
-                }],
-            }
-        })).dxDataGrid("instance");
+        },
+        columns: [
+            {
+                cssClass: "text-center",
+                headerCellTemplate(container) {
+                    $('<div>').dxCheckBox({
+                        onValueChanged: (e) => {
+                            $('.actionCheckboxFormControl').each(function () {
+                                let id = $(this).attr('id')
+                                if (e.value) {
+                                    $(this).dxCheckBox('instance').option('value', e.value)
+                                    currentSelectedDoc.set(id, true)
+                                }
+                                else {
+                                    $(this).dxCheckBox('instance').option('value', e.value)
 
-    /****function*****/
-    var bc = new BroadcastChannel('ARInvoiceHeaders');
-    bc.onmessage = function (ev) {
-        if (ev.data == 'reload') {
-            dgArInvoiceHeaders.refresh();
-        }
-    }
+                                }
+                            })
+                        }
+                    }).appendTo(container)
+                },
+                cellTemplate(container, option) {
+                    let disabled = Boolean(option.data.docStatus)
+                    $('<div>').dxCheckBox({
+                        elementAttr: {
+                            class: Boolean(option.data.docStatus) ? 'disabledActionCheckboxFormControl' : "actionCheckboxFormControl",
+                            id: option.data.id
+                        },
+                        disabled,
+                        onValueChanged: (e) => {
+                            currentSelectedDoc.set(e.element.attr('id'), e.value)
+                        }
+                    }).appendTo(container)
+                },
+                fixed: true,
+                fixedPosition: "left",
+                allowExporting: false,
+            },
+            {
+                caption: l("Actions"),
+                type: 'buttons',
+                buttons: [
+                    {
+                        text: l('Button.ViewDetail'),
+                        icon: "fieldchooser",
+                        onClick: function (e) {
+                            preLoad.then((data) => {
+                                helper(data).renderPopup(e.row.data.id)
+                            })
 
-    initImportPopup('', 'ArInvoice_Template', 'dgArInvoiceHeaders');
-});
+                        }
+                    }
+                ],
+                fixed: true,
+                fixedPosition: "left",
+                allowExporting: false,
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
+                dataField: 'docNbr',
+                dataType: 'string',
+                validationRules: [{ type: 'required' }],
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
+                dataField: 'routeId',
+                calculateDisplayValue: "routeDisplay",
+                dataType: 'string',
+                validationRules: [{ type: 'required' }],
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
+                dataField: 'employeeId',
+                calculateDisplayValue: "employeeDisplay",
+                dataType: 'string',
+                validationRules: [{ type: 'required' }],
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocType'),
+                dataField: 'docType',
+                lookup: {
+                    dataSource: docTypeStore,
+                    displayExpr: "text",
+                    valueExpr: "id"
+                },
+                validationRules: [{ type: 'required' }],
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocSource'),
+                dataField: 'docSource',
+                dataType: 'string',
+                lookup: {
+                    dataSource: docSourceStore,
+                    displayExpr: "text",
+                    valueExpr: "id"
+                },
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:Remark'),
+                dataField: 'remark',
+                dataType: 'string'
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:BusinessPartner'),
+                editorType: 'dxSelectBox',
+                dataField: 'businessPartnerId',
+                validationRules: [{ type: 'required' }],
+                calculateDisplayValue: "businessPartnerDisplay"
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:RequestDate'),
+                dataField: 'requestDate',
+                dataType: 'date',
+                format: 'dd/MM/yyyy',
+                validationRules: [{ type: 'required' }],
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocDate'),
+                dataField: 'docDate',
+                dataType: 'date',
+                format: 'dd/MM/yyyy',
+                validationRules: [{ type: 'required' }],
+                visible: false,
+
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocStatus'),
+                dataField: 'docStatus',
+                dataType: 'string',
+                lookup: {
+                    dataSource: docStatusStore,
+                    valueExpr: "id",
+                    displayExpr: "text",
+                },
+                visible: true,
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt'),
+                dataField: 'docTotalLineDiscountAmt',
+                dataType: 'number',
+                width: 100,
+                validationRules: [{ type: 'required' }],
+                allowEditing: false,
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
+                dataField: 'docTotalAmt',
+                dataType: 'number',
+                visible: true,
+                allowEditing: false,
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax'),
+                dataField: 'docTotalAmtAfterTax',
+                dataType: 'number',
+                visible: true,
+                validationRules: [{ type: 'required' }],
+                allowEditing: false,
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType'),
+                dataField: 'docDiscountType',
+                dataType: 'string',
+                lookup: {
+                    dataSource: discountTypeStore,
+                    valueExpr: "id",
+                    displayExpr: "text",
+                },
+                validationRules: [{ type: 'required' }],
+                visible: true,
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc'),
+                dataField: 'docDiscountPerc',
+                dataType: 'number',
+                validationRules: [{ type: 'required' }],
+                format: '#0.00 %',
+                width: 100,
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt'),
+                dataField: 'docDiscountAmt',
+                dataType: 'number',
+                validationRules: [{ type: 'required' }],
+                width: 100,
+            },
+
+        ],
+        summary: {
+            totalItems: [{
+                column: 'docTotalLineAmt',
+                summaryType: 'sum',
+                valueFormat: ",##0.###",
+            }, {
+                column: 'docTotalLineAmtAfterTax',
+                summaryType: 'sum',
+                valueFormat: ",##0.###",
+            }],
+        },
+        onContentReady: (e) => {
+            currentSelectedDoc.clear()
+            $('.disabledActionCheckboxFormControl').each(function () {
+                let id = $(this).attr('id')
+                currentSelectedDoc.set(id, false)
+            })
+            $('.actionCheckboxFormControl').each(function () {
+                let id = $(this).attr('id')
+                currentSelectedDoc.set(id, false)
+            })
+        },
+    }).dxDataGrid("instance");
+})

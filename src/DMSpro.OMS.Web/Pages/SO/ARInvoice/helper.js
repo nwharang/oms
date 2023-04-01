@@ -62,9 +62,9 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 ...defaultNewHeader,
                 ...header,
             },
+            readOnly: true,
             editing: {
                 readOnly: true,
-
             },
             colCountByScreen: {
                 lg: 2,
@@ -179,6 +179,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             dataField: "docDiscountPerc",
                             editorType: 'dxNumberBox',
                             editorOptions: {
+                                readOnly: true,
                                 format: '#0.00',
                                 min: 0,
                                 max: 100,
@@ -194,6 +195,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                         {
                             dataField: "docDiscountAmt",
                             editorType: 'dxNumberBox',
+                            readOnly: true,
                             editorOptions: {
                                 readOnly: true,
                                 format: '#,##0.##',
@@ -204,6 +206,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                         {
                             dataField: "docTotalAmt",
                             editorType: 'dxNumberBox',
+                            readOnly: true,
                             editorOptions: {
                                 readOnly: true,
                                 elementAttr: {
@@ -281,7 +284,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
             stateStoring: {
                 enabled: true,
                 type: 'localStorage',
-                storageKey: 'dgDODetails',
+                storageKey: 'dgArInvoiceDetails',
             },
             toolbar: {
                 items: ["columnChooserButton",]
@@ -359,12 +362,14 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountType'),
                     dataField: 'discountType',
                     lookup: {
+                        readOnly: true,
                         dataSource: discountTypeStore,
                         displayExpr: 'text',
                         valueExpr: 'id',
                     },
                     editorType: 'dxSelectBox',
                     editorOptions: {
+                        readOnly: true,
                         dataSource: discountTypeStore,
                         displayExpr: 'text',
                         valueExpr: 'id',
@@ -378,6 +383,9 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     customizeText: function (cellInfo) {
                         if (cellInfo.value)
                             return cellInfo.value + " %";
+                    },
+                    editorOptions: {
+                        readOnly: true,
                     },
                     format: '#0.00',
                     width: 100,
@@ -431,7 +439,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                         column: 'itemId',
                         summaryType: 'count',
                         customizeText: (data) => "Total Item : " + data.value
-                        // valueFormat: ",##0.###",
                     },
                     {
                         column: 'price',
@@ -476,7 +483,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
             isDocOpen = !Boolean(currentData.header.docStatus)
             if (!popup) popup = $('<div id="popup">')
             popup.dxPopup({
-                title: `Delivery Order - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[currentData.header.docStatus || 0].text}`,
+                title: `AR Invoice - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[currentData.header.docStatus || 0].text}`,
                 showTitle: true,
                 height: '99%',
                 width: "99%",
@@ -511,7 +518,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 form.dxForm('instance').option("readOnly", Boolean(comingData.previous.header.docStatus))
                                 grid.dxDataGrid('instance').option("editing", newEditingOption)
                                 $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", Boolean(comingData.previous.header.docStatus))
-                                popup.dxPopup('instance').option("title", `Delivery Order - #${docId ? comingData.previous.header.docNbr : "New"} - ${docStatusStore[comingData.previous.header.docStatus || 0].text}`)
+                                popup.dxPopup('instance').option("title", `AR Invoice - #${docId ? comingData.previous.header.docNbr : "New"} - ${docStatusStore[comingData.previous.header.docStatus || 0].text}`)
                                 loadNavigationButton(docId)
                             }
                         }
@@ -541,7 +548,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 form.dxForm('instance').option("readOnly", Boolean(comingData.next.header.docStatus))
                                 grid.dxDataGrid('instance').option("editing", newEditingOption)
                                 $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", Boolean(comingData.next.header.docStatus))
-                                popup.dxPopup('instance').option("title", `Delivery Order - #${docId ? comingData.next.header.docNbr : "New"} - ${docStatusStore[comingData.next.header.docStatus || 0].text}`)
+                                popup.dxPopup('instance').option("title", `AR Invoice - #${docId ? comingData.next.header.docNbr : "New"} - ${docStatusStore[comingData.next.header.docStatus || 0].text}`)
                                 loadNavigationButton(docId)
                             }
                         }
@@ -560,37 +567,21 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             },
                             items: [
                                 {
-                                    text: "Create AR Invoice",
+                                    text: "Create AR Credit Memo",
                                     icon: "check",
                                     onClick: () => {
                                         if (docId)
-                                            mainService.createListARInvoiceDoc([docId])
+                                            mainService.createListARCrMemoDoc([docId])
                                                 .done(() => {
-                                                    notify({ type: 'success', message: "Create Ar Invoice Successfully" })
+                                                    notify({ type: 'success', message: "Create AR Credit Memo Successfully" })
                                                     $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", true)
-                                                    popup.dxPopup('instance').option("title", `Delivery Order - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[1].text}`)
+                                                    popup.dxPopup('instance').option("title", `AR Invoice - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[1].text}`)
                                                 })
                                                 .fail(() => {
-                                                    notify({ type: 'error', message: "reate RO Invoice Failed" })
+                                                    notify({ type: 'error', message: "Create Failed" })
                                                 })
                                     }
                                 },
-                                {
-                                    text: "Create Return Order",
-                                    icon: "close",
-                                    onClick: () => {
-                                        if (docId)
-                                            mainService.createListRODoc([docId])
-                                                .done(() => {
-                                                    notify({ type: 'success', message: "Create RO Successfully" })
-                                                    $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", true)
-                                                    popup.dxPopup('instance').option("title", `Delivery Order - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[1].text}`)
-                                                })
-                                                .fail(() => {
-                                                    notify({ type: 'error', message: "Create RO Failed" })
-                                                })
-                                    }
-                                }
                             ]
                         },
                     },
@@ -603,7 +594,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             icon: "return",
                             onClick: function () {
                                 popup.dxPopup('instance').hide()
-                                $('#dgDeliveryHeader').dxDataGrid('instance').getDataSource().reload()
+                                $('#dgArInvoiceHeaders').dxDataGrid('instance').getDataSource().reload()
                             }
                         },
                     },
