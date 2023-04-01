@@ -20,15 +20,10 @@
     }
 
     let vatList = {};
-    let company = await Common.getCurrentCompany();
-    if (company != null)
-        companyId = company.id;
-    else
-        companyId = '29d43197-c742-90b8-65d8-3a099166f987';
-    // get data api getInfoForSo in item service
+    let company = await (await Common.getCurrentCompany()).id;
+    console.log(company);
     var itemService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
-
-    itemService.getSOInfo(companyId, new Date(), null)
+    itemService.getInfoSO({ companyId: company }, new Date())
         .done(async result => {
             let resultJson = await Common.parseJSON(result);
             let data = Common.processInitData(resultJson);
@@ -955,21 +950,21 @@
 
         initImportPopup('', 'ArCreditMemoDetails_Template', 'dgArCreditMemoDetails');
 
-    //  var headerId = JSON.parse(sessionStorage.getItem('ARCreditMemoHeaderId'));
-    if (ARCreditMemoHeaderId != null) {
-        $('#CancelButton').show();
-        //headerId = JSON.parse(headerId);
-        // load data for form
-        arCreditMemoService.getHeader(ARCreditMemoHeaderId)
-            .done(result => {
-                $('#frmArCreditMemoHeaders').data('dxForm').option('formData', result);
-            });
-        // load data for grid details
-        arCreditMemoService.getDetailListDevextremes({ filter: JSON.stringify(['docId', '=', ARCreditMemoHeaderId]) })
-            .done(result => {
-                ARCreditMemoDetailsModel = result.data;
-                if (ARCreditMemoDetailsModel.find(x => x.itemId == null) == null)
-                    ARCreditMemoDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
+        //  var headerId = JSON.parse(sessionStorage.getItem('ARCreditMemoHeaderId'));
+        if (ARCreditMemoHeaderId != null) {
+            $('#CancelButton').show();
+            //headerId = JSON.parse(headerId);
+            // load data for form
+            arCreditMemoService.getHeader(ARCreditMemoHeaderId)
+                .done(result => {
+                    $('#frmArCreditMemoHeaders').data('dxForm').option('formData', result);
+                });
+            // load data for grid details
+            arCreditMemoService.getDetailListDevextremes({ filter: JSON.stringify(['docId', '=', ARCreditMemoHeaderId]) })
+                .done(result => {
+                    ARCreditMemoDetailsModel = result.data;
+                    if (ARCreditMemoDetailsModel.find(x => x.itemId == null) == null)
+                        ARCreditMemoDetailsModel.unshift(JSON.parse(JSON.stringify(defaultEmptyModel)));
 
                     dgArCreditMemoDetails.option('dataSource', ARCreditMemoDetailsModel);
                     dgArCreditMemoDetails.refresh();
