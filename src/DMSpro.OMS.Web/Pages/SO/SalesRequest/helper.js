@@ -426,8 +426,8 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     },
                     setCellValue: function (newData, value, currentRowData) {
                         let customerId = form.dxForm('instance').getEditor('businessPartnerId').option('value');
-                        let customer = salesOrderStore.customerList.find(x => x.id == customerId);
-                        let price = salesOrderStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + value)?.value || 0;
+                        let customer = mainStore.customerList.find(x => x.id == customerId);
+                        let price = mainStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + value)?.value || 0;
                         let priceAfterTax = price + (price * currentRowData.taxRate) / 100;
                         let lineAmtAfterTax = priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0);
                         let lineAmt = price * currentRowData.qty - (currentRowData.discountAmt || 0);
@@ -444,23 +444,16 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     dataType: 'boolean',
                     width: "75",
                     setCellValue: (newData, value, currentRowData) => {
+                        let lineAmtAfterTax = currentRowData.priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0);
+                        let lineAmt = currentRowData.price * currentRowData.qty - (currentRowData.discountAmt || 0);
                         newData.isFree = value;
-                        if (value) {
-                            newData.discountType = 0
-                            newData.discountAmt = 0
+                        if (Boolean(value)) {
                             newData.lineAmt = 0
                             newData.lineAmtAfterTax = 0
                         }
                         else {
-                            let thisData = {}
-                            if (detailsData.length > 0)
-                                thisData = detailsData?.find(e => e.id === currentRowData.id)
-                            newData.price = thisData?.price || 0
-                            newData.priceAfterTax = thisData?.priceAfterTax || 0
-                            newData.discountType = thisData?.discountType || 0
-                            newData.discountAmt = thisData?.discountAmt || 0
-                            newData.lineAmt = thisData?.lineAmt || 0
-                            newData.lineAmtAfterTax = thisData?.lineAmtAfterTax || 0
+                            newData.lineAmt = lineAmt
+                            newData.lineAmtAfterTax = lineAmtAfterTax
                         }
                     }
                 },
@@ -483,8 +476,8 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     setCellValue: function (newData, value, currentRowData) {
                         newData.price = value;
                         newData.priceAfterTax = value + (value * currentRowData.taxRate) / 100;
-                        newData.lineAmt = value * currentRowData.qty - (currentRowData.discountAmt || 0);
-                        newData.lineAmtAfterTax = newData.priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0);
+                        newData.lineAmt = (value * currentRowData.qty - (currentRowData.discountAmt || 0)) * (100 - (currentRowData.discountPerc || 0)) / 100;
+                        newData.lineAmtAfterTax = (newData.priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0)) * (100 - (currentRowData.discountPerc || 0)) / 100
                     },
                 },
                 {
@@ -513,8 +506,8 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     dataType: 'number',
                     setCellValue: function (newData, value, currentRowData) {
                         newData.qty = value;
-                        newData.lineAmt = value * currentRowData.price - (currentRowData.discountAmt || 0);
-                        newData.lineAmtAfterTax = currentRowData.priceAfterTax * value - (currentRowData.discountAmt || 0);
+                        newData.lineAmt = (value * currentRowData.price - (currentRowData.discountAmt || 0)) * (100 - (currentRowData.discountPerc || 0)) / 100;
+                        newData.lineAmtAfterTax = (currentRowData.priceAfterTax * value - (currentRowData.discountAmt || 0)) * (100 - (currentRowData.discountPerc || 0)) / 100;
                     },
                     validationRules: [{ type: 'required', message: '' }],
                     editorOptions: {

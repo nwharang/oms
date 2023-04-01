@@ -426,20 +426,16 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     dataType: 'boolean',
                     width: "75",
                     setCellValue: (newData, value, currentRowData) => {
+                        let lineAmtAfterTax = currentRowData.priceAfterTax * currentRowData.qty;
+                        let lineAmt = currentRowData.price * currentRowData.qty;
                         newData.isFree = value;
-                        if (value) {
+                        if (Boolean(value)) {
                             newData.lineAmt = 0
                             newData.lineAmtAfterTax = 0
                         }
                         else {
-                            let thisData = {}
-                            if (detailsData.length > 0)
-                                thisData = detailsData?.find(e => e.id === currentRowData.id)
-                            newData.price = thisData?.price || 0
-                            newData.priceAfterTax = thisData?.priceAfterTax || 0
-
-                            newData.lineAmt = thisData?.lineAmt || 0
-                            newData.lineAmtAfterTax = thisData?.lineAmtAfterTax || 0
+                            newData.lineAmt = lineAmt
+                            newData.lineAmtAfterTax = lineAmtAfterTax
                         }
                     }
                 },
@@ -462,7 +458,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     setCellValue: function (newData, value, currentRowData) {
                         newData.price = value;
                         newData.priceAfterTax = value + (value * currentRowData.taxRate) / 100;
-                        newData.lineAmt = value * currentRowData.qty
+                        newData.lineAmt = value * currentRowData.qty;
                         newData.lineAmtAfterTax = newData.priceAfterTax * currentRowData.qty
                     },
                 },
@@ -492,8 +488,8 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     dataType: 'number',
                     setCellValue: function (newData, value, currentRowData) {
                         newData.qty = value;
-                        newData.lineAmt = value * currentRowData.price
-                        newData.lineAmtAfterTax = currentRowData.priceAfterTax * value
+                        newData.lineAmt = value * currentRowData.price - (currentRowData.discountAmt || 0)
+                        newData.lineAmtAfterTax = currentRowData.priceAfterTax * value - (currentRowData.discountAmt || 0)
                     },
                     validationRules: [{ type: 'required', message: '' }],
                     editorOptions: {
