@@ -507,6 +507,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     editorOptions: {
                         format: '#,##0.##',
                     },
+                    allowEditing: false,
                     format: '#,##0.##',
                 },
                 {
