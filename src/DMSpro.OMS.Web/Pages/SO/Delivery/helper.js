@@ -365,6 +365,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     },
                     editorType: 'dxSelectBox',
                     editorOptions: {
+                        readOnly: true,
                         dataSource: discountTypeStore,
                         displayExpr: 'text',
                         valueExpr: 'id',
@@ -375,6 +376,9 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     dataField: 'discountPerc',
                     // dataType: 'number',
                     editorType: 'dxNumberBox',
+                    editorOptions: {
+                        readOnly: true,
+                    },
                     customizeText: function (cellInfo) {
                         if (cellInfo.value)
                             return cellInfo.value + " %";
@@ -387,6 +391,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     dataField: 'discountAmt',
                     editorType: 'dxNumberBox',
                     editorOptions: {
+                        readOnly: true,
                         format: '#,##0.##',
                         min: 0,
                     },
@@ -398,6 +403,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     dataField: 'lineAmt',
                     dataType: 'number',
                     editorOptions: {
+                        readOnly: true,
                         format: '#,##0.##',
                     },
                     format: '#,##0.##',
@@ -407,6 +413,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     dataField: 'lineAmtAfterTax',
                     dataType: 'number',
                     editorOptions: {
+                        readOnly: true,
                         format: '#,##0.##',
                     },
                     allowEditing: false,
