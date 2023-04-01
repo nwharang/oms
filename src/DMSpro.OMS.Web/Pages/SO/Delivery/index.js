@@ -94,7 +94,7 @@
                     options: {
                         icon: 'preferences',
                         text: 'Actions',
-                        width: 120,
+                        width: 180,
                         items: [
                             {
                                 text: "Create AR Invoice",
