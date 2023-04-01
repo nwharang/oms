@@ -122,6 +122,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 dataSource: mainStore.employeesList,
                                 valueExpr: 'id',
                                 showClearButton: true,
+                                placeholder: "",
                                 displayExpr(e) {
                                     if (e)
                                         return `${e.code} ${"- " + e.firstName || ""}`;
@@ -146,6 +147,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 dataSource: mainStore.routesList,
                                 valueExpr: 'id',
                                 showClearButton: true,
+                                placeholder: "",
                                 displayExpr(e) {
                                     if (e)
                                         return `${e.code} ${"- " + e.name || ""}`;
@@ -287,10 +289,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 })
                 routeId = e.component.getEditor('routeId')
                 employeeId = e.component.getEditor('employeeId')
-                if (businessPartnerId.option("value") && mainStore.specialCustomer.indexOf(businessPartnerId.option("value")) == -1 && !currentData.header.docStatus) {
-                    routeId.option('readOnly', false)
-                    employeeId.option('readOnly', false)
-                }
                 routeId.option("dataSource", {
                     store: mainStore.customerRoutesList.find(arr => arr.id == businessPartnerId.option("value"))?.data || [],
                 })
@@ -298,16 +296,24 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     store: mainStore.customerEmployeesList.find(arr => arr.id == businessPartnerId.option("value"))?.data || [],
                 })
                 businessPartnerId.option('onSelectionChanged', ({ selectedItem }) => {
-                    routeId.option("dataSource", {
-                        store: mainStore.customerRoutesList.find(arr => arr.id == selectedItem.id).data,
-                    })
-                    employeeId.option("dataSource", {
-                        store: mainStore.customerEmployeesList.find(arr => arr.id == selectedItem.id).data,
-                    })
-                    routeId.option('value', null)
-                    employeeId.option('value', null)
-                    routeId.option('readOnly', false)
-                    employeeId.option('readOnly', false)
+                    if (mainStore.customerEmployeesList.find(eploy => eploy.id === selectedItem.id)?.data.length > 0 && mainStore.customerRoutesList.find(route => route.id === selectedItem.id)?.data.length > 0) {
+                        routeId.option("dataSource", {
+                            store: mainStore.customerRoutesList.find(arr => arr.id == selectedItem.id).data,
+                        })
+                        employeeId.option("dataSource", {
+                            store: mainStore.customerEmployeesList.find(arr => arr.id == selectedItem.id).data,
+                        })
+                        routeId.option('value', mainStore.customerRoutesList.find(arr => arr.id == selectedItem.id).data[0].id)
+                        employeeId.option('value', mainStore.customerEmployeesList.find(arr => arr.id == selectedItem.id).data[0].id)
+                        routeId.option('readOnly', false)
+                        employeeId.option('readOnly', false)
+                    }
+                    else {
+                        routeId.option('value', null)
+                        employeeId.option('value', null)
+                        routeId.option('readOnly', true)
+                        employeeId.option('readOnly', true)
+                    }
                 })
             }
         })
@@ -474,8 +480,8 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             newData.uomId = selectedItem.salesUomId;
                             newData.price = selectedItem.basePrice;
                             newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100;
-                            newData.lineAmtAfterTax = newData.priceAfterTax * currentRowData.qty - currentRowData.discountAmt;
-                            newData.lineAmt = newData.price * currentRowData.qty - currentRowData.discountAmt;
+                            newData.lineAmtAfterTax = newData.priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0);
+                            newData.lineAmt = newData.price * currentRowData.qty - (currentRowData.discountAmt || 0);
                         }
                     },
                 },
@@ -492,8 +498,8 @@ let helper = ({ companyId, mainStore, vatList }) => {
                         let customer = mainStore.customerList.find(x => x.id == customerId);
                         let price = mainStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + value)?.value || 0;
                         let priceAfterTax = price + (price * currentRowData.taxRate) / 100;
-                        let lineAmtAfterTax = priceAfterTax * currentRowData.qty - currentRowData.discountAmt;
-                        let lineAmt = price * currentRowData.qty - currentRowData.discountAmt;
+                        let lineAmtAfterTax = priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0);
+                        let lineAmt = price * currentRowData.qty - (currentRowData.discountAmt || 0);
                         newData.uomId = value;
                         newData.price = price;
                         newData.priceAfterTax = priceAfterTax;
@@ -546,8 +552,8 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     setCellValue: function (newData, value, currentRowData) {
                         newData.price = value;
                         newData.priceAfterTax = value + (value * currentRowData.taxRate) / 100;
-                        newData.lineAmt = value * currentRowData.qty - currentRowData.discountAmt;
-                        newData.lineAmtAfterTax = newData.priceAfterTax * currentRowData.qty - currentRowData.discountAmt;
+                        newData.lineAmt = value * currentRowData.qty - (currentRowData.discountAmt || 0);
+                        newData.lineAmtAfterTax = newData.priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0);
                     },
                 },
                 {
@@ -576,8 +582,8 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     dataType: 'number',
                     setCellValue: function (newData, value, currentRowData) {
                         newData.qty = value;
-                        newData.lineAmt = value * currentRowData.price - currentRowData.discountAmt;
-                        newData.lineAmtAfterTax = currentRowData.priceAfterTax * value - currentRowData.discountAmt;
+                        newData.lineAmt = value * currentRowData.price - (currentRowData.discountAmt || 0);
+                        newData.lineAmtAfterTax = currentRowData.priceAfterTax * value - (currentRowData.discountAmt || 0);
                     },
                     validationRules: [{ type: 'required', message: '' }],
                     editorOptions: {
@@ -641,15 +647,15 @@ let helper = ({ companyId, mainStore, vatList }) => {
                         newData.discountAmt = null
                         switch (currentRowData.discountType) {
                             case 1: // 
-                                var discountAmt = value * currentRowData.qty * currentRowData.price / 100
+                                var discountAmtCal = value * currentRowData.qty * currentRowData.price / 100
                                 break;
                             case 2:
-                                var discountAmt = value * currentRowData.qty * currentRowData.priceAfterTax / 100
+                                var discountAmtCal = value * currentRowData.qty * currentRowData.priceAfterTax / 100
                                 break;
                         }
-                        newData.lineDiscountAmt = discountAmt;
-                        newData.lineAmt = currentRowData.qty * currentRowData.price - discountAmt;
-                        newData.lineAmtAfterTax = currentRowData.priceAfterTax * currentRowData.qty - discountAmt;
+                        newData.lineDiscountAmt = discountAmtCal;
+                        newData.lineAmt = currentRowData.qty * currentRowData.price - discountAmtCal;
+                        newData.lineAmtAfterTax = currentRowData.priceAfterTax * currentRowData.qty - discountAmtCal;
                     },
 
                 },
