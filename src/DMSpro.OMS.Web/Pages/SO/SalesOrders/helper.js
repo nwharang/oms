@@ -121,7 +121,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 readOnly: true,
                                 dataSource: mainStore.employeesList,
                                 valueExpr: 'id',
-                                showClearButton: true,
                                 placeholder: "",
                                 displayExpr(e) {
                                     if (e)
@@ -146,7 +145,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 readOnly: true,
                                 dataSource: mainStore.routesList,
                                 valueExpr: 'id',
-                                showClearButton: true,
                                 placeholder: "",
                                 displayExpr(e) {
                                     if (e)
@@ -367,7 +365,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 visible: false,
             },
             stateStoring: {
-                // enabled: true,
+                enabled: true,
                 type: 'localStorage',
                 storageKey: 'dgSalesRequestDetails',
             },
