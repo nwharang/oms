@@ -17,7 +17,6 @@ using Volo.Abp.OpenIddict.Pro.Web.Menus;
 using Volo.Saas.Host.Navigation;
 using DMSpro.OMS.MdmService.Permissions;
 using DMSpro.OMS.MdmService.Web.Menus;
-using DMSpro.OMS.Localization;
 using DMSpro.OMS.MdmService;
 using Volo.Abp.Features;
 using System.Collections.Generic;
