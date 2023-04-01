@@ -197,14 +197,14 @@
                 validationRules: [{ type: 'required' }],
             },
             {
-                caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
+                caption: l('EntityFieldName:OrderService:SalesRequest:Route'),
                 dataField: 'routeId',
                 calculateDisplayValue: "routeDisplay",
                 dataType: 'string',
                 validationRules: [{ type: 'required' }],
             },
             {
-                caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
+                caption: l('EntityFieldName:OrderService:SalesRequest:Employee'),
                 dataField: 'employeeId',
                 calculateDisplayValue: "employeeDisplay",
                 dataType: 'string',
