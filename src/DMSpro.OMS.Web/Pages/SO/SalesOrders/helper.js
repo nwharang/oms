@@ -975,7 +975,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                     }
                                     if (docId && currentData.header && currentData.details.length > 0)
                                         mainService.updateDoc(docId, currentData)
-                                            .done(() => {
+                                            .done((data) => {
                                                 currentData = data
                                                 grid.dxDataGrid('instance').option('dataSource', data.details)
                                                 grid.dxDataGrid('instance').refresh()
