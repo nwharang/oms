@@ -910,7 +910,10 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                     }
                                     if (docId && currentData.header && currentData.details.length > 0)
                                         salesRequestsHeaderService.updateDoc(docId, currentData)
-                                            .done(() => {
+                                            .done((data) => {
+                                                currentData = data
+                                                grid.dxDataGrid('instance').option('dataSource', data.details)
+                                                grid.dxDataGrid('instance').refresh()
                                                 notify({ type: 'success', message: "Updated SR" })
                                             })
                                             .fail(() => {
@@ -920,8 +923,12 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                     else
                                         salesRequestsHeaderService.createDoc(currentData)
                                             .done((data) => {
-                                                notify({ type: 'success', message: "SR Created" })
                                                 docId = data.header.id
+                                                currentData = data
+                                                grid.dxDataGrid('instance').option('dataSource', data.details)
+                                                grid.dxDataGrid('instance').refresh()
+                                                notify({ type: 'success', message: "SR Created" })
+
                                                 popup.dxPopup('instance').option("title", `Sale Request - #${docId ? data.header.docNbr : "New"} - ${docStatusStore[data.header.docStatus || 0].text}`)
                                                 loadNavigationButton(docId)
                                             })
