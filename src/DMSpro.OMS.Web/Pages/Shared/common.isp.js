@@ -184,8 +184,8 @@ function initChooseItemsPopup(items) {
     })).dxDataGrid("instance");
 
     const popupItems = $('#popupItems').dxPopup({
-        width: "100vh",
-        height: 500,
+        width: "fit-content",
+        height: 'fit-content',
         container: '.panel-container',
         showTitle: true,
         title: l('Popup.Title.ChooseItems'),
