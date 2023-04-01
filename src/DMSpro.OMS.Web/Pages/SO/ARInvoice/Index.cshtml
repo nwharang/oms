@@ -15,13 +15,6 @@
 
 @section styles{
     <style>
-        .dx-datagrid-headers .dx-datagrid-content {
-            margin: -1px 0 -1px 0px !important;
-        }
-
-        .dx-datagrid-borders .dx-datagrid-rowsview, .dx-datagrid-headers + .dx-datagrid-rowsview {
-            margin: -1px 0 -1px 0px !important;
-        }
         .dx-datagrid-rowsview .dx-data-row .dx-cell-modified.dx-cell-modified::after, .dx-datagrid-rowsview .dx-data-row .dx-cell-modified.dx-datagrid-invalid::after {
             border : 1px solid transparent
         }
@@ -31,12 +24,16 @@
         .dx-col-fixed.dx-cell-focus-disabled[role="columnheader"]{
             background-color : #2b4c81 !important;
         }
-
-        .dx-gridbase-container > .dx-datagrid-rowsview.dx-scrollable > .dx-scrollable-wrapper {
-            padding-bottom : 1rem;
-        }
         .dx-checkbox-icon {
             border : 1px solid rgba(0, 0, 0, 0.4); 
+        }
+        #resizeBox {
+            overflow: hidden;
+        }
+        .priceTotalStyleBox input.dx-texteditor-input{
+            font-size: 1.5rem !important;
+            line-height: 1.5rem;
+            color : #000
         }
     </style>
 }
