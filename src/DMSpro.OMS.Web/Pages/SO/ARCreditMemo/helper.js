@@ -51,7 +51,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
     function renderForm(e, { header, details }, docId) {
         let defaultNewHeader = {
             requestDate: new Date().toString(),
-            docTotalLineDiscountAmt: 0,
             docTotalLineAmt: 0,
             docTotalLineAmtAfterTax: 0,
             docTotalAmt: 0,
@@ -165,57 +164,11 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     itemType: "group",
                     caption: 'Total Information',
                     colCountByScreen: {
-                        lg: 3,
-                        md: 3,
-                        sm: 3,
+                        lg: 2,
+                        md: 2,
+                        sm: 2,
                     },
                     items: [
-                        {
-                            dataField: "docDiscountType",
-                            editorType: 'dxSelectBox',
-                            editorOptions: {
-                                dataSource: discountTypeStore,
-                                displayExpr: 'text',
-                                valueExpr: 'id',
-                                searchEnabled: true,
-                                showClearButton: true,
-                            },
-                        },
-                        {
-                            dataField: "docDiscountPerc",
-                            editorType: 'dxNumberBox',
-                            editorOptions: {
-                                format: '#0.00',
-                                min: 0,
-                                max: 100,
-                                readOnly: true,
-                                onValueChanged: () => {
-                                    setTimeout(() => {
-                                        recalulateDocTotal()
-                                    }, 200)
-                                }
-                            },
-                            customizeText: function (cellInfo) {
-                                if (cellInfo.value)
-                                    return cellInfo.value + " %";
-                            },
-                            format: '#0.00',
-                            width: 100,
-                        },
-                        {
-                            dataField: "docDiscountAmt",
-                            editorType: 'dxNumberBox',
-                            editorOptions: {
-                                format: '#,##0.##',
-                                min: 0,
-                                value: 0,
-                                onValueChanged: () => {
-                                    setTimeout(() => {
-                                        recalulateDocTotal()
-                                    }, 200)
-                                }
-                            }
-                        },
                         {
                             dataField: "docTotalAmt",
                             editorType: 'dxNumberBox',
@@ -259,32 +212,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
             onContentReady: (e) => {
                 let openState = !Boolean(currentData.header.docStatus)
                 let businessPartnerId = e.component.getEditor('businessPartnerId')
-                let docDiscountType = e.component.getEditor('docDiscountType')
-                let docDiscountPerc = e.component.getEditor('docDiscountPerc')
-                let docDiscountAmt = e.component.getEditor('docDiscountAmt')
-                if (openState)
-                    switch (docDiscountType.option('value')) {
-                        case 0:
-                            docDiscountPerc.option('readOnly', true)
-                            docDiscountAmt.option('readOnly', false)
-                            break;
-                        case 1:
-                        case 2:
-                            docDiscountPerc.option('readOnly', false)
-                            docDiscountAmt.option('readOnly', true)
-                            break;
-                        default:
-                            docDiscountPerc.option('readOnly', false)
-                            docDiscountAmt.option('readOnly', false)
-                            break;
-                    }
-                docDiscountType.option('onSelectionChanged', () => {
-                    docDiscountPerc.option('value', 0)
-                    docDiscountAmt.option('value', 0)
-                    setTimeout(() => {
-                        recalulateDocTotal()
-                    }, 200)
-                })
                 routeId = e.component.getEditor('routeId')
                 employeeId = e.component.getEditor('employeeId')
                 if (businessPartnerId.option("value") && mainStore.specialCustomer.indexOf(businessPartnerId.option("value")) == -1 && !currentData.header.docStatus) {
@@ -454,10 +381,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 e.component.on('valueChanged', (args) => {
                                     content.dxDataGrid('instance').selectRows(args.value, false);
                                     e.component.close();
-                                    setTimeout(() => {
-                                        recalulateDocTotal()
-                                    }, 200)
-
                                 });
                                 return content
                             }
@@ -474,8 +397,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             newData.uomId = selectedItem.salesUomId;
                             newData.price = selectedItem.basePrice;
                             newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100;
-                            newData.lineAmtAfterTax = newData.priceAfterTax * currentRowData.qty - currentRowData.discountAmt;
-                            newData.lineAmt = newData.price * currentRowData.qty - currentRowData.discountAmt;
                         }
                     },
                 },
@@ -492,8 +413,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                         let customer = mainStore.customerList.find(x => x.id == customerId);
                         let price = mainStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + value)?.value || 0;
                         let priceAfterTax = price + (price * currentRowData.taxRate) / 100;
-                        let lineAmtAfterTax = priceAfterTax * currentRowData.qty - currentRowData.discountAmt;
-                        let lineAmt = price * currentRowData.qty - currentRowData.discountAmt;
                         newData.uomId = value;
                         newData.price = price;
                         newData.priceAfterTax = priceAfterTax;
@@ -509,8 +428,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     setCellValue: (newData, value, currentRowData) => {
                         newData.isFree = value;
                         if (value) {
-                            newData.discountType = 0
-                            newData.discountAmt = 0
                             newData.lineAmt = 0
                             newData.lineAmtAfterTax = 0
                         }
@@ -520,8 +437,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 thisData = detailsData?.find(e => e.id === currentRowData.id)
                             newData.price = thisData?.price || 0
                             newData.priceAfterTax = thisData?.priceAfterTax || 0
-                            newData.discountType = thisData?.discountType || 0
-                            newData.discountAmt = thisData?.discountAmt || 0
+
                             newData.lineAmt = thisData?.lineAmt || 0
                             newData.lineAmtAfterTax = thisData?.lineAmtAfterTax || 0
                         }
@@ -546,8 +462,8 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     setCellValue: function (newData, value, currentRowData) {
                         newData.price = value;
                         newData.priceAfterTax = value + (value * currentRowData.taxRate) / 100;
-                        newData.lineAmt = value * currentRowData.qty - currentRowData.discountAmt;
-                        newData.lineAmtAfterTax = newData.priceAfterTax * currentRowData.qty - currentRowData.discountAmt;
+                        newData.lineAmt = value * currentRowData.qty
+                        newData.lineAmtAfterTax = newData.priceAfterTax * currentRowData.qty
                     },
                 },
                 {
@@ -576,105 +492,13 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     dataType: 'number',
                     setCellValue: function (newData, value, currentRowData) {
                         newData.qty = value;
-                        newData.lineAmt = value * currentRowData.price - currentRowData.discountAmt;
-                        newData.lineAmtAfterTax = currentRowData.priceAfterTax * value - currentRowData.discountAmt;
+                        newData.lineAmt = value * currentRowData.price
+                        newData.lineAmtAfterTax = currentRowData.priceAfterTax * value
                     },
                     validationRules: [{ type: 'required', message: '' }],
                     editorOptions: {
                         min: 1
                     }
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountType'),
-                    dataField: 'discountType',
-                    setCellValue: (newData, value, currentRowData) => {
-                        newData.discountType = value;
-                        switch (newData.discountType) {
-                            case 0:
-                                newData.discountAmt = 0;
-                                newData.discountPerc = null
-                                break;
-                            case 1:
-                                newData.discountAmt = null
-                                newData.discountPerc = 0
-                                break;
-                            case 2:
-                                newData.discountAmt = null
-                                newData.discountPerc = 0
-                                break;
-
-                            default:
-                                break;
-                        }
-                    },
-                    lookup: {
-                        dataSource: discountTypeStore,
-                        displayExpr: 'text',
-                        valueExpr: 'id',
-                    },
-                    editorType: 'dxSelectBox',
-                    editorOptions: {
-                        dataSource: discountTypeStore,
-                        displayExpr: 'text',
-                        valueExpr: 'id',
-                        showClearButton: true,
-                    }
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountPerc'),
-                    dataField: 'discountPerc',
-                    // dataType: 'number',
-                    editorType: 'dxNumberBox',
-                    editorOptions: {
-                        format: '#0.00',
-                        min: 0,
-                        max: 100,
-                    },
-                    customizeText: function (cellInfo) {
-                        if (cellInfo.value)
-                            return cellInfo.value + " %";
-                    },
-                    format: '#0.00',
-                    width: 100,
-                    setCellValue: function (newData, value, currentRowData) {
-                        newData.discountPerc = value;
-                        newData.discountAmt = null
-                        switch (currentRowData.discountType) {
-                            case 1: // 
-                                var discountAmt = value * currentRowData.qty * currentRowData.price / 100
-                                break;
-                            case 2:
-                                var discountAmt = value * currentRowData.qty * currentRowData.priceAfterTax / 100
-                                break;
-                        }
-                        newData.lineDiscountAmt = discountAmt;
-                        newData.lineAmt = currentRowData.qty * currentRowData.price - discountAmt;
-                        newData.lineAmtAfterTax = currentRowData.priceAfterTax * currentRowData.qty - discountAmt;
-                    },
-
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountAmt'),
-                    dataField: 'discountAmt',
-                    editorType: 'dxNumberBox',
-                    editorOptions: {
-                        format: '#,##0.##',
-                        min: 0,
-                    },
-                    format: '#,##0.##',
-                    width: 100,
-                    setCellValue: function (newData, value, currentRowData) {
-                        newData.discountAmt = value;
-                        newData.discountPerc = null;
-                        switch (currentRowData.discountType) {
-                            case 0:
-                                newData.lineDiscountAmt = value;
-                                newData.lineAmt = currentRowData.qty * currentRowData.price - value;
-                                newData.lineAmtAfterTax = currentRowData.priceAfterTax * currentRowData.qty - value;
-                                break;
-
-                        }
-                    },
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineAmt'),
@@ -733,12 +557,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                         valueFormat: '#,##0.##',
                     },
                     {
-                        column: 'lineDiscountAmt',
-                        name: "docTotalLineDiscountAmt",
-                        summaryType: 'sum',
-                        valueFormat: '#,##0.##',
-                    },
-                    {
                         column: 'lineAmtAfterTax',
                         name: 'docTotalLineAmtAfterTax',
                         summaryType: 'sum',
@@ -784,14 +602,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
             onDisposing: () => {
                 gridInitialized = false
             },
-            onEditorPreparing: (e) => {
-                if (e.row?.rowType != 'data') return
-                let discountType = e.row.data.discountType
-                if (e.dataField == "discountAmt")
-                    e.cancel = discountType == 0 ? false : true
-                if (e.dataField == "discountPerc")
-                    e.cancel = discountType > 0 ? false : true
-            }
         })
         gridInstance = grid.dxDataGrid('instance')
         loadNavigationButton(docId)
@@ -1084,51 +894,14 @@ function recalulateDocTotal() {
     let formInstance = $("#form-container").dxForm('instance')
     let gridInstance = $("#detailsDataGrids").dxDataGrid('instance')
     if (!formInstance || !gridInstance) return
-    if (gridInstance.hasEditData()) {
+    if (gridInstance.hasEditData())
         debounce(gridInstance.saveEditData(), 250)
-    }
-    let { docDiscountType, docDiscountPerc = 0, docDiscountAmt } = formInstance.option('formData')
-    let docTotalLineDiscountAmt = gridInstance.getTotalSummaryValue('docTotalLineDiscountAmt') || 0
     let docTotalLineAmt = gridInstance.getTotalSummaryValue('docTotalLineAmt') || 0
     let docTotalLineAmtAfterTax = gridInstance.getTotalSummaryValue('docTotalLineAmtAfterTax') || 0
-    let totalDiscountAmt = docTotalLineDiscountAmt + docDiscountAmt
-    formInstance.updateData('docTotalLineDiscountAmt', docTotalLineDiscountAmt)
     formInstance.updateData('docTotalLineAmt', docTotalLineAmt)
     formInstance.updateData('docTotalLineAmtAfterTax', docTotalLineAmtAfterTax)
-    formInstance.updateData('totalDiscountAmt', totalDiscountAmt);
-    switch (docDiscountType) {
-        case 0:
-            formInstance.updateData('docDiscountAmt', docDiscountAmt);
-            formInstance.getEditor('docDiscountPerc').option('readOnly', true);
-            formInstance.getEditor('docDiscountAmt').option('readOnly', false);
-            formInstance.updateData('docTotalAmt', docTotalLineAmt - docDiscountAmt);
-            formInstance.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - docDiscountAmt);
-            break;
-        case 1:
-            var discountAmt = docDiscountPerc * docTotalLineAmt / 100
-            formInstance.updateData('docDiscountAmt', 0);
-            formInstance.getEditor('docDiscountAmt').option('readOnly', true);
-            formInstance.getEditor('docDiscountPerc').option('readOnly', false);
-            formInstance.updateData('docTotalAmt', docTotalLineAmt - discountAmt);
-            formInstance.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - discountAmt);
-            break;
-        case 2:
-            var discountAmt = docDiscountPerc * docTotalLineAmtAfterTax / 100
-            formInstance.updateData('docDiscountAmt', 0);
-            formInstance.getEditor('docDiscountAmt').option('readOnly', true);
-            formInstance.getEditor('docDiscountPerc').option('readOnly', false);
-            formInstance.updateData('docTotalAmt', docTotalLineAmt - discountAmt);
-            formInstance.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax - discountAmt);
-            break;
-        default:
-            formInstance.getEditor('docDiscountAmt').option('readOnly', true);
-            formInstance.getEditor('docDiscountPerc').option('readOnly', true);
-            formInstance.getEditor('docDiscountAmt').option('value', 0);
-            formInstance.getEditor('docDiscountPerc').option('value', 0);
-            formInstance.updateData('docTotalAmt', docTotalLineAmt);
-            formInstance.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax);
-            break;
-    }
+    formInstance.updateData('docTotalAmt', docTotalLineAmt);
+    formInstance.updateData('docTotalAmtAfterTax', docTotalLineAmtAfterTax);
     if (currentData.details.length > 0) {
         $('#saveButtonPopup').dxButton('instance').option('disabled', false);
         formInstance.getEditor('businessPartnerId').option('readOnly', true);

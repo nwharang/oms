@@ -17,7 +17,7 @@
     })
 
     var l = abp.localization.getResource("OMS");
-    let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
+    let { mainStore, docTypeStore, docStatusStore, docSourceStore } = store()
     let mainGrid = $('#dgReturnOrderHeader').dxDataGrid({
         dataSource: { store: mainStore },
         showRowLines: true,
@@ -192,14 +192,6 @@
                 visible: true,
             },
             {
-                caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt'),
-                dataField: 'docTotalLineDiscountAmt',
-                dataType: 'number',
-                width: 100,
-                validationRules: [{ type: 'required' }],
-                allowEditing: false,
-            },
-            {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
                 dataField: 'docTotalAmt',
                 dataType: 'number',
@@ -214,34 +206,6 @@
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
             },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountType'),
-                dataField: 'docDiscountType',
-                dataType: 'string',
-                lookup: {
-                    dataSource: discountTypeStore,
-                    valueExpr: "id",
-                    displayExpr: "text",
-                },
-                validationRules: [{ type: 'required' }],
-                visible: true,
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountPerc'),
-                dataField: 'docDiscountPerc',
-                dataType: 'number',
-                validationRules: [{ type: 'required' }],
-                format: '#0.00 %',
-                width: 100,
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt'),
-                dataField: 'docDiscountAmt',
-                dataType: 'number',
-                validationRules: [{ type: 'required' }],
-                width: 100,
-            },
-
         ],
         summary: {
             totalItems: [{

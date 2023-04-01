@@ -44,7 +44,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
     function renderForm(e, { header, details }, docId) {
         let defaultNewHeader = {
             requestDate: new Date().toString(),
-            docTotalLineDiscountAmt: 0,
             docTotalLineAmt: 0,
             docTotalLineAmtAfterTax: 0,
             docTotalAmt: 0,
@@ -159,48 +158,11 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     itemType: "group",
                     caption: 'Total Information',
                     colCountByScreen: {
-                        lg: 3,
-                        md: 3,
-                        sm: 3,
+                        lg: 2,
+                        md: 2,
+                        sm: 2,
                     },
                     items: [
-                        {
-                            dataField: "docDiscountType",
-                            editorType: 'dxSelectBox',
-                            editorOptions: {
-                                readOnly: true,
-                                dataSource: discountTypeStore,
-                                displayExpr: 'text',
-                                valueExpr: 'id',
-                                searchEnabled: true,
-                            },
-                        },
-                        {
-                            dataField: "docDiscountPerc",
-                            editorType: 'dxNumberBox',
-                            editorOptions: {
-                                format: '#0.00',
-                                min: 0,
-                                max: 100,
-                                readOnly: true,
-                            },
-                            customizeText: function (cellInfo) {
-                                if (cellInfo.value)
-                                    return cellInfo.value + " %";
-                            },
-                            format: '#0.00',
-                            width: 100,
-                        },
-                        {
-                            dataField: "docDiscountAmt",
-                            editorType: 'dxNumberBox',
-                            editorOptions: {
-                                readOnly: true,
-                                format: '#,##0.##',
-                                min: 0,
-                                value: 0,
-                            }
-                        },
                         {
                             dataField: "docTotalAmt",
                             editorType: 'dxNumberBox',
@@ -356,56 +318,13 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     dataType: 'number',
                 },
                 {
-                    caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountType'),
-                    dataField: 'discountType',
-                    lookup: {
-                        dataSource: discountTypeStore,
-                        displayExpr: 'text',
-                        valueExpr: 'id',
-                    },
-                    editorType: 'dxSelectBox',
-                    editorOptions: {
-                        readOnly: true,
-                        dataSource: discountTypeStore,
-                        displayExpr: 'text',
-                        valueExpr: 'id',
-                    }
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountPerc'),
-                    dataField: 'discountPerc',
-                    // dataType: 'number',
-                    editorType: 'dxNumberBox',
-                    editorOptions: {
-                        readOnly: true,
-                    },
-                    customizeText: function (cellInfo) {
-                        if (cellInfo.value)
-                            return cellInfo.value + " %";
-                    },
-                    format: '#0.00',
-                    width: 100,
-                },
-                {
-                    caption: l('EntityFieldName:OrderService:SalesRequestDetails:DiscountAmt'),
-                    dataField: 'discountAmt',
-                    editorType: 'dxNumberBox',
-                    editorOptions: {
-                        readOnly: true,
-                        format: '#,##0.##',
-                        min: 0,
-                    },
-                    format: '#,##0.##',
-                    width: 100,
-                },
-                {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:LineAmt'),
                     dataField: 'lineAmt',
                     dataType: 'number',
                     editorOptions: {
-                        readOnly: true,
                         format: '#,##0.##',
                     },
+                    allowEditing: false,
                     format: '#,##0.##',
                 },
                 {
@@ -453,12 +372,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     {
                         column: 'lineAmt',
                         name: "docTotalLineAmt",
-                        summaryType: 'sum',
-                        valueFormat: '#,##0.##',
-                    },
-                    {
-                        column: 'lineDiscountAmt',
-                        name: "docTotalLineDiscountAmt",
                         summaryType: 'sum',
                         valueFormat: '#,##0.##',
                     },
