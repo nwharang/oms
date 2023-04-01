@@ -138,15 +138,15 @@ function initChooseItemsPopup(items) {
                 dataField: 'qty',
                 width: 100,
                 cellTemplate(container, options) {
-                    $('<div>')
-                        .dxNumberBox({
-                            value: options.value,
-                            min: 0,
-                            value: 1,
-                            onValueChanged: function (e) {
-                                options.data.qty = e.value;
-                            }
-                        })
+                    $('<div>').dxNumberBox({
+                        value: options.value,
+                        min: 0,
+                        value: 1,
+                        height: '23px',
+                        onValueChanged: function (e) {
+                            options.data.qty = e.value;
+                        }
+                    })
                         .appendTo(container);
                 }
             },
