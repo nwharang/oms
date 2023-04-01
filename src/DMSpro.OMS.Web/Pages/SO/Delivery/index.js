@@ -1,7 +1,4 @@
 ﻿$(async function () {
-    let deliveryHeaderService = window.dMSpro.oMS.orderService.controllers.deliveries.delivery;
-    let salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
-
     let notify = ({ type = "success", position = "bottom right", message = "Message Placeholder" }) => DevExpress.ui.notify({
         message,
         height: 45,
@@ -18,12 +15,11 @@
     }, {
         position
     })
+
     var l = abp.localization.getResource("OMS");
-    let { mainStore, employeeProfileStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
-    let currentSelectedDoc = new Map()
-    const InfoSO = await store().getInfoSO()
-    const { renderPopup } = helper(InfoSO)
-    let mainDataGrid = $('#dgDeliveryHeader').dxDataGrid({
+    let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
+    let currentSelectedDoc = new Map();
+    let mainGrid = $('#dgDeliveryHeader').dxDataGrid({
         dataSource: { store: mainStore },
         showRowLines: true,
         showBorders: true,
@@ -53,7 +49,7 @@
         },
         export: {
             enabled: true,
-            allowExportSelectedData: true,
+            // allowExportSelectedData: true,
         },
         onExporting(e) {
             const workbook = new ExcelJS.Workbook();
@@ -74,7 +70,7 @@
             visible: true,
         },
         stateStoring: {
-            enabled: true,
+            // enabled: true,
             type: 'localStorage',
             storageKey: 'dgDeliveryHeader',
         },
@@ -98,39 +94,41 @@
                     options: {
                         icon: 'preferences',
                         text: 'Actions',
-                        width: 150,
+                        width: 120,
                         items: [
                             {
                                 text: "Create AR Invoice",
+                                icon: "check",
                                 onClick() {
                                     let array = []
                                     currentSelectedDoc.forEach((e, k) => {
                                         if (e) array.push(k)
                                     })
-                                    deliveryHeaderService.createListARInvoiceDoc(array)
+                                    mainService.createListARInvoiceDoc(array)
                                         .done(() => {
-                                            notify({ type: 'success', message: `${array.length} AR Created` })
+                                            notify({ type: 'success', message: `Create ${array.length} Ar Invoice` })
                                             $('#dgDeliveryHeader').dxDataGrid('instance').getDataSource().reload()
                                         }
                                         ).fail(() => {
-                                            notify({ type: 'error', message: "ARs Create Failed" })
+                                            notify({ type: 'error', message: "Create Failed" })
                                         })
                                 }
                             },
                             {
                                 text: "Create Return Order",
+                                icon: "check",
                                 onClick() {
                                     let array = []
                                     currentSelectedDoc.forEach((e, k) => {
                                         if (e) array.push(k)
                                     })
-                                    deliveryHeaderService.createListRODoc(array)
+                                    mainService.createListRODoc(array)
                                         .done(() => {
-                                            notify({ type: 'success', message: `${array.length} ROs Created` })
+                                            notify({ type: 'success', message: `Create ${array.length} RO` })
                                             $('#dgDeliveryHeader').dxDataGrid('instance').getDataSource().reload()
                                         }
                                         ).fail(() => {
-                                            notify({ type: 'error', message: "ROs Create Failed" })
+                                            notify({ type: 'error', message: "Create Failed" })
                                         })
                                 }
                             },
@@ -140,22 +138,6 @@
                 },
                 'columnChooserButton',
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
                 "searchPanel"
             ],
         },
@@ -204,7 +186,10 @@
                         text: l('Button.ViewDetail'),
                         icon: "fieldchooser",
                         onClick: function (e) {
-                            renderPopup(e.row.data.id)
+                            preLoad.then((data) => {
+                                helper(data).renderPopup(e.row.data.id)
+                            })
+
                         }
                     }
                 ],
@@ -215,6 +200,20 @@
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
                 dataField: 'docNbr',
+                dataType: 'string',
+                validationRules: [{ type: 'required' }],
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
+                dataField: 'routeId',
+                calculateDisplayValue: "routeDisplay",
+                dataType: 'string',
+                validationRules: [{ type: 'required' }],
+            },
+            {
+                caption: l('EntityFieldName:OrderService:SalesRequest:DocNbr'),
+                dataField: 'employeeId',
+                calculateDisplayValue: "employeeDisplay",
                 dataType: 'string',
                 validationRules: [{ type: 'required' }],
             },
@@ -248,62 +247,20 @@
                 editorType: 'dxSelectBox',
                 dataField: 'businessPartnerId',
                 validationRules: [{ type: 'required' }],
-                lookup: {
-                    dataSource: InfoSO.salesOrderStore.customerList,
-                    displayExpr: 'name',
-                    valueExpr: 'id',
-                },
-            },
-            {
-                dataField: "routeId",
-                editorType: "dxSelectBox",
-                editorOptions: {
-                    dataSource: {
-                        store: InfoSO.salesOrderStore.routeList
-                    },
-                    displayExpr: 'name',
-                    valueExpr: 'id'
-                },
-                label: {
-                    visible: false,
-                    text: l('Route')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
-            },
-            {
-                dataField: "employeeId",
-                editorType: 'dxSelectBox',
-                editorOptions: {
-                    dataSource: {
-                        store: InfoSO.salesOrderStore.employeeList,
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    },
-                    displayExpr: 'code',
-                    valueExpr: 'id'
-                },
-                label: {
-                    visible: false,
-                    text: l('Employee')
-                },
-                validationRules: [{
-                    type: 'required',
-                }]
+                calculateDisplayValue: "businessPartnerDisplay"
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:RequestDate'),
                 dataField: 'requestDate',
-                dataType: 'datetime',
-                format: 'M/d/yyyy, HH:mm',
+                dataType: 'date',
+                format: 'dd/MM/yyyy',
                 validationRules: [{ type: 'required' }],
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocDate'),
                 dataField: 'docDate',
-                dataType: 'datetime',
-                format: 'M/d/yyyy, HH:mm',
+                dataType: 'date',
+                format: 'dd/MM/yyyy',
                 validationRules: [{ type: 'required' }],
                 visible: false,
 
@@ -327,23 +284,23 @@
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
             },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
-                dataField: 'docTotalLineAmt',
-                dataType: 'number',
-                visible: true,
-                validationRules: [{ type: 'required' }],
-                allowEditing: false,
-            },
-            {
-                caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
-                dataField: 'docTotalLineAmtAfterTax',
-                dataType: 'number',
-                width: 100,
-                visible: true,
-                validationRules: [{ type: 'required' }],
-                allowEditing: false,
-            },
+            // {
+            //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
+            //     dataField: 'docTotalLineAmt',
+            //     dataType: 'number',
+            //     visible: true,
+            //     validationRules: [{ type: 'required' }],
+            //     allowEditing: false,
+            // },
+            // {
+            //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
+            //     dataField: 'docTotalLineAmtAfterTax',
+            //     dataType: 'number',
+            //     width: 100,
+            //     visible: true,
+            //     validationRules: [{ type: 'required' }],
+            //     allowEditing: false,
+            // },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
                 dataField: 'docTotalAmt',
@@ -399,7 +356,16 @@
                 valueFormat: ",##0.###",
             }],
         },
+        onContentReady: (e) => {
+            currentSelectedDoc.clear()
+            $('.disabledActionCheckboxFormControl').each(function () {
+                let id = $(this).attr('id')
+                currentSelectedDoc.set(id, false)
+            })
+            $('.actionCheckboxFormControl').each(function () {
+                let id = $(this).attr('id')
+                currentSelectedDoc.set(id, false)
+            })
+        },
     }).dxDataGrid("instance");
-
-    initImportPopup('', 'Delivery_Template', 'dgDeliveryHeader');
-});
+})

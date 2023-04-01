@@ -70,7 +70,7 @@
             visible: true,
         },
         stateStoring: {
-            // enabled: true,
+            enabled: true,
             type: 'localStorage',
             storageKey: 'dgSalesOrderHeader',
         },
@@ -293,23 +293,6 @@
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
             },
-            // {
-            //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
-            //     dataField: 'docTotalLineAmt',
-            //     dataType: 'number',
-            //     visible: true,
-            //     validationRules: [{ type: 'required' }],
-            //     allowEditing: false,
-            // },
-            // {
-            //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
-            //     dataField: 'docTotalLineAmtAfterTax',
-            //     dataType: 'number',
-            //     width: 100,
-            //     visible: true,
-            //     validationRules: [{ type: 'required' }],
-            //     allowEditing: false,
-            // },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
                 dataField: 'docTotalAmt',
