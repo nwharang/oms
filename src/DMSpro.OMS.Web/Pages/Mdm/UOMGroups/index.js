@@ -567,7 +567,13 @@ $(function () {
                         ]
                     }).appendTo(container);
             }
-        }
+        },
+        onEditorPreparing: (e) => {
+            if (e.row?.rowType != 'data') return
+            if (e.row.data.id && e.dataField == 'code') {
+                e.editorOptions.readOnly = true
+            }
+        },
     }).dxDataGrid('instance');
 
     initImportPopup('api/mdm-service/u-oMGroups', 'UOMGroups_Template', 'gridUOMGroups');
