@@ -1146,7 +1146,11 @@ function recalulateDocTotal() {
     if (currentData.details.length > 0) {
         $('#saveButtonPopup').dxButton('instance').option('disabled', false);
         formInstance.getEditor('businessPartnerId').option('readOnly', true);
+        formInstance.getEditor('routeId').option('readOnly', true);
+        formInstance.getEditor('employeeId').option('readOnly', true);
     } else {
         formInstance.getEditor('businessPartnerId').option('readOnly', false);
+        formInstance.getEditor('routeId').option('readOnly', false);
+        formInstance.getEditor('employeeId').option('readOnly', false);
     }
 }
