@@ -31,23 +31,26 @@ let helper = ({ companyId, mainStore, vatList }) => {
             })
         }
     }
-
-    let notify = ({ type = "success", position = "bottom left", message = "Message Placeholder" }) => DevExpress.ui.notify({
-        message,
-        height: 45,
-        width: 250,
-        minWidth: 250,
-        type,
-        displayTime: 5000,
-        animation: {
-            show: {
-                type: 'fade', duration: 400, from: 0, to: 1,
+    let notify = (option) => {
+        obj = { type: "success", position: "bottom right", message: "Message Placeholder", ...option };
+        DevExpress.ui.notify({
+            message: obj.message,
+            height: 45,
+            width: 250,
+            minWidth: 250,
+            type: obj.type,
+            displayTime: 5000,
+            animation: {
+                show: {
+                    type: 'fade', duration: 400, from: 0, to: 1,
+                },
+                hide: { type: 'fade', duration: 40, to: 0 },
             },
-            hide: { type: 'fade', duration: 40, to: 0 },
-        },
-    }, {
-        position
-    })
+        }, {
+            position: obj.position,
+        })
+        return obj
+    }
     function renderForm(e, { header, details }, docId) {
         let defaultNewHeader = {
             requestDate: new Date().toString(),
@@ -686,76 +689,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             }
                         }
                     },
-                    // {
-                    //     widget: "dxDropDownButton",
-                    //     location: "after",
-                    //     toolbar: "bottom",
-                    //     options: {
-                    //         icon: 'preferences',
-                    //         text: 'Actions',
-                    //         disabled: Boolean(currentData.header.docStatus),
-                    //         width: 120,
-                    //         elementAttr: {
-                    //             id: "actionButtonDetailsPanel",
-                    //         },
-                    //         items: [
-                    //             {
-                    //                 text: "Approve",
-                    //                 icon: "check",
-                    //                 onClick: () => {
-                    //                     if (docId)
-                    //                         mainService.createListDODoc([docId])
-                    //                             .done(() => {
-                    //                                 let newEditingOption = {
-                    //                                     ...grid.dxDataGrid('instance').option("editing"),
-                    //                                     allowAdding: false,
-                    //                                     allowUpdating: false,
-                    //                                     allowDeleting: false,
-                    //                                 }
-                    //                                 notify({ type: 'success', message: "SO Approved" })
-                    //                                 form.dxForm('instance').option("readOnly", true)
-                    //                                 grid.dxDataGrid('instance').option("editing", newEditingOption)
-                    //                                 $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", true)
-                    //                                 $('#saveButtonPopup').dxButton('instance').option('disabled', true);
-                    //                                 popup.dxPopup('instance').option("title", `AR Credit Memo - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[1].text}`)
-                    //                             })
-                    //                             .fail(() => {
-                    //                                 notify({ type: 'error', message: "SO Approve Failed" })
-                    //                                 popup.dxPopup('instance').option("title", `AR Credit Memo - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[0].text}`)
-                    //                                 popup.dxPopup('instance').repaint()
-                    //                             })
-                    //                 }
-                    //             },
-                    //             {
-                    //                 text: "Reject",
-                    //                 icon: "close",
-                    //                 onClick: () => DevExpress.ui.dialog.confirm("<i> Do you wish to continue this action?</i>", "Rejecting AR Credit Memo")
-                    //                     .done((e) => {
-                    //                         if (e) {
-                    //                             mainService.cancelDoc(docId)
-                    //                                 .done(() => {
-                    //                                     let newEditingOption = {
-                    //                                         ...grid.dxDataGrid('instance').option("editing"),
-                    //                                         allowAdding: false,
-                    //                                         allowUpdating: false,
-                    //                                         allowDeleting: false,
-                    //                                     }
-                    //                                     notify({ type: 'success', message: "SO Rejected" })
-                    //                                     form.dxForm('instance').option("readOnly", true)
-                    //                                     grid.dxDataGrid('instance').option("editing", newEditingOption)
-                    //                                     $('#saveButtonPopup').dxButton('instance').option('disabled', true);
-                    //                                     popup.dxPopup('instance').option("title", `AR Credit Memo - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[2].text}`)
-                    //                                 })
-                    //                                 .fail(() => {
-                    //                                     notify({ type: 'error', message: "SO Reject Failed" })
-                    //                                     popup.dxPopup('instance').option("title", `AR Credit Memo - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[0].text}`)
-                    //                                 })
-                    //                         }
-                    //                     })
-                    //             }
-                    //         ]
-                    //     },
-                    // },
                     {
                         widget: 'dxButton',
                         location: "after",

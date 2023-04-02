@@ -24,23 +24,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
             })
         }
     }
-
-    let notify = ({ type = "success", position = "bottom left", message = "Message Placeholder" }) => DevExpress.ui.notify({
-        message,
-        height: 45,
-        width: 250,
-        minWidth: 250,
-        type,
-        displayTime: 5000,
-        animation: {
-            show: {
-                type: 'fade', duration: 400, from: 0, to: 1,
-            },
-            hide: { type: 'fade', duration: 40, to: 0 },
-        },
-    }, {
-        position
-    })
     function renderForm(e, { header, details }, docId) {
         let defaultNewHeader = {
             requestDate: new Date().toString(),
