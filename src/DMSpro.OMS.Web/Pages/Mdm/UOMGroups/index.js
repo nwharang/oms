@@ -368,6 +368,7 @@ $(function () {
                             if (isRecord) {
                                 e.data = {
                                     ...e.data,
+                                    baseQty: 2,
                                     baseUOMId: detailDataSrc[0].baseUOMId,
                                     altQty: 1,
                                 }
@@ -527,6 +528,9 @@ $(function () {
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:BaseQty"),
                                 dataField: "baseQty",
+                                editorOptions: {
+                                    min: 2,
+                                },
                                 validationRules: [
                                     {
                                         type: "required",
