@@ -265,11 +265,11 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'gridPriceLists',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'gridPriceLists',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
