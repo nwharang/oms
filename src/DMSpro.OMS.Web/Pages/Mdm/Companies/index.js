@@ -7,8 +7,7 @@ $(function () {
 
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
-        //loadMode: 'raw',
-        //cacheRawData: true,
+        useDefaultSearch: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const argsGeo = {};
@@ -297,23 +296,21 @@ $(function () {
                 fixedPosition: "left"
             },
             {
-                dataField: "geoLevel0.name",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel0Id"),
-                formItem: {
-                    visible: false
-                },
-            },
-            {
                 dataField: "geoLevel0Id",
                 caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel0Id"),
                 visible: false,
                 formItem: {
                     visible: true,
                 },
-                calculateDisplayValue: "geoLevel0.name", // provides display values
-                //calculateCellValue: function (rowData) {
-                //    return rowData.geoLevel0.name;
-                //},
+                //calculateDisplayValue: "geoLevel0.name", // provides display values
+                calculateDisplayValue: function (rowData) {
+                    if(rowData.geoLevel0){
+                        return rowData.geoLevel0.name;
+                    }else{
+                        return "";
+                    }
+                    
+                },
                 setCellValue(rowData, value) {
                     rowData.geoLevel0Id = value;
                     rowData.geoLevel1Id = null;
@@ -335,22 +332,20 @@ $(function () {
                 },
                 //editCellTemplate: geoLookupEditorTemplate,
                 dataType: 'string',
-                showInColumnChooser: false
+                //showInColumnChooser: false
             },
-            
-            {
-                dataField: "geoLevel1.name",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel1Id"),
-                formItem: {
-                    visible: false
-                },
-                visible: true,
-                showInColumnChooser: true
-            },
+    
             {
                 dataField: "geoLevel1Id",
                 caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel1Id"),
-                calculateDisplayValue: "geoLevel1Id",
+                //calculateDisplayValue: "geoLevel1Id",
+                calculateDisplayValue(rowData){
+                    
+                    if(rowData.geoLevel1){
+                        return rowData.geoLevel1.name;
+                    }
+                    return "";
+                },
                 //width: 110,
                 visible: false,
                 setCellValue(rowData, value) {
@@ -372,20 +367,20 @@ $(function () {
                     
                 },
                 dataType: 'string',
-                showInColumnChooser: false
-            },
-            {
-                dataField: "geoLevel2.name",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel2Id"),
-                formItem: {
-                    visible: false
-                },
+                //showInColumnChooser: false
             },
             {
                 dataField: "geoLevel2Id",
                 caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel2Id"),
-                calculateDisplayValue: "geoLevel2.name",
+                //calculateDisplayValue: "geoLevel2.name",
                 //width: 110,
+                calculateDisplayValue(rowData){
+                    //console.log(rowData.geoLevel2);
+                    if(rowData.geoLevel2){
+                        return rowData.geoLevel2.name;
+                    }
+                    return "";
+                },
                 visible: false,
                 setCellValue(rowData, value) {
                     rowData.geoLevel2Id = value;
@@ -421,19 +416,19 @@ $(function () {
                     //},
                 },
                 dataType: 'string',
-                showInColumnChooser: false
-            },
-            {
-                dataField: "geoLevel3.name",
-                caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel3Id"),
-                formItem: {
-                    visible: false
-                },
+                //showInColumnChooser: false
             },
             {
                 dataField: "geoLevel3Id",
                 caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel3Id"),
-                calculateDisplayValue: "geoLevel3.name",
+                //calculateDisplayValue: "geoLevel3.name",
+                calculateDisplayValue(rowData){
+                    //console.log(rowData.geoLevel2);
+                    if(rowData.geoLevel3){
+                        return rowData.geoLevel3.name;
+                    }
+                    return "";
+                },
                 //width: 110,
                 visible: false,
                 setCellValue(rowData, value) {
@@ -453,7 +448,7 @@ $(function () {
                     displayExpr: 'name',
                 },
                 dataType: 'string',
-                showInColumnChooser: false
+                //showInColumnChooser: false
             },
             // {
             //     dataField: "geoLevel4.name",
@@ -539,7 +534,13 @@ $(function () {
                 //width: 145,
                 visible: false,
                 dataType: 'string',
-                calculateDisplayValue: "parent.name",
+                calculateDisplayValue(rowData){
+                    //console.log(rowData.geoLevel2);
+                    if(rowData.parent){
+                        return rowData.parent.name;
+                    }
+                    return "";
+                },
                 lookup: {
                     dataSource(options) {
                         return {
