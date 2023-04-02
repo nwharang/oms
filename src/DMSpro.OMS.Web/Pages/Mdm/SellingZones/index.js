@@ -219,8 +219,8 @@ $(function () {
         dataSource: salesOrgHierarchyStore,
         valueExpr: 'id',
         displayExpr: "name",
-        label: "Code",
-        labelMode: "floating",
+        label: l["Selling Zone"],
+        // labelMode: "floating",
         searchEnabled: true,
         showClearButton: true,
         onSelectionChanged(data) {
@@ -251,49 +251,49 @@ $(function () {
         allowColumnResizing: true,
         columnResizingMode: 'widget',
         columnAutoWidth: true,
-        filterRow: {
-            visible: true
-        },
-        groupPanel: {
-            visible: true,
-        },
-        searchPanel: {
-            visible: true
-        },
+        // filterRow: {
+        //     visible: true
+        // },
+        // groupPanel: {
+        //     visible: true,
+        // },
+        // searchPanel: {
+        //     visible: true
+        // },
         columnMinWidth: 50,
-        columnChooser: {
-            enabled: true,
-            mode: "select"
-        },
-        columnFixing: {
-            enabled: true,
-        },
-        export: {
-            enabled: true,
-        },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
+        // columnChooser: {
+        //     enabled: true,
+        //     mode: "select"
+        // },
+        // columnFixing: {
+        //     enabled: true,
+        // },
+        // export: {
+        //     enabled: true,
+        // },
+        // onExporting(e) {
+        //     const workbook = new ExcelJS.Workbook();
+        //     const worksheet = workbook.addWorksheet('Data');
 
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
-        headerFilter: {
-            visible: true,
-        },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dgCompanyAssign',
-        },
+        //     DevExpress.excelExporter.exportDataGrid({
+        //         component: e.component,
+        //         worksheet,
+        //         autoFilterEnabled: true,
+        //     }).then(() => {
+        //         workbook.xlsx.writeBuffer().then((buffer) => {
+        //             saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+        //         });
+        //     });
+        //     e.cancel = true;
+        // },
+        // headerFilter: {
+        //     visible: true,
+        // },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'dgCompanyAssign',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -306,31 +306,31 @@ $(function () {
             showNavigationButtons: true
         },
         editing: {
-            mode: 'popup',
+            mode: 'row',
             allowAdding: salesOrgHierarchyId != null && abp.auth.isGranted('MdmService.CompanyInZones.Create'),
             allowUpdating: abp.auth.isGranted('MdmService.CompanyInZones.Edit'),
             allowDeleting: abp.auth.isGranted('MdmService.CompanyInZones.Delete'),
             useIcons: true,
-            texts: {
-                editRow: l("Edit"),
-                deleteRow: l("Delete"),
-                confirmDeleteMessage: l("DeleteConfirmationMessage")
-            },
-            popup: {
-                showTitle: false,
-                width: 400,
-                height: 280
-            },
-            form: {
-                items: [
-                    {
-                        itemType: 'group',
-                        colCount: 1,
-                        colSpan: 2,
-                        items: ["companyId", "effectiveDate", "endDate", "isBase"],
-                    }
-                ],
-            }
+            // texts: {
+            //     editRow: l("Edit"),
+            //     deleteRow: l("Delete"),
+            //     confirmDeleteMessage: l("DeleteConfirmationMessage")
+            // },
+            // popup: {
+            //     showTitle: false,
+            //     width: 400,
+            //     height: 280
+            // },
+            // form: {
+            //     items: [
+            //         {
+            //             itemType: 'group',
+            //             colCount: 1,
+            //             colSpan: 2,
+            //             items: ["companyId", "effectiveDate", "endDate", "isBase"],
+            //         }
+            //     ],
+            // }
         },
         onRowInserting: function (e) {
             e.data.salesOrgHierarchyId = salesOrgHierarchyId;
@@ -346,40 +346,40 @@ $(function () {
         },
         toolbar: {
             items: [
-                "groupPanel",
+                //"groupPanel",
                 "addRowButton",
-                "columnChooserButton",
-                "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
-                "searchPanel",
+                // "columnChooserButton",
+                // "exportButton",
+                // {
+                //     location: 'after',
+                //     widget: 'dxButton',
+                //     options: {
+                //         icon: "import",
+                //         elementAttr: {
+                //             //id: "import-excel",
+                //             class: "import-excel",
+                //         },
+                //         onClick(e) {
+                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //             var gridName = gridControl.attr('id');
+                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //             if (popup) popup.show();
+                //         },
+                //     },
+                // },
+                //"searchPanel",
             ],
         },
-        onContentReady: function (e) {
+        // onContentReady: function (e) {
            
-            if (salesOrgHierarchyId) { 
-                initImportPopup('api/mdm-service/customer-group-by-atts', 'CustomerGroupByAtts_Template', 'dgCustomerAttribute');
-                e.component.option('toolbar.items[4].visible', true);
-            }
-            else {
-                e.component.option('toolbar.items[4].visible', false);
-            }
-        },
+        //     if (salesOrgHierarchyId) { 
+        //         initImportPopup('api/mdm-service/customer-group-by-atts', 'CustomerGroupByAtts_Template', 'dgCustomerAttribute');
+        //         e.component.option('toolbar.items[4].visible', true);
+        //     }
+        //     else {
+        //         e.component.option('toolbar.items[4].visible', false);
+        //     }
+        // },
         columns: [
             {
                 caption: l("Actions"),
@@ -497,11 +497,11 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dgCustomerAssgin',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'dgCustomerAssgin',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -555,39 +555,39 @@ $(function () {
         },
         toolbar: {
             items: [
-                "groupPanel",
+                // "groupPanel",
                 "addRowButton",
-                "columnChooserButton",
-                "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
-                "searchPanel",
+                // "columnChooserButton",
+                // "exportButton",
+                // {
+                //     location: 'after',
+                //     widget: 'dxButton',
+                //     options: {
+                //         icon: "import",
+                //         elementAttr: {
+                //             //id: "import-excel",
+                //             class: "import-excel",
+                //         },
+                //         onClick(e) {
+                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //             var gridName = gridControl.attr('id');
+                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //             if (popup) popup.show();
+                //         },
+                //     },
+                // },
+                // "searchPanel",
             ],
         },
-        onContentReady: function (e) { 
-            if (salesOrgHierarchyId) {
-                initImportPopup('api/mdm-service/customer-group-by-atts', 'CustomerGroupByAtts_Template', 'dgCustomerAttribute');
-                e.component.option('toolbar.items[4].visible', true);
-            }
-            else {
-                e.component.option('toolbar.items[4].visible', false);
-            }
-        },
+        // onContentReady: function (e) { 
+        //     if (salesOrgHierarchyId) {
+        //         initImportPopup('api/mdm-service/customer-group-by-atts', 'CustomerGroupByAtts_Template', 'dgCustomerAttribute');
+        //         e.component.option('toolbar.items[4].visible', true);
+        //     }
+        //     else {
+        //         e.component.option('toolbar.items[4].visible', false);
+        //     }
+        // },
         columns: [
             {
                 caption: l("Actions"),
