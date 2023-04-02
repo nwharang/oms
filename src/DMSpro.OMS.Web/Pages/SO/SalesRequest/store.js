@@ -135,9 +135,21 @@ let getInfoSO = async () => {
         })
         let uOMList = []
         Object.keys(data.uom).forEach((key) => {
-            if (validUOM.find(e => e.uomId === key))
-                uOMList.push(data.uom[key]);
+            uOMList.push(data.uom[key]);
         })
+        let uomGroupWithDetailsDictionary = []
+        Object.keys(data.uomGroupWithDetailsDictionary).forEach(key => {
+            uomGroupWithDetailsDictionary.push({
+                id: key,
+                detailsDictionary: Object.keys(data.uomGroupWithDetailsDictionary[key].detailsDictionary).map(key1 => {
+                    return {
+                        ...data.uomGroupWithDetailsDictionary[key].detailsDictionary[key1],
+                        ...data.uom[key1]
+                    }
+                })
+            })
+        })
+
         return {
             companyId,
             salesOrderStore: {
@@ -151,7 +163,7 @@ let getInfoSO = async () => {
                     return data.uomGroup[key];
                 }),
                 itemGroupList: Object.keys(data.itemsInItemGroupsDictionary).map((key) => data.itemsInItemGroupsDictionary[key]),
-                uomGroupWithDetailsDictionary: Object.keys(data.uomGroupWithDetailsDictionary).map((key) => data.uomGroupWithDetailsDictionary[key])
+                uomGroupWithDetailsDictionary,
             },
             vatList: Object.keys(data.vat).map((key) => data.vat[key])
         }

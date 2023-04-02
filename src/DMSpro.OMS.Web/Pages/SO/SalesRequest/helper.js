@@ -424,14 +424,22 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:UOM'),
                     dataField: 'uomId',
                     lookup: {
-                        dataSource: salesOrderStore.uOMList,
+                        dataSource(e) {
+                            if (e?.data?.uomGroupId) {
+                                return salesOrderStore.uomGroupWithDetailsDictionary.find(v => v.id === e.data.uomGroupId).detailsDictionary
+                            }
+                            return salesOrderStore.uOMList
+                        },
                         displayExpr: "name",
                         valueExpr: "id"
                     },
+                    calculateDisplayValue: (e) => {
+                        return salesOrderStore.uOMList.find(v => v.id === e.uomId)?.name || "None"
+                    },
                     setCellValue: function (newData, value, currentRowData) {
                         let customerId = form.dxForm('instance').getEditor('businessPartnerId').option('value');
-                        let customer = mainStore.customerList.find(x => x.id == customerId);
-                        let price = mainStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + value)?.value || 0;
+                        let customer = salesOrderStore.customerList.find(x => x.id == customerId);
+                        let price = salesOrderStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + value)?.value || 0;
                         let priceAfterTax = price + (price * currentRowData.taxRate) / 100;
                         let lineAmtAfterTax = priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0);
                         let lineAmt = price * currentRowData.qty - (currentRowData.discountAmt || 0);
