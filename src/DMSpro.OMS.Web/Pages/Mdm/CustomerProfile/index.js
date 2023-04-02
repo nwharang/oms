@@ -255,11 +255,11 @@
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dgCustomerProfile',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'dgCustomerProfile',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -878,7 +878,7 @@
 
     initImportPopup('api/mdm-service/customers', 'Customers_Template', 'dgCustomers');
 
-    const dsAttrValue = function (n) {
+    function dsAttrValue(n) {
         return {
             store: getCusAttrValue,
             filter: ['customerAttribute.attrNo', '=', n],
