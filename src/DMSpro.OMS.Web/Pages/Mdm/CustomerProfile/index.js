@@ -107,9 +107,9 @@
         cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
-            priceListService.getPriceListLookup({})
+            priceListService.getListDevextremes({})
                 .done(result => {
-                    deferred.resolve(result.items, {
+                    deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                     });
                 });
@@ -122,6 +122,7 @@
 
     var gridCustomers = $('#dgCustomers').dxDataGrid({
         dataSource: customStore,
+        repaintChangesOnly: true,
         editing: {
             mode: "popup",
             allowAdding: abp.auth.isGranted('MdmService.Customers.Create'),
@@ -467,7 +468,7 @@
                         paginate: true,
                     },
                     valueExpr: "id",
-                    displayExpr: "displayName"
+                    displayExpr: "name"
                 }
             },
             {
@@ -476,6 +477,7 @@
                 width: 110,
                 lookup: {
                     dataSource(options) {
+                        console.log(options);
                         return {
                             store: geoMasterStore,
                             filter: options.data ? ['level', '=', 0] : null,
@@ -489,6 +491,9 @@
                 setCellValue(rowData, value) {
                     rowData.geoMaster0Id = value;
                     rowData.geoMaster1Id = null;
+                    rowData.geoMaster2Id = null;
+                    rowData.geoMaster3Id = null;
+                    rowData.geoMaster4Id = null;
                 },
             },
             {
@@ -499,7 +504,7 @@
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? ['level', '=', 1] : null,
+                            filter: options.data ? [['level', '=', 1], 'and', ['parentId', '=', options.data.geoMaster0Id]] : null,
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
@@ -510,6 +515,8 @@
                 setCellValue(rowData, value) {
                     rowData.geoMaster1Id = value;
                     rowData.geoMaster2Id = null;
+                    rowData.geoMaster3Id = null;
+                    rowData.geoMaster4Id = null;
                 },
             },
             {
@@ -520,7 +527,7 @@
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? ['level', '=', 2] : null,
+                            filter: options.data ? [['level', '=', 2], 'and', ['parentId', '=', options.data.geoMaster1Id]] : null,
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
@@ -530,7 +537,8 @@
                 },
                 setCellValue(rowData, value) {
                     rowData.geoMaster2Id = value;
-                    rowData.geoMaster1Id = null;
+                    rowData.geoMaster3Id = null;
+                    rowData.geoMaster4Id = null;
                 },
             },
             {
@@ -541,14 +549,18 @@
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? ['level', '=', 3] : null,
+                            filter: options.data ? [['level', '=', 3], 'and', ['parentId', '=', options.data.geoMaster2Id]] : null,
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
                     displayExpr: 'name',
-                }
+                },
+                setCellValue(rowData, value) {
+                    rowData.geoMaster3Id = value;
+                    rowData.geoMaster4Id = null;
+                },
             },
             {
                 dataField: "geoMaster4Id",
@@ -558,14 +570,17 @@
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? ['level', '=', 4] : null,
+                            filter: options.data ? [['level', '=', 4], 'and', ['parentId', '=', options.data.geoMaster3Id]] : null,
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
                     },
                     valueExpr: 'id',
                     displayExpr: 'name',
-                }
+                },
+                setCellValue(rowData, value) {
+                    rowData.geoMaster4Id = value;
+                },
             },
             {
                 dataField: 'street',
