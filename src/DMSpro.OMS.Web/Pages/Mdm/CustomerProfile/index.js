@@ -8,6 +8,7 @@
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
+        useDefaultSearch: true,
         // loadMode: "raw",
         // cacheRawData: true,
         load(loadOptions) {
@@ -178,7 +179,7 @@
                                     { dataField: 'creditLimit' },
                                     { dataField: 'paymentTermId' },
                                     { dataField: 'linkedCompanyId' },
-                                    { dataField: 'sfaCustomerCode' },
+                                    // { dataField: 'sfaCustomerCode' },
                                     { dataField: 'isCompany' }
                                 ]
                             },
@@ -379,6 +380,10 @@
                 dataField: 'effectiveDate',
                 caption: l("EffectiveDate"),
                 dataType: 'date',
+                editorOptions: {
+                    displayFormat: 'dd/MM/yyyy',
+                },
+                format: 'dd/MM/yyyy',
                 validationRules: [{ type: "required" }]
             },
             {
@@ -472,10 +477,13 @@
             {
                 dataField: "geoMaster0Id",
                 caption: l1("GeoLevel0Name"),
+                calculateDisplayValue(rowData) {
+                    if (!rowData.geoMaster0 || rowData.geoMaster0 === null) return "";
+                    return rowData.geoMaster0.name;
+                },
                 width: 110,
                 lookup: {
                     dataSource(options) {
-                        console.log(options);
                         return {
                             store: geoMasterStore,
                             filter: ['level', '=', 0],
@@ -497,6 +505,10 @@
             {
                 dataField: "geoMaster1Id",
                 caption: l1("GeoLevel1Name"),
+                calculateDisplayValue(rowData) {
+                    if (!rowData.geoMaster1 || rowData.geoMaster1 === null) return "";
+                    return rowData.geoMaster1.name;
+                },
                 width: 110,
                 lookup: {
                     dataSource(options) {
@@ -520,6 +532,10 @@
             {
                 dataField: "geoMaster2Id",
                 caption: l1("GeoLevel2Name"),
+                calculateDisplayValue(rowData) {
+                    if (!rowData.geoMaster2 || rowData.geoMaster2 === null) return "";
+                    return rowData.geoMaster2.name;
+                },
                 width: 110,
                 lookup: {
                     dataSource(options) {
@@ -542,6 +558,10 @@
             {
                 dataField: "geoMaster3Id",
                 caption: l1("GeoLevel3Name"),
+                calculateDisplayValue(rowData) {
+                    if (!rowData.geoMaster3 || rowData.geoMaster3 === null) return "";
+                    return rowData.geoMaster3.name;
+                },
                 width: 110,
                 lookup: {
                     dataSource(options) {
@@ -563,6 +583,10 @@
             {
                 dataField: "geoMaster4Id",
                 caption: l1("GeoLevel4Name"),
+                calculateDisplayValue(rowData) {
+                    if (!rowData.geoMaster4 || rowData.geoMaster4 === null) return "";
+                    return rowData.geoMaster4.name;
+                },
                 width: 110,
                 lookup: {
                     dataSource(options) {
@@ -846,8 +870,8 @@
             },
         ],
         onInitNewRow: function (e) {
-            e.data.sfaCustomerCode = "sfaCode";
-            e.data.effectiveDate = Date.now();
+            // e.data.sfaCustomerCode = "sfaCode";
+            e.data.effectiveDate = new Date().toString();
             e.data.active = true;
         },
     }).dxDataGrid("instance");
