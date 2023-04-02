@@ -544,6 +544,7 @@ $(function () {
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Item"),
                                 dataField: "itemId",
+                                sortIndex: 0, sortOrder: "asc",
                                 lookup: {
                                     //dataSource: getItemList,
                                     dataSource: {
