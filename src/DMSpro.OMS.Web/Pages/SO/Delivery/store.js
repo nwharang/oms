@@ -150,14 +150,6 @@ let getInfoSO = async () => {
             customerEmployeesList.push({ id: key, data: data.customerEmployeesDictionary[key].map(cusEmp => employeesList.find(emp => emp.id == cusEmp)) })
         });
         let specialCustomer = Object.keys(data.customerIdsWithoutRoute).map((key) => data.customerIdsWithoutRoute[key])
-        let customerList = []
-        Object.keys(data.customerDictionary).forEach((key) => {
-            let isSpecailCustomer = specialCustomer.indexOf(key) > -1
-            let isCustomerWithRoute = customerRoutesList.find(e => e.id === key).data.length > 0
-            let isCustomerWithEmployee = customerEmployeesList.find(e => e.id === key).data.length > 0
-            if (!isSpecailCustomer && (!isCustomerWithRoute || !isCustomerWithEmployee)) return
-            else customerList.push(data.customerDictionary[key])
-        })
         let employeesRoute = []
         let routesEmployee = []
         // employeesInRoutesDictionary
@@ -171,7 +163,7 @@ let getInfoSO = async () => {
         return {
             companyId,
             mainStore: {
-                customerList,
+                customerList: Object.keys(data.customerDictionary).map((key) => data.customerDictionary[key]),
                 priceList: Object.keys(data.priceDictionary).map(function (key) {
                     return { id: key, value: data.priceDictionary[key] };
                 }),
