@@ -214,10 +214,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 let businessPartnerId = e.component.getEditor('businessPartnerId')
                 routeId = e.component.getEditor('routeId')
                 employeeId = e.component.getEditor('employeeId')
-                if (businessPartnerId.option("value") && mainStore.specialCustomer.indexOf(businessPartnerId.option("value")) == -1 && !currentData.header.docStatus) {
-                    routeId.option('readOnly', false)
-                    employeeId.option('readOnly', false)
-                }
                 routeId.option("dataSource", {
                     store: mainStore.customerRoutesList.find(arr => arr.id == businessPartnerId.option("value"))?.data || [],
                 })
@@ -225,16 +221,24 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     store: mainStore.customerEmployeesList.find(arr => arr.id == businessPartnerId.option("value"))?.data || [],
                 })
                 businessPartnerId.option('onSelectionChanged', ({ selectedItem }) => {
-                    routeId.option("dataSource", {
-                        store: mainStore.customerRoutesList.find(arr => arr.id == selectedItem.id).data,
-                    })
-                    employeeId.option("dataSource", {
-                        store: mainStore.customerEmployeesList.find(arr => arr.id == selectedItem.id).data,
-                    })
-                    routeId.option('value', null)
-                    employeeId.option('value', null)
-                    routeId.option('readOnly', false)
-                    employeeId.option('readOnly', false)
+                    if (mainStore.customerEmployeesList.find(eploy => eploy.id === selectedItem.id)?.data.length > 0 && mainStore.customerRoutesList.find(route => route.id === selectedItem.id)?.data.length > 0) {
+                        routeId.option("dataSource", {
+                            store: mainStore.customerRoutesList.find(arr => arr.id == selectedItem.id).data,
+                        })
+                        employeeId.option("dataSource", {
+                            store: mainStore.customerEmployeesList.find(arr => arr.id == selectedItem.id).data,
+                        })
+                        routeId.option('value', mainStore.customerRoutesList.find(arr => arr.id == selectedItem.id).data[0].id)
+                        employeeId.option('value', mainStore.customerEmployeesList.find(arr => arr.id == selectedItem.id).data[0].id)
+                        routeId.option('readOnly', false)
+                        employeeId.option('readOnly', false)
+                    }
+                    else {
+                        routeId.option('value', null)
+                        employeeId.option('value', null)
+                        routeId.option('readOnly', true)
+                        employeeId.option('readOnly', true)
+                    }
                 })
             }
         })
