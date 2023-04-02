@@ -153,8 +153,8 @@ let getInfoSO = async () => {
         let customerList = []
         Object.keys(data.customerDictionary).forEach((key) => {
             let isSpecailCustomer = specialCustomer.indexOf(key) > -1
-            let isCustomerWithRoute = customerRoutesList.find(e => e.id === key).data.length > 0
-            let isCustomerWithEmployee = customerEmployeesList.find(e => e.id === key).data.length > 0
+            let isCustomerWithRoute = customerRoutesList.find(e => e.id === key) != "undefined"
+            let isCustomerWithEmployee = customerEmployeesList.find(e => e.id === key) != "undefined"
             if (!isSpecailCustomer && (!isCustomerWithRoute || !isCustomerWithEmployee)) return
             else customerList.push(data.customerDictionary[key])
         })
