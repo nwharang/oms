@@ -6,11 +6,10 @@
     var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
     var cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
-
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
-        loadMode: "raw",
-        cacheRawData: true,
+        // loadMode: "raw",
+        // cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -56,7 +55,6 @@
 
             customerService.getListDevextremes(args)
                 .done(result => {
-                    //console.log('data:', result)
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -139,7 +137,7 @@
                 showTitle: true,
                 width: "95%",
                 height: "95%",
-                hideOnOutsideClick: true,
+                hideOnOutsideClick: false,
                 dragEnabled: false,
             },
             form: {
@@ -480,7 +478,7 @@
                         console.log(options);
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? ['level', '=', 0] : null,
+                            filter: ['level', '=', 0],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
@@ -504,7 +502,7 @@
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? [['level', '=', 1], 'and', ['parentId', '=', options.data.geoMaster0Id]] : null,
+                            filter: options.data ? [['level', '=', 1], 'and', ['parentId', '=', options.data.geoMaster0Id]] : ['level', '=', 1],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
@@ -527,7 +525,7 @@
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? [['level', '=', 2], 'and', ['parentId', '=', options.data.geoMaster1Id]] : null,
+                            filter: options.data ? [['level', '=', 2], 'and', ['parentId', '=', options.data.geoMaster1Id]] : ['level', '=', 2],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
@@ -549,7 +547,7 @@
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? [['level', '=', 3], 'and', ['parentId', '=', options.data.geoMaster2Id]] : null,
+                            filter: options.data ? [['level', '=', 3], 'and', ['parentId', '=', options.data.geoMaster2Id]] : ['level', '=', 3],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
@@ -570,7 +568,7 @@
                     dataSource(options) {
                         return {
                             store: geoMasterStore,
-                            filter: options.data ? [['level', '=', 4], 'and', ['parentId', '=', options.data.geoMaster3Id]] : null,
+                            filter: options.data ? [['level', '=', 4], 'and', ['parentId', '=', options.data.geoMaster3Id]] : ['level', '=', 4],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
