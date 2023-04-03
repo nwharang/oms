@@ -62,6 +62,7 @@ $(function () {
 
             workingPositionService.getListDevextremes(args)
                 .done(result => {
+                    console.log(result);
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -204,8 +205,8 @@ $(function () {
             popup: {
                 title: l("Page.Title.EmployeeProfiles"),
                 showTitle: false,
-                width: 1000,
-                height: 580
+                width: 'fit-content',
+                height: 'fit-content'
             },
             form: {
                 items: [
@@ -364,11 +365,11 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:EmployeeTypeName"),
                 dataField: "employeeTypeId",
-                calculateDisplayValue: "employeeType.valueName",
+                // calculateDisplayValue: "employeeType",
                 dataType: 'string',
                 lookup: {
                     dataSource: {
-                        store: "employeeType.valueName",
+                        store: employeeTypeStore,
                     },
                     displayExpr: 'valueName',
                     valueExpr: 'id',
