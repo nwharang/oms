@@ -16,8 +16,60 @@
 
 @section styles {
     <style>
+        .isRoute:before {
+            content: "R";
+            display: inline-block;
+            font-size: 8px;
+            font-weight: bold;
+            color: white;
+            border: 1px solid #9bc023;
+            border-radius: 10px;
+            background: #9bc023;
+            text-align: center;
+            height: 13px;
+            width: 13px;
+            position: relative;
+            top: -2px;
+        }
+
+        .isSellingZone:before {
+            content: "Z";
+            display: inline-block;
+            font-size: 8px;
+            font-weight: bold;
+            color: white;
+            border: 1px solid orange;
+            border-radius: 10px;
+            background: orange;
+            text-align: center;
+            height: 13px;
+            width: 13px;
+            position: relative;
+            top: -2px;
+        }
+        .dx-datagrid-rowsview .dx-data-row .dx-cell-modified.dx-cell-modified::after, .dx-datagrid-rowsview .dx-data-row .dx-cell-modified.dx-datagrid-invalid::after {
+            border : 1px solid transparent
+        }
+        .dx-datagrid-rowsview .dx-data-row .dx-cell-modified .dx-highlight-outline::after {
+            border-color: rgba(0, 0, 0, 0.175);
+        }
+        .dx-col-fixed.dx-cell-focus-disabled[role="columnheader"]{
+            background-color : #2b4c81 !important;
+        }
+        .dx-checkbox-icon {
+            border : 1px solid rgba(0, 0, 0, 0.4); 
+        }
+        .dx-treelist-rowsview .dx-row-focused.dx-data-row .dx-command-edit:not(.dx-focused) .dx-link, .dx-treelist-rowsview .dx-row-focused.dx-data-row > td:not(.dx-focused), .dx-treelist-rowsview .dx-row-focused.dx-data-row > tr > td:not(.dx-focused){
+            background-color : #2b4c81 !important;
+        }
+        .dx-popup-content { 
+            padding-bottom : 5px;
+        }
         #btnActive {
             margin-top: 7.5px;
+        }
+        #resizeBox {
+            overflow: hidden;
         }
     </style>
 }
@@ -25,6 +77,11 @@
 @section scripts {
     <script src="/js/devextreme/exceljs.min.js"></script>
     <script src="/js/devextreme/filesaver.min.js"></script>
+    <abp-script src="/Pages/Mdm/SalesOrganization/store.js" />
+    <abp-script src="/Pages/Mdm/SalesOrganization/component/popup.js" />
+    <abp-script src="/Pages/Mdm/SalesOrganization/component/form.js" />
+    <abp-script src="/Pages/Mdm/SalesOrganization/component/tree.js" />
+    <abp-script src="/Pages/Mdm/SalesOrganization/component/grid.js" />
     <abp-script src="/Pages/Mdm/SalesOrganization/index.js" />
 }
 
