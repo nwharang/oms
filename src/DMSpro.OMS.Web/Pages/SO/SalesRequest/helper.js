@@ -829,6 +829,9 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                         location: "after",
                         toolbar: "bottom",
                         options: {
+                            dropDownOptions: {
+                                width: 230,
+                            },
                             icon: 'preferences',
                             text: 'Actions',
                             disabled: Boolean(currentData.header.docStatus),
@@ -1041,7 +1044,7 @@ function recalulateDocTotal() {
     if (gridInstance.hasEditData()) {
         debounce(gridInstance.saveEditData(), 250)
     }
-    let { docDiscountType, docDiscountPerc = 0, docDiscountAmt } = formInstance.option('formData')
+    let { docDiscountType, docDiscountPerc, docDiscountAmt } = formInstance.option('formData')
     let docTotalLineDiscountAmt = gridInstance.getTotalSummaryValue('docTotalLineDiscountAmt') || 0
     let docTotalLineAmt = gridInstance.getTotalSummaryValue('docTotalLineAmt') || 0
     let docTotalLineAmtAfterTax = gridInstance.getTotalSummaryValue('docTotalLineAmtAfterTax') || 0
