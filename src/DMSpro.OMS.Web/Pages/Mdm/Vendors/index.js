@@ -126,7 +126,10 @@ $(function () {
             return key == 0 ? vendorService.get(key) : null;
         },
         insert(values) {
-            return vendorService.create(values, { contentType: "application/json" });
+            return Common.getCurrentCompany().then(x => {
+                values.companyId = x.id;
+                return vendorService.create(values, { contentType: "application/json" });
+            });
         },
         update(key, values) {
             return vendorService.update(key, values, { contentType: "application/json" });
@@ -148,7 +151,10 @@ $(function () {
                 editRow: l("Edit"),
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
-            }
+            },
+            popup: {
+                height: "fit-content"
+            },
         },
         onInitNewRow: function (e) {
             e.data.active = true;
@@ -264,7 +270,7 @@ $(function () {
                 dataField: 'shortName',
                 caption: l("EntityFieldName:MDMService:Vendor:ShortName"),
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                //validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'phone1',
@@ -297,14 +303,14 @@ $(function () {
             {
                 dataField: 'linkedCompany',
                 caption: l("EntityFieldName:MDMService:Vendor:LinkedCompany"),
-                validationRules: [{ type: "required" }],
+                //validationRules: [{ type: "required" }],
                 dataType: 'string',
-                calculateDisplayValue: function (rowData) {
-                    // if(rowData.geoLevel0){
-                    //     return rowData.geoLevel0.name;
-                    // }
-                    // return "";
-                },
+                // calculateDisplayValue: function (rowData) {
+                //     // if(rowData.geoLevel0){
+                //     //     return rowData.geoLevel0.name;
+                //     // }
+                //     // return "";
+                // },
                 lookup: {
                    dataSource: {
                        store: companiesLookup,
@@ -472,57 +478,4 @@ $(function () {
         ],
     }).dxDataGrid("instance");
     initImportPopup('api/mdm-service/vendors', 'Vendors_Template', 'dgVendors');
-//    $("#btnNewVendor").click(function (e) {
-//        gridVendors.addRow();
-//    });
-
-//    $("input#Search").on("input", function () {
-//        gridVendors.searchByText($(this).val());
-//    });
-
-	
-//    $("#ExportToExcelButton").click(function (e) {
-//        e.preventDefault();
-
-//        vendorService.getDownloadToken().then(
-//            function(result){
-//                    var input = getFilter();
-//                    var url =  abp.appPath + 'api/mdm-service/vendors/as-excel-file' + 
-//                        abp.utils.buildQueryString([
-//                            { name: 'downloadToken', value: result.token },
-//                            { name: 'filterText', value: input.filterText }, 
-//                            { name: 'code', value: input.code }, 
-//                            { name: 'name', value: input.name }, 
-//                            { name: 'shortName', value: input.shortName }, 
-//                            { name: 'phone1', value: input.phone1 }, 
-//                            { name: 'phone2', value: input.phone2 }, 
-//                            { name: 'erpCode', value: input.erpCode }, 
-//                            { name: 'active', value: input.active },
-//                            { name: 'endDateMin', value: input.endDateMin },
-//                            { name: 'endDateMax', value: input.endDateMax }, 
-//                            { name: 'warehouseId', value: input.warehouseId }, 
-//                            { name: 'street', value: input.street }, 
-//                            { name: 'address', value: input.address }, 
-//                            { name: 'latitude', value: input.latitude }, 
-//                            { name: 'longitude', value: input.longitude }, 
-//                            { name: 'linkedCompanyId', value: input.linkedCompanyId }
-//, 
-//                            { name: 'priceListId', value: input.priceListId }
-//, 
-//                            { name: 'geoMaster0Id', value: input.geoMaster0Id }
-//, 
-//                            { name: 'geoMaster1Id', value: input.geoMaster1Id }
-//, 
-//                            { name: 'geoMaster2Id', value: input.geoMaster2Id }
-//, 
-//                            { name: 'geoMaster3Id', value: input.geoMaster3Id }
-//, 
-//                            { name: 'geoMaster4Id', value: input.geoMaster4Id }
-//                            ]);
-                            
-//                    var downloadWindow = window.open(url, '_blank');
-//                    downloadWindow.focus();
-//            }
-//        )
-//    });
 });
