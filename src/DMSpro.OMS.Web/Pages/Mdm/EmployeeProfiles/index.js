@@ -367,13 +367,8 @@ $(function () {
                 calculateDisplayValue: "employeeType.valueName",
                 dataType: 'string',
                 lookup: {
-                    dataSource() {
-                        return {
-                            store: employeeTypeStore,
-                            filter: ["code", "=", "MD03"],
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
+                    dataSource: {
+                        store: "employeeType.valueName",
                     },
                     displayExpr: 'valueName',
                     valueExpr: 'id',
@@ -450,7 +445,7 @@ $(function () {
             labelText: '',
             accept: 'image/*',
             uploadMethod: 'POST',
-            uploadMode: selectedRowsData ?'instantly':'useButtons',
+            uploadMode: selectedRowsData ? 'instantly' : 'useButtons',
             onValueChanged(e) {
                 files = e.value;
                 $("#img-avatar").attr("src", URL.createObjectURL(files[0]));
