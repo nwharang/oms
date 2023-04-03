@@ -5,7 +5,7 @@ let salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrg
 let salesOrgEmpAssignmentService = window.dMSpro.oMS.mdmService.controllers.salesOrgEmpAssignments.salesOrgEmpAssignment;
 let employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
 let popup, tree, grid, form, context, popupInstance, treeInstance, gridInstance, formInstance, contextMenu, dataGridContainer
-let salesOrgHierarchyIdFilter = null, sendMode = 0, stateMode = "home", SalesOrgHeaderModel = null, salesOrgHeaderIdFilter = null
+let salesOrgHierarchyIdFilter = null, sendMode = 0, SalesOrgHeaderModel = null, salesOrgHeaderIdFilter = null
 
 /** Create global notification */
 let notify = (option) => {

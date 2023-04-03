@@ -1,4 +1,7 @@
 $(function () {
+    /**
+     * Flow : https://cdn.discordapp.com/attachments/549203328458817541/1092489669079470191/basic-flow.png
+     */
     dataGridContainer = $('#dataGridContainer').dxDataGrid({
         dataSource: store.salesOrgHeaderStore,
         remoteOperations: true,
@@ -75,7 +78,6 @@ $(function () {
                     options: {
                         icon: 'add',
                         onClick(e) {
-                            stateMode = 'adding'
                             renderPopup(null)
                         }
                     }
@@ -111,7 +113,6 @@ $(function () {
                     text: l('Button.ViewDetail'),
                     icon: "fieldchooser",
                     onClick: function (e) {
-                        stateMode = 'edit'
                         renderPopup(e.row.data)
                     }
                 }],
