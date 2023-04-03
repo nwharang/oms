@@ -1,4 +1,5 @@
 var numberingConfigService = window.dMSpro.oMS.mdmService.controllers.numberingConfigs.numberingConfig;
+var numberingConfigDetailService = window.dMSpro.oMS.mdmService.controllers.numberingConfigDetails.numberingConfigDetail;
 var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
 $(function () {
     var l = abp.localization.getResource("OMS");
@@ -43,6 +44,46 @@ $(function () {
         }
     });
 
+    var numberingConfigDetailStore = new DevExpress.data.CustomStore({
+        key: "id",
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            numberingConfigDetailService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+            var d = new $.Deferred();
+            numberingConfigDetailService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        },
+        insert(values) {
+            return numberingConfigDetailService.create(values, { contentType: "application/json" });
+        },
+        update(key, values) {
+            return numberingConfigDetailService.update(key, values, { contentType: "application/json" });
+        },
+        remove(key) {
+            return numberingConfigDetailService.delete(key);
+        }
+    });
+
     var companyStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
@@ -55,6 +96,7 @@ $(function () {
             });
             companyService.getListDevextremes(args)
                 .done(result => {
+                    //result.data.push({});
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -103,32 +145,14 @@ $(function () {
         columnFixing: {
             enabled: true,
         },
-        export: {
-            enabled: true,
-        },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'gridNumberingConfigs',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'gridNumberingConfigs',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -154,78 +178,158 @@ $(function () {
         },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
-            //var objectRequire = ['companyId', 'prefix', 'startNumber', 'length'];
-            //for (var property in e.oldData) {
-            //    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-            //        e.newData[property] = e.oldData[property];
-            //    }
-            //}
         },
-        toolbar: {
-            items: [
-                "groupPanel",
-                "addRowButton",
-                "columnChooserButton",
-                "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
-                "searchPanel",
-            ],
-        },
+        // toolbar: {
+        //     items: [
+        //         "groupPanel",
+        //         "addRowButton",
+        //         "columnChooserButton",
+        //         "exportButton",
+        //         {
+        //             location: 'after',
+        //             widget: 'dxButton',
+        //             options: {
+        //                 icon: "import",
+        //                 elementAttr: {
+        //                     //id: "import-excel",
+        //                     class: "import-excel",
+        //                 },
+        //                 onClick(e) {
+        //                     var gridControl = e.element.closest('div.dx-datagrid').parent();
+        //                     var gridName = gridControl.attr('id');
+        //                     var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+        //                     if (popup) popup.show();
+        //                 },
+        //             },
+        //         },
+        //         "searchPanel",
+        //     ],
+        // },
         columns: [
             {
                 type: 'buttons',
                 caption: l('Actions'),
-                buttons: ['edit', 'delete'],
+                buttons: ['edit'],
                 width: 110,
                 fixedPosition: 'left'
             },
             {
-                dataField: 'companyId',
-                calculateDisplayValue: "company.name",
-                caption: l("EntityFieldName:MDMService:NumberingConfig:CompanyName"),
-                lookup: {
-                    valueExpr: 'id',
-                    displayExpr: 'name',
-                    dataSource: {
-                        store: companyStore,
-                        //filter: ['level', '=', 0],
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    }
-                }
-            },
-            {
-                dataField: 'startNumber',
-                caption: l("EntityFieldName:MDMService:NumberingConfig:Numbnr"),
-                dataType: 'number'
+                dataField: 'systemData.valueName',
+                caption: l("EntityFieldName:MDMService:NumberingConfig:SystemDataId"),
+                dataType: 'string'
             },
             {
                 dataField: 'prefix',
                 caption: l("EntityFieldName:MDMService:NumberingConfig:Prefix"),
                 dataType: 'string'
             },
+
             {
-                dataField: 'length',
-                caption: l("EntityFieldName:MDMService:NumberingConfig:Length"),
+                dataField: 'paddingZeroNumber',
+                caption: l("EntityFieldName:MDMService:NumberingConfig:PaddingZeroNumber"),
                 dataType: 'number'
-            }
-        ]
+            },
+            {
+                dataField: 'suffix',
+                caption: l("EntityFieldName:MDMService:NumberingConfig:Suffix"),
+                dataType: 'string'
+            },
+        ],
+        masterDetail: {
+            enabled: true,
+            template(container, options) {
+                $('<div>').dxDataGrid({
+                    columnAutoWidth: true,
+                    showBorders: true,
+                    paging: {
+                        enabled: true,
+                        pageSize: pageSize
+                    },
+                    pager: {
+                        visible: true,
+                        showPageSizeSelector: true,
+                        allowedPageSizes: allowedPageSizes,
+                        showInfo: true,
+                        showNavigationButtons: true
+                    },
+                    dataSource: new DevExpress.data.DataSource({
+                        store: numberingConfigDetailStore,
+                        filter: ['numberingConfigId', '=', options.key],
+                    }),
+                    editing: {
+                        mode: "row",
+                        allowAdding: true, //abp.auth.isGranted('MdmService.NumberingConfigDetails.Create'),
+                        allowUpdating: true, //abp.auth.isGranted('MdmService.NumberingConfigDetails.Edit'),
+                        allowDeleting: true, //abp.auth.isGranted('MdmService.NumberingConfigDetails.Delete'),
+                        useIcons: true,
+                        texts: {
+                            editRow: l("Edit"),
+                            deleteRow: l("Delete"),
+                            confirmDeleteMessage: l("DeleteConfirmationMessage")
+                        }
+                    },
+                    onRowUpdating: function (e) {
+                        e.newData = Object.assign({}, e.oldData, e.newData);
+                    },
+                    columns: [
+                        {
+                            type: 'buttons',
+                            caption: l('Actions'),
+                            buttons: ['edit'],
+                            width: 110,
+                        },
+                        {
+                            dataField: 'companyId',
+                            dataType: 'string',
+                            calculateDisplayValue(rowData) {
+                                if (!rowData.company || rowData.company === null) return "";
+                                return rowData.company.name;
+                            },
+                            lookup: {
+                                dataSource: {
+                                    store: companyStore,
+                                    paginate: true,
+                                    pageSize: pageSizeForLookup,
+
+                                },
+                                displayExpr: 'name',
+                                valueExpr: 'id',
+                                searchEnabled: true,
+                                searchMode: 'contains'
+                            }
+                        },
+                        {
+                            dataField: 'prefix',
+                            caption: l("EntityFieldName:MDMService:NumberingConfig:Prefix"),
+                            dataType: 'string'
+                        },
+                        {
+                            dataField: 'currentNumber',
+                            caption: l("EntityFieldName:MDMService:NumberingConfig:CurrentNumber"),
+                            dataType: 'number',
+                            allowEditing: false,
+                        },
+                        {
+                            dataField: 'paddingZeroNumber',
+                            caption: l("EntityFieldName:MDMService:NumberingConfig:PaddingZeroNumber"),
+                            dataType: 'number'
+                        },
+                        {
+                            dataField: 'suffix',
+                            caption: l("EntityFieldName:MDMService:NumberingConfig:Suffix"),
+                            dataType: 'string'
+                        },
+                    ],
+
+                    onEditorPreparing: function (e) {
+                        if (e.dataField == 'companyId' && e.value != null) {
+                            e.editorOptions.readOnly = true;
+                        }
+                    },
+
+                }).appendTo(container);
+            },
+        },
     }).dxDataGrid('instance');
 
     initImportPopup('api/mdm-service/numbering-configs', 'NumberingConfigs', 'gridNumberingConfigs');
