@@ -347,7 +347,14 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:JobTittle"),
                 dataField: "workingPositionId",
-                calculateDisplayValue: "workingPosition.name",
+                //calculateDisplayValue: "workingPosition.name",
+                calculateDisplayValue(rowData){
+                    //console.log(rowData.geoLevel2);
+                    if(rowData.workingPosition){
+                        return rowData.workingPosition.name;
+                    }
+                    return "";
+                },
                 dataType: 'string',
                 lookup: {
                     dataSource() {
@@ -366,6 +373,13 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:EmployeeTypeName"),
                 dataField: "employeeTypeId",
                 // calculateDisplayValue: "employeeType",
+                calculateDisplayValue(rowData){
+                    //console.log(rowData.geoLevel2);
+                    if(rowData.employeeType){
+                        return rowData.employeeType.valueName;
+                    }
+                    return "";
+                },
                 dataType: 'string',
                 lookup: {
                     dataSource: {
