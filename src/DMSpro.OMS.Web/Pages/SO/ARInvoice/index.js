@@ -269,6 +269,7 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt'),
                 dataField: 'docTotalLineDiscountAmt',
                 dataType: 'number',
+                format: '#,##0.##',
                 width: 100,
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
@@ -277,6 +278,7 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
                 dataField: 'docTotalAmt',
                 dataType: 'number',
+                format: '#,##0.##',
                 visible: true,
                 allowEditing: false,
             },
@@ -284,6 +286,7 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax'),
                 dataField: 'docTotalAmtAfterTax',
                 dataType: 'number',
+                format: '#,##0.##',
                 visible: true,
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
@@ -312,21 +315,35 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt'),
                 dataField: 'docDiscountAmt',
                 dataType: 'number',
+                format: '#,##0.##',
                 validationRules: [{ type: 'required' }],
                 width: 100,
             },
 
         ],
         summary: {
-            totalItems: [{
-                column: 'docTotalLineAmt',
-                summaryType: 'sum',
-                valueFormat: ",##0.###",
-            }, {
-                column: 'docTotalLineAmtAfterTax',
-                summaryType: 'sum',
-                valueFormat: ",##0.###",
-            }],
+            totalItems: [
+                {
+                    column: 'docTotalLineDiscountAmt',
+                    summaryType: 'sum',
+                    valueFormat: ",##0.###",
+                },
+                {
+                    column: 'docTotalAmt',
+                    summaryType: 'sum',
+                    valueFormat: ",##0.###",
+                },
+                {
+                    column: 'docTotalAmtAfterTax',
+                    summaryType: 'sum',
+                    valueFormat: ",##0.###",
+                },
+                {
+                    column: 'docDiscountAmt',
+                    summaryType: 'sum',
+                    valueFormat: ",##0.###",
+                },
+            ],
         },
         onContentReady: (e) => {
             currentSelectedDoc.clear()

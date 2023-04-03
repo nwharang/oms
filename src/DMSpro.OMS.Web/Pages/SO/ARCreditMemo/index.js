@@ -271,15 +271,28 @@
             },
         ],
         summary: {
-            totalItems: [{
-                column: 'docTotalLineAmt',
-                summaryType: 'sum',
-                valueFormat: ",##0.###",
-            }, {
-                column: 'docTotalLineAmtAfterTax',
-                summaryType: 'sum',
-                valueFormat: ",##0.###",
-            }],
+            totalItems: [
+                {
+                    column: 'docTotalLineDiscountAmt',
+                    summaryType: 'sum',
+                    valueFormat: ",##0.###",
+                },
+                {
+                    column: 'docTotalAmt',
+                    summaryType: 'sum',
+                    valueFormat: ",##0.###",
+                },
+                {
+                    column: 'docTotalAmtAfterTax',
+                    summaryType: 'sum',
+                    valueFormat: ",##0.###",
+                },
+                {
+                    column: 'docDiscountAmt',
+                    summaryType: 'sum',
+                    valueFormat: ",##0.###",
+                },
+            ],
         },
         onContentReady: (e) => {
             currentSelectedDoc.clear()
