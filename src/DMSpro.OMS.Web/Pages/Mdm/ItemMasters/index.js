@@ -1116,7 +1116,7 @@
     /****function*****/
     initImportPopup('api/mdm-service/items', 'Items_Template', 'dataGridItemMasters');
 
-    const dsAttrValue = function (n) {
+    function dsAttrValue(n) {
         return {
             store: getItemAttrValue,
             filter: ['itemAttribute.attrNo', '=', n],
