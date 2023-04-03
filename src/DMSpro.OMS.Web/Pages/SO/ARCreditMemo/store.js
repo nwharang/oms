@@ -57,6 +57,10 @@ let store = () => {
             {
                 id: 2,
                 text: l('EntityFieldName:OrderService:SalesRequest:DocStatus.Cancelled')
+            },
+            {
+                id: 3,
+                text: l('In Progress')
             }
         ],
         docSourceStore: [

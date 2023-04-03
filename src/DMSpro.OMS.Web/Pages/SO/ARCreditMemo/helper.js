@@ -596,7 +596,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
             onOptionChanged: (e) => {
                 if (gridInitialized) {
                     if (grid?.dxDataGrid('instance') && form?.dxForm('instance')) {
-                        // $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", grid?.dxDataGrid('instance').hasEditData())
+                        $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", grid?.dxDataGrid('instance').hasEditData())
 
                     }
                 }
@@ -651,7 +651,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 grid.dxDataGrid("instance").option('dataSource', comingData.previous.details)
                                 form.dxForm('instance').option("readOnly", Boolean(comingData.previous.header.docStatus))
                                 grid.dxDataGrid('instance').option("editing", newEditingOption)
-                                // $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", Boolean(comingData.previous.header.docStatus))
+                                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", Boolean(comingData.previous.header.docStatus))
                                 popup.dxPopup('instance').option("title", `AR Credit Memo - #${docId ? comingData.previous.header.docNbr : "New"} - ${docStatusStore[comingData.previous.header.docStatus || 0].text}`)
                                 loadNavigationButton(docId)
                             }
@@ -681,11 +681,81 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 grid.dxDataGrid("instance").option('dataSource', comingData.next.details)
                                 form.dxForm('instance').option("readOnly", Boolean(comingData.next.header.docStatus))
                                 grid.dxDataGrid('instance').option("editing", newEditingOption)
-                                // $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", Boolean(comingData.next.header.docStatus))
+                                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", Boolean(comingData.next.header.docStatus))
                                 popup.dxPopup('instance').option("title", `AR Credit Memo - #${docId ? comingData.next.header.docNbr : "New"} - ${docStatusStore[comingData.next.header.docStatus || 0].text}`)
                                 loadNavigationButton(docId)
                             }
                         }
+                    },
+                    {
+                        widget: "dxDropDownButton",
+                        location: "after",
+                        toolbar: "bottom",
+                        options: {
+                            icon: 'preferences',
+                            text: 'Actions',
+                            disabled: Boolean(currentData.header.docStatus),
+                            width: 120,
+                            elementAttr: {
+                                id: "actionButtonDetailsPanel",
+                            },
+                            items: [
+                                {
+                                    text: "Close",
+                                    icon: "close",
+                                    onClick: () => {
+                                        if (docId)
+                                            mainService.closeDoc(docId)
+                                                .done(() => {
+                                                    let newEditingOption = {
+                                                        ...grid.dxDataGrid('instance').option("editing"),
+                                                        allowAdding: false,
+                                                        allowUpdating: false,
+                                                        allowDeleting: false,
+                                                    }
+                                                    notify({ type: 'success', message: "Close Credit Memo Successfully" })
+                                                    form.dxForm('instance').option("readOnly", true)
+                                                    grid.dxDataGrid('instance').option("editing", newEditingOption)
+                                                    $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", true)
+                                                    $('#saveButtonPopup').dxButton('instance').option('disabled', true);
+                                                    popup.dxPopup('instance').option("title", `Sale Request - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[1].text}`)
+                                                })
+                                                .fail(() => {
+                                                    notify({ type: 'error', message: "Close Credit Memo Failed" })
+                                                    popup.dxPopup('instance').option("title", `Sale Request - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[0].text}`)
+                                                    popup.dxPopup('instance').repaint()
+                                                })
+                                    }
+                                },
+                                {
+                                    text: "Cancel",
+                                    icon: "clear",
+                                    onClick: () => {
+                                        if (docId)
+                                            mainService.cancelDoc(docId)
+                                                .done(() => {
+                                                    let newEditingOption = {
+                                                        ...grid.dxDataGrid('instance').option("editing"),
+                                                        allowAdding: false,
+                                                        allowUpdating: false,
+                                                        allowDeleting: false,
+                                                    }
+                                                    notify({ type: 'success', message: "Cancel Credit Memo Successfully" })
+                                                    form.dxForm('instance').option("readOnly", true)
+                                                    grid.dxDataGrid('instance').option("editing", newEditingOption)
+                                                    $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", true)
+                                                    $('#saveButtonPopup').dxButton('instance').option('disabled', true);
+                                                    popup.dxPopup('instance').option("title", `Sale Request - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[1].text}`)
+                                                })
+                                                .fail(() => {
+                                                    notify({ type: 'error', message: "Cancel Credit Memo Failed" })
+                                                    popup.dxPopup('instance').option("title", `Sale Request - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[0].text}`)
+                                                    popup.dxPopup('instance').repaint()
+                                                })
+                                    }
+                                },
+                            ]
+                        },
                     },
                     {
                         widget: 'dxButton',
@@ -714,7 +784,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                                 grid.dxDataGrid('instance').option('dataSource', data.details)
                                                 grid.dxDataGrid('instance').refresh()
                                                 notify({ type: 'success', message: "Updated SO" })
-                                                // $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
+                                                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
                                             })
                                             .fail(() => {
                                                 notify({ type: 'error', message: "SO Update Failed" })
@@ -728,7 +798,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                                 grid.dxDataGrid('instance').option('dataSource', data.details)
                                                 grid.dxDataGrid('instance').refresh()
                                                 notify({ type: 'success', message: "SO Created" })
-                                                // $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
+                                                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
                                                 popup.dxPopup('instance').option("title", `AR Credit Memo - #${docId ? data.header.docNbr : "New"} - ${docStatusStore[data.header.docStatus || 0].text}`)
                                                 loadNavigationButton(docId)
                                             })
@@ -758,14 +828,14 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 onHiding: () => {
                     gridInitialized = false
                 },
-                // onContentReady: (e) => {
-                //     if (docId && !Boolean(currentData.header.docStatus)) { // Open
-                //         $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
-                //     }
-                //     else {
-                //         $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", true)
-                //     }
-                // }
+                onContentReady: (e) => {
+                    if (docId && !Boolean(currentData.header.docStatus)) { // Open
+                        $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
+                    }
+                    else {
+                        $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", true)
+                    }
+                }
             })
             popup.appendTo('body')
             popup.dxPopup('instance').show()
