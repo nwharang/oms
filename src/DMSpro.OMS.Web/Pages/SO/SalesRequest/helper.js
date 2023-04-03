@@ -829,6 +829,9 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                         location: "after",
                         toolbar: "bottom",
                         options: {
+                            dropDownOptions: {
+                                width: 230,
+                            },
                             icon: 'preferences',
                             text: 'Actions',
                             disabled: Boolean(currentData.header.docStatus),

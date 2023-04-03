@@ -562,10 +562,13 @@ let helper = ({ companyId, mainStore, vatList }) => {
                         location: "after",
                         toolbar: "bottom",
                         options: {
+                            dropDownOptions: {
+                                width: 230,
+                            },
                             icon: 'preferences',
                             text: 'Actions',
                             disabled: Boolean(currentData.header.docStatus),
-                            width: 200,
+                            width: 120,
                             elementAttr: {
                                 id: "actionButtonDetailsPanel",
                             },
