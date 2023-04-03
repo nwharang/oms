@@ -854,13 +854,16 @@
                 dataField: 'vatId',
                 caption: l('EntityFieldName:MDMService:Item:VATName'),
                 calculateDisplayValue: 'vat.name',
-                lookup: {
-                    dataSource: 'vat.name',
-                    valueExpr: "id",
-                    displayExpr: "code",
+                editorOptions: {
+                    searchEnabled: true
                 },
-                editorOptions : {
-                    searchEnabled :true
+                lookup: {
+                    dataSource: {
+                        store: getVATs,
+                        paginate: true,
+                    },
+                    valueExpr: 'id',
+                    displayExpr: 'code'
                 },
                 validationRules: [{ type: "required" }],
                 visible: false,
