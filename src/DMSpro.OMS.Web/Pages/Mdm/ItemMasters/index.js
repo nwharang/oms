@@ -391,20 +391,21 @@
                                     onSelectionChanged: (e) => {
                                         let formInstance = $("#formGridAddItemMaster").dxForm('instance')
                                         let expiredValue = $('#expiredValue').dxNumberBox('instance')
+                                        let expiredType = $('#expiredType').dxSelectBox('instance')
                                         let issueMethod = $('#issueMethod').dxSelectBox('instance')
-                                        if (formInstance && formInstance.getEditor('expiredType') && expiredValue && issueMethod) {
+                                        if (formInstance && expiredType && expiredValue && issueMethod) {
                                             switch (e.selectedItem.id) {
                                                 case 0:
-                                                    formInstance.getEditor('expiredType').option('readOnly', true)
+                                                    expiredType.option('readOnly', true)
                                                     expiredValue.option('readOnly', true)
                                                     break;
                                                 case 1:
-                                                    formInstance.getEditor('expiredType').option('readOnly', false)
+                                                    expiredType.option('readOnly', false)
                                                     expiredValue.option('readOnly', false)
                                                     issueMethod.option('value', 0)
                                                     break;
                                                 case 2:
-                                                    formInstance.getEditor('expiredType').option('readOnly', true)
+                                                    expiredType.option('readOnly', true)
                                                     expiredValue.option('readOnly', true)
                                                     issueMethod.option('value', 1)
                                                     break;
@@ -416,16 +417,13 @@
                                 }
                             },
                             {
-                                name: 'expiredType',
                                 dataField: 'expiredType',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
-                                    items: expiredType,
-                                    searchEnabled: true,
-                                    displayExpr: 'text',
-                                    valueExpr: 'id',
+                                    elementAttr: {
+                                        id: 'expiredType'
+                                    },
                                     readOnly: true,
-                                    // disabled: true
                                 }
                             },
                             {
@@ -587,11 +585,11 @@
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dataGridItemMasters',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'dataGridItemMasters',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -670,6 +668,11 @@
             {
                 dataField: 'shortName',
                 caption: l("EntityFieldName:MDMService:Item:ShortName"),
+                dataType: 'string'
+            },
+            {
+                dataField: 'barcode',
+                caption: l("EntityFieldName:MDMService:Item:Barcode"),
                 dataType: 'string'
             },
             {
@@ -761,7 +764,6 @@
                 visible: false,
             },
             {
-                name: 'ExpiredType',
                 dataField: 'expiredType',
                 caption: l('EntityFieldName:MDMService:Item:ExpiredType'),
                 dataType: 'string',
@@ -815,7 +817,6 @@
             {
                 dataField: 'purUOMId',
                 caption: l('EntityFieldName:MDMService:Item:PurUnitName'),
-                calculateDisplayValue: "purUOM.name",
                 validationRules: [{ type: "required" }],
                 visible: false,
                 lookup: {
@@ -853,6 +854,14 @@
                 dataField: 'vatId',
                 caption: l('EntityFieldName:MDMService:Item:VATName'),
                 calculateDisplayValue: 'vat.name',
+                lookup: {
+                    dataSource: 'vat.name',
+                    valueExpr: "id",
+                    displayExpr: "code",
+                },
+                editorOptions : {
+                    searchEnabled :true
+                },
                 validationRules: [{ type: "required" }],
                 visible: false,
             },
