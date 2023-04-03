@@ -9,7 +9,6 @@ $(function () {
 
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -41,7 +40,6 @@ $(function () {
 
     var pricelistLookup = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -72,7 +70,6 @@ $(function () {
     });
     var companiesLookup = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -116,7 +113,6 @@ $(function () {
 
             vendorService.getListDevextremes(args)
                 .done(result => {
-                    dataCusAttributes = result.data;
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -130,7 +126,10 @@ $(function () {
             return key == 0 ? vendorService.get(key) : null;
         },
         insert(values) {
-            return vendorService.create(values, { contentType: "application/json" });
+            return Common.getCurrentCompany().then(x => {
+                values.companyId = x.id;
+                return vendorService.create(values, { contentType: "application/json" });
+            });
         },
         update(key, values) {
             return vendorService.update(key, values, { contentType: "application/json" });
@@ -142,7 +141,6 @@ $(function () {
 
     var gridVendors = $('#dgVendors').dxDataGrid({
         dataSource: customStore,
-        //keyExpr: "id",
         editing: {
             mode: "popup",
             allowAdding: abp.auth.isGranted('MdmService.Vendors.Create'),
@@ -153,7 +151,10 @@ $(function () {
                 editRow: l("Edit"),
                 deleteRow: l("Delete"),
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
-            }
+            },
+            popup: {
+                height: "fit-content"
+            },
         },
         onInitNewRow: function (e) {
             e.data.active = true;
@@ -208,11 +209,6 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dgVendors',
-        },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -227,14 +223,8 @@ $(function () {
         toolbar: {
             items: [
                 "groupPanel",
-                {
-                    location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        gridVendors.addRow();
-                    },
-                },
-                'columnChooserButton',
+                "addRowButton",
+                "columnChooserButton",
                 "exportButton",
                 {
                     location: 'after',
@@ -280,7 +270,7 @@ $(function () {
                 dataField: 'shortName',
                 caption: l("EntityFieldName:MDMService:Vendor:ShortName"),
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                //validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'phone1',
@@ -311,44 +301,25 @@ $(function () {
                 },
             },
             {
-                dataField: 'creationTime',
-                caption: l("EntityFieldName:MDMService:Vendor:CreationTime"),
-                dataType: 'date',
-                validationRules: [{ type: "required" }]
-            },
-            {
-                dataField: 'endDate',
-                caption: l("EntityFieldName:MDMService:Vendor:EndDate"),
-                dataType: 'date',
-            },
-            {
-                dataField: 'companyId',
-                caption: 'Company',
-                validationRules: [{ type: "required" }],
-                lookup: {
-                    dataSource: {
-                        store: companiesLookup,
-                        paginate: true,
-                        pageSize: pageSizeForLookup
-                    },
-                    valueExpr: "id",
-                    displayExpr: "code"
-                }
-            },
-            {
                 dataField: 'linkedCompany',
                 caption: l("EntityFieldName:MDMService:Vendor:LinkedCompany"),
-                validationRules: [{ type: "required" }],
-                dataType: 'string'
-                //lookup: {
-                //    dataSource: {
-                //        store: companiesLookup,
-                //        paginate: true,
-                //        pageSize: pageSizeForLookup
-                //    },
-                //    valueExpr: "id",
-                //    displayExpr: "code"
-                //}
+                //validationRules: [{ type: "required" }],
+                dataType: 'string',
+                // calculateDisplayValue: function (rowData) {
+                //     // if(rowData.geoLevel0){
+                //     //     return rowData.geoLevel0.name;
+                //     // }
+                //     // return "";
+                // },
+                lookup: {
+                   dataSource: {
+                       store: companiesLookup,
+                       paginate: true,
+                       pageSize: pageSizeForLookup
+                   },
+                   valueExpr: "id",
+                   displayExpr: "code"
+                }
             },
             //{
             //    dataField: 'warehouseId',
@@ -376,188 +347,135 @@ $(function () {
                     displayExpr: "code"
                 }
             },
-            {
-                dataField: "geoMaster0Id",
-                caption: l1("GeoLevel0Name"),
-                width: 110,
-                setCellValue(rowData, value) {
-                    rowData.geoMaster0Id = value;
-                    rowData.geoMaster1Id = null;
-                },
-                lookup: {
-                    dataSource(options) {
-                        return {
-                            store: geoMasterStore,
-                            filter: options.data ? ['level', '=', 0] : null,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    valueExpr: "id",
-                    displayExpr: "name"
-                }
-            },
-            {
-                dataField: "geoMaster1Id",
-                caption: l1("GeoLevel1Name"),
-                width: 110,
-                setCellValue(rowData, value) {
-                    rowData.geoMaster1Id = value;
-                    rowData.geoMaster2Id = null;
-                    rowData.geoMaster3Id = null;
-                    rowData.geoMaster4Id = null;
-                },
-                lookup: {
-                    dataSource(options) {
-                        return {
-                            store: geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoMaster0Id] : null,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    valueExpr: 'id',
-                    displayExpr: 'name',
-                },
-            },
-            {
-                dataField: "geoMaster2Id",
-                caption: l1("GeoLevel2Name"),
-                width: 110,
-                setCellValue(rowData, value) {
-                    rowData.geoMaster2Id = value;
-                    rowData.geoMaster3Id = null;
-                    rowData.geoMaster4Id = null;
-                },
-                lookup: {
-                    dataSource(options) {
-                        return {
-                            store: geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoMaster1Id] : null,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    valueExpr: 'id',
-                    displayExpr: 'name',
-                },
-            },
-            {
-                dataField: "geoMaster3Id",
-                caption: l1("GeoLevel3Name"),
-                width: 110,
-                setCellValue(rowData, value) {
-                    rowData.geoMaster3Id = value;
-                    rowData.geoMaster4Id = null;
-                },
-                lookup: {
-                    dataSource(options) {
-                        return {
-                            store: geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoMaster2Id] : null,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    valueExpr: 'id',
-                    displayExpr: 'name',
-                }
-            },
-            {
-                dataField: "geoMaster4Id",
-                caption: l1("GeoLevel4Name"),
-                width: 110,
-                lookup: {
-                    dataSource(options) {
-                        return {
-                            store: geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoMaster3Id] : null,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    valueExpr: 'id',
-                    displayExpr: 'name',
-                }
-            },
-            {
-                dataField: 'street',
-                caption: l("EntityFieldName:MDMService:CompanyProfile:Street"),
-                width: 150,
-                dataType: 'string',
-            },
+            // {
+            //     dataField: "geoMaster0Id",
+            //     caption: l1("GeoLevel0Name"),
+            //     width: 110,
+            //     setCellValue(rowData, value) {
+            //         rowData.geoMaster0Id = value;
+            //         rowData.geoMaster1Id = null;
+            //     },
+            //     lookup: {
+            //         dataSource(options) {
+            //             return {
+            //                 store: geoMasterStore,
+            //                 filter: options.data ? ['level', '=', 0] : null,
+            //                 paginate: true,
+            //                 pageSize: pageSizeForLookup
+            //             };
+            //         },
+            //         valueExpr: "id",
+            //         displayExpr: "name"
+            //     }
+            // },
+            // {
+            //     dataField: "geoMaster1Id",
+            //     caption: l1("GeoLevel1Name"),
+            //     width: 110,
+            //     setCellValue(rowData, value) {
+            //         rowData.geoMaster1Id = value;
+            //         rowData.geoMaster2Id = null;
+            //         rowData.geoMaster3Id = null;
+            //         rowData.geoMaster4Id = null;
+            //     },
+            //     lookup: {
+            //         dataSource(options) {
+            //             return {
+            //                 store: geoMasterStore,
+            //                 filter: options.data ? ['parentId', '=', options.data.geoMaster0Id] : null,
+            //                 paginate: true,
+            //                 pageSize: pageSizeForLookup
+            //             };
+            //         },
+            //         valueExpr: 'id',
+            //         displayExpr: 'name',
+            //     },
+            // },
+            // {
+            //     dataField: "geoMaster2Id",
+            //     caption: l1("GeoLevel2Name"),
+            //     width: 110,
+            //     setCellValue(rowData, value) {
+            //         rowData.geoMaster2Id = value;
+            //         rowData.geoMaster3Id = null;
+            //         rowData.geoMaster4Id = null;
+            //     },
+            //     lookup: {
+            //         dataSource(options) {
+            //             return {
+            //                 store: geoMasterStore,
+            //                 filter: options.data ? ['parentId', '=', options.data.geoMaster1Id] : null,
+            //                 paginate: true,
+            //                 pageSize: pageSizeForLookup
+            //             };
+            //         },
+            //         valueExpr: 'id',
+            //         displayExpr: 'name',
+            //     },
+            // },
+            // {
+            //     dataField: "geoMaster3Id",
+            //     caption: l1("GeoLevel3Name"),
+            //     width: 110,
+            //     setCellValue(rowData, value) {
+            //         rowData.geoMaster3Id = value;
+            //         rowData.geoMaster4Id = null;
+            //     },
+            //     lookup: {
+            //         dataSource(options) {
+            //             return {
+            //                 store: geoMasterStore,
+            //                 filter: options.data ? ['parentId', '=', options.data.geoMaster2Id] : null,
+            //                 paginate: true,
+            //                 pageSize: pageSizeForLookup
+            //             };
+            //         },
+            //         valueExpr: 'id',
+            //         displayExpr: 'name',
+            //     }
+            // },
+            // {
+            //     dataField: "geoMaster4Id",
+            //     caption: l1("GeoLevel4Name"),
+            //     width: 110,
+            //     lookup: {
+            //         dataSource(options) {
+            //             return {
+            //                 store: geoMasterStore,
+            //                 filter: options.data ? ['parentId', '=', options.data.geoMaster3Id] : null,
+            //                 paginate: true,
+            //                 pageSize: pageSizeForLookup
+            //             };
+            //         },
+            //         valueExpr: 'id',
+            //         displayExpr: 'name',
+            //     }
+            // },
+            // {
+            //     dataField: 'street',
+            //     caption: l("EntityFieldName:MDMService:CompanyProfile:Street"),
+            //     width: 150,
+            //     dataType: 'string',
+            // },
             {
                 dataField: 'address',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Address"),
                 width: 150,
                 dataType: 'string',
             },
-            {
-                dataField: 'latitude',
-                caption: l("EntityFieldName:MDMService:CompanyProfile:Latitude"),
-                width: 110,
-                dataType: 'string',
-            },
-            {
-                dataField: 'longitude',
-                caption: l("EntityFieldName:MDMService:CompanyProfile:Longitude"),
-                width: 110,
-                dataType: 'string',
-            },
+            // {
+            //     dataField: 'latitude',
+            //     caption: l("EntityFieldName:MDMService:CompanyProfile:Latitude"),
+            //     width: 110,
+            //     dataType: 'string',
+            // },
+            // {
+            //     dataField: 'longitude',
+            //     caption: l("EntityFieldName:MDMService:CompanyProfile:Longitude"),
+            //     width: 110,
+            //     dataType: 'string',
+            // },
         ],
     }).dxDataGrid("instance");
     initImportPopup('api/mdm-service/vendors', 'Vendors_Template', 'dgVendors');
-//    $("#btnNewVendor").click(function (e) {
-//        gridVendors.addRow();
-//    });
-
-//    $("input#Search").on("input", function () {
-//        gridVendors.searchByText($(this).val());
-//    });
-
-	
-//    $("#ExportToExcelButton").click(function (e) {
-//        e.preventDefault();
-
-//        vendorService.getDownloadToken().then(
-//            function(result){
-//                    var input = getFilter();
-//                    var url =  abp.appPath + 'api/mdm-service/vendors/as-excel-file' + 
-//                        abp.utils.buildQueryString([
-//                            { name: 'downloadToken', value: result.token },
-//                            { name: 'filterText', value: input.filterText }, 
-//                            { name: 'code', value: input.code }, 
-//                            { name: 'name', value: input.name }, 
-//                            { name: 'shortName', value: input.shortName }, 
-//                            { name: 'phone1', value: input.phone1 }, 
-//                            { name: 'phone2', value: input.phone2 }, 
-//                            { name: 'erpCode', value: input.erpCode }, 
-//                            { name: 'active', value: input.active },
-//                            { name: 'endDateMin', value: input.endDateMin },
-//                            { name: 'endDateMax', value: input.endDateMax }, 
-//                            { name: 'warehouseId', value: input.warehouseId }, 
-//                            { name: 'street', value: input.street }, 
-//                            { name: 'address', value: input.address }, 
-//                            { name: 'latitude', value: input.latitude }, 
-//                            { name: 'longitude', value: input.longitude }, 
-//                            { name: 'linkedCompanyId', value: input.linkedCompanyId }
-//, 
-//                            { name: 'priceListId', value: input.priceListId }
-//, 
-//                            { name: 'geoMaster0Id', value: input.geoMaster0Id }
-//, 
-//                            { name: 'geoMaster1Id', value: input.geoMaster1Id }
-//, 
-//                            { name: 'geoMaster2Id', value: input.geoMaster2Id }
-//, 
-//                            { name: 'geoMaster3Id', value: input.geoMaster3Id }
-//, 
-//                            { name: 'geoMaster4Id', value: input.geoMaster4Id }
-//                            ]);
-                            
-//                    var downloadWindow = window.open(url, '_blank');
-//                    downloadWindow.focus();
-//            }
-//        )
-//    });
 });

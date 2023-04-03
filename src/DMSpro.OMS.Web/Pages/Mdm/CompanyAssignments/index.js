@@ -70,7 +70,6 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            console.log(args)
             companyService.getListDevextremes(args)
                 .done(result => {
                     //console.log(result.data);
@@ -126,24 +125,6 @@ $(function () {
             return d.promise();
         }
     });
-
-    // function selectBoxEditorTemplate(cellElement, cellInfo) {
-    //     return $('<div>').dxLookup({
-    //         valueExpr: "id",
-    //         displayExpr: "name",
-    //         dataSource: new DevExpress.data.DataSource({
-    //             store: companyStore,
-    //             paginate: true,
-    //             pageSize: pageSizeForLookup
-    //         }),
-    //         searchEnabled: true,
-    //         searchMode: 'contains',
-    //         searchExpr: ['name'],
-    //         onValueChanged(data) {
-    //             //cellInfo.setValue(data.value);
-    //         },
-    //     });
-    // }
 
     var gridComAssignments = $('#dgComAssignments').dxDataGrid({
         dataSource: assignmentStore,
@@ -266,7 +247,10 @@ $(function () {
                 dataField: 'companyIdentityUserAssignment.identityUserId',
                 caption: l("UserName"),
                 validationRules: [{ type: "required" }],
-                calculateDisplayValue: "identityUser.userName",
+                calculateDisplayValue(rowData){
+                    if (!rowData.identityUser || rowData.identityUser === null) return "";
+                    return rowData.identityUser.userName;
+                },
                 lookup: {
                     dataSource() {
                         return {
@@ -287,8 +271,11 @@ $(function () {
                 dataField: 'companyIdentityUserAssignment.companyId',
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
                 validationRules: [{ type: "required" }],
-                //calculateDisplayValue: "company.name",
-                //editCellTemplate: selectBoxEditorTemplate,
+                calculateDisplayValue(rowData){
+                    if (rowData.company)
+                        return rowData.company.name;
+                    else return "";
+                },
                 lookup: {
                     dataSource: {
                         store: companyStore,

@@ -219,8 +219,8 @@ $(function () {
         dataSource: salesOrgHierarchyStore,
         valueExpr: 'id',
         displayExpr: "name",
-        label: "Code",
-        labelMode: "floating",
+        label: l["Selling Zone"],
+        // labelMode: "floating",
         searchEnabled: true,
         showClearButton: true,
         onSelectionChanged(data) {
@@ -240,7 +240,7 @@ $(function () {
 
     //DataGrid - Company Assgin
     var companyAssginContainer = $('#companyAssgin').dxDataGrid({
-        //dataSource: companyInZoneStore,
+        dataSource: companyInZoneStore,
         //keyExpr: "id",
         remoteOperations: true,
         showRowLines: true,
@@ -251,49 +251,7 @@ $(function () {
         allowColumnResizing: true,
         columnResizingMode: 'widget',
         columnAutoWidth: true,
-        filterRow: {
-            visible: true
-        },
-        groupPanel: {
-            visible: true,
-        },
-        searchPanel: {
-            visible: true
-        },
         columnMinWidth: 50,
-        columnChooser: {
-            enabled: true,
-            mode: "select"
-        },
-        columnFixing: {
-            enabled: true,
-        },
-        export: {
-            enabled: true,
-        },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
-        headerFilter: {
-            visible: true,
-        },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dgCompanyAssign',
-        },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -306,31 +264,31 @@ $(function () {
             showNavigationButtons: true
         },
         editing: {
-            mode: 'popup',
+            mode: 'row',
             allowAdding: salesOrgHierarchyId != null && abp.auth.isGranted('MdmService.CompanyInZones.Create'),
             allowUpdating: abp.auth.isGranted('MdmService.CompanyInZones.Edit'),
             allowDeleting: abp.auth.isGranted('MdmService.CompanyInZones.Delete'),
             useIcons: true,
-            texts: {
-                editRow: l("Edit"),
-                deleteRow: l("Delete"),
-                confirmDeleteMessage: l("DeleteConfirmationMessage")
-            },
-            popup: {
-                showTitle: false,
-                width: 400,
-                height: 280
-            },
-            form: {
-                items: [
-                    {
-                        itemType: 'group',
-                        colCount: 1,
-                        colSpan: 2,
-                        items: ["companyId", "effectiveDate", "endDate", "isBase"],
-                    }
-                ],
-            }
+            // texts: {
+            //     editRow: l("Edit"),
+            //     deleteRow: l("Delete"),
+            //     confirmDeleteMessage: l("DeleteConfirmationMessage")
+            // },
+            // popup: {
+            //     showTitle: false,
+            //     width: 400,
+            //     height: 280
+            // },
+            // form: {
+            //     items: [
+            //         {
+            //             itemType: 'group',
+            //             colCount: 1,
+            //             colSpan: 2,
+            //             items: ["companyId", "effectiveDate", "endDate", "isBase"],
+            //         }
+            //     ],
+            // }
         },
         onRowInserting: function (e) {
             e.data.salesOrgHierarchyId = salesOrgHierarchyId;
@@ -346,40 +304,40 @@ $(function () {
         },
         toolbar: {
             items: [
-                "groupPanel",
+                //"groupPanel",
                 "addRowButton",
-                "columnChooserButton",
-                "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
-                "searchPanel",
+                // "columnChooserButton",
+                // "exportButton",
+                // {
+                //     location: 'after',
+                //     widget: 'dxButton',
+                //     options: {
+                //         icon: "import",
+                //         elementAttr: {
+                //             //id: "import-excel",
+                //             class: "import-excel",
+                //         },
+                //         onClick(e) {
+                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //             var gridName = gridControl.attr('id');
+                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //             if (popup) popup.show();
+                //         },
+                //     },
+                // },
+                //"searchPanel",
             ],
         },
-        onContentReady: function (e) {
+        // onContentReady: function (e) {
            
-            if (salesOrgHierarchyId) { 
-                initImportPopup('api/mdm-service/customer-group-by-atts', 'CustomerGroupByAtts_Template', 'dgCustomerAttribute');
-                e.component.option('toolbar.items[4].visible', true);
-            }
-            else {
-                e.component.option('toolbar.items[4].visible', false);
-            }
-        },
+        //     if (salesOrgHierarchyId) { 
+        //         initImportPopup('api/mdm-service/customer-group-by-atts', 'CustomerGroupByAtts_Template', 'dgCustomerAttribute');
+        //         e.component.option('toolbar.items[4].visible', true);
+        //     }
+        //     else {
+        //         e.component.option('toolbar.items[4].visible', false);
+        //     }
+        // },
         columns: [
             {
                 caption: l("Actions"),
@@ -391,8 +349,10 @@ $(function () {
             {
                 caption: l1("CompanyInZone.Company"),
                 dataField: "companyId",
-                calculateDisplayValue: "company.name",
-                visible: false,
+                calculateDisplayValue(rowData){
+                    if (rowData.company) return rowData.company.name;
+                    else return "";
+                }, //: "company.name",
                 validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource(options) {
@@ -406,20 +366,6 @@ $(function () {
                     displayExpr: 'name',
                     valueExpr: 'id'
                 }
-            },
-            {
-                caption: l("EntityFieldName:MDMService:CompanyInZone:CompanyCode"),
-                dataField: "companyId",
-                calculateDisplayValue: "company.code",
-                name: "companycode",
-                allowEditing: false
-            },
-            {
-                caption: l("EntityFieldName:MDMService:CompanyInZone:CompanyName"),
-                dataField: "companyId",
-                calculateDisplayValue: "company.name",
-                name: "companyname",
-                allowEditing: false
             },
             {
                 caption: l("EntityFieldName:MDMService:CompanyInZone:EffectiveDate"),
@@ -438,17 +384,12 @@ $(function () {
                     min: new Date()
                 }
             },
-            {
-                caption: l("EntityFieldName:MDMService:CompanyInZone:IsBase"),
-                dataField: "isBase",
-                dataType: "boolean"
-            }
         ]
     }).dxDataGrid("instance");
 
     //DataGrid - Customer Assgin
     var customerAssginContainer = $('#customerAssgin').dxDataGrid({
-        //dataSource: customerInZoneStore,
+        dataSource: customerInZoneStore,
         //keyExpr: "id",
         remoteOperations: true,
         showRowLines: true,
@@ -497,11 +438,6 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dgCustomerAssgin',
-        },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -514,7 +450,7 @@ $(function () {
             showNavigationButtons: true
         },
         editing: {
-            mode: 'popup',
+            mode: 'row',
             allowAdding: salesOrgHierarchyId != null && abp.auth.isGranted('MdmService.CustomerInZones.Create'),
             allowUpdating: abp.auth.isGranted('MdmService.CustomerInZones.Edit'),
             allowDeleting: abp.auth.isGranted('MdmService.CustomerInZones.Delete'),
@@ -529,16 +465,6 @@ $(function () {
                 width: 400,
                 height: 280
             },
-            form: {
-                items: [
-                    {
-                        itemType: 'group',
-                        colCount: 1,
-                        colSpan: 2,
-                        items: ["customerId", "effectiveDate", "endDate"/*, "active"*/],
-                    }
-                ],
-            }
         },
         onRowInserting: function (e) {
             e.data.salesOrgHierarchyId = salesOrgHierarchyId;
@@ -555,38 +481,8 @@ $(function () {
         },
         toolbar: {
             items: [
-                "groupPanel",
                 "addRowButton",
-                "columnChooserButton",
-                "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
-                "searchPanel",
             ],
-        },
-        onContentReady: function (e) { 
-            if (salesOrgHierarchyId) {
-                initImportPopup('api/mdm-service/customer-group-by-atts', 'CustomerGroupByAtts_Template', 'dgCustomerAttribute');
-                e.component.option('toolbar.items[4].visible', true);
-            }
-            else {
-                e.component.option('toolbar.items[4].visible', false);
-            }
         },
         columns: [
             {
@@ -599,8 +495,10 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:CustomerInZone:Customer"),
                 dataField: "customerId",
-                calculateDisplayValue: "customer.name",
-                visible: false,
+                calculateDisplayValue(rowData){
+                    if(rowData.customer) return rowData.customer.name;
+                     return "";
+                },
                 validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource(options) {
@@ -614,20 +512,6 @@ $(function () {
                     displayExpr: 'name',
                     valueExpr: 'id'
                 }
-            },
-            {
-                caption: l1("CustomerInZone.CustomerCode"),
-                dataField: "customerId",
-                calculateDisplayValue: "customer.code",
-                name: "customercode",
-                allowEditing: false
-            },
-            {
-                caption: l1("CustomerInZone.CustomerName"),
-                dataField: "customerId",
-                calculateDisplayValue: "customer.name",
-                name: "customername",
-                allowEditing: false
             },
             {
                 caption: l("EntityFieldName:MDMService:CustomerInZone:EffectiveDate"),

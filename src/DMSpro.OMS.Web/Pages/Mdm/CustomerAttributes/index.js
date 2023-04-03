@@ -16,6 +16,8 @@ $(function () {
                 }
             });
 
+            //args["sort"] = [{"selector":"attrNo","desc": false}];
+
             customerAttributeService.getListDevextremes(args)
                 .done(result => {
                     //console.log('data res:', result.data)
@@ -75,62 +77,64 @@ $(function () {
         focusedRowEnabled: true,
         allowColumnReordering: false,
         rowAlternationEnabled: true,
-        columnAutoWidth: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
+        //columnAutoWidth: true,
         columnHidingEnabled: true,
         errorRowEnabled: false,
         filterRow: {
-            visible: false
-        },
-        searchPanel: {
             visible: true
         },
+        // searchPanel: {
+        //     visible: true
+        // },
         scrolling: {
             mode: 'standard'
         },
         columnMinWidth: 50,
-        columnChooser: {
-            enabled: true,
-            mode: "select"
-        },
-        columnFixing: {
-            enabled: true,
-        },
-        export: {
-            enabled: true,
-        },
-        onExporting(e) {
-            if (e.format === 'xlsx') {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('CustomerAttributes');
-                DevExpress.excelExporter.exportDataGrid({
-                    component: e.component,
-                    worksheet,
-                    autoFilterEnabled: true,
-                }).then(() => {
-                    workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'CustomerAttributes.xlsx');
-                    });
-                });
-                e.cancel = true;
-            }
-            else if (e.format === 'pdf') {
-                const doc = new jsPDF();
-                DevExpress.pdfExporter.exportDataGrid({
-                    jsPDFDocument: doc,
-                    component: e.component,
-                }).then(() => {
-                    doc.save('CustomerAttributes.pdf');
-                });
-            }
-        },
+        // columnChooser: {
+        //     enabled: true,
+        //     mode: "select"
+        // },
+        // columnFixing: {
+        //     enabled: true,
+        // },
+        // export: {
+        //     enabled: true,
+        // },
+        // onExporting(e) {
+        //     if (e.format === 'xlsx') {
+        //         const workbook = new ExcelJS.Workbook();
+        //         const worksheet = workbook.addWorksheet('CustomerAttributes');
+        //         DevExpress.excelExporter.exportDataGrid({
+        //             component: e.component,
+        //             worksheet,
+        //             autoFilterEnabled: true,
+        //         }).then(() => {
+        //             workbook.xlsx.writeBuffer().then((buffer) => {
+        //                 saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'CustomerAttributes.xlsx');
+        //             });
+        //         });
+        //         e.cancel = true;
+        //     }
+        //     else if (e.format === 'pdf') {
+        //         const doc = new jsPDF();
+        //         DevExpress.pdfExporter.exportDataGrid({
+        //             jsPDFDocument: doc,
+        //             component: e.component,
+        //         }).then(() => {
+        //             doc.save('CustomerAttributes.pdf');
+        //         });
+        //     }
+        // },
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dgCustomerAttributes',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'dgCustomerAttributes',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -144,7 +148,7 @@ $(function () {
         },
         toolbar: {
             items: [
-                "groupPanel",
+                //"groupPanel",
                 //{
                 //    location: 'after',
                 //    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
@@ -152,8 +156,8 @@ $(function () {
                 //        gridCusAttribute.addRow();
                 //    },
                 //},
-                'columnChooserButton',
-                "exportButton",
+                //'columnChooserButton',
+                //"exportButton",
                 //{
                 //    location: 'after',
                 //    widget: 'dxButton',
@@ -171,35 +175,37 @@ $(function () {
                 //        },
                 //    },
                 //}, 
-                "searchPanel"
+                //"searchPanel"
             ],
         },
         columns: [
             {
                 type: 'buttons',
                 caption: l("Actions"),
-                width: 90,
+                width: 110,
                 buttons: ['edit'],
                 fixedPosition: 'left'
             },
             {
                 dataField: 'attrNo',
-                caption: l1("CustomerAttribute.Code"),
+                sortIndex: 0, sortOrder: "asc",
+                width: 200,
+                caption: l("EntityFieldName:MDMService:CustomerAttribute:AttrNo"),
                 allowEditing: false,
-                dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'attrName',
+                width: 500,
                 caption: l1("CustomerAttribute.Name"),
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
-            {
-                dataField: 'hierarchyLevel',
-                caption: l1("CustomerAttribute.HierarchyLevel"),
-                dataType: 'number',
-            },
+            // {
+            //     dataField: 'hierarchyLevel',
+            //     caption: l1("CustomerAttribute.HierarchyLevel"),
+            //     dataType: 'number',
+            // },
             {
                 dataField: 'active',
                 caption: l1("CustomerAttribute.Active"),
@@ -215,38 +221,4 @@ $(function () {
             },
         ],
     }).dxDataGrid("instance");
-    //initImportPopup('api/mdm-service/customer-attributes', 'CusAttributes_Template', 'dgCusAttributes');
-    //$("#btnNewCusAttribute").click(function (e) {
-    //    if (dataCusAttributes.length < 20) {
-    //        gridCusAttribute.addRow();
-    //    }
-    //});
-
-    //$("input#Search").on("input", function () {
-    //    gridCusAttribute.searchByText($(this).val());
-    //});
-
-    //$("#ExportToExcelButton").click(function (e) {
-    //    e.preventDefault();
-
-    //    customerAttributeService.getDownloadToken().then(
-    //        function(result){
-    //                var input = getFilter();
-    //                var url =  abp.appPath + 'api/mdm-service/customer-attributes/as-excel-file' + 
-    //                    abp.utils.buildQueryString([
-    //                        { name: 'downloadToken', value: result.token },
-    //                        { name: 'filterText', value: input.filterText },
-    //                        { name: 'attrNoMin', value: input.attrNoMin },
-    //                        { name: 'attrNoMax', value: input.attrNoMax }, 
-    //                        { name: 'attrName', value: input.attrName },
-    //                        { name: 'hierarchyLevelMin', value: input.hierarchyLevelMin },
-    //                        { name: 'hierarchyLevelMax', value: input.hierarchyLevelMax }, 
-    //                        { name: 'active', value: input.active }
-    //                        ]);
-                            
-    //                var downloadWindow = window.open(url, '_blank');
-    //                downloadWindow.focus();
-    //        }
-    //    )
-    //});
 });

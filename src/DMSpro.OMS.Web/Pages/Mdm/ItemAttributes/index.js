@@ -59,46 +59,46 @@ $(function () {
         filterRow: {
             visible: true
         },
-        groupPanel: {
-            visible: true,
-        },
-        searchPanel: {
-            visible: true
-        },
+        // groupPanel: {
+        //     visible: true,
+        // },
+        // searchPanel: {
+        //     visible: true
+        // },
         columnMinWidth: 50,
-        columnChooser: {
-            enabled: true,
-            mode: "select"
-        },
+        // columnChooser: {
+        //     enabled: true,
+        //     mode: "select"
+        // },
         columnFixing: {
             enabled: true,
         },
-        export: {
-            enabled: true,
-        },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
+        // export: {
+        //     enabled: true,
+        // },
+        // onExporting(e) {
+        //     const workbook = new ExcelJS.Workbook();
+        //     const worksheet = workbook.addWorksheet('Data');
 
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'ItemAttributes.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
+        //     DevExpress.excelExporter.exportDataGrid({
+        //         component: e.component,
+        //         worksheet,
+        //         autoFilterEnabled: true,
+        //     }).then(() => {
+        //         workbook.xlsx.writeBuffer().then((buffer) => {
+        //             saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'ItemAttributes.xlsx');
+        //         });
+        //     });
+        //     e.cancel = true;
+        // },
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'gridProdAttribute',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'gridProdAttribute',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -127,7 +127,7 @@ $(function () {
         },
         toolbar: {
             items: [
-                "groupPanel",
+                //"groupPanel",
                 //{
                 //    location: 'after',
                 //    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
@@ -135,7 +135,7 @@ $(function () {
                 //        dataGrid.addRow();
                 //    },
                 //},
-                'columnChooserButton',
+                //'columnChooserButton',
                 //"exportButton",
                 //{
                 //    location: 'after',
@@ -144,7 +144,7 @@ $(function () {
                 //        //todo
                 //    },
                 //},
-                "searchPanel"
+                //"searchPanel"
             ],
         },
         columns: [
@@ -157,11 +157,14 @@ $(function () {
             },
             {
                 dataField: 'attrNo',
+                width: 200,
+                sortIndex: 0, sortOrder: "asc",
                 caption: l("EntityFieldName:MDMService:ItemAttribute:AttrNo"),
                 allowEditing: false
             },
             {
                 dataField: 'attrName',
+                width: 500,
                 caption: l("EntityFieldName:MDMService:ItemAttribute:AttrName"),
                 validationRules: [
                     {
@@ -170,12 +173,13 @@ $(function () {
                     }
                 ]
             },
-            {
-                dataField: 'hierarchyLevel',
-                caption: l("EntityFieldName:MDMService:ItemAttribute:HierarchyLevel"),
-            },
+            // {
+            //     dataField: 'hierarchyLevel',
+            //     caption: l("EntityFieldName:MDMService:ItemAttribute:HierarchyLevel"),
+            // },
             {
                 dataField: 'active',
+                width: 110,
                 caption: l("EntityFieldName:MDMService:ItemAttribute:Active"),
                 alignment: 'center',
                 dataType: 'boolean',
@@ -185,17 +189,17 @@ $(function () {
                         .appendTo(container);
                 }
             },
-            {
-                dataField: 'isSellingCategory',
-                caption: l("EntityFieldName:MDMService:ItemAttribute:IsSellingCategory"),
-                alignment: 'center',
-                dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                }
-            }
+            // {
+            //     dataField: 'isSellingCategory',
+            //     caption: l("EntityFieldName:MDMService:ItemAttribute:IsSellingCategory"),
+            //     alignment: 'center',
+            //     dataType: 'boolean',
+            //     cellTemplate(container, options) {
+            //         $('<div>')
+            //             .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+            //             .appendTo(container);
+            //     }
+            // }
         ]
     }).dxDataGrid('instance');
 });

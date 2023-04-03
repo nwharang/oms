@@ -147,7 +147,7 @@ public class OMSMenuContributor : IMenuContributor
         AddMenuItemArInvoiceHeaders(context, soMenu); 
         AddMenuItemReturnOrderHeaders(context, soMenu);
         AddMenuItemArCreditMemoHeaders(context, soMenu);
-        AddMenuItemProcessSalesOrderHeaders(context, soMenu);
+        //AddMenuItemProcessSalesOrderHeaders(context, soMenu);
         //AddMenuItemProcessDeliveryHeaders(context, soMenu);
         //AddMenuItemProcessSOToInvoice(context, soMenu);
 
