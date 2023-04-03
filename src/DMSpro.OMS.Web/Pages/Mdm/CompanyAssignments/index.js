@@ -272,8 +272,9 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
                 validationRules: [{ type: "required" }],
                 calculateDisplayValue(rowData){
-                    if (!rowData.company || rowData.company === null) return "";
-                    return rowData.company.name;
+                    if (rowData.company)
+                        return rowData.company.name;
+                    else return "";
                 },
                 lookup: {
                     dataSource: {
