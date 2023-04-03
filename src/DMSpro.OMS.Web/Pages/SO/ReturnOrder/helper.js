@@ -24,6 +24,26 @@ let helper = ({ companyId, mainStore, vatList }) => {
             })
         }
     }
+    let notify = (option) => {
+        obj = { type: "success", position: "bottom right", message: "Message Placeholder", ...option };
+        DevExpress.ui.notify({
+            message: obj.message,
+            height: 45,
+            width: 250,
+            minWidth: 250,
+            type: obj.type,
+            displayTime: 5000,
+            animation: {
+                show: {
+                    type: 'fade', duration: 400, from: 0, to: 1,
+                },
+                hide: { type: 'fade', duration: 40, to: 0 },
+            },
+        }, {
+            position: obj.position,
+        })
+        return obj
+    }
     function renderForm(e, { header, details }, docId) {
         let defaultNewHeader = {
             requestDate: new Date().toString(),
@@ -379,7 +399,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
             isDocOpen = !Boolean(currentData.header.docStatus)
             if (!popup) popup = $('<div id="popup">')
             popup.dxPopup({
-                title: `Delivery Order - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[currentData.header.docStatus || 0].text}`,
+                title: `Return Order - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[currentData.header.docStatus || 0].text}`,
                 showTitle: true,
                 height: '99%',
                 width: "99%",
@@ -413,7 +433,8 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 grid.dxDataGrid("instance").option('dataSource', comingData.previous.details)
                                 form.dxForm('instance').option("readOnly", Boolean(comingData.previous.header.docStatus))
                                 grid.dxDataGrid('instance').option("editing", newEditingOption)
-                                popup.dxPopup('instance').option("title", `Delivery Order - #${docId ? comingData.previous.header.docNbr : "New"} - ${docStatusStore[comingData.previous.header.docStatus || 0].text}`)
+                                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", Boolean(comingData.previous.header.docStatus))
+                                popup.dxPopup('instance').option("title", `Return Order - #${docId ? comingData.previous.header.docNbr : "New"} - ${docStatusStore[comingData.previous.header.docStatus || 0].text}`)
                                 loadNavigationButton(docId)
                             }
                         }
@@ -442,10 +463,79 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 grid.dxDataGrid("instance").option('dataSource', comingData.next.details)
                                 form.dxForm('instance').option("readOnly", Boolean(comingData.next.header.docStatus))
                                 grid.dxDataGrid('instance').option("editing", newEditingOption)
-                                popup.dxPopup('instance').option("title", `Delivery Order - #${docId ? comingData.next.header.docNbr : "New"} - ${docStatusStore[comingData.next.header.docStatus || 0].text}`)
+                                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", Boolean(comingData.next.header.docStatus))
+                                popup.dxPopup('instance').option("title", `Return Order - #${docId ? comingData.next.header.docNbr : "New"} - ${docStatusStore[comingData.next.header.docStatus || 0].text}`)
                                 loadNavigationButton(docId)
                             }
                         }
+                    },
+                    {
+                        widget: "dxDropDownButton",
+                        location: "after",
+                        toolbar: "bottom",
+                        options: {
+                            icon: 'preferences',
+                            text: 'Actions',
+                            disabled: Boolean(currentData.header.docStatus),
+                            width: 120,
+                            elementAttr: {
+                                id: "actionButtonDetailsPanel",
+                            },
+                            items: [
+                                {
+                                    text: "Close",
+                                    icon: "close",
+                                    onClick: () => {
+                                        if (docId)
+                                            mainService.closeDoc(docId)
+                                                .done(() => {
+                                                    let newEditingOption = {
+                                                        ...grid.dxDataGrid('instance').option("editing"),
+                                                        allowAdding: false,
+                                                        allowUpdating: false,
+                                                        allowDeleting: false,
+                                                    }
+                                                    notify({ type: 'success', message: "Close Return Order Successfully" })
+                                                    form.dxForm('instance').option("readOnly", true)
+                                                    grid.dxDataGrid('instance').option("editing", newEditingOption)
+                                                    $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", true)
+                                                    popup.dxPopup('instance').option("title", `Return Order - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[1].text}`)
+                                                })
+                                                .fail(() => {
+                                                    notify({ type: 'error', message: "Close Credit Memo Failed" })
+                                                    popup.dxPopup('instance').option("title", `Return Order - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[0].text}`)
+                                                    popup.dxPopup('instance').repaint()
+                                                })
+                                    }
+                                },
+                                {
+                                    text: "Cancel",
+                                    icon: "clear",
+                                    onClick: () => {
+                                        if (docId)
+                                            mainService.cancelDoc(docId)
+                                                .done(() => {
+                                                    let newEditingOption = {
+                                                        ...grid.dxDataGrid('instance').option("editing"),
+                                                        allowAdding: false,
+                                                        allowUpdating: false,
+                                                        allowDeleting: false,
+                                                    }
+                                                    notify({ type: 'success', message: "Cancel Return Order Successfully" })
+                                                    form.dxForm('instance').option("readOnly", true)
+                                                    grid.dxDataGrid('instance').option("editing", newEditingOption)
+                                                    $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", true)
+                                                    popup.dxPopup('instance').option("title", `Return Order - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[1].text}`)
+                                                })
+                                                .fail(() => {
+                                                    notify({ type: 'error', message: "Cancel Credit Memo Failed" })
+                                                    popup.dxPopup('instance').option("title", `Return Order - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[0].text}`)
+                                                    popup.dxPopup('instance').repaint()
+                                                })
+                                    }
+                                },
+                            ]
+                        },
                     },
                     {
                         widget: "dxButton",
@@ -461,6 +551,14 @@ let helper = ({ companyId, mainStore, vatList }) => {
                         },
                     },
                 ],
+                onContentReady: (e) => {
+                    if (docId && !Boolean(currentData.header.docStatus)) { // Open
+                        $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
+                    }
+                    else {
+                        $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", true)
+                    }
+                }
             })
             popup.appendTo('body')
             popup.dxPopup('instance').show()
