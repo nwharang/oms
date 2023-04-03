@@ -107,6 +107,9 @@
                     widget: "dxDropDownButton",
                     location: 'after',
                     options: {
+                        dropDownOptions: {
+                            width: 120,
+                        },
                         icon: 'preferences',
                         text: 'Actions',
                         items: [

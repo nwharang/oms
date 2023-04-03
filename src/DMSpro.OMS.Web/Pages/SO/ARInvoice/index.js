@@ -96,9 +96,12 @@
                     widget: "dxDropDownButton",
                     location: 'after',
                     options: {
+                        dropDownOptions: {
+                            width: 230,
+                        },
                         icon: 'preferences',
                         text: 'Actions',
-                        width: 200,
+                        width: 120,
                         items: [
                             {
                                 text: "Create AR Credit Memo",
