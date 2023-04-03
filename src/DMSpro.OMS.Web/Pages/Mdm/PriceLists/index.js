@@ -406,6 +406,19 @@ $(function () {
                     // },
                     width: 200
                 },
+                
+                {
+                    dataField: 'active',
+                    caption: l("EntityFieldName:MDMService:PriceList:Active"),
+                    alignment: 'center',
+                    dataType: 'boolean',
+                    cellTemplate(container, options) {
+                        $('<div>')
+                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                            .appendTo(container);
+                    },
+                    width: 120
+                },
                 {
                     dataField: 'arithmeticOperation',
                     caption: l("EntityFieldName:MDMService:PriceList:ArithmeticOperation"),
@@ -434,6 +447,42 @@ $(function () {
                         displayExpr: 'text'
                     },
                     width: 200
+                },
+                {
+                    dataField: 'isBase',
+                    caption: l("EntityFieldName:MDMService:PriceList:IsBase"),
+                    alignment: 'center',
+                    dataType: 'boolean',
+                    cellTemplate(container, options) {
+                        $('<div>')
+                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                            .appendTo(container);
+                    },
+                    width: 120
+                },
+                {
+                    dataField: 'isDefaultForCustomer',
+                    caption: l("EntityFieldName:MDMService:PriceList:IsDefaultForCustomer"),
+                    alignment: 'center',
+                    dataType: 'boolean',
+                    cellTemplate(container, options) {
+                        $('<div>')
+                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                            .appendTo(container);
+                    },
+                    width: 120
+                },
+                {
+                    dataField: 'isDefaultForVendor',
+                    caption: l("EntityFieldName:MDMService:PriceList:IsDefaultForVendor"),
+                    alignment: 'center',
+                    dataType: 'boolean',
+                    cellTemplate(container, options) {
+                        $('<div>')
+                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                            .appendTo(container);
+                    },
+                    width: 120
                 }
             ],
         masterDetail: {
