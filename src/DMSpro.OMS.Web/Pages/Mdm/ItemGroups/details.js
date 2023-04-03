@@ -266,11 +266,11 @@ function initItemAttributeTab() {
                 headerFilter: {
                     visible: true,
                 },
-                stateStoring: {
-                    enabled: true,
-                    type: 'localStorage',
-                    storageKey: 'gridItemAttribute',
-                },
+                // stateStoring: {
+                //     enabled: true,
+                //     type: 'localStorage',
+                //     storageKey: 'gridItemAttribute',
+                // },
                 paging: {
                     enabled: true,
                     pageSize: pageSize
@@ -302,37 +302,6 @@ function initItemAttributeTab() {
                         }
                     }
                 },
-                toolbar: {
-                    items: [
-                        {
-                            location: 'after',
-                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                            onClick() {
-                                $('#gridItemAttribute').data('dxDataGrid').addRow();
-                            },
-                        },
-                        'columnChooserButton',
-                        "exportButton",
-                        {
-                            location: 'after',
-                            widget: 'dxButton',
-                            options: {
-                                icon: "import",
-                                elementAttr: {
-                                    //id: "import-excel",
-                                    class: "import-excel",
-                                },
-                                onClick(e) {
-                                    var gridControl = e.element.closest('div.dx-datagrid').parent();
-                                    var gridName = gridControl.attr('id');
-                                    var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                                    if (popup) popup.show();
-                                },
-                            },
-                        }, 
-                        'searchPanel'
-                    ]
-                },
                 onInitialized: function (e) {
                     getItemAttributeColumns(e.component);
                 },
@@ -353,7 +322,10 @@ function initListItemTab() {
     return function () {
         return $('<div id="gridListItem">')
             .dxDataGrid({
-                dataSource: getDataSourceListGrid(itemGroup.id),
+                dataSource: {
+                    store: itemGroupListStore,
+                    filter: ['itemGroupId', '=', itemGroup.id],
+                },//getDataSourceListGrid(itemGroup.id),
                 remoteOperations: true,
                 showBorders: true,
                 autoExpandAll: true,
@@ -366,46 +338,7 @@ function initListItemTab() {
                 filterRow: {
                     visible: true
                 },
-                groupPanel: {
-                    visible: true,
-                },
-                searchPanel: {
-                    visible: true
-                },
                 columnMinWidth: 50,
-                columnChooser: {
-                    enabled: true,
-                    mode: "select"
-                },
-                columnFixing: {
-                    enabled: true,
-                },
-                export: {
-                    enabled: true,
-                },
-                onExporting(e) {
-                    const workbook = new ExcelJS.Workbook();
-                    const worksheet = workbook.addWorksheet('Data');
-
-                    DevExpress.excelExporter.exportDataGrid({
-                        component: e.component,
-                        worksheet,
-                        autoFilterEnabled: true,
-                    }).then(() => {
-                        workbook.xlsx.writeBuffer().then((buffer) => {
-                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
-                        });
-                    });
-                    e.cancel = true;
-                },
-                headerFilter: {
-                    visible: true,
-                },
-                stateStoring: {
-                    enabled: true,
-                    type: 'localStorage',
-                    storageKey: 'gridListItem',
-                },
                 paging: {
                     enabled: true,
                     pageSize: pageSize
@@ -442,37 +375,6 @@ function initListItemTab() {
                         }
                     }
                 },
-                toolbar: {
-                    items: [
-                        {
-                            location: 'after',
-                            template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                            onClick() {
-                                $('#gridListItem').data('dxDataGrid').addRow();
-                            },
-                        },
-                        'columnChooserButton',
-                        "exportButton",
-                        {
-                            location: 'after',
-                            widget: 'dxButton',
-                            options: {
-                                icon: "import",
-                                elementAttr: {
-                                    //id: "import-excel",
-                                    class: "import-excel",
-                                },
-                                onClick(e) {
-                                    var gridControl = e.element.closest('div.dx-datagrid').parent();
-                                    var gridName = gridControl.attr('id');
-                                    var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                                    if (popup) popup.show();
-                                },
-                            },
-                        }, 
-                        'searchPanel'
-                    ]
-                },
                 columns: [
                     {
                         type: 'buttons',
@@ -488,7 +390,12 @@ function initListItemTab() {
                         dataField: 'itemId',
                         caption: l("EntityFieldName:MDMService:ItemGroupList:Item"),
                         validationRules: [{ type: "required" }],
-                        editorType: 'dxSelectBox',
+                        calculateDisplayValue(rowData){
+                            if(rowData.item){
+                                return rowData.item.name;
+                            }
+                            return "";
+                        },
                         lookup: {
                             //dataSource: getItemList,
                             dataSource: {
@@ -506,30 +413,33 @@ function initListItemTab() {
                         dataField: 'uomId',
                         caption: l("EntityFieldName:MDMService:ItemGroupList:UOM"),
                         validationRules: [{ type: "required" }],
-                        editorType: 'dxSelectBox',
                         lookup: {
-                            //dataSource: getUOMs,
-                            dataSource: {
-                                store: getUOMs,
-                                paginate: true,
-                                pageSize: pageSizeForLookup
+                            dataSource(options){
+                                return {
+                                    store: getUOMs,
+                                };
                             },
+                            // dataSource: {
+                            //     store: getUOMs,
+                            //     paginate: true,
+                            //     pageSize: pageSizeForLookup
+                            // },
                             valueExpr: 'id',
                             displayExpr: 'code'
                         }
                     },
-                    {
-                        dataField: 'rate',
-                        caption: l("EntityFieldName:MDMService:ItemGroupList:Rate"),
-                        /*validationRules: [{ type: "required" }],*/
-                        dataType: 'number',
-                        value: 1
-                    },
-                    {
-                        dataField: 'price',
-                        caption: l("EntityFieldName:MDMService:ItemGroupList:Price"),
-                        dataType: 'number'
-                    }
+                    // {
+                    //     dataField: 'rate',
+                    //     caption: l("EntityFieldName:MDMService:ItemGroupList:Rate"),
+                    //     /*validationRules: [{ type: "required" }],*/
+                    //     dataType: 'number',
+                    //     value: 1
+                    // },
+                    // {
+                    //     dataField: 'price',
+                    //     caption: l("EntityFieldName:MDMService:ItemGroupList:Price"),
+                    //     dataType: 'number'
+                    // }
                 ],
                 onContentReady: function (e) { 
                     if (itemGroup.status != 0) {

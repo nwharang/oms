@@ -33,7 +33,13 @@ $(function () {
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
-            itemGroupService.getListDevextremes({})
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            itemGroupService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -123,11 +129,11 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'gridItemGroups',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'gridItemGroups',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -233,10 +239,6 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:ItemGroup:Name"),
                 dataField: "name",
                 validationRules: [{ type: "required" }]
-            },
-            {
-                caption: l("EntityFieldName:MDMService:ItemGroup:Description"),
-                dataField: "description"
             },
             {
                 caption: l("EntityFieldName:MDMService:ItemGroup:Type"),
