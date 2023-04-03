@@ -73,11 +73,11 @@
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dgSalesRequestHeader',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'dgSalesRequestHeader',
+        // },
         paging: {
             enabled: true,
             pageSize: 10
@@ -282,6 +282,7 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt'),
                 dataField: 'docTotalLineDiscountAmt',
                 dataType: 'number',
+                format: '#,##0.##',
                 width: 100,
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
@@ -307,6 +308,7 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
                 dataField: 'docTotalAmt',
                 dataType: 'number',
+                format: '#,##0.##',
                 visible: true,
                 allowEditing: false,
             },
@@ -314,6 +316,7 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax'),
                 dataField: 'docTotalAmtAfterTax',
                 dataType: 'number',
+                format: '#,##0.##',
                 visible: true,
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
@@ -342,6 +345,7 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt'),
                 dataField: 'docDiscountAmt',
                 dataType: 'number',
+                format: '#,##0.##',
                 validationRules: [{ type: 'required' }],
                 width: 100,
             },

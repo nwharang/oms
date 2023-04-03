@@ -295,6 +295,7 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineDiscountAmt'),
                 dataField: 'docTotalLineDiscountAmt',
                 dataType: 'number',
+                format: '#,##0.##',
                 width: 100,
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
@@ -302,6 +303,7 @@
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
                 dataField: 'docTotalAmt',
+                format: '#,##0.##',
                 dataType: 'number',
                 visible: true,
                 allowEditing: false,
@@ -309,6 +311,7 @@
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmtAfterTax'),
                 dataField: 'docTotalAmtAfterTax',
+                format: '#,##0.##',
                 dataType: 'number',
                 visible: true,
                 validationRules: [{ type: 'required' }],
@@ -338,6 +341,7 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt'),
                 dataField: 'docDiscountAmt',
                 dataType: 'number',
+                format: '#,##0.##',
                 validationRules: [{ type: 'required' }],
                 width: 100,
             },
