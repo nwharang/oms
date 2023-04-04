@@ -76,7 +76,7 @@ let renderTree = (e, headerData) => {
             if (e.data && e.data.parentId == 0) {
                 e.data.parentId = null;
             }
-            e.data.salesOrgHeaderId = salesOrgHeaderId;
+            e.data.salesOrgHeaderId = headerData.id || salesOrgHeaderId;
             e.data.sendMode = sendMode;
         },
         onRowUpdating: function (e) {

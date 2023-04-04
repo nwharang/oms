@@ -1,6 +1,6 @@
 let renderForm = (e, headerData) => {
     if (!form) form = $('<div id="form" class="border-bottom pb-1">')
-    let buttonTitle = headerData.status < 0 ? "Open" : headerData.status == 0 ? "Release" : headerData.status > 1 ? "Inactive" : "Inactived"
+    let buttonTitle = headerData.status < 0 ? "Save" : headerData.status == 0 ? "Release" : headerData.status > 1 ? "Inactive" : "Inactived"
     form.dxForm({
         labelMode: "floatting",
         colCount: 9,
@@ -56,7 +56,7 @@ let renderForm = (e, headerData) => {
                                     })
                                     .fail(() => {
                                         notify({ type: "error", message: "Create Sale Organization Error" })
-                                        e.component.option('text', 'Open')
+                                        e.component.option('text', 'Save')
                                     });
                                 break;
                             case 0:
