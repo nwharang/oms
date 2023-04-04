@@ -420,17 +420,6 @@
                 caption: l("PaymentTerm"),
                 dataType: 'string',
                 visible: false,
-                //lookup: {
-                //    dataSource: {
-                //        store: systemDataLookup,
-                //        paginate: true,
-                //        pageSize: pageSizeForLookup
-                //    },
-                //    valueExpr: "id",
-                //    displayExpr: function (e) {
-                //        return e.code + ' - ' + e.valueCode
-                //    }
-                //}
             },
             {
                 dataField: 'linkedCompanyId',
@@ -477,6 +466,7 @@
             {
                 dataField: "geoMaster0Id",
                 caption: l1("GeoLevel0Name"),
+                allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster0 || rowData.geoMaster0 === null) return "";
                     return rowData.geoMaster0.name;
@@ -505,6 +495,7 @@
             {
                 dataField: "geoMaster1Id",
                 caption: l1("GeoLevel1Name"),
+                allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster1 || rowData.geoMaster1 === null) return "";
                     return rowData.geoMaster1.name;
@@ -532,6 +523,7 @@
             {
                 dataField: "geoMaster2Id",
                 caption: l1("GeoLevel2Name"),
+                allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster2 || rowData.geoMaster2 === null) return "";
                     return rowData.geoMaster2.name;
@@ -558,6 +550,7 @@
             {
                 dataField: "geoMaster3Id",
                 caption: l1("GeoLevel3Name"),
+                allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster3 || rowData.geoMaster3 === null) return "";
                     return rowData.geoMaster3.name;
@@ -583,6 +576,7 @@
             {
                 dataField: "geoMaster4Id",
                 caption: l1("GeoLevel4Name"),
+                allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster4 || rowData.geoMaster4 === null) return "";
                     return rowData.geoMaster4.name;

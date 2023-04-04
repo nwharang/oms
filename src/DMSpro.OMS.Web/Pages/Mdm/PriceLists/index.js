@@ -296,18 +296,18 @@ $(function () {
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
-        onEditorPreparing: (e) => {
-            if (e.row?.rowType != "data" && !Boolean(e.dataField) && e.parentType != 'dataRow' && !e.row?.isNewRow){
-                return
-            }
-            const items = e.component.getDataSource().items();
-            if (["action", 'name', 'code'].indexOf(e.dataField) === -1 && items.length < 1){
-                e.editorOptions.disabled = true
-            }
+        // onEditorPreparing: (e) => {
+        //     if (e.row?.rowType != "data" && !Boolean(e.dataField) && e.parentType != 'dataRow' && !e.row?.isNewRow){
+        //         return
+        //     }
+        //     const items = e.component.getDataSource().items();
+        //     if (["action", 'name', 'code'].indexOf(e.dataField) === -1 && items.length < 1){
+        //         e.editorOptions.disabled = true
+        //     }
                 
-            // if (e.dataField == 'basePriceListId')
-            //     e.editorOptions.disabled = true
-        },
+        //     // if (e.dataField == 'basePriceListId')
+        //     //     e.editorOptions.disabled = true
+        // },
         onEditorPrepared: function (e) {
             if (e.row?.rowType == "data" && Boolean(e.dataField) && e.parentType == 'dataRow' && e.row.isNewRow){
                 console.log("ThUY");
@@ -406,19 +406,6 @@ $(function () {
                     // },
                     width: 200
                 },
-                
-                {
-                    dataField: 'active',
-                    caption: l("EntityFieldName:MDMService:PriceList:Active"),
-                    alignment: 'center',
-                    dataType: 'boolean',
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                            .appendTo(container);
-                    },
-                    width: 120
-                },
                 {
                     dataField: 'arithmeticOperation',
                     caption: l("EntityFieldName:MDMService:PriceList:ArithmeticOperation"),
@@ -497,6 +484,7 @@ $(function () {
                             paginate: true,
                             pageSize: pageSize,
                         },
+                        key: "id",
                         // editing: {
                         //     mode: 'row',
                         //     allowUpdating: true,

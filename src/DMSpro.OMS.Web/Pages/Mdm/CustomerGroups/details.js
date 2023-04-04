@@ -242,34 +242,8 @@ function initItemAttributeTab() {
                     enabled: true,
                     mode: "select"
                 },
-                columnFixing: {
-                    enabled: true,
-                },
-                export: {
-                    enabled: true,
-                },
-                onExporting(e) {
-                    const workbook = new ExcelJS.Workbook();
-                    const worksheet = workbook.addWorksheet('Data');
-
-                    DevExpress.excelExporter.exportDataGrid({
-                        component: e.component,
-                        worksheet,
-                        autoFilterEnabled: true,
-                    }).then(() => {
-                        workbook.xlsx.writeBuffer().then((buffer) => {
-                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'CustomerAttribute.xlsx');
-                        });
-                    });
-                    e.cancel = true;
-                },
                 headerFilter: {
                     visible: true,
-                },
-                stateStoring: {
-                    enabled: true,
-                    type: 'localStorage',
-                    storageKey: 'dgCustomerAttribute',
                 },
                 paging: {
                     enabled: true,
