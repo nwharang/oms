@@ -183,6 +183,11 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:Route'),
                 dataField: 'routeId',
                 calculateDisplayValue: "routeDisplay",
+                lookup: {
+                    store: "routeDisplay",
+                    displayExpr: "name",
+                    valueExpr: 'id'
+                },
                 dataType: 'string',
                 validationRules: [{ type: 'required' }],
             },
@@ -190,6 +195,11 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:Employee'),
                 dataField: 'employeeId',
                 calculateDisplayValue: "employeeDisplay",
+                lookup: {
+                    store: "employeeDisplay",
+                    displayExpr: "name",
+                    valueExpr: 'id'
+                },
                 dataType: 'string',
                 validationRules: [{ type: 'required' }],
             },
@@ -222,6 +232,11 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:BusinessPartner'),
                 editorType: 'dxSelectBox',
                 dataField: 'businessPartnerId',
+                lookup: {
+                    store: "businessPartnerId",
+                    displayExpr: "name",
+                    valueExpr: 'id'
+                },
                 validationRules: [{ type: 'required' }],
                 calculateDisplayValue: "businessPartnerDisplay"
             },

@@ -248,6 +248,11 @@
                 caption: l('EntityFieldName:OrderService:SalesRequest:BusinessPartner'),
                 editorType: 'dxSelectBox',
                 dataField: 'businessPartnerId',
+                lookup: {
+                    store: "businessPartnerId",
+                    displayExpr: "name",
+                    valueExpr: 'id'
+                },
                 validationRules: [{ type: 'required' }],
                 calculateDisplayValue: "businessPartnerDisplay"
             },

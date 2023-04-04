@@ -62,6 +62,7 @@ $(function () {
 
             workingPositionService.getListDevextremes(args)
                 .done(result => {
+                    console.log(result);
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -204,8 +205,8 @@ $(function () {
             popup: {
                 title: l("Page.Title.EmployeeProfiles"),
                 showTitle: false,
-                width: 1000,
-                height: 580
+                width: 'fit-content',
+                height: 'fit-content'
             },
             form: {
                 items: [
@@ -346,7 +347,14 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:JobTittle"),
                 dataField: "workingPositionId",
-                calculateDisplayValue: "workingPosition.name",
+                //calculateDisplayValue: "workingPosition.name",
+                calculateDisplayValue(rowData){
+                    //console.log(rowData.geoLevel2);
+                    if(rowData.workingPosition){
+                        return rowData.workingPosition.name;
+                    }
+                    return "";
+                },
                 dataType: 'string',
                 lookup: {
                     dataSource() {
@@ -364,16 +372,18 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:EmployeeTypeName"),
                 dataField: "employeeTypeId",
-                calculateDisplayValue: "employeeType.valueName",
+                // calculateDisplayValue: "employeeType",
+                calculateDisplayValue(rowData){
+                    //console.log(rowData.geoLevel2);
+                    if(rowData.employeeType){
+                        return rowData.employeeType.valueName;
+                    }
+                    return "";
+                },
                 dataType: 'string',
                 lookup: {
-                    dataSource() {
-                        return {
-                            store: employeeTypeStore,
-                            filter: ["code", "=", "MD03"],
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
+                    dataSource: {
+                        store: employeeTypeStore,
                     },
                     displayExpr: 'valueName',
                     valueExpr: 'id',
@@ -450,7 +460,7 @@ $(function () {
             labelText: '',
             accept: 'image/*',
             uploadMethod: 'POST',
-            uploadMode: selectedRowsData ?'instantly':'useButtons',
+            uploadMode: selectedRowsData ? 'instantly' : 'useButtons',
             onValueChanged(e) {
                 files = e.value;
                 $("#img-avatar").attr("src", URL.createObjectURL(files[0]));
