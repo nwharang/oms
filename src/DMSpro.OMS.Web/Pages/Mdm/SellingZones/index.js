@@ -1,14 +1,13 @@
 $(function () {
-    var l = abp.localization.getResource("OMS");
-    var l1 = abp.localization.getResource("OMS");
-    var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
-    var companyInZoneService = window.dMSpro.oMS.mdmService.controllers.companyInZones.companyInZone;
-    var customerInZoneService = window.dMSpro.oMS.mdmService.controllers.customerInZones.customerInZone;
-    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
-    var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
+    let l = abp.localization.getResource("OMS");
+    let salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
+    let companyInZoneService = window.dMSpro.oMS.mdmService.controllers.companyInZones.companyInZone;
+    let customerInZoneService = window.dMSpro.oMS.mdmService.controllers.customerInZones.customerInZone;
+    let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+    let customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
 
-    var salesOrgHierarchyId = null;
-
+    let salesOrgHierarchyId = null;
+    let popup, popupInstance, grid, gridInstance
     /****custom store*****/
     var salesOrgHierarchyStore = new DevExpress.data.CustomStore({
         key: 'id',
@@ -136,8 +135,14 @@ $(function () {
                 });
             return d.promise();
         },
-        insert(values) {
-            return customerInZoneService.create(values, { contentType: "application/json" });
+        insert({ customerId, effectiveDate, endDate, salesOrgHierarchyId }) {
+            console.log(customerId, effectiveDate, endDate, salesOrgHierarchyId);
+            // To do , Update when new api coming 😘
+            return customerId.forEach((e) => {
+                customerInZoneService.create({ customerId: e, effectiveDate, endDate, salesOrgHierarchyId }, { contentType: "application/json" })
+            })
+            // For new API requests
+            // return customerInZoneService.Some Thing Here({ customerId, effectiveDate, endDate, salesOrgHierarchyId }, { contentType: "application/json" })
         },
         update(key, values) {
             return customerInZoneService.update(key, values, { contentType: "application/json" });
@@ -183,6 +188,7 @@ $(function () {
 
     var customerStore = new DevExpress.data.CustomStore({
         key: 'id',
+        useDefaultSearch: true,
         load(loadOptions) {
             const args = {};
             requestOptions.forEach((i) => {
@@ -215,12 +221,17 @@ $(function () {
     });
 
     /****control*****/
-    const salesOrgHierarchy = $('#salesOrgHierarchy').dxSelectBox({
+    const salesOrgHierarchy = $('#salesOrgHierarchy').css({ 'max-width': "20em", 'width': "20em" }).dxSelectBox({
         dataSource: salesOrgHierarchyStore,
         valueExpr: 'id',
-        displayExpr: "name",
-        label: l["Selling Zone"],
-        // labelMode: "floating",
+        displayExpr(e) {
+            if (e)
+                return `${e.code} - ${e.name}`
+            return ''
+
+        },
+        label: l("Selling Zone"),
+        labelMode: "floating",
         searchEnabled: true,
         showClearButton: true,
         onSelectionChanged(data) {
@@ -329,7 +340,7 @@ $(function () {
             ],
         },
         // onContentReady: function (e) {
-           
+
         //     if (salesOrgHierarchyId) { 
         //         initImportPopup('api/mdm-service/customer-group-by-atts', 'CustomerGroupByAtts_Template', 'dgCustomerAttribute');
         //         e.component.option('toolbar.items[4].visible', true);
@@ -347,7 +358,7 @@ $(function () {
                 fixedPosition: 'left'
             },
             {
-                caption: l1("CompanyInZone.Company"),
+                caption: l("CompanyInZone.Company"),
                 dataField: "companyId",
                 allowSearch: false,
                 calculateDisplayValue(rowData){
@@ -482,7 +493,17 @@ $(function () {
         },
         toolbar: {
             items: [
-                "addRowButton",
+                // "addRowButton",
+                {
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
+                        icon: "add",
+                        onClick(e) {
+                            renderMassInputCus()
+                        },
+                    },
+                },
             ],
         },
         columns: [
@@ -533,7 +554,7 @@ $(function () {
                 }
             },
             //{
-            //    caption: l1("Active"),
+            //    caption: l("Active"),
             //    dataField: "active",
             //    dataType: "boolean"
             //}
@@ -549,6 +570,166 @@ $(function () {
     $("#tab2").click(function () {
         setTimeout(() => { customerAssginContainer.refresh(); }, 100);
     });
+
+    function renderMassInputCus() {
+        popup = $("<div id='popup'>").dxPopup({
+            title: "Mass Input",
+            height: '75vh',
+            width: '80vw',
+            contentTemplate: (e) => {
+                customerService.getListDevextremes({ filter: JSON.stringify(["active", "=", "true"]) }).done(({ data }) => {
+                    grid = $("<div id='grid'>").dxDataGrid({
+                        dataSource: data,
+                        height: '100%',
+                        width: '100%',
+                        filterRow: {
+                            visible: true,
+                        },
+                        headerFilter: {
+                            visible: true,
+                        },
+                        selection: {
+                            mode: 'multiple',
+                            showCheckBoxesMode: 'always',
+                            selectAllMode: 'page'
+                        },
+                        showBorders: true,
+                        columnAutoWidth: true,
+                        showRowLines: true,
+                        showColumnLines: true,
+                        columnChooser: {
+                            enabled: true,
+                            mode: "select"
+                        },
+                        paging: {
+                            enabled: true,
+                            pageSize: pageSize
+                        },
+                        pager: {
+                            visible: true,
+                            showPageSizeSelector: true,
+                            allowedPageSizes: allowedPageSizes,
+                            showInfo: true,
+                            showNavigationButtons: true
+                        },
+                        toolbar: {
+
+                            items: [
+                                {
+                                    widget: "dxDateBox",
+                                    location: 'before',
+                                    options: {
+                                        width: '20rem',
+                                        label: 'effectiveDate',
+                                        labelMode: 'floating',
+                                        displayFormat: "dd/MM/yyyy",
+                                        type: 'date',
+                                        value: new Date(),
+                                        elementAttr: {
+                                            id: 'cusBatchInputEffectiveDate'
+                                        }
+                                    }
+                                },
+                                {
+                                    widget: "dxDateBox",
+                                    location: 'before',
+                                    options: {
+                                        width: '20rem',
+                                        label: 'endDate',
+                                        labelMode: 'floating',
+                                        displayFormat: "dd/MM/yyyy",
+                                        type: 'date',
+                                        value: null,
+                                        elementAttr: {
+                                            id: 'cusBatchInputEndDate'
+                                        }
+                                    }
+                                },
+                                'columnChooserButton'
+                            ]
+                        }
+                        ,
+                        columns: [
+                            {
+                                // Custom column
+                                dataField: 'code',
+                                calculateDisplayValue(e) {
+                                    if (e)
+                                        return `${e.code} - ${e.name}`
+                                    return "None"
+                                },
+                                lookup: {
+                                    dataSource: customerStore,
+                                    valueExpr: 'code',
+                                    displayExpr: 'code'
+                                }
+                            },
+                            {
+                                caption: l("EntityFieldName:MDMService:CustomerInZone:EndDate"),
+                                dataField: "geoMaster4.name",
+                            },
+                            {
+                                caption: l("EntityFieldName:MDMService:CustomerInZone:EndDate"),
+                                dataField: "geoMaster3.name",
+                            },
+                            {
+                                caption: l("EntityFieldName:MDMService:CustomerInZone:EndDate"),
+                                dataField: "geoMaster2.name",
+                            },
+                            {
+                                caption: l("EntityFieldName:MDMService:CustomerInZone:EndDate"),
+                                dataField: "geoMaster1.name",
+                            },
+                            {
+                                caption: l("EntityFieldName:MDMService:CustomerInZone:EndDate"),
+                                dataField: "geoMaster0.name",
+                            },
+                        ]
+                    })
+                    gridInstance = grid.dxDataGrid('instance')
+                    grid.appendTo(e)
+                })
+            },
+
+            toolbarItems: [{
+                widget: 'dxButton',
+                toolbar: 'bottom',
+                location: 'after',
+                options: {
+                    icon: 'fa fa-check hvr-icon',
+                    text: 'Submit',
+                    onClick(e) {
+                        data = {
+                            salesOrgHierarchyId,
+                            customerId: gridInstance.getSelectedRowsData().map(e => e.id),
+                            effectiveDate: $("#cusBatchInputEffectiveDate").dxDateBox('instance').option('value'),
+                            endDate: $("#cusBatchInputEndDate").dxDateBox('instance').option('value'),
+                        }
+                        customerAssginContainer.getDataSource().store().insert(data).then(()=> {
+                            popupInstance.beginUpdate()
+                            customerAssginContainer.refresh().then(() => {
+                                popupInstance.endUpdate()
+                                popupInstance.hide();
+                            })
+                        })
+                    },
+                },
+            }, {
+                widget: 'dxButton',
+                toolbar: 'bottom',
+                location: 'after',
+                options: {
+                    text: 'Cancel',
+                    onClick() {
+                        popupInstance.hide();
+                    },
+                },
+            }],
+        })
+        popupInstance = popup.dxPopup('instance')
+        popup.appendTo('body')
+        popupInstance.show()
+    }
 
     /****function*****/
     initImportPopup('api/mdm-service/customer-in-zones', 'CustomerInZones_Template', 'customerAssgin');
