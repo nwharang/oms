@@ -5,7 +5,7 @@ let salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrg
 let salesOrgEmpAssignmentService = window.dMSpro.oMS.mdmService.controllers.salesOrgEmpAssignments.salesOrgEmpAssignment;
 let employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
 let popup, tree, grid, form, context, popupInstance, treeInstance, gridInstance, formInstance, contextMenu, dataGridContainer
-let salesOrgHierarchyIdFilter = null, sendMode = 0, SalesOrgHeaderModel = null, salesOrgHeaderIdFilter = null
+let salesOrgHierarchyIdFilter = null, sendMode = 0, SalesOrgHeaderModel = null, salesOrgHeaderIdFilter = null, salesOrgHeaderId = null
 
 /** Create global notification */
 let notify = (option) => {
@@ -151,26 +151,13 @@ let store = {
             return d.promise();
         },
         insert({ name, parentId, salesOrgHeaderId, sendMode }) {
-            // TODO: API will change in the future , for now just use old api route
-            let data = {
-                parentId,
-                name,
-                isRoute: sendMode == 2,
-                salesOrgHeaderId,
-                code: Date.now().toString(),
-                hierarchyCode: Date.now().toString()
-            };
-            return salesOrgHierarchyService.create(data);
             switch (sendMode) {
                 case 2: // Route
-                    // salesOrgHierarchyService.something here({name , parentId});
-                    break;
+                    return salesOrgHierarchyService.createRoute({ name, parentId });
                 case 1: // Sub
-                    // salesOrgHierarchyService.something here({name , parentId});
-                    break;
+                    return salesOrgHierarchyService.createSub({ name, parentId });
                 case 0: // Root
-                    // salesOrgHierarchyService.something here({name , salesOrgHeaderId});
-                    break;
+                    return salesOrgHierarchyService.createRoot({ name, salesOrgHeaderId });
                 default:
                     break;
             }
