@@ -339,6 +339,7 @@ $(function () {
                 dataField: "geoLevel1Id",
                 caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel1Id"),
                 //calculateDisplayValue: "geoLevel1Id",
+                allowSearch: false,
                 calculateDisplayValue(rowData){
                     
                     if(rowData.geoLevel1){
@@ -374,6 +375,7 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel2Id"),
                 //calculateDisplayValue: "geoLevel2.name",
                 //width: 110,
+                allowSearch: false,
                 calculateDisplayValue(rowData){
                     //console.log(rowData.geoLevel2);
                     if(rowData.geoLevel2){
@@ -422,6 +424,7 @@ $(function () {
                 dataField: "geoLevel3Id",
                 caption: l("EntityFieldName:MDMService:CompanyProfile:geoLevel3Id"),
                 //calculateDisplayValue: "geoLevel3.name",
+                allowSearch: false,
                 calculateDisplayValue(rowData){
                     //console.log(rowData.geoLevel2);
                     if(rowData.geoLevel3){
@@ -534,6 +537,7 @@ $(function () {
                 //width: 145,
                 visible: false,
                 dataType: 'string',
+                allowSearch: false,
                 calculateDisplayValue(rowData){
                     //console.log(rowData.geoLevel2);
                     if(rowData.parent){

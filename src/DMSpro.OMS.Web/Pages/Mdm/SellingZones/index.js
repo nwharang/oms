@@ -349,6 +349,7 @@ $(function () {
             {
                 caption: l1("CompanyInZone.Company"),
                 dataField: "companyId",
+                allowSearch: false,
                 calculateDisplayValue(rowData){
                     if (rowData.company) return rowData.company.name;
                     else return "";
@@ -495,6 +496,7 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:CustomerInZone:Customer"),
                 dataField: "customerId",
+                allowSearch: false,
                 calculateDisplayValue(rowData){
                     if(rowData.customer) return rowData.customer.name;
                      return "";

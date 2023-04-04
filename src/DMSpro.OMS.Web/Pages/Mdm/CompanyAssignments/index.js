@@ -247,6 +247,7 @@ $(function () {
                 dataField: 'companyIdentityUserAssignment.identityUserId',
                 caption: l("UserName"),
                 validationRules: [{ type: "required" }],
+                allowSearch: false,
                 calculateDisplayValue(rowData){
                     if (!rowData.identityUser || rowData.identityUser === null) return "";
                     return rowData.identityUser.userName;
@@ -271,6 +272,7 @@ $(function () {
                 dataField: 'companyIdentityUserAssignment.companyId',
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
                 validationRules: [{ type: "required" }],
+                allowSearch: false,
                 calculateDisplayValue(rowData){
                     if (rowData.company)
                         return rowData.company.name;

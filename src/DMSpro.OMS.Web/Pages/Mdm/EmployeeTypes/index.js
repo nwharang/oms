@@ -186,13 +186,13 @@ $(function () {
             //    visible: false,
             //    allowEditing: false
             //},
-            {
-                caption: l("EntityFieldName:MDMService:SystemData:Name"),
-                dataField: "name",
-                //validationRules: [{ type: "required" }],
-                visible: false,
-                allowEditing: false
-            },
+            // {
+            //     caption: l("EntityFieldName:MDMService:SystemData:Name"),
+            //     dataField: "name",
+            //     //validationRules: [{ type: "required" }],
+            //     visible: false,
+            //     allowEditing: false
+            // },
             {
                 caption: l("EntityFieldName:MDMService:SystemData:ValueCode"),
                 dataField: "valueCode",
