@@ -302,6 +302,7 @@ $(function () {
                 formItem: {
                     visible: true,
                 },
+                allowSearch: false,
                 //calculateDisplayValue: "geoLevel0.name", // provides display values
                 calculateDisplayValue: function (rowData) {
                     if(rowData.geoLevel0){

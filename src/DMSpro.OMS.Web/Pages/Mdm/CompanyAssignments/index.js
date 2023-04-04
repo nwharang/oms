@@ -214,25 +214,9 @@ $(function () {
                 "groupPanel",
                 "addRowButton",
                 "columnChooserButton",
-                "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
-                "searchPanel"
+                "exportButton"
+                
+                
             ],
         },
         columns: [
