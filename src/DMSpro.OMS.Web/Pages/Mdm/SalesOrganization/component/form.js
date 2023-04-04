@@ -62,7 +62,7 @@ let renderForm = (e, headerData) => {
                             case 0:
                                 dialog({ body: "After releasing, you still can create routes, but won't be able to create sub ", header: "Releasing Sale Organization" },
                                     () => {
-                                        salesOrgHeaderService.update(headerData.id, orgHeaderValue, { contentType: "application/json" })
+                                        salesOrgHeaderService.release(headerData.id, { contentType: "application/json" })
                                             .done(result => {
                                                 notify({ message: "Release Sale Organization Successfully" })
                                                 headerData = result;
@@ -82,7 +82,7 @@ let renderForm = (e, headerData) => {
                             case 1:
                                 dialog({ header: "Inactivate Sale Organization ", body: "After inactivate, you WON'T be able to create or edit this" },
                                     () => {
-                                        salesOrgHeaderService.update(headerData.id, orgHeaderValue, { contentType: "application/json" })
+                                        salesOrgHeaderService.inactive(headerData.id, { contentType: "application/json" })
                                             .done(result => {
                                                 notify({ message: "Inactived Sale Organization Successfully" })
                                                 headerData = result;
