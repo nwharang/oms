@@ -421,18 +421,11 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             },
                             disabled: true,
                             onClick: function (e) {
-                                let newEditingOption = {
-                                    ...grid.dxDataGrid('instance').option("editing"),
-                                    allowAdding: !Boolean(comingData.previous.header.docStatus),
-                                    allowUpdating: !Boolean(comingData.previous.header.docStatus),
-                                    allowDeleting: !Boolean(comingData.previous.header.docStatus),
-                                }
                                 docId = comingData.previous.header.id;
                                 form.dxForm("instance").option("formData", comingData.previous.header)
                                 savedFormData = { ...form.dxForm('instance').option('formData') }
                                 grid.dxDataGrid("instance").option('dataSource', comingData.previous.details)
                                 form.dxForm('instance').option("readOnly", Boolean(comingData.previous.header.docStatus))
-                                grid.dxDataGrid('instance').option("editing", newEditingOption)
                                 $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", Boolean(comingData.previous.header.docStatus))
                                 popup.dxPopup('instance').option("title", `Return Order - #${docId ? comingData.previous.header.docNbr : "New"} - ${docStatusStore[comingData.previous.header.docStatus || 0].text}`)
                                 loadNavigationButton(docId)
@@ -451,18 +444,11 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             },
                             disabled: true,
                             onClick: function (e) {
-                                let newEditingOption = {
-                                    ...grid.dxDataGrid('instance').option("editing"),
-                                    allowAdding: !Boolean(comingData.next.header.docStatus),
-                                    allowUpdating: !Boolean(comingData.next.header.docStatus),
-                                    allowDeleting: !Boolean(comingData.next.header.docStatus),
-                                }
                                 docId = comingData.next.header.id;
                                 form.dxForm("instance").option("formData", comingData.next.header)
                                 savedFormData = { ...form.dxForm('instance').option('formData') }
                                 grid.dxDataGrid("instance").option('dataSource', comingData.next.details)
                                 form.dxForm('instance').option("readOnly", Boolean(comingData.next.header.docStatus))
-                                grid.dxDataGrid('instance').option("editing", newEditingOption)
                                 $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", Boolean(comingData.next.header.docStatus))
                                 popup.dxPopup('instance').option("title", `Return Order - #${docId ? comingData.next.header.docNbr : "New"} - ${docStatusStore[comingData.next.header.docStatus || 0].text}`)
                                 loadNavigationButton(docId)
