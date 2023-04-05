@@ -214,25 +214,9 @@ $(function () {
                 "groupPanel",
                 "addRowButton",
                 "columnChooserButton",
-                "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
-                "searchPanel"
+                "exportButton"
+                
+                
             ],
         },
         columns: [
@@ -247,6 +231,7 @@ $(function () {
                 dataField: 'companyIdentityUserAssignment.identityUserId',
                 caption: l("UserName"),
                 validationRules: [{ type: "required" }],
+                allowSearch: false,
                 calculateDisplayValue(rowData){
                     if (!rowData.identityUser || rowData.identityUser === null) return "";
                     return rowData.identityUser.userName;
@@ -271,6 +256,7 @@ $(function () {
                 dataField: 'companyIdentityUserAssignment.companyId',
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
                 validationRules: [{ type: "required" }],
+                allowSearch: false,
                 calculateDisplayValue(rowData){
                     if (rowData.company)
                         return rowData.company.name;

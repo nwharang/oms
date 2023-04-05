@@ -360,7 +360,8 @@ $(function () {
             {
                 caption: l("CompanyInZone.Company"),
                 dataField: "companyId",
-                calculateDisplayValue(rowData) {
+                allowSearch: false,
+                calculateDisplayValue(rowData){
                     if (rowData.company) return rowData.company.name;
                     else return "";
                 }, //: "company.name",
@@ -516,9 +517,10 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:CustomerInZone:Customer"),
                 dataField: "customerId",
-                calculateDisplayValue(rowData) {
-                    if (rowData.customer) return rowData.customer.name;
-                    return "";
+                allowSearch: false,
+                calculateDisplayValue(rowData){
+                    if(rowData.customer) return rowData.customer.name;
+                     return "";
                 },
                 validationRules: [{ type: "required" }],
                 lookup: {

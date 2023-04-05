@@ -390,6 +390,7 @@ function initListItemTab() {
                         dataField: 'itemId',
                         caption: l("EntityFieldName:MDMService:ItemGroupList:Item"),
                         validationRules: [{ type: "required" }],
+                        allowSearch: false,
                         calculateDisplayValue(rowData){
                             if(rowData.item){
                                 return rowData.item.name;

@@ -312,25 +312,6 @@ $(function () {
                             });
                             e.cancel = true;
                         },
-                        // headerFilter: {
-                        //     visible: true,
-                        // },
-                        stateStoring: {
-                            enabled: true,
-                            type: 'localStorage',
-                            storageKey: 'dgUOMGroupDetails' + options.key,
-                        },
-                        // paging: {
-                        //     enabled: true,
-                        //     pageSize: pageSize
-                        // },
-                        // pager: {
-                        //     visible: true,
-                        //     showPageSizeSelector: true,
-                        //     allowedPageSizes: allowedPageSizes,
-                        //     showInfo: true,
-                        //     showNavigationButtons: true
-                        // },
                         editing: {
                             mode: "row",
                             allowAdding: abp.auth.isGranted('MdmService.UOMGroupDetails.Create'),
@@ -507,11 +488,15 @@ $(function () {
                                     }
                                 ],
                                 editorType: 'dxSelectBox',
-                                calculateDisplayValue: 'altUOM.code',
                                 lookup: {
                                     dataSource: getUOMs,
                                     valueExpr: 'id',
-                                    displayExpr: 'code',
+                                    displayExpr(e){
+                                        if(e){
+                                            return `${e.code} - ${e.name}`
+                                        }
+                                        return "";
+                                    },
                                     paginate: true,
                                     pageSize: pageSizeForLookup
                                 },
@@ -543,11 +528,15 @@ $(function () {
                                 dataField: "baseUOMId",
                                 validationRules: [{ type: "required" }],
                                 editorType: 'dxSelectBox',
-                                calculateDisplayValue: 'baseUOM.code',
                                 lookup: {
                                     dataSource: getUOMs,
                                     valueExpr: 'id',
-                                    displayExpr: 'code',
+                                    displayExpr(e){
+                                        if(e){
+                                            return `${e.code} - ${e.name}`
+                                        }
+                                        return "";
+                                    },
                                     paginate: true,
                                     pageSize: pageSizeForLookup
                                 },
