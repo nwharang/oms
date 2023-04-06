@@ -74,7 +74,7 @@
         }
     });
     customStore.load().then(() => {
-        const dataGrid = $('#gridProdAttribute').dxDataGrid({
+        const dataGrid = $('#gridProdAttribute').css('max-width', "1000px").dxDataGrid({
             dataSource: {
                 store: customStore,
                 filter: ['active', '=', true]
