@@ -393,7 +393,7 @@ public class OMSMenuContributor : IMenuContributor
                 context.GetLocalizer<OMSResource>()["Menu:SOService:Delivery"],
                 "/SO/Delivery",
                 icon: "fa fa-truck",
-                requiredPermissionName: OrderServicePermissions.Deliveries.Edit
+                requiredPermissionName: OrderServicePermissions.Deliveries.Default
             )
         );
     }
@@ -952,7 +952,7 @@ public class OMSMenuContributor : IMenuContributor
 				context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemAttributeValues"],
                 "/Mdm/ItemAttributeValues",
 				icon: "fa fa-check",
-				requiredPermissionName: MdmServicePermissions.ItemAttributeValues.Default
+				requiredPermissionName: MdmServicePermissions.ItemAttributes.Default
 			).RequireFeatures(MdmFeatures.ItemAttributes)
 		);
 
@@ -1209,7 +1209,7 @@ public class OMSMenuContributor : IMenuContributor
 			   icon: "fa fa-user-secret"
            )
 			.RequirePermissions(false, MdmServicePermissions.CustomerAttributes.Default,
-				MdmServicePermissions.CusAttributeValues.Default,
+				MdmServicePermissions.CustomerAttributes.Default,
 				MdmServicePermissions.Vendors.Default,
 				MdmServicePermissions.CustomerGroups.Default,
 				MdmServicePermissions.CustomerGroupByAtts.Default,
@@ -1239,7 +1239,7 @@ public class OMSMenuContributor : IMenuContributor
 				context.GetLocalizer<OMSResource>()["Menu:MdmService:CusAttributeValues"],
                 "/Mdm/CusAttributeValues",
 				icon: "fa fa-check-square",
-				requiredPermissionName: MdmServicePermissions.CusAttributeValues.Default
+				requiredPermissionName: MdmServicePermissions.CustomerAttributes.Default
 			).RequireFeatures(MdmFeatures.CustomerAttributes)
 		);
 
