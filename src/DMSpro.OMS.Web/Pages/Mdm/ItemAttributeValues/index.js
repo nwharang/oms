@@ -1,16 +1,25 @@
 $(function () {
     // language
-    var l = abp.localization.getResource("OMS");
+    let l = abp.localization.getResource("OMS");
     // load mdmService
-    var itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
-    var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
+    let itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
+    let itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
 
+    /**
+     * 0 : Root
+     * 1 : Flat
+     * 2 : Hierarchy
+     */
+    let _filter = JSON.stringify(['itemAttribute.hierarchyLevel', '<>', null])
+    let createMode;
+    let itemAttr
     //Custom store - for load, update, delete
-    var customStore = new DevExpress.data.CustomStore({
+    let customStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
+            args.filter = _filter
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
@@ -28,16 +37,22 @@ $(function () {
         },
         byKey: function (key) {
             if (key == 0) return null;
-
-            var d = new $.Deferred();
+            let d = new $.Deferred();
             itemAttrValueService.get(key)
                 .done(data => {
                     d.resolve(data);
                 })
             return d.promise();
         },
-        insert(values) {
-            return itemAttrValueService.create(values, { contentType: 'application/json' });
+        insert({ attrValName, code, itemAttributeId, parentId }) {
+            switch (createMode) {
+                case 0:
+                    return itemAttrValueService.createRoot({ attrValName, code, itemAttributeId })
+                case 1:
+                    return itemAttrValueService.createFlat({ attrValName, code, itemAttributeId })
+                case 2:
+                    return itemAttrValueService.createHierarchy({ attrValName, code, parentId, itemAttributeId })
+            }
         },
         update(key, values) {
             return itemAttrValueService.update(key, values, { contentType: 'application/json' });
@@ -48,8 +63,10 @@ $(function () {
     });
 
     // get item attribute
-    var getItemAttr = new DevExpress.data.CustomStore({
+    let getItemAttr = new DevExpress.data.CustomStore({
         key: "id",
+        loadMode: 'raw',
+        cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = { filter: JSON.stringify(['active', '=', true]) };
@@ -68,34 +85,44 @@ $(function () {
                 });
             return deferred.promise();
         },
-        byKey: function (key) {
-            if (key == 0) return null;
-            var d = new $.Deferred();
-            itemAttrService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                })
-            return d.promise();
-        }
     });
-
+    getItemAttr.load({}).then((data) => {
+        itemAttr = [...data]
+    })
     const dataTreeContainer = $('#treeProdAttributeValue').dxTreeList({
-        dataSource: customStore,
+        dataSource: {
+            store: customStore,
+            paginate: true,
+            pageSize
+        },
+        // remoteOperations: {
+        //     filtering: true,
+        //     sorting: true,
+        //     grouping: true,
+        // },
         keyExpr: 'id',
         parentIdExpr: 'parentId',
-        remoteOperations: true,
+        rootValue: null,
+        // autoExpandAll: true,
+        // paging: {
+        //     enabled: true,
+        //     pageSize: pageSize
+        // },
+        // pager: {
+        //     visible: true,
+        //     showPageSizeSelector: true,
+        //     allowedPageSizes: allowedPageSizes,
+        //     showInfo: true,
+        //     showNavigationButtons: true
+        // },
         showRowLines: true,
         showBorders: true,
         cacheEnabled: true,
-        autoExpandAll: true,
         focusedRowEnabled: true,
         allowColumnReordering: true,
-        rowAlternationEnabled: true,
         allowColumnResizing: true,
         columnResizingMode: 'widget',
         columnAutoWidth: true,
-        //columnHidingEnabled: true,
-        //errorRowEnabled: false,
         filterRow: {
             visible: true
         },
@@ -134,27 +161,17 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'treeProdAttributeValue',
-        },
-        paging: {
-            enabled: true,
-            pageSize: pageSize
-        },
-        pager: {
-            visible: true,
-            showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
-            showInfo: true,
-            showNavigationButtons: true
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'treeProdAttributeValue',
+        // },
+
         editing: {
             mode: 'row',
-            allowAdding: abp.auth.isGranted('MdmService.ItemAttributeValues.Create'),
-            allowUpdating: abp.auth.isGranted('MdmService.ItemAttributeValues.Edit'),
-            allowDeleting: abp.auth.isGranted('MdmService.ItemAttributeValues.Delete'),
+            allowAdding: abp.auth.isGranted('MdmService.ItemAttributes.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.ItemAttributes.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.ItemAttributes.Delete'),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -162,31 +179,114 @@ $(function () {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        onEditorPreparing(e) {
-            if (e.dataField === 'parentId' && e.editorOptions.value == 0) {
-                e.editorOptions.value = '';
+        // onEditorPreparing(e) {
+        //     if (e.dataField === 'parentId' && e.editorOptions.value == 0) {
+        //         e.editorOptions.value = '';
+        //     }
+        // },
+        // onInitNewRow(e) {
+        //     var row = e.component.getNodeByKey(e.data.parentId) ? e.component.getNodeByKey(e.data.parentId).data : null;
+        // },
+        // onRowInserting: function (e) {
+        //     if (e.data && e.data.parentId == 0) {
+        //         e.data.parentId = null;
+        //     }
+        // },
+        // onRowUpdating: function (e) {
+        //     e.newData = Object.assign({}, e.oldData, e.newData);
+        // },
+        onEditorPreparing: (e) => {
+            // if (e.dataField === 'parentId' && e.editorOptions.value == 0)
+            // e.editorOptions.value = '';//tlGeoMaster.getKeyByRowIndex(0); //tlGeoMaster.getRootNode().children[0].key;
+            // Editing
+            if ((e.dataField === 'code' || e.dataField === "itemAttributeId") && !e.row?.isNewRow)
+                e.editorOptions.disabled = true;
+            // Creating
+            if (!e.row?.isNewRow) return
+            if (e.dataField === "itemAttributeId" && createMode == 2) {
+                let findChild = itemAttr.find(v => v.hierarchyLevel == e.row.data.level)
+                e.cancel = !findChild
+                e.setValue(findChild.id)
+                e.editorOptions.value = findChild.id;
+                e.editorOptions.disabled = true;
             }
         },
         onInitNewRow(e) {
-            var row = e.component.getNodeByKey(e.data.parentId) ? e.component.getNodeByKey(e.data.parentId).data : null;
-        },
-        onRowInserting: function (e) {
-            if (e.data && e.data.parentId == 0) {
-                e.data.parentId = null;
-            }
+            var row = e.component.getNodeByKey(e.data.parentId);
+            e.data.level = row?.level + 1 || 0;
         },
         onRowUpdating: function (e) {
-            e.newData = Object.assign({}, e.oldData, e.newData);
+            var objectRequire = ['name', 'parentId', 'code', 'level'];
+            for (let property in e.oldData) {
+                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+                    e.newData[property] = e.oldData[property];
+                }
+            }
         },
         toolbar: {
             items: [
-                "groupPanel",
                 {
-                    location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        dataTreeContainer.addRow();
+                    widget: "dxButtonGroup",
+                    location: 'center',
+                    options: {
+                        selectedItemKeys: ['Hierarchy'],
+                        keyExpr: 'text',
+                        onItemClick: (e) => {
+                            if (e.itemData.text === 'Hierarchy') {
+                                _filter = JSON.stringify(['itemAttribute.hierarchyLevel', '<>', null])
+                            }
+                            if (e.itemData.text === 'Attributes')
+                                _filter = JSON.stringify(['itemAttribute.hierarchyLevel', '=', null])
+                            if (e.itemData.text === 'All')
+                                _filter = JSON.stringify([])
+                            dataTreeContainer.refresh()
+                        },
+                        items: [
+                            {
+                                text: 'All',
+                            },
+                            {
+                                text: 'Hierarchy',
+                            },
+                            {
+                                text: 'Attributes',
+                            },
+                        ]
                     }
+                },
+                {
+                    widget: "dxDropDownButton",
+                    location: "after",
+                    options: {
+                        dropDownOptions: {
+                            width: 230,
+                        },
+                        icon: 'preferences',
+                        text: l('Actions'),
+                        visible: true,
+                        width: 120,
+                        elementAttr: {
+                            id: "actionButtonDetailsPanel",
+                        },
+                        items: [
+                            {
+                                text: l('Button:MDMService:ItemAttribute:CreateRoot'),
+                                icon: "add",
+                                onClick: () => {
+                                    createMode = 0
+                                    dataTreeContainer.addRow();
+                                }
+                            },
+                            {
+                                text: l('Button:MDMService:ItemAttribute:CreateHierarchy'),
+                                icon: "add",
+                                onClick: () => {
+                                    createMode = 1
+                                    dataTreeContainer.addRow();
+                                }
+                            }
+                        ]
+                    },
                 },
                 'columnChooserButton',
                 "exportButton",
@@ -214,7 +314,22 @@ $(function () {
                 caption: l("Actions"),
                 type: 'buttons',
                 width: 120,
-                buttons: ['add', 'edit', 'delete'],
+                alignment: 'right',
+                buttons: [{
+                    icon: 'add',
+                    onClick(e) {
+                        createMode = 2
+                        dataTreeContainer.addRow(e.row.key)
+                    },
+                    cssClass: 'btnAddNewRow',
+                    disabled: (e) => !(e.row.data?.itemAttribute?.hierarchyLevel !== null && !e.row.isEditing && abp.auth.isGranted('MdmService.ItemAttributes.Create'))
+
+
+                }, {
+                    name: 'delete',
+                    cssClass: 'btnAddNewRow',
+                    disabled: (e) => !(!e.row.node.hasChildren && !e.row.isEditing && abp.auth.isGranted('MdmService.ItemAttributes.Create'))
+                }, 'edit'],
                 fixedPosition: 'left'
             },
             {
@@ -225,20 +340,33 @@ $(function () {
                         type: "required",
                         message: 'Attribute value name is required'
                     }
-                ]
+                ],
+                width: '100%'
+            },
+            {
+                dataField: 'code',
+                caption: l("EntityFieldName:MDMService:ItemAttributeValue:Code"),
+                validationRules: [
+                    {
+                        type: "required",
+                        message: 'Attribute value code is required'
+                    }
+                ],
+                width: 200
+
             },
             {
                 dataField: 'itemAttributeId',
                 caption: l("EntityFieldName:MDMService:ItemAttributeValue:ItemAttributeName"),
                 editorType: 'dxSelectBox',
-                calculateDisplayValue: 'itemAttribute.attrName',
                 lookup: {
                     valueExpr: 'id',
                     displayExpr: 'attrName',
-                    dataSource: {
-                        store: getItemAttr,
-                        paginate: true,
-                        pageSize: pageSizeForLookup
+                    dataSource: (e) => {
+                        return {
+                            store: getItemAttr,
+                            filter: e?.isEditing ? createMode == 0 ? ["hierarchyLevel", "=", "0"] : ["hierarchyLevel", "=", null] : null
+                        }
                     }
                 },
                 validationRules: [
@@ -248,24 +376,29 @@ $(function () {
                     }
                 ]
             },
-            {
-                caption: l("EntityFieldName:MDMService:ProdAttributeValue:ParentProdAttributeValueId"),
-                dataField: 'parentId',
-                editorType: 'dxSelectBox',
-                visible: false,
-                lookup: {
-                    valueExpr: 'id',
-                    displayExpr: 'name',
-                    dataSource(options) {
-                        return {
-                            store: customStore,
-                            filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    }
-                }
-            }
+            // {
+            //     dataField: 'itemAttribute.hierarchyLevel',
+            //     caption: l("EntityFieldName:MDMService:ItemAttributeValue:ItemAttributeName"),
+            //     visible: false
+            // },
+            // {
+            //     caption: l("EntityFieldName:MDMService:ProdAttributeValue:ParentProdAttributeValueId"),
+            //     dataField: 'parentId',
+            //     editorType: 'dxSelectBox',
+            //     visible: false,
+            //     lookup: {
+            //         valueExpr: 'id',
+            //         displayExpr: 'name',
+            //         dataSource(options) {
+            //             return {
+            //                 store: customStore,
+            //                 filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
+            //                 paginate: true,
+            //                 pageSize: pageSizeForLookup
+            //             };
+            //         }
+            //     }
+            // }
         ]
     }).dxTreeList("instance");
 
