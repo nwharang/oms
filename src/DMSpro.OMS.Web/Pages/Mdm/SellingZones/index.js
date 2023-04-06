@@ -5,10 +5,37 @@ $(function () {
     let customerInZoneService = window.dMSpro.oMS.mdmService.controllers.customerInZones.customerInZone;
     let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     let customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
+    let itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
 
     let salesOrgHierarchyId = null;
     let popup, popupInstance, grid, gridInstance
     /****custom store*****/
+    var itemGroupStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            itemGroupService.getListDevextremes({})
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            itemGroupService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        },
+    });
     var salesOrgHierarchyStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
@@ -136,13 +163,12 @@ $(function () {
             return d.promise();
         },
         insert({ customerId, effectiveDate, endDate, salesOrgHierarchyId }) {
-            console.log(customerId, effectiveDate, endDate, salesOrgHierarchyId);
             // To do , Update when new api coming 😘
+            // For new API requests , customerId is Array[]
+            // return customerInZoneService.Some Thing Here({ customerId, effectiveDate, endDate, salesOrgHierarchyId }, { contentType: "application/json" })
             return customerId.forEach((e) => {
                 customerInZoneService.create({ customerId: e, effectiveDate, endDate, salesOrgHierarchyId }, { contentType: "application/json" })
             })
-            // For new API requests
-            // return customerInZoneService.Some Thing Here({ customerId, effectiveDate, endDate, salesOrgHierarchyId }, { contentType: "application/json" })
         },
         update(key, values) {
             return customerInZoneService.update(key, values, { contentType: "application/json" });
@@ -230,22 +256,20 @@ $(function () {
             return ''
 
         },
-        label: l("Selling Zone"),
+        label: l("Menu:MdmService:SellingZones"),
         labelMode: "floating",
         searchEnabled: true,
         showClearButton: true,
         onSelectionChanged(data) {
             const checkStatus = data.selectedItem != undefined && data.selectedItem.id != null;
-
             //set salesOrgHierarchyId value
             salesOrgHierarchyId = checkStatus ? data.selectedItem.id : null;
-
             companyAssginContainer.option('dataSource', companyInZoneStore);
             customerAssginContainer.option('dataSource', customerInZoneStore);
-
             //update button status
             companyAssginContainer.option("editing.allowAdding", checkStatus);
             customerAssginContainer.option("editing.allowAdding", checkStatus);
+            $("#massInputButton").dxButton('instance').option('visible', salesOrgHierarchyId != null && abp.auth.isGranted('MdmService.CustomerInZones.Create'));
         }
     }).dxSelectBox("instance");
 
@@ -257,11 +281,12 @@ $(function () {
         showRowLines: true,
         showBorders: true,
         cacheEnabled: true,
-        allowColumnReordering: true,
+        allowColumnReordering: false,
         rowAlternationEnabled: true,
         allowColumnResizing: true,
         columnResizingMode: 'widget',
         columnAutoWidth: true,
+        allowColumnDragging: false,
         columnMinWidth: 50,
         paging: {
             enabled: true,
@@ -355,13 +380,13 @@ $(function () {
                 type: 'buttons',
                 width: 120,
                 buttons: ['edit', 'delete'],
-                fixedPosition: 'left'
+                // fixedPosition: 'left'
             },
             {
                 caption: l("CompanyInZone.Company"),
                 dataField: "companyId",
                 allowSearch: false,
-                calculateDisplayValue(rowData){
+                calculateDisplayValue(rowData) {
                     if (rowData.company) return rowData.company.name;
                     else return "";
                 }, //: "company.name",
@@ -396,6 +421,19 @@ $(function () {
                     min: new Date()
                 }
             },
+            {
+                caption: l("Page.Title.ItemGroups"),
+                dataField: "itemGroupId",
+                dataType: "date",
+                lookup: {
+                    dataSource: itemGroupStore,
+                    valueExpr: "id",
+                    displayExpr: "name"
+                },
+                editorOptions: {
+                    min: new Date()
+                }
+            }
         ]
     }).dxDataGrid("instance");
 
@@ -412,6 +450,7 @@ $(function () {
         allowColumnResizing: true,
         columnResizingMode: 'widget',
         columnAutoWidth: true,
+        allowColumnDragging: false,
         filterRow: {
             visible: true
         },
@@ -426,9 +465,9 @@ $(function () {
             enabled: true,
             mode: "select"
         },
-        columnFixing: {
-            enabled: true,
-        },
+        // columnFixing: {
+        //     enabled: true,
+        // },
         export: {
             enabled: true,
         },
@@ -499,9 +538,13 @@ $(function () {
                     widget: 'dxButton',
                     options: {
                         icon: "add",
+                        elementAttr: {
+                            id: 'massInputButton'
+                        },
                         onClick(e) {
                             renderMassInputCus()
                         },
+                        visible: salesOrgHierarchyId != null && abp.auth.isGranted('MdmService.CustomerInZones.Create')
                     },
                 },
             ],
@@ -512,15 +555,15 @@ $(function () {
                 type: 'buttons',
                 width: 120,
                 buttons: ['edit', 'delete'],
-                fixedPosition: 'left'
+                // fixedPosition: 'left'
             },
             {
                 caption: l("EntityFieldName:MDMService:CustomerInZone:Customer"),
                 dataField: "customerId",
                 allowSearch: false,
-                calculateDisplayValue(rowData){
-                    if(rowData.customer) return rowData.customer.name;
-                     return "";
+                calculateDisplayValue(rowData) {
+                    if (rowData.customer) return rowData.customer.name;
+                    return "";
                 },
                 validationRules: [{ type: "required" }],
                 lookup: {
@@ -568,14 +611,21 @@ $(function () {
     });
 
     $("#tab2").click(function () {
-        setTimeout(() => { customerAssginContainer.refresh(); }, 100);
+        setTimeout(() => {
+            customerAssginContainer.refresh();
+            console.log($("#massInputButton").dxButton('instance').option('visible'));
+            $("#massInputButton").dxButton('instance').option('visible', salesOrgHierarchyId != null && abp.auth.isGranted('MdmService.CustomerInZones.Create'));
+        }, 100);
     });
 
     function renderMassInputCus() {
         popup = $("<div id='popup'>").dxPopup({
-            title: "Mass Input",
+            title: l('EntityFieldName:MDMService:CustomerInZone:MassInput'),
             height: '75vh',
             width: '80vw',
+            dragEnabled: false,
+            allowColumnReordering: false,
+            allowColumnDragging: false,
             contentTemplate: (e) => {
                 customerService.getListDevextremes({ filter: JSON.stringify(["active", "=", "true"]) }).done(({ data }) => {
                     grid = $("<div id='grid'>").dxDataGrid({
@@ -594,8 +644,10 @@ $(function () {
                             selectAllMode: 'page'
                         },
                         showBorders: true,
+                        allowColumnDragging: false,
                         columnAutoWidth: true,
                         showRowLines: true,
+                        rowAlternationEnabled: true,
                         showColumnLines: true,
                         columnChooser: {
                             enabled: true,
@@ -665,23 +717,23 @@ $(function () {
                                 }
                             },
                             {
-                                caption: l("EntityFieldName:MDMService:CustomerInZone:EndDate"),
+                                caption: l("EntityFieldName:MDMService:GeoMaster:Level4"),
                                 dataField: "geoMaster4.name",
                             },
                             {
-                                caption: l("EntityFieldName:MDMService:CustomerInZone:EndDate"),
+                                caption: l("EntityFieldName:MDMService:GeoMaster:Level3"),
                                 dataField: "geoMaster3.name",
                             },
                             {
-                                caption: l("EntityFieldName:MDMService:CustomerInZone:EndDate"),
+                                caption: l("EntityFieldName:MDMService:GeoMaster:Level2"),
                                 dataField: "geoMaster2.name",
                             },
                             {
-                                caption: l("EntityFieldName:MDMService:CustomerInZone:EndDate"),
+                                caption: l("EntityFieldName:MDMService:GeoMaster:Level1"),
                                 dataField: "geoMaster1.name",
                             },
                             {
-                                caption: l("EntityFieldName:MDMService:CustomerInZone:EndDate"),
+                                caption: l("EntityFieldName:MDMService:GeoMaster:Level0"),
                                 dataField: "geoMaster0.name",
                             },
                         ]
@@ -705,7 +757,7 @@ $(function () {
                             effectiveDate: $("#cusBatchInputEffectiveDate").dxDateBox('instance').option('value'),
                             endDate: $("#cusBatchInputEndDate").dxDateBox('instance').option('value'),
                         }
-                        customerAssginContainer.getDataSource().store().insert(data).then(()=> {
+                        customerAssginContainer.getDataSource().store().insert(data).then(() => {
                             popupInstance.beginUpdate()
                             customerAssginContainer.refresh().then(() => {
                                 popupInstance.endUpdate()
