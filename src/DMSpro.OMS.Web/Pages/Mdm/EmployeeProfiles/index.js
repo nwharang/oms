@@ -86,6 +86,7 @@ $(function () {
 
     var employeeTypeStore = new DevExpress.data.CustomStore({
         key: 'id',
+        useDefaultSearch: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -376,7 +377,6 @@ $(function () {
                 // calculateDisplayValue: "employeeType",
                 allowSearch: false,
                 calculateDisplayValue(rowData){
-                    //console.log(rowData.geoLevel2);
                     if(rowData.employeeType){
                         return rowData.employeeType.valueName;
                     }
@@ -386,6 +386,7 @@ $(function () {
                 lookup: {
                     dataSource: {
                         store: employeeTypeStore,
+                        filter: ['code', '=', 'MD03'],
                     },
                     displayExpr: 'valueName',
                     valueExpr: 'id',

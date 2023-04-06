@@ -864,8 +864,7 @@
             },
         ],
         onInitNewRow: function (e) {
-            // e.data.sfaCustomerCode = "sfaCode";
-            e.data.effectiveDate = new Date().toString();
+            e.data.effectiveDate = new Date().toISOString();
             e.data.active = true;
         },
     }).dxDataGrid("instance");
