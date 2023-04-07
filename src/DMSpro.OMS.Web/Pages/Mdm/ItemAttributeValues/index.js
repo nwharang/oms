@@ -4,22 +4,25 @@ $(function () {
     // load mdmService
     let itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
     let itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
+    let isFirstLoad = false;
 
     /**
      * 0 : Root
      * 1 : Flat
      * 2 : Hierarchy
      */
-    let _filter = JSON.stringify(['itemAttribute.hierarchyLevel', '<>', null])
+    // let _filter = JSON.stringify(['itemAttribute.hierarchyLevel', '<>', null])
     let createMode;
     let itemAttr
     //Custom store - for load, update, delete
     let customStore = new DevExpress.data.CustomStore({
         key: "id",
+        loadMode: 'raw',
+        cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            args.filter = _filter
+            // args.filter = _filter
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
@@ -27,6 +30,19 @@ $(function () {
             });
             itemAttrValueService.getListDevextremes(args)
                 .done(result => {
+                    // let obj = [
+                    //     "753aad93-9ea5-cd0d-8bf3-3a09f0590fe8",
+                    //     "c5048a65-83cd-7ca6-ea6f-3a09f059dc1a",
+                    //     "7657a10d-6045-06bb-dcd9-3a0a67ab30b3",
+                    //     "18ba7e9c-b9f4-c186-7a48-3a0a67c7a530",
+                    //     "f9f5fb93-2300-359e-4024-3a0a67c9b7b9"
+                    // ]
+                    // result.data = result.data.map(e => {
+                    //     return {
+                    //         ...e,
+                    //         hasChild: Boolean(obj.find(v => v === e.id))
+                    //     }
+                    // })
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -90,11 +106,7 @@ $(function () {
         itemAttr = [...data]
     })
     const dataTreeContainer = $('#treeProdAttributeValue').dxTreeList({
-        dataSource: {
-            store: customStore,
-            paginate: true,
-            pageSize
-        },
+        dataSource: customStore,
         // remoteOperations: {
         //     filtering: true,
         //     sorting: true,
@@ -103,18 +115,8 @@ $(function () {
         keyExpr: 'id',
         parentIdExpr: 'parentId',
         rootValue: null,
-        // autoExpandAll: true,
-        // paging: {
-        //     enabled: true,
-        //     pageSize: pageSize
-        // },
-        // pager: {
-        //     visible: true,
-        //     showPageSizeSelector: true,
-        //     allowedPageSizes: allowedPageSizes,
-        //     showInfo: true,
-        //     showNavigationButtons: true
-        // },
+        autoExpandAll: false,
+        expandNodesOnFiltering: false,
         showRowLines: true,
         showBorders: true,
         cacheEnabled: true,
@@ -179,26 +181,7 @@ $(function () {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        // onEditorPreparing(e) {
-        //     if (e.dataField === 'parentId' && e.editorOptions.value == 0) {
-        //         e.editorOptions.value = '';
-        //     }
-        // },
-        // onInitNewRow(e) {
-        //     var row = e.component.getNodeByKey(e.data.parentId) ? e.component.getNodeByKey(e.data.parentId).data : null;
-        // },
-        // onRowInserting: function (e) {
-        //     if (e.data && e.data.parentId == 0) {
-        //         e.data.parentId = null;
-        //     }
-        // },
-        // onRowUpdating: function (e) {
-        //     e.newData = Object.assign({}, e.oldData, e.newData);
-        // },
         onEditorPreparing: (e) => {
-            // if (e.dataField === 'parentId' && e.editorOptions.value == 0)
-            // e.editorOptions.value = '';//tlGeoMaster.getKeyByRowIndex(0); //tlGeoMaster.getRootNode().children[0].key;
-            // Editing
             if ((e.dataField === 'code' || e.dataField === "itemAttributeId") && !e.row?.isNewRow)
                 e.editorOptions.disabled = true;
             // Creating
@@ -212,15 +195,21 @@ $(function () {
             }
         },
         onInitNewRow(e) {
-            var row = e.component.getNodeByKey(e.data.parentId);
+            let row = e.component.getNodeByKey(e.data.parentId);
             e.data.level = row?.level + 1 || 0;
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['name', 'parentId', 'code', 'level'];
+            let objectRequire = ['name', 'parentId', 'code', 'level'];
             for (let property in e.oldData) {
                 if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                     e.newData[property] = e.oldData[property];
                 }
+            }
+        },
+        onContentReady: function (e) {
+            if (!isFirstLoad) {
+                dataTreeContainer.option('filterValue', ['itemAttribute.hierarchyLevel', '<>', null])
+                isFirstLoad = true;
             }
         },
         toolbar: {
@@ -232,14 +221,13 @@ $(function () {
                         selectedItemKeys: ['Hierarchy'],
                         keyExpr: 'text',
                         onItemClick: (e) => {
-                            if (e.itemData.text === 'Hierarchy') {
-                                _filter = JSON.stringify(['itemAttribute.hierarchyLevel', '<>', null])
-                            }
+                            if (e.itemData.text === 'Hierarchy')
+                                dataTreeContainer.option('filterValue', ['itemAttribute.hierarchyLevel', '<>', null])
+
                             if (e.itemData.text === 'Attributes')
-                                _filter = JSON.stringify(['itemAttribute.hierarchyLevel', '=', null])
+                                dataTreeContainer.option('filterValue', ['itemAttribute.hierarchyLevel', '=', null])
                             if (e.itemData.text === 'All')
-                                _filter = JSON.stringify([])
-                            dataTreeContainer.refresh()
+                                dataTreeContainer.option('filterValue', [])
                         },
                         items: [
                             {
@@ -299,9 +287,9 @@ $(function () {
                             class: "import-excel",
                         },
                         onClick(e) {
-                            var gridControl = e.element.closest('div.dx-treelist');
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            let gridControl = e.element.closest('div.dx-treelist');
+                            let gridName = gridControl.attr('id');
+                            let popup = $(`div.${gridName}.popupImport`).data('dxPopup');
                             if (popup) popup.show();
                         }
                     }
@@ -376,29 +364,11 @@ $(function () {
                     }
                 ]
             },
-            // {
-            //     dataField: 'itemAttribute.hierarchyLevel',
-            //     caption: l("EntityFieldName:MDMService:ItemAttributeValue:ItemAttributeName"),
-            //     visible: false
-            // },
-            // {
-            //     caption: l("EntityFieldName:MDMService:ProdAttributeValue:ParentProdAttributeValueId"),
-            //     dataField: 'parentId',
-            //     editorType: 'dxSelectBox',
-            //     visible: false,
-            //     lookup: {
-            //         valueExpr: 'id',
-            //         displayExpr: 'name',
-            //         dataSource(options) {
-            //             return {
-            //                 store: customStore,
-            //                 filter: options.data ? ["!", ["name", "=", options.data.name]] : null,
-            //                 paginate: true,
-            //                 pageSize: pageSizeForLookup
-            //             };
-            //         }
-            //     }
-            // }
+            {
+                dataField: 'itemAttribute.hierarchyLevel',
+                caption: l("EntityFieldName:MDMService:ItemAttributeValue:ItemAttributeName"),
+                visible: false
+            },
         ]
     }).dxTreeList("instance");
 
