@@ -5,9 +5,11 @@ $(function () {
 
     var cusAttributes = new DevExpress.data.CustomStore({
         key: 'id',
+        loadMode: 'raw',
+        cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
-            const args = { filter: JSON.stringify(['active', '=', true]) };
+            const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
@@ -16,7 +18,6 @@ $(function () {
 
             cusAttributeService.getListDevextremes(args)
                 .done(result => {
-                    //console.log('data:', result)
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -25,9 +26,6 @@ $(function () {
                 });
 
             return deferred.promise();
-        },
-        byKey: function (key) {
-            return key == 0 ? cusAttributeService.get(key) : null;
         }
     });
 
@@ -45,7 +43,6 @@ $(function () {
 
             cusAttributesValueService.getListDevextremes(args)
                 .done(result => {
-                    //console.log('data:', result)
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -70,7 +67,6 @@ $(function () {
     });
     var gridCusAttributeValues = $('#dgCusAttributeValues').dxDataGrid({
         dataSource: customStore,
-        keyExpr: "id",
         editing: {
             mode: "row",
             allowAdding: abp.auth.isGranted('MdmService.CustomerAttributes.Create'),
@@ -83,23 +79,7 @@ $(function () {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        onEditorPreparing(e) {
-            if (e.rowType === "data" && e.column.command == "edit") {
-                var grid = e.component;
-                var index = e.row.rowIndex;
-                var value = grid.cellValue(index, "parentCusAttributeValueId");
-                if (!value) {
-                    //e.cellElement.css("background-color", "yellow");
-                    //e.cellElement.find(".dx-link-edit").remove();
-                    e.cellElement.find(".dx-link-edit").disable();
-                }
-            }
-        },
         onRowInserting: function (e) {
-            // for create first data - if parentId = 0, update parentId = null
-            if (e.data && e.data.parentCusAttributeValueId == 0) {
-                e.data.parentCusAttributeValueId = null;
-            }
         },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
@@ -151,11 +131,11 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dgCusAttributeValues',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'dgCusAttributeValues',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -195,7 +175,7 @@ $(function () {
                             if (popup) popup.show();
                         },
                     },
-                }, 
+                },
                 "searchPanel"
             ],
         },
@@ -216,76 +196,18 @@ $(function () {
             {
                 dataField: 'customerAttributeId',
                 caption: l("EntityFieldName:MDMService:CusAttributeValue:AttrNo"),
-                calculateDisplayValue: 'customerAttribute.attrName',
                 lookup: {
-                    //dataSource: cusAttributes,
                     dataSource: {
                         store: cusAttributes,
-                        paginate: true,
-                        pageSize: pageSizeForLookup,
-                        filter: ["active", "=", "true"],
+                        filter: ["active", "=", true],
                     },
                     valueExpr: "id",
                     displayExpr: "attrName"
                 },
                 validationRules: [{ type: "required" }]
             },
-            {
-                dataField: 'parentCusAttributeValueId',
-                caption: l("EntityFieldName:MDMService:CusAttributeValue:ParentName"),
-                lookup: {
-                    dataSource(options) {
-                        return {
-                            store: customStore,
-                            filter: options.data ? ["!", ["attrValName", "=", options.data.attrValName]] : null,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
-                    },
-                    valueExpr: "id",
-                    displayExpr: "attrValName"
-                }
-            },
-            //{
-            //    dataField: 'active',
-            //    caption: l("EntityFieldName:MDMService:CusAttributeValue:Active"),
-            //    width: 110,
-            //    alignment: 'center',
-            //    dataType: 'boolean',
-            //    cellTemplate(container, options) {
-            //        $('<div>')
-            //            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-            //            .appendTo(container);
-            //    }
-            //}
         ],
     }).dxDataGrid("instance");
     initImportPopup('api/mdm-service/cus-attribute-values', 'CusAttributeValues_Template', 'dgCusAttributeValues');
-    //$("input#Search").on("input", function () {
-    //    gridCusAttributeValues.searchByText($(this).val());
-    //});
 
-    //$("#btnNewCusAttributeValue").click(function (e) {
-    //    gridCusAttributeValues.addRow();
-    //});
-
-    //$("#ExportToExcelButton").click(function (e) {
-    //    e.preventDefault();
-
-    //    cusAttributesValueService.getDownloadToken().then(
-    //        function (result) {
-    //            var input = getFilter();
-    //            var url = abp.appPath + 'api/mdm-service/sales-channels/as-excel-file' +
-    //                abp.utils.buildQueryString([
-    //                    { name: 'downloadToken', value: result.token },
-    //                    { name: 'filterText', value: input.filterText },
-    //                    { name: 'code', value: input.code },
-    //                    { name: 'name', value: input.name }
-    //                ]);
-
-    //            var downloadWindow = window.open(url, '_blank');
-    //            downloadWindow.focus();
-    //        }
-    //    )
-    //});
 });
