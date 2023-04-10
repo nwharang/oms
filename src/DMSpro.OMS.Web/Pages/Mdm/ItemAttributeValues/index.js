@@ -30,19 +30,6 @@ $(function () {
             });
             itemAttrValueService.getListDevextremes(args)
                 .done(result => {
-                    // let obj = [
-                    //     "753aad93-9ea5-cd0d-8bf3-3a09f0590fe8",
-                    //     "c5048a65-83cd-7ca6-ea6f-3a09f059dc1a",
-                    //     "7657a10d-6045-06bb-dcd9-3a0a67ab30b3",
-                    //     "18ba7e9c-b9f4-c186-7a48-3a0a67c7a530",
-                    //     "f9f5fb93-2300-359e-4024-3a0a67c9b7b9"
-                    // ]
-                    // result.data = result.data.map(e => {
-                    //     return {
-                    //         ...e,
-                    //         hasChild: Boolean(obj.find(v => v === e.id))
-                    //     }
-                    // })
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -67,7 +54,7 @@ $(function () {
                 case 1:
                     return itemAttrValueService.createFlat({ attrValName, code, itemAttributeId })
                 case 2:
-                    return itemAttrValueService.createHierarchy({ attrValName, code, parentId, itemAttributeId })
+                    return itemAttrValueService.createHierarchy({ attrValName, code, parentId })
             }
         },
         update(key, values) {
