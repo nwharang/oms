@@ -140,12 +140,18 @@ function initChooseItemsPopup(items) {
                 cellTemplate(container, options) {
                     $('<div>').dxNumberBox({
                         value: options.value,
-                        min: 0,
-                        value: 1,
+                        min: 1,
                         height: '23px',
                         onValueChanged: function (e) {
                             options.data.qty = e.value;
-                        }
+                        },
+                        onKeyDown(e) {
+                            const { event } = e;
+                            const str = event.key || String.fromCharCode(event.which);
+                            if (/^[.,e]$/.test(str)) {
+                                event.preventDefault();
+                            }
+                        },
                     })
                         .appendTo(container);
                 }
