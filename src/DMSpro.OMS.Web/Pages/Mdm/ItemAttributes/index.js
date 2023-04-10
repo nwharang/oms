@@ -1,5 +1,5 @@
 ﻿$(function () {
-    let gridInfo = {}, sendMode
+    let gridInfo = {}, sendMode = 0
     let itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
     let l = abp.localization.getResource("OMS");
     let dialog = ({ header, body }, callBackIfTrue, callBackIfFalse) => {
@@ -58,7 +58,7 @@
                 })
             return d.promise();
         },
-        insert({ attrName, sendMode }) {
+        insert({ attrName }) {
             switch (sendMode) {
                 case 0:
                     return itemAttrService.createFlat({ attrName })
@@ -109,7 +109,6 @@
             },
             onRowInserting: (e) => {
                 e.data.active = true
-                e.data.sendMode = sendMode
             },
             toolbar: {
                 items: [
