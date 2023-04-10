@@ -65,7 +65,7 @@ $(function () {
             return cusAttributesValueService.delete(key);
         }
     });
-    var gridCusAttributeValues = $('#dgCusAttributeValues').dxDataGrid({
+    var gridCustomerAttributeValues = $('#dgCustomerAttributeValues').dxDataGrid({
         dataSource: customStore,
         editing: {
             mode: "row",
@@ -134,7 +134,7 @@ $(function () {
         // stateStoring: {
         //     enabled: true,
         //     type: 'localStorage',
-        //     storageKey: 'dgCusAttributeValues',
+        //     storageKey: 'dgCustomerAttributeValues',
         // },
         paging: {
             enabled: true,
@@ -154,7 +154,7 @@ $(function () {
                     location: 'after',
                     template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
                     onClick() {
-                        gridCusAttributeValues.addRow();
+                        gridCustomerAttributeValues.addRow();
                     },
                 },
                 'columnChooserButton',
@@ -208,6 +208,6 @@ $(function () {
             },
         ],
     }).dxDataGrid("instance");
-    initImportPopup('api/mdm-service/cus-attribute-values', 'CusAttributeValues_Template', 'dgCusAttributeValues');
+    initImportPopup('api/mdm-service/cus-attribute-values', 'CustomerAttributeValues_Template', 'dgCustomerAttributeValues');
 
 });

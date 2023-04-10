@@ -16,7 +16,6 @@ using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.OpenIddict.Pro.Web.Menus;
 using Volo.Saas.Host.Navigation;
 using DMSpro.OMS.MdmService.Permissions;
-using DMSpro.OMS.MdmService.Web.Menus;
 using DMSpro.OMS.MdmService;
 using Volo.Abp.Features;
 using System.Collections.Generic;
@@ -29,7 +28,6 @@ using DMSpro.OMS.OrderService.Permissions;
 using Volo.Saas.Localization;
 using Volo.Saas.Host;
 using DMSpro.OMS.InventoryService.Web.Menus;
-using DMSpro.OMS.InventoryService;
 
 namespace DMSpro.OMS.Web.Navigation;
 
@@ -95,8 +93,8 @@ public class OMSMenuContributor : IMenuContributor
 
         context.Menu.SetSubItemOrder(SaasHostMenuNames.GroupName, 3);
 
-		//saas
-		//AddModuleSaaSMenuItem(context);
+        //saas
+        //AddModuleSaaSMenuItem(context);
         //Administration
         var administration = context.Menu.GetAdministration();
         administration.Order = 4;
@@ -119,39 +117,39 @@ public class OMSMenuContributor : IMenuContributor
         //Administration->Settings
         administration.SetSubItemOrder(SettingManagementMenuNames.GroupName, 6);
 
-		//mdm
-		var mdmMenu = AddModuleMdmMenuItem(context);
+        //mdm
+        var mdmMenu = AddModuleMdmMenuItem(context);
         AddMenuItemSystem(context, mdmMenu);
-		AddMenuItemGeographical(context, mdmMenu);
-		AddMenuItemCompanies(context, mdmMenu);
-		AddMenuProductItems(context, mdmMenu);
-		AddMenuItemSalesOrganizations(context, mdmMenu);
-		AddMenuItemCustomers(context, mdmMenu);
-		AddMenuItemRouteAndMCP(context, mdmMenu);
+        AddMenuItemGeographical(context, mdmMenu);
+        AddMenuItemCompanies(context, mdmMenu);
+        AddMenuProductItems(context, mdmMenu);
+        AddMenuItemSalesOrganizations(context, mdmMenu);
+        AddMenuItemCustomers(context, mdmMenu);
+        AddMenuItemRouteAndMCP(context, mdmMenu);
 
-		//inventory
-		AddModuleInventoryMenuItem(context);
-		//po
-		var poMenu = AddModulePOMenuItem(context);
-		AddMenuItemPurchaseRequestHeaders(context, poMenu);
-		AddMenuItemPurchaseOrderHeaders(context, poMenu);
-		AddMenuItemPurchaseReceiptHeaders(context, poMenu); 
-		AddMenuItemGoodsReturnRequestHeaders(context, poMenu);
-		AddMenuItemGoodsReturnHeaders(context, poMenu);
+        //inventory
+        AddModuleInventoryMenuItem(context);
+        //po
+        var poMenu = AddModulePOMenuItem(context);
+        AddMenuItemPurchaseRequestHeaders(context, poMenu);
+        AddMenuItemPurchaseOrderHeaders(context, poMenu);
+        AddMenuItemPurchaseReceiptHeaders(context, poMenu);
+        AddMenuItemGoodsReturnRequestHeaders(context, poMenu);
+        AddMenuItemGoodsReturnHeaders(context, poMenu);
 
-		//so
-		var soMenu = AddModuleSOMenuItem(context);
-		AddMenuItemSalesRequestHeaders(context, soMenu);
-		AddMenuItemSalesOrderHeaders(context, soMenu);
-		AddMenuItemDeliveryHeaders(context, soMenu);
-        AddMenuItemArInvoiceHeaders(context, soMenu); 
+        //so
+        var soMenu = AddModuleSOMenuItem(context);
+        AddMenuItemSalesRequestHeaders(context, soMenu);
+        AddMenuItemSalesOrderHeaders(context, soMenu);
+        AddMenuItemDeliveryHeaders(context, soMenu);
+        AddMenuItemArInvoiceHeaders(context, soMenu);
         AddMenuItemReturnOrderHeaders(context, soMenu);
         AddMenuItemArCreditMemoHeaders(context, soMenu);
         //AddMenuItemProcessSalesOrderHeaders(context, soMenu);
         //AddMenuItemProcessDeliveryHeaders(context, soMenu);
         //AddMenuItemProcessSOToInvoice(context, soMenu);
 
-		//maps
+        //maps
         var mapsMenu = AddModuleMapsMenuItem(context);
     }
     private static ApplicationMenuItem AddModuleMapsMenuItem(MenuConfigurationContext context)
@@ -269,7 +267,7 @@ public class OMSMenuContributor : IMenuContributor
 
     private static void AddMenuItemPurchaseOrderDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
     {
-		//same permission
+        //same permission
         parentMenu.AddItem(
             new ApplicationMenuItem(
                 OrderServiceMenus.PurchaseOrderDetails,
@@ -293,7 +291,7 @@ public class OMSMenuContributor : IMenuContributor
             )
         );
     }
-	//removed
+    //removed
     //private static void AddMenuItemPurchaseReceiptDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
     //{
     //    parentMenu.AddItem(
@@ -372,20 +370,20 @@ public class OMSMenuContributor : IMenuContributor
         );
     }
 
-	//private static void AddMenuItemSalesRequestDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-	//{
-	//	parentMenu.AddItem(
-	//		new ApplicationMenuItem(
-	//			OrderServiceMenus.SalesRequestDetails,
-	//			context.GetLocalizer<OrderServiceResource>()["Menu:SalesRequestDetails"],
-	//			"/SalesRequestDetails",
-	//			icon: "fa fa-file-alt",
-	//			requiredPermissionName: OrderServicePermissions.SalesRequestDetails.Default
-	//		)
-	//	);
-	//}
+    //private static void AddMenuItemSalesRequestDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    //{
+    //	parentMenu.AddItem(
+    //		new ApplicationMenuItem(
+    //			OrderServiceMenus.SalesRequestDetails,
+    //			context.GetLocalizer<OrderServiceResource>()["Menu:SalesRequestDetails"],
+    //			"/SalesRequestDetails",
+    //			icon: "fa fa-file-alt",
+    //			requiredPermissionName: OrderServicePermissions.SalesRequestDetails.Default
+    //		)
+    //	);
+    //}
 
-	private static void AddMenuItemDeliveryHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    private static void AddMenuItemDeliveryHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
     {
         parentMenu.AddItem(
             new ApplicationMenuItem(
@@ -435,31 +433,31 @@ public class OMSMenuContributor : IMenuContributor
     //}
 
     private static void AddMenuItemArInvoiceHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-	{
-		parentMenu.AddItem(
-			new ApplicationMenuItem(
-				OrderServiceMenus.ArHeaders,
-				context.GetLocalizer<OMSResource>()["Menu:SOService:ArInvoice"],
+    {
+        parentMenu.AddItem(
+            new ApplicationMenuItem(
+                OrderServiceMenus.ArHeaders,
+                context.GetLocalizer<OMSResource>()["Menu:SOService:ArInvoice"],
                 "/SO/ARInvoice",
-				icon: "fa fa-check-circle-o",
-				requiredPermissionName: OrderServicePermissions.ArInvoices.Default
-			)
-		);
-	}
+                icon: "fa fa-check-circle-o",
+                requiredPermissionName: OrderServicePermissions.ArInvoices.Default
+            )
+        );
+    }
 
-	//private static void AddMenuItemArDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-	//{
-	//	parentMenu.AddItem(
-	//		new ApplicationMenuItem(
-	//			OrderServiceMenus.ArDetails,
-	//			context.GetLocalizer<OrderServiceResource>()["Menu:ArDetails"],
-	//			"/ArDetails",
-	//			icon: "fa fa-file-alt",
-	//			requiredPermissionName: OrderServicePermissions.ArDetails.Default
-	//		)
-	//	);
-	//} 
-	private static void AddMenuItemReturnOrderHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    //private static void AddMenuItemArDetails(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    //{
+    //	parentMenu.AddItem(
+    //		new ApplicationMenuItem(
+    //			OrderServiceMenus.ArDetails,
+    //			context.GetLocalizer<OrderServiceResource>()["Menu:ArDetails"],
+    //			"/ArDetails",
+    //			icon: "fa fa-file-alt",
+    //			requiredPermissionName: OrderServicePermissions.ArDetails.Default
+    //		)
+    //	);
+    //} 
+    private static void AddMenuItemReturnOrderHeaders(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
     {
         parentMenu.AddItem(
             new ApplicationMenuItem(
@@ -510,29 +508,29 @@ public class OMSMenuContributor : IMenuContributor
     //        )
     //    );
     //}
-    
+
     private static void AddModuleSurveyMenuItem(MenuConfigurationContext context)
-	{
-        var formMenuItem = new ApplicationMenuItem(FormsMenus.GroupName, 
-			context.GetLocalizer<FormsResource>()["Menu:Survey"], icon: "fa fa-tachometer", url: "/Forms");
+    {
+        var formMenuItem = new ApplicationMenuItem(FormsMenus.GroupName,
+            context.GetLocalizer<FormsResource>()["Menu:Survey"], icon: "fa fa-tachometer", url: "/Forms");
         context.Menu.AddItem(formMenuItem);
     }
-	private static void AddModuleInventoryMenuItem(MenuConfigurationContext context)
-	{
-		var moduleMenu = new ApplicationMenuItem(
-			InventoryServicePermissions.GroupName,
-			context.GetLocalizer<OMSResource>()["Menu:InventoryService:GroupMenu:Inventory"],
-			icon: "fa fa-bookmark"
-		);
+    private static void AddModuleInventoryMenuItem(MenuConfigurationContext context)
+    {
+        var moduleMenu = new ApplicationMenuItem(
+            InventoryServicePermissions.GroupName,
+            context.GetLocalizer<OMSResource>()["Menu:InventoryService:GroupMenu:Inventory"],
+            icon: "fa fa-bookmark"
+        );
 
-		context.Menu.Items.AddIfNotContains(moduleMenu);
+        context.Menu.Items.AddIfNotContains(moduleMenu);
 
         moduleMenu.AddItem(new ApplicationMenuItem(
                 InventoryServiceMenus.Prefix,
                 context.GetLocalizer<OMSResource>()["Menu:InventoryService:Warehouses"],
                 "/Inventories/Warehouses",
                 icon: "fa fa-list-ul",
-				requiredPermissionName: InventoryServicePermissions.Warehouses.Default
+                requiredPermissionName: InventoryServicePermissions.Warehouses.Default
             ));
 
         moduleMenu.AddItem(new ApplicationMenuItem(
@@ -708,8 +706,8 @@ public class OMSMenuContributor : IMenuContributor
         //iNTransferSplitPermission.AddChild(InventoryServicePermissions.INTransferSplits.Edit, L("Permission:Edit"));
         //iNTransferSplitPermission.AddChild(InventoryServicePermissions.INTransferSplits.Delete, L("Permission:Delete"));
     }
-	private static void AddModuleSaaSMenuItem(MenuConfigurationContext context)
-	{
+    private static void AddModuleSaaSMenuItem(MenuConfigurationContext context)
+    {
         var l = context.GetLocalizer<SaasResource>();
 
         var saasMenu = new ApplicationMenuItem(SaasHostMenuNames.GroupName, l["Menu:Saas"], icon: "fal fa-globe");
@@ -727,368 +725,368 @@ public class OMSMenuContributor : IMenuContributor
             l["Editions"],
             url: "~/Saas/Host/Editions",
             icon: "fa fa-th"
-            ).RequirePermissions(SaasHostPermissions.Tenants.Default));  
+            ).RequirePermissions(SaasHostPermissions.Tenants.Default));
     }
     private static ApplicationMenuItem AddModuleMdmMenuItem(MenuConfigurationContext context)
-	{
-		//InventoryServiceMenus.Prefix;
-		//OMSResource
-		//InventoryFeatures.Enable;
+    {
+        //InventoryServiceMenus.Prefix;
+        //OMSResource
+        //InventoryFeatures.Enable;
 
         var moduleMenu = new ApplicationMenuItem(
-			MdmServiceMenus.Prefix,
-			context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:Mdm"],
-			icon: "fal fal fa-window"
-		).RequireFeatures(MdmFeatures.Enable);
+            MdmServiceMenus.Prefix,
+            context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:Mdm"],
+            icon: "fal fal fa-window"
+        ).RequireFeatures(MdmFeatures.Enable);
 
-		context.Menu.Items.AddIfNotContains(moduleMenu);
-		return moduleMenu;
-	}
+        context.Menu.Items.AddIfNotContains(moduleMenu);
+        return moduleMenu;
+    }
 
-	private static void AddMenuItemSystem(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-	{
-		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
-			   MdmServiceMenus.Administration,
-			   context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:Administration"],
-			   null,
-			   icon: "fa fa-cogs"
-		   )
-			.RequirePermissions(false, MdmServicePermissions.SystemData.Default,
-				MdmServicePermissions.SystemConfig.Default, MdmServicePermissions.NumberingConfigs.Default)
-			.RequireFeatures(false, MdmFeatures.SystemData, MdmFeatures.SystemConfig, MdmFeatures.NumberingConfig);
-
-		parentMenu.AddItem(groupMenu);
-
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.SystemData,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:SystemData"],
-				"/Mdm/SystemDatas",
-				icon: "fa fa-database",
-				requiredPermissionName: MdmServicePermissions.SystemData.Default
-			).RequireFeatures(MdmFeatures.SystemData)
-		);
-
-		//removed
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.SystemConfig,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:SystemConfigs"],
-		//		"/SystemConfigs",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.SystemConfig.Default
-		//	).RequireFeatures(MdmFeatures.SystemConfig)
-		//);
-
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.NumberingConfig,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:NumberingConfigs"],
-				"/Mdm/NumberingConfigs",
-				icon: "fa fa-file-code-o",
-				requiredPermissionName: MdmServicePermissions.NumberingConfigs.Default
-			).RequireFeatures(MdmFeatures.NumberingConfig)
-		);
-	}
-
-	private static void AddMenuItemGeographical(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-	{
-		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
-			   MdmServiceMenus.Geographical,
-			   context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:Geographical"],
-			   null,
-			   icon: "fa fa-map-pin"
+    private static void AddMenuItemSystem(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    {
+        ApplicationMenuItem groupMenu = new ApplicationMenuItem(
+               MdmServiceMenus.Administration,
+               context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:Administration"],
+               null,
+               icon: "fa fa-cogs"
            )
-			.RequirePermissions(false, MdmServicePermissions.GeoMasters.Default)
-			.RequireFeatures(false, MdmFeatures.GeoMaster);
+            .RequirePermissions(false, MdmServicePermissions.SystemData.Default,
+                MdmServicePermissions.SystemConfig.Default, MdmServicePermissions.NumberingConfigs.Default)
+            .RequireFeatures(false, MdmFeatures.SystemData, MdmFeatures.SystemConfig, MdmFeatures.NumberingConfig);
 
-		parentMenu.AddItem(groupMenu);
+        parentMenu.AddItem(groupMenu);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.GeoMasters,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:GeoMasters"],
-				"/Mdm/GeoMasters",
-				icon: "fa fa-map",
-				requiredPermissionName: MdmServicePermissions.GeoMasters.Default
-			).RequireFeatures(MdmFeatures.GeoMaster)
-		);
-		//map
-		//set tạm thời. vì chưa có permission cho map
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.Maps,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:Maps"],
-		//		"/Mdm/Maps",
-		//		icon: "fas fa-map-marked",
-  //              requiredPermissionName: MdmServicePermissions.GeoMasters.Default
-  //          ).RequireFeatures(MdmFeatures.GeoMaster)
-  //      );
-	}
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.SystemData,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:SystemData"],
+                "/Mdm/SystemDatas",
+                icon: "fa fa-database",
+                requiredPermissionName: MdmServicePermissions.SystemData.Default
+            ).RequireFeatures(MdmFeatures.SystemData)
+        );
 
-	private static void AddMenuItemCompanies(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-	{
-		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
-			   MdmServiceMenus.Companies,
-			   context.GetLocalizer<OMSResource>()["Menu:MdmService:Company"],
-			   null,
-			   icon: "fa fa-building"
-		   )
-			.RequirePermissions(false, MdmServicePermissions.CompanyMasters.Default,
-				MdmServicePermissions.VATs.Default,
-				MdmServicePermissions.CompanyIdentityUserAssignments.Default)
-			.RequireFeatures(false,
-				MdmFeatures.CompanyMaster,
-				MdmFeatures.VATs,
-				MdmFeatures.CompanyIdentityUserAssignments);
+        //removed
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.SystemConfig,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:SystemConfigs"],
+        //		"/SystemConfigs",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.SystemConfig.Default
+        //	).RequireFeatures(MdmFeatures.SystemConfig)
+        //);
 
-		parentMenu.AddItem(groupMenu);
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.NumberingConfig,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:NumberingConfigs"],
+                "/Mdm/NumberingConfigs",
+                icon: "fa fa-file-code-o",
+                requiredPermissionName: MdmServicePermissions.NumberingConfigs.Default
+            ).RequireFeatures(MdmFeatures.NumberingConfig)
+        );
+    }
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.CompanyMaster,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:CompanyProfiles"],
-				"/Mdm/Companies",
-				icon: "fa fa-id-card-o",
-				requiredPermissionName: MdmServicePermissions.CompanyMasters.Default
-			).RequireFeatures(MdmFeatures.CompanyMaster)
-		);
+    private static void AddMenuItemGeographical(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    {
+        ApplicationMenuItem groupMenu = new ApplicationMenuItem(
+               MdmServiceMenus.Geographical,
+               context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:Geographical"],
+               null,
+               icon: "fa fa-map-pin"
+           )
+            .RequirePermissions(false, MdmServicePermissions.GeoMasters.Default)
+            .RequireFeatures(false, MdmFeatures.GeoMaster);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.VATs,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:VATs"],
-				"/Mdm/VATs",
-				icon: "fa fa-file-alt",
-				requiredPermissionName: MdmServicePermissions.VATs.Default
-			).RequireFeatures(MdmFeatures.VATs)
-		);
+        parentMenu.AddItem(groupMenu);
 
-		
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.GeoMasters,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:GeoMasters"],
+                "/Mdm/GeoMasters",
+                icon: "fa fa-map",
+                requiredPermissionName: MdmServicePermissions.GeoMasters.Default
+            ).RequireFeatures(MdmFeatures.GeoMaster)
+        );
+        //map
+        //set tạm thời. vì chưa có permission cho map
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.Maps,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:Maps"],
+        //		"/Mdm/Maps",
+        //		icon: "fas fa-map-marked",
+        //              requiredPermissionName: MdmServicePermissions.GeoMasters.Default
+        //          ).RequireFeatures(MdmFeatures.GeoMaster)
+        //      );
+    }
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.CompanyIdentityUserAssignments,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:CompanyIdentityUserAssignments"],
+    private static void AddMenuItemCompanies(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    {
+        ApplicationMenuItem groupMenu = new ApplicationMenuItem(
+               MdmServiceMenus.Companies,
+               context.GetLocalizer<OMSResource>()["Menu:MdmService:Company"],
+               null,
+               icon: "fa fa-building"
+           )
+            .RequirePermissions(false, MdmServicePermissions.CompanyMasters.Default,
+                MdmServicePermissions.VATs.Default,
+                MdmServicePermissions.CompanyIdentityUserAssignments.Default)
+            .RequireFeatures(false,
+                MdmFeatures.CompanyMaster,
+                MdmFeatures.VATs,
+                MdmFeatures.CompanyIdentityUserAssignments);
+
+        parentMenu.AddItem(groupMenu);
+
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.CompanyMaster,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:CompanyProfiles"],
+                "/Mdm/Companies",
+                icon: "fa fa-id-card-o",
+                requiredPermissionName: MdmServicePermissions.CompanyMasters.Default
+            ).RequireFeatures(MdmFeatures.CompanyMaster)
+        );
+
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.VATs,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:VATs"],
+                "/Mdm/VATs",
+                icon: "fa fa-file-alt",
+                requiredPermissionName: MdmServicePermissions.VATs.Default
+            ).RequireFeatures(MdmFeatures.VATs)
+        );
+
+
+
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.CompanyIdentityUserAssignments,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:CompanyIdentityUserAssignments"],
                 "/Mdm/CompanyAssignments",
-				icon: "fa fa-user",
-				requiredPermissionName: MdmServicePermissions.CompanyIdentityUserAssignments.Default
-			).RequireFeatures(MdmFeatures.CompanyIdentityUserAssignments)
-		);
-	}
+                icon: "fa fa-user",
+                requiredPermissionName: MdmServicePermissions.CompanyIdentityUserAssignments.Default
+            ).RequireFeatures(MdmFeatures.CompanyIdentityUserAssignments)
+        );
+    }
 
-	private static void AddMenuProductItems(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-	{
-		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
-			   MdmServiceMenus.Items,
-			   //context.GetLocalizer<OMSResource>()["Menu:MdmService:Product"],
-			   context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:Item"],
-			   null,
-			   icon: "fa fa-product-hunt"
+    private static void AddMenuProductItems(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    {
+        ApplicationMenuItem groupMenu = new ApplicationMenuItem(
+               MdmServiceMenus.Items,
+               //context.GetLocalizer<OMSResource>()["Menu:MdmService:Product"],
+               context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:Item"],
+               null,
+               icon: "fa fa-product-hunt"
            )
-			.RequirePermissions(false, MdmServicePermissions.UOMs.Default,
-				MdmServicePermissions.UOMGroups.Default,
-				MdmServicePermissions.UOMGroupDetails.Default,
-				MdmServicePermissions.ItemAttributes.Default,
-				MdmServicePermissions.Items.Default,
-				MdmServicePermissions.ItemGroups.Default,
-				MdmServicePermissions.PriceLists.Default,
-				MdmServicePermissions.PriceListDetails.Default,
-				MdmServicePermissions.PriceUpdates.Default,
-				MdmServicePermissions.PriceUpdateDetails.Default,
-				MdmServicePermissions.PriceListAssignments.Default)
-			.RequireFeatures(false, MdmFeatures.UOMs,
-				MdmFeatures.UOMGroups,
-				MdmFeatures.ItemAttributes,
-				MdmFeatures.Items, MdmFeatures.ItemGroups,
-				MdmFeatures.PriceLists, MdmFeatures.PriceUpdate,
-				MdmFeatures.PriceListAssignments);
+            .RequirePermissions(false, MdmServicePermissions.UOMs.Default,
+                MdmServicePermissions.UOMGroups.Default,
+                MdmServicePermissions.UOMGroupDetails.Default,
+                MdmServicePermissions.ItemAttributes.Default,
+                MdmServicePermissions.Items.Default,
+                MdmServicePermissions.ItemGroups.Default,
+                MdmServicePermissions.PriceLists.Default,
+                MdmServicePermissions.PriceListDetails.Default,
+                MdmServicePermissions.PriceUpdates.Default,
+                MdmServicePermissions.PriceUpdateDetails.Default,
+                MdmServicePermissions.PriceListAssignments.Default)
+            .RequireFeatures(false, MdmFeatures.UOMs,
+                MdmFeatures.UOMGroups,
+                MdmFeatures.ItemAttributes,
+                MdmFeatures.Items, MdmFeatures.ItemGroups,
+                MdmFeatures.PriceLists, MdmFeatures.PriceUpdate,
+                MdmFeatures.PriceListAssignments);
 
-		parentMenu.AddItem(groupMenu);
+        parentMenu.AddItem(groupMenu);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.UOMs,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:UOMs"],
-				"/Mdm/UOMs",
-				icon: "fa fa-cube",
-				requiredPermissionName: MdmServicePermissions.UOMs.Default
-			).RequireFeatures(MdmFeatures.UOMs)
-		);
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.UOMs,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:UOMs"],
+                "/Mdm/UOMs",
+                icon: "fa fa-cube",
+                requiredPermissionName: MdmServicePermissions.UOMs.Default
+            ).RequireFeatures(MdmFeatures.UOMs)
+        );
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.UOMGroups,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:UOMGroups"],
-				"/Mdm/UOMGroups",
-				icon: "fa fa-cubes",
-				requiredPermissionName: MdmServicePermissions.UOMGroups.Default
-			).RequireFeatures(MdmFeatures.UOMGroups)
-		);
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.UOMGroups,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:UOMGroups"],
+                "/Mdm/UOMGroups",
+                icon: "fa fa-cubes",
+                requiredPermissionName: MdmServicePermissions.UOMGroups.Default
+            ).RequireFeatures(MdmFeatures.UOMGroups)
+        );
 
-		//groupMenu.AddItem(
-		//   new ApplicationMenuItem(
-		//	   MdmServiceMenus.UOMGroupDetails,
-		//	   context.GetLocalizer<OMSResource>()["Menu:MdmService:UOMGroupDetails"],
-		//	   "/Mdm/UOMGroupDetails",
-		//	   icon: "fa fa-file-alt",
-		//	   requiredPermissionName: MdmServicePermissions.UOMGroupDetails.Default
-		//   ).RequireFeatures(MdmFeatures.UOMGroups)
-		//);
+        //groupMenu.AddItem(
+        //   new ApplicationMenuItem(
+        //	   MdmServiceMenus.UOMGroupDetails,
+        //	   context.GetLocalizer<OMSResource>()["Menu:MdmService:UOMGroupDetails"],
+        //	   "/Mdm/UOMGroupDetails",
+        //	   icon: "fa fa-file-alt",
+        //	   requiredPermissionName: MdmServicePermissions.UOMGroupDetails.Default
+        //   ).RequireFeatures(MdmFeatures.UOMGroups)
+        //);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.ItemAttributes,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemAttributes"],
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.ItemAttributes,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemAttributes"],
                 "/Mdm/ItemAttributes",
-				icon: "fa fa-indent",
-				requiredPermissionName: MdmServicePermissions.ItemAttributes.Default
-			).RequireFeatures(MdmFeatures.ItemAttributes)
-		);
+                icon: "fa fa-indent",
+                requiredPermissionName: MdmServicePermissions.ItemAttributes.Default
+            ).RequireFeatures(MdmFeatures.ItemAttributes)
+        );
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.ItemAttributeValues,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemAttributeValues"],
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.ItemAttributeValues,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemAttributeValues"],
                 "/Mdm/ItemAttributeValues",
-				icon: "fa fa-check",
-				requiredPermissionName: MdmServicePermissions.ItemAttributes.Default
-			).RequireFeatures(MdmFeatures.ItemAttributes)
-		);
+                icon: "fa fa-check",
+                requiredPermissionName: MdmServicePermissions.ItemAttributes.Default
+            ).RequireFeatures(MdmFeatures.ItemAttributes)
+        );
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.Items,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemMasters"],
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.Items,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemMasters"],
                 "/Mdm/ItemMasters",
-				icon: "fa fa-folder-open",
-				requiredPermissionName: MdmServicePermissions.Items.Default
-			).RequireFeatures(MdmFeatures.Items)
-		);
+                icon: "fa fa-folder-open",
+                requiredPermissionName: MdmServicePermissions.Items.Default
+            ).RequireFeatures(MdmFeatures.Items)
+        );
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.ItemImages,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemImages"],
-  //              "/Mdm/ItemImages",
-		//		icon: "fa fa-file-image-o",
-		//		requiredPermissionName: MdmServicePermissions.Items.Default
-		//	).RequireFeatures(MdmFeatures.Items)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.ItemImages,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemImages"],
+        //              "/Mdm/ItemImages",
+        //		icon: "fa fa-file-image-o",
+        //		requiredPermissionName: MdmServicePermissions.Items.Default
+        //	).RequireFeatures(MdmFeatures.Items)
+        //);
 
-		//parentMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.ItemAttachments,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemAttachments"],
-  //              "/Mdm/ItemAttachments",
-		//		icon: "fa fa-paperclip",
-		//		requiredPermissionName: MdmServicePermissions.Items.Default
-		//	).RequireFeatures(MdmFeatures.Items)
-		//);
+        //parentMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.ItemAttachments,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemAttachments"],
+        //              "/Mdm/ItemAttachments",
+        //		icon: "fa fa-paperclip",
+        //		requiredPermissionName: MdmServicePermissions.Items.Default
+        //	).RequireFeatures(MdmFeatures.Items)
+        //);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.ItemGroups,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemGroups"],
-				"/Mdm/ItemGroups",
-				icon: "fa fa-object-group",
-				requiredPermissionName: MdmServicePermissions.ItemGroups.Default
-			).RequireFeatures(MdmFeatures.ItemGroups)
-		);
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.ItemGroups,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemGroups"],
+                "/Mdm/ItemGroups",
+                icon: "fa fa-object-group",
+                requiredPermissionName: MdmServicePermissions.ItemGroups.Default
+            ).RequireFeatures(MdmFeatures.ItemGroups)
+        );
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.ItemGroupAttributes,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemGroupAttrs"],
-  //              "/Mdm/ItemGroupAttrs",
-		//		icon: "fa fa-clone",
-		//		requiredPermissionName: MdmServicePermissions.ItemGroups.Default
-		//	).RequireFeatures(MdmFeatures.ItemGroups)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.ItemGroupAttributes,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemGroupAttrs"],
+        //              "/Mdm/ItemGroupAttrs",
+        //		icon: "fa fa-clone",
+        //		requiredPermissionName: MdmServicePermissions.ItemGroups.Default
+        //	).RequireFeatures(MdmFeatures.ItemGroups)
+        //);
 
-		//parentMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.ItemGroupLists,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemGroupLists"],
-  //              "/Mdm/ItemGroupLists",
-		//		icon: "fa fa-list-alt",
-		//		requiredPermissionName: MdmServicePermissions.ItemGroups.Default
-		//	).RequireFeatures(MdmFeatures.ItemGroups)
-		//);
+        //parentMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.ItemGroupLists,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemGroupLists"],
+        //              "/Mdm/ItemGroupLists",
+        //		icon: "fa fa-list-alt",
+        //		requiredPermissionName: MdmServicePermissions.ItemGroups.Default
+        //	).RequireFeatures(MdmFeatures.ItemGroups)
+        //);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.PriceLists,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceLists"],
-				"/Mdm/PriceLists",
-				icon: "fa fa-money",
-				requiredPermissionName: MdmServicePermissions.PriceLists.Default
-			).RequireFeatures(MdmFeatures.PriceLists)
-		);
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.PriceLists,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceLists"],
+                "/Mdm/PriceLists",
+                icon: "fa fa-money",
+                requiredPermissionName: MdmServicePermissions.PriceLists.Default
+            ).RequireFeatures(MdmFeatures.PriceLists)
+        );
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.PriceListDetails,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceListDetails"],
-		//		"/Mdm/PriceListDetails",
-		//		icon: "fa fa-list",
-		//		requiredPermissionName: MdmServicePermissions.PriceListDetails.Default
-		//	).RequireFeatures(MdmFeatures.PriceLists)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.PriceListDetails,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceListDetails"],
+        //		"/Mdm/PriceListDetails",
+        //		icon: "fa fa-list",
+        //		requiredPermissionName: MdmServicePermissions.PriceListDetails.Default
+        //	).RequireFeatures(MdmFeatures.PriceLists)
+        //);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.PriceUpdateDefs,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceUpdates"],
-				"/Mdm/PriceUpdates",
-				icon: "fa fa-pencil-square-o",
-				requiredPermissionName: MdmServicePermissions.PriceUpdates.Default
-			).RequireFeatures(MdmFeatures.PriceUpdate)
-		);
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.PriceUpdates,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceUpdates"],
+                "/Mdm/PriceUpdates",
+                icon: "fa fa-pencil-square-o",
+                requiredPermissionName: MdmServicePermissions.PriceUpdates.Default
+            ).RequireFeatures(MdmFeatures.PriceUpdate)
+        );
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.PriceUpdateDetails,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceUpdateDetails"],
-		//		"/Mdm/PriceUpdateDetails",
-		//		icon: "fa fa-info-circle",
-		//		requiredPermissionName: MdmServicePermissions.PriceUpdateDetails.Default
-		//	).RequireFeatures(MdmFeatures.PriceUpdate)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.PriceUpdateDetails,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceUpdateDetails"],
+        //		"/Mdm/PriceUpdateDetails",
+        //		icon: "fa fa-info-circle",
+        //		requiredPermissionName: MdmServicePermissions.PriceUpdateDetails.Default
+        //	).RequireFeatures(MdmFeatures.PriceUpdate)
+        //);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.PriceListAssignments,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceListAssignments"],
-				"/Mdm/PricelistAssignments",
-				icon: "fa fa-table",
-				requiredPermissionName: MdmServicePermissions.PriceListAssignments.Default
-			).RequireFeatures(MdmFeatures.PriceListAssignments)
-		);
-	}
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.PriceListAssignments,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceListAssignments"],
+                "/Mdm/PricelistAssignments",
+                icon: "fa fa-table",
+                requiredPermissionName: MdmServicePermissions.PriceListAssignments.Default
+            ).RequireFeatures(MdmFeatures.PriceListAssignments)
+        );
+    }
 
-	private static void AddMenuItemSalesOrganizations(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-	{
-		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
-			   MdmServiceMenus.SalesOrganizations,
-			   context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:SalesOrganization"],
-			   null,
-			   icon: "fa fa-sitemap"
+    private static void AddMenuItemSalesOrganizations(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    {
+        ApplicationMenuItem groupMenu = new ApplicationMenuItem(
+               MdmServiceMenus.SalesOrganizations,
+               context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:SalesOrganization"],
+               null,
+               icon: "fa fa-sitemap"
            )
-			.RequirePermissions(false,
-				MdmServicePermissions.WorkingPositions.Default,
-				MdmServicePermissions.EmployeeProfiles.Default,
-				MdmServicePermissions.SalesOrgHeaders.Default,
-				MdmServicePermissions.SalesOrgHierarchies.Default,
-				MdmServicePermissions.SalesOrgEmpAssignments.Default,
-				MdmServicePermissions.CompanyInZones.Default,
-				MdmServicePermissions.CustomerInZones.Default,
-				MdmServicePermissions.EmployeeInZones.Default)
-			.RequireFeatures(false, MdmFeatures.WorkingPositions,
-				MdmFeatures.EmployeeProfiles, MdmFeatures.SalesOrgs,
-				MdmFeatures.SellingZones);
+            .RequirePermissions(false,
+                MdmServicePermissions.WorkingPositions.Default,
+                MdmServicePermissions.EmployeeProfiles.Default,
+                MdmServicePermissions.SalesOrgHeaders.Default,
+                MdmServicePermissions.SalesOrgHierarchies.Default,
+                MdmServicePermissions.SalesOrgEmpAssignments.Default,
+                MdmServicePermissions.CompanyInZones.Default,
+                MdmServicePermissions.CustomerInZones.Default,
+                MdmServicePermissions.EmployeeInZones.Default)
+            .RequireFeatures(false, MdmFeatures.WorkingPositions,
+                MdmFeatures.EmployeeProfiles, MdmFeatures.SalesOrgs,
+                MdmFeatures.SellingZones);
 
-		parentMenu.AddItem(groupMenu);
+        parentMenu.AddItem(groupMenu);
 
         groupMenu.AddItem(
             new ApplicationMenuItem(
@@ -1100,330 +1098,330 @@ public class OMSMenuContributor : IMenuContributor
         );
 
         groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.WorkingPositions,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:WorkingPositions"],
-				"/Mdm/WorkingPositions",
-				icon: "fa fa-archive",
-				requiredPermissionName: MdmServicePermissions.WorkingPositions.Default
-			).RequireFeatures(MdmFeatures.WorkingPositions)
-		);
+            new ApplicationMenuItem(
+                MdmServiceMenus.WorkingPositions,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:WorkingPositions"],
+                "/Mdm/WorkingPositions",
+                icon: "fa fa-archive",
+                requiredPermissionName: MdmServicePermissions.WorkingPositions.Default
+            ).RequireFeatures(MdmFeatures.WorkingPositions)
+        );
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.EmployeeProfiles,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:EmployeeProfiles"],
-				"/Mdm/EmployeeProfiles",
-				icon: "fa fa-user",
-				requiredPermissionName: MdmServicePermissions.EmployeeProfiles.Default
-			).RequireFeatures(MdmFeatures.EmployeeProfiles)
-		);
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.EmployeeProfiles,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:EmployeeProfiles"],
+                "/Mdm/EmployeeProfiles",
+                icon: "fa fa-user",
+                requiredPermissionName: MdmServicePermissions.EmployeeProfiles.Default
+            ).RequireFeatures(MdmFeatures.EmployeeProfiles)
+        );
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.EmployeeImages,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:EmployeeImages"],
-		//		"/Mdm/EmployeeImages",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.EmployeeProfiles.Default
-		//	).RequireFeatures(MdmFeatures.EmployeeProfiles)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.EmployeeImages,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:EmployeeImages"],
+        //		"/Mdm/EmployeeImages",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.EmployeeProfiles.Default
+        //	).RequireFeatures(MdmFeatures.EmployeeProfiles)
+        //);
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.EmployeeAttachments,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:EmployeeAttachments"],
-		//		"/Mdm/EmployeeAttachments",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.EmployeeProfiles.Default
-		//	).RequireFeatures(MdmFeatures.EmployeeProfiles)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.EmployeeAttachments,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:EmployeeAttachments"],
+        //		"/Mdm/EmployeeAttachments",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.EmployeeProfiles.Default
+        //	).RequireFeatures(MdmFeatures.EmployeeProfiles)
+        //);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.SalesOrgHeaders,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:SalesOrganization"],
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.SalesOrgHeaders,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:SalesOrganization"],
                 "/Mdm/SalesOrganization",
-				icon: "fa fa-check-square",
-				requiredPermissionName: MdmServicePermissions.SalesOrgHeaders.Default
-			).RequireFeatures(MdmFeatures.SalesOrgs)
-		);
+                icon: "fa fa-check-square",
+                requiredPermissionName: MdmServicePermissions.SalesOrgHeaders.Default
+            ).RequireFeatures(MdmFeatures.SalesOrgs)
+        );
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.SalesOrgHierarchies,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:SalesOrgHierarchies"],
-		//		"/Mdm/SalesOrgHierarchies",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.SalesOrgHierarchies.Default
-		//	).RequireFeatures(MdmFeatures.SalesOrgs)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.SalesOrgHierarchies,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:SalesOrgHierarchies"],
+        //		"/Mdm/SalesOrgHierarchies",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.SalesOrgHierarchies.Default
+        //	).RequireFeatures(MdmFeatures.SalesOrgs)
+        //);
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.SalesOrgEmpAssignments,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:SalesOrgEmpAssignments"],
-		//		"/Mdm/SalesOrgEmpAssignments",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.SalesOrgEmpAssignments.Default
-		//	).RequireFeatures(MdmFeatures.SalesOrgs)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.SalesOrgEmpAssignments,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:SalesOrgEmpAssignments"],
+        //		"/Mdm/SalesOrgEmpAssignments",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.SalesOrgEmpAssignments.Default
+        //	).RequireFeatures(MdmFeatures.SalesOrgs)
+        //);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.CompanyInZones,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:SellingZones"],
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.CompanyInZones,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:SellingZones"],
                 "/Mdm/SellingZones",
-				icon: "fa fa-map-marker",
-				requiredPermissionName: MdmServicePermissions.CompanyInZones.Default
+                icon: "fa fa-map-marker",
+                requiredPermissionName: MdmServicePermissions.CompanyInZones.Default
             ).RequireFeatures(MdmFeatures.SellingZones)
-		);
+        );
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.CustomerInZones,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerInZone"],
-		//		"/Mdm/CustomerInZones",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: 
-		//	).RequireFeatures(MdmFeatures.SellingZones)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.CustomerInZones,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerInZone"],
+        //		"/Mdm/CustomerInZones",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: 
+        //	).RequireFeatures(MdmFeatures.SellingZones)
+        //);
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.EmployeeInZones,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:EmployeeInZone"],
-		//		"/Mdm/EmployeeInZones",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.EmployeeInZones.Default
-		//	).RequireFeatures(MdmFeatures.SellingZones)
-		//);
-	}
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.EmployeeInZones,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:EmployeeInZone"],
+        //		"/Mdm/EmployeeInZones",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.EmployeeInZones.Default
+        //	).RequireFeatures(MdmFeatures.SellingZones)
+        //);
+    }
 
-	private static void AddMenuItemCustomers(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-	{
-		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
-			   MdmServiceMenus.Customers,
-			   context.GetLocalizer<OMSResource>()["Menu:MdmService:Customer"],
-			   null,
-			   icon: "fa fa-user-secret"
+    private static void AddMenuItemCustomers(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    {
+        ApplicationMenuItem groupMenu = new ApplicationMenuItem(
+               MdmServiceMenus.Customers,
+               context.GetLocalizer<OMSResource>()["Menu:MdmService:Customer"],
+               null,
+               icon: "fa fa-user-secret"
            )
-			.RequirePermissions(false, MdmServicePermissions.CustomerAttributes.Default,
-				MdmServicePermissions.CustomerAttributes.Default,
-				MdmServicePermissions.Vendors.Default,
-				MdmServicePermissions.CustomerGroups.Default,
-				MdmServicePermissions.CustomerGroupByAtts.Default,
-				MdmServicePermissions.CustomerGroupByLists.Default,
-				MdmServicePermissions.CustomerGroupByGeos.Default,
-				MdmServicePermissions.Customers.Default,
-				MdmServicePermissions.CustomerAssignments.Default)
-			.RequireFeatures(false, MdmFeatures.CustomerAttributes,
-				MdmFeatures.CustomerProfiles,
-				MdmFeatures.CustomerGroups, MdmFeatures.CustomerAssignments);
+            .RequirePermissions(false, MdmServicePermissions.CustomerAttributes.Default,
+                MdmServicePermissions.CustomerAttributes.Default,
+                MdmServicePermissions.Vendors.Default,
+                MdmServicePermissions.CustomerGroups.Default,
+                MdmServicePermissions.CustomerGroupByAtts.Default,
+                MdmServicePermissions.CustomerGroupByLists.Default,
+                MdmServicePermissions.CustomerGroupByGeos.Default,
+                MdmServicePermissions.Customers.Default,
+                MdmServicePermissions.CustomerAssignments.Default)
+            .RequireFeatures(false, MdmFeatures.CustomerAttributes,
+                MdmFeatures.CustomerProfiles,
+                MdmFeatures.CustomerGroups, MdmFeatures.CustomerAssignments);
 
-		parentMenu.AddItem(groupMenu);
+        parentMenu.AddItem(groupMenu);
 
-		groupMenu.AddItem(
-		   new ApplicationMenuItem(
-			   MdmServiceMenus.CustomerAttributeDefs,
-			   context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerAttributes"],
-			   "/Mdm/CustomerAttributes",
-			   icon: "fa fa-id-card",
-			   requiredPermissionName: MdmServicePermissions.CustomerAttributes.Default
-		   ).RequireFeatures(MdmFeatures.CustomerAttributes)
-		);
+        groupMenu.AddItem(
+           new ApplicationMenuItem(
+               MdmServiceMenus.CustomerAttributes,
+               context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerAttributes"],
+               "/Mdm/CustomerAttributes",
+               icon: "fa fa-id-card",
+               requiredPermissionName: MdmServicePermissions.CustomerAttributes.Default
+           ).RequireFeatures(MdmFeatures.CustomerAttributes)
+        );
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.CusAttributeValues,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:CusAttributeValues"],
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.CustomerAttributeValues,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:CusAttributeValues"],
                 "/Mdm/CusAttributeValues",
-				icon: "fa fa-check-square",
-				requiredPermissionName: MdmServicePermissions.CustomerAttributes.Default
-			).RequireFeatures(MdmFeatures.CustomerAttributes)
-		);
+                icon: "fa fa-check-square",
+                requiredPermissionName: MdmServicePermissions.CustomerAttributes.Default
+            ).RequireFeatures(MdmFeatures.CustomerAttributes)
+        );
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.CustomerProfiles,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerProfile"],
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.CustomerProfiles,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerProfile"],
                 "/Mdm/CustomerProfile",
-				icon: "fa fa-user",
-				requiredPermissionName: MdmServicePermissions.Customers.Default
-			).RequireFeatures(MdmFeatures.CustomerProfiles)
-		);
+                icon: "fa fa-user",
+                requiredPermissionName: MdmServicePermissions.Customers.Default
+            ).RequireFeatures(MdmFeatures.CustomerProfiles)
+        );
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.CustomerContacts,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerContacts"],
-		//		"/Mdm/CustomerContacts",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.Customers.Default
-		//	).RequireFeatures(MdmFeatures.CustomerProfiles)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.CustomerContacts,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerContacts"],
+        //		"/Mdm/CustomerContacts",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.Customers.Default
+        //	).RequireFeatures(MdmFeatures.CustomerProfiles)
+        //);
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.CustomerAttachments,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerAttachments"],
-		//		"/Mdm/CustomerAttachments",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.Customers.Default
-		//	).RequireFeatures(MdmFeatures.CustomerProfiles)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.CustomerAttachments,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerAttachments"],
+        //		"/Mdm/CustomerAttachments",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.Customers.Default
+        //	).RequireFeatures(MdmFeatures.CustomerProfiles)
+        //);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.Vendors,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:Vendors"],
-				"/Mdm/Vendors",
-				icon: "fa fa-user-secret",
-				requiredPermissionName: MdmServicePermissions.Vendors.Default
-			).RequireFeatures(MdmFeatures.Vendors)
-		);
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.Vendors,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:Vendors"],
+                "/Mdm/Vendors",
+                icon: "fa fa-user-secret",
+                requiredPermissionName: MdmServicePermissions.Vendors.Default
+            ).RequireFeatures(MdmFeatures.Vendors)
+        );
 
-		groupMenu.AddItem(
-		   new ApplicationMenuItem(
-			   MdmServiceMenus.CustomerAssignments,
-			   context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerAssignments"],
-			   "/Mdm/CustomerAssignments",
-			   icon: "fa fa-tasks",
-			   requiredPermissionName: MdmServicePermissions.CustomerAssignments.Default
-		   ).RequireFeatures(MdmFeatures.CustomerAssignments)
-	   );
+        groupMenu.AddItem(
+           new ApplicationMenuItem(
+               MdmServiceMenus.CustomerAssignments,
+               context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerAssignments"],
+               "/Mdm/CustomerAssignments",
+               icon: "fa fa-tasks",
+               requiredPermissionName: MdmServicePermissions.CustomerAssignments.Default
+           ).RequireFeatures(MdmFeatures.CustomerAssignments)
+       );
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.CustomerGroupDefs,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerGroups"],
-				"/Mdm/CustomerGroups",
-				icon: "fa fa-list-alt",
-				requiredPermissionName: MdmServicePermissions.CustomerGroups.Default
-			).RequireFeatures(MdmFeatures.CustomerGroups)
-		);
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.CustomerGroups,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerGroups"],
+                "/Mdm/CustomerGroups",
+                icon: "fa fa-list-alt",
+                requiredPermissionName: MdmServicePermissions.CustomerGroups.Default
+            ).RequireFeatures(MdmFeatures.CustomerGroups)
+        );
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.CustomerGroupByAtts,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerGroupsByAtt"],
-		//		"/Mdm/CustomerGroupByAtts",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.CustomerGroupByAtts.Default
-		//	).RequireFeatures(MdmFeatures.CustomerGroups)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.CustomerGroupByAtts,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerGroupsByAtt"],
+        //		"/Mdm/CustomerGroupByAtts",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.CustomerGroupByAtts.Default
+        //	).RequireFeatures(MdmFeatures.CustomerGroups)
+        //);
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.CustomerGroupByLists,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerGroupsByList"],
-		//		"/Mdm/CustomerGroupByLists",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.CustomerGroupByLists.Default
-		//	).RequireFeatures(MdmFeatures.CustomerGroups)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.CustomerGroupByLists,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerGroupsByList"],
+        //		"/Mdm/CustomerGroupByLists",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.CustomerGroupByLists.Default
+        //	).RequireFeatures(MdmFeatures.CustomerGroups)
+        //);
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.CustomerGroupByGeos,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerGroupsByGeo"],
-		//		"/Mdm/CustomerGroupByGeos",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.CustomerGroupByGeos.Default
-		//	).RequireFeatures(MdmFeatures.CustomerGroups)
-		//);
-	}
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.CustomerGroupByGeos,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerGroupsByGeo"],
+        //		"/Mdm/CustomerGroupByGeos",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.CustomerGroupByGeos.Default
+        //	).RequireFeatures(MdmFeatures.CustomerGroups)
+        //);
+    }
 
-	private static void AddMenuItemRouteAndMCP(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
-	{
-		ApplicationMenuItem groupMenu = new ApplicationMenuItem(
-			   MdmServiceMenus.RouteAndMCP,
-			   context.GetLocalizer<OMSResource>()["Menu:MdmService:RouteAndMCP"],
-			   null,
-			   icon: "fa fa-calendar"
+    private static void AddMenuItemRouteAndMCP(MenuConfigurationContext context, ApplicationMenuItem parentMenu)
+    {
+        ApplicationMenuItem groupMenu = new ApplicationMenuItem(
+               MdmServiceMenus.RouteAndMCP,
+               context.GetLocalizer<OMSResource>()["Menu:MdmService:RouteAndMCP"],
+               null,
+               icon: "fa fa-calendar"
            )
-			.RequirePermissions(false, MdmServicePermissions.Holidays.Default,
-				MdmServicePermissions.HolidayDetails.Default,
-				MdmServicePermissions.Routes.Default,
-				MdmServicePermissions.MCPs.Default,
-				MdmServicePermissions.VisitPlans.Default,
-				MdmServicePermissions.RouteAssignments.Default)
-			.RequireFeatures(false, MdmFeatures.Holidays, MdmFeatures.Routes,
-				MdmFeatures.MCPs, MdmFeatures.VisitPlans, MdmFeatures.RouteAssignments);
+            .RequirePermissions(false, MdmServicePermissions.Holidays.Default,
+                MdmServicePermissions.HolidayDetails.Default,
+                MdmServicePermissions.Routes.Default,
+                MdmServicePermissions.MCPs.Default,
+                MdmServicePermissions.VisitPlans.Default,
+                MdmServicePermissions.RouteAssignments.Default)
+            .RequireFeatures(false, MdmFeatures.Holidays, MdmFeatures.Routes,
+                MdmFeatures.MCPs, MdmFeatures.VisitPlans, MdmFeatures.RouteAssignments);
 
-		parentMenu.AddItem(groupMenu);
+        parentMenu.AddItem(groupMenu);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.HolidayDefs,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:Holidays"],
-				"/Mdm/Holidays",
-				icon: "fa fa-calendar-check-o",
-				requiredPermissionName: MdmServicePermissions.Holidays.Default
-			).RequireFeatures(MdmFeatures.Holidays)
-		);
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.Holidays,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:Holidays"],
+                "/Mdm/Holidays",
+                icon: "fa fa-calendar-check-o",
+                requiredPermissionName: MdmServicePermissions.Holidays.Default
+            ).RequireFeatures(MdmFeatures.Holidays)
+        );
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.HolidayDetails,
-		//		context.GetLocalizer<OMSResource>()["Page.Title.HolidayDetails"],
-		//		"/Mdm/HolidayDetails",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.HolidayDetails.Default
-		//	).RequireFeatures(MdmFeatures.Holidays)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.HolidayDetails,
+        //		context.GetLocalizer<OMSResource>()["Page.Title.HolidayDetails"],
+        //		"/Mdm/HolidayDetails",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.HolidayDetails.Default
+        //	).RequireFeatures(MdmFeatures.Holidays)
+        //);
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.Routes,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:Routes"],
-		//		"/Mdm/Routes",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.Routes.Default
-		//	).RequireFeatures(MdmFeatures.Routes)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.Routes,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:Routes"],
+        //		"/Mdm/Routes",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.Routes.Default
+        //	).RequireFeatures(MdmFeatures.Routes)
+        //);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.MCPHeaders,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:MCP"],
-				"/Mdm/MCPHeaders",
-				icon: "fa fa-calendar-minus-o",
-				requiredPermissionName: MdmServicePermissions.MCPs.Default
-			).RequireFeatures(MdmFeatures.MCPs)
-		);
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.MCPHeaders,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:MCP"],
+                "/Mdm/MCPHeaders",
+                icon: "fa fa-calendar-minus-o",
+                requiredPermissionName: MdmServicePermissions.MCPs.Default
+            ).RequireFeatures(MdmFeatures.MCPs)
+        );
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.MCPDetails,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:MCPDetails"],
-		//		"/Mdm/MCPDetails",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.MCPDetails.Default
-		//	).RequireFeatures(MdmFeatures.MCPs)
-		//);
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.MCPDetails,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:MCPDetails"],
+        //		"/Mdm/MCPDetails",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.MCPDetails.Default
+        //	).RequireFeatures(MdmFeatures.MCPs)
+        //);
 
-		groupMenu.AddItem(
-			new ApplicationMenuItem(
-				MdmServiceMenus.VisitPlans,
-				context.GetLocalizer<OMSResource>()["Menu:MdmService:VisitPlans"],
-				"/Mdm/VisitPlans",
-				icon: "fa fa-calendar-check-o",
-				requiredPermissionName: MdmServicePermissions.VisitPlans.Default
-			).RequireFeatures(MdmFeatures.VisitPlans)
-		);
+        groupMenu.AddItem(
+            new ApplicationMenuItem(
+                MdmServiceMenus.VisitPlans,
+                context.GetLocalizer<OMSResource>()["Menu:MdmService:VisitPlans"],
+                "/Mdm/VisitPlans",
+                icon: "fa fa-calendar-check-o",
+                requiredPermissionName: MdmServicePermissions.VisitPlans.Default
+            ).RequireFeatures(MdmFeatures.VisitPlans)
+        );
 
-		//groupMenu.AddItem(
-		//	new ApplicationMenuItem(
-		//		MdmServiceMenus.RouteAssignments,
-		//		context.GetLocalizer<OMSResource>()["Menu:MdmService:RouteAssignments"],
-		//		"/Mdm/RouteAssignments",
-		//		icon: "fa fa-file-alt",
-		//		requiredPermissionName: MdmServicePermissions.RouteAssignments.Default
-		//	).RequireFeatures(MdmFeatures.RouteAssignments)
-		//);
-	}
-	private Task ConfigureUserMenuAsync(MenuConfigurationContext context)
+        //groupMenu.AddItem(
+        //	new ApplicationMenuItem(
+        //		MdmServiceMenus.RouteAssignments,
+        //		context.GetLocalizer<OMSResource>()["Menu:MdmService:RouteAssignments"],
+        //		"/Mdm/RouteAssignments",
+        //		icon: "fa fa-file-alt",
+        //		requiredPermissionName: MdmServicePermissions.RouteAssignments.Default
+        //	).RequireFeatures(MdmFeatures.RouteAssignments)
+        //);
+    }
+    private Task ConfigureUserMenuAsync(MenuConfigurationContext context)
     {
         var authServerUrl = _configuration["AuthServer:Authority"] ?? "~";
         var uiResource = context.GetLocalizer<AbpUiResource>();
