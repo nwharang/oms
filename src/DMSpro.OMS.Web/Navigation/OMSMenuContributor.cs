@@ -1235,7 +1235,7 @@ public class OMSMenuContributor : IMenuContributor
             new ApplicationMenuItem(
                 MdmServiceMenus.CustomerAttributeValues,
                 context.GetLocalizer<OMSResource>()["Menu:MdmService:CusAttributeValues"],
-                "/Mdm/CusAttributeValues",
+                "/Mdm/CustomerAttributeValues",
                 icon: "fa fa-check-square",
                 requiredPermissionName: MdmServicePermissions.CustomerAttributes.Default
             ).RequireFeatures(MdmFeatures.CustomerAttributes)
