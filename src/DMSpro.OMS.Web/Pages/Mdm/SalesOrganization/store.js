@@ -42,8 +42,9 @@ let dialog = ({ header, body }, callBackIfTrue, callBackIfFalse) => {
 }
 /** Reload Popup Title, Tree dataSource, Grid Editting Setting */
 let reloadPopupBodyComponent = (result) => {
-    console.log(result.status);
     salesOrgHeaderId = result.id;
+    if (result.status === 0)
+        treeInstance.option('dataSource', store.salesOrgHierarchyStore(result.id))
     let newEditingOption = {
         ...grid.dxDataGrid('instance').option("editing"),
         allowAdding: result.status == 0 || result.status == 1,
