@@ -59,10 +59,12 @@
             return d.promise();
         },
         insert({ attrName }) {
+            console.log(sendMode)
             switch (sendMode) {
                 case 0:
                     return itemAttrService.createFlat({ attrName })
                 case 1:
+                    sendMode = 0
                     return itemAttrService.createHierarchy({ attrName })
             }
         },
