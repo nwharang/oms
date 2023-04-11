@@ -148,23 +148,23 @@
                 },
                 'columnChooserButton',
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        }
-                    }
-                },
+                // {
+                //     location: 'after',
+                //     widget: 'dxButton',
+                //     options: {
+                //         icon: "import",
+                //         elementAttr: {
+                //             //id: "import-excel",
+                //             class: "import-excel",
+                //         },
+                //         onClick(e) {
+                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //             var gridName = gridControl.attr('id');
+                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //             if (popup) popup.show();
+                //         }
+                //     }
+                // },
                 "searchPanel"
             ],
         },
@@ -227,5 +227,5 @@
     //});
 
     /****function*****/
-    initImportPopup('api/mdm-service/working-positions', 'WorkingPositions_Template', 'dataGridContainer');
+    // initImportPopup('api/mdm-service/working-positions', 'WorkingPositions_Template', 'dataGridContainer');
 });

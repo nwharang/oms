@@ -596,6 +596,13 @@ $(function () {
                     min: new Date()
                 }
             },
+            {
+                dataField: 'address',
+                caption: l("EntityFieldName:MDMService:CustomerContact:Address"),
+                dataType: "string",
+                allowEditing: false,
+                visible: false
+            }
             //{
             //    caption: l("Active"),
             //    dataField: "active",
@@ -736,6 +743,11 @@ $(function () {
                                 caption: l("EntityFieldName:MDMService:GeoMaster:Level0"),
                                 dataField: "geoMaster0.name",
                             },
+                            {
+                                caption: l("EntityFieldName:MDMService:CustomerContact:Address"),
+                                dataField: "address",
+                                calculateDisplayValue: () => 'delete this field when api ready'
+                            }
                         ]
                     })
                     gridInstance = grid.dxDataGrid('instance')

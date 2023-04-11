@@ -282,23 +282,23 @@ $(function () {
                 },
                 "columnChooserButton",
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                }, 
+                // {
+                //     location: 'after',
+                //     widget: 'dxButton',
+                //     options: {
+                //         icon: "import",
+                //         elementAttr: {
+                //             //id: "import-excel",
+                //             class: "import-excel",
+                //         },
+                //         onClick(e) {
+                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //             var gridName = gridControl.attr('id');
+                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //             if (popup) popup.show();
+                //         },
+                //     },
+                // }, 
                 "searchPanel",
             ],
         },
@@ -573,5 +573,5 @@ $(function () {
 
     $('#ChangeVisitPlanButton').click(function () { $('#popupChangeVisitPlan').data('dxPopup').show(); });
 
-    initImportPopup('api/mdm-service/visit-plans', 'VisitPlans_Template', 'dgVisitPlans');
+    // initImportPopup('api/mdm-service/visit-plans', 'VisitPlans_Template', 'dgVisitPlans');
 });
