@@ -84,40 +84,24 @@ $(function () {
         }
     });
 
-    var employeeTypeStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        useDefaultSearch: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            systemDataService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
+    var employeeTypeStore = [
+        {
+            id: 0,
+            displayName: l('EntityFieldValue:MDMService:EmployeeType:Salesman')
         },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            systemDataService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
+        {
+            id: 1,
+            displayName: l('EntityFieldValue:MDMService:EmployeeType:Deliveryman')
+        },
+        {
+            id: 2,
+            displayName: l('EntityFieldValue:MDMService:EmployeeType:Supervisor')
+        },
+        {
+            id: 3,
+            displayName: l('EntityFieldValue:MDMService:EmployeeType:PromotionGirl')
+        },
+    ];
 
     /****control*****/
     //DataGrid - Employee Profile
@@ -236,7 +220,7 @@ $(function () {
                         colCount: 2,
                         colSpan: 2,
                         caption: '',
-                        items: ['dateOfBirth', 'employeeTypeId', 'idCardNumber', 'address', 'phone', 'email', 'effectiveDate', 'endDate', 'active']
+                        items: ['dateOfBirth', 'employeeType', 'idCardNumber', 'address', 'phone', 'email', 'effectiveDate', 'endDate', 'active']
                     }
                 ],
             }
@@ -250,7 +234,7 @@ $(function () {
             }
         },
         onEditorPreparing: function (e) {
-            if (e.dataField == "workingPositionId" || e.dataField == "employeeTypeId") {
+            if (e.dataField == "workingPositionId" || e.dataField == "employeeType") {
                 e.editorOptions.showClearButton = true;
             }
         },
@@ -373,22 +357,12 @@ $(function () {
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:EmployeeTypeName"),
-                dataField: "employeeTypeId",
-                // calculateDisplayValue: "employeeType",
+                dataField: "employeeType",
                 allowSearch: false,
-                calculateDisplayValue(rowData){
-                    if(rowData.employeeType){
-                        return rowData.employeeType.valueName;
-                    }
-                    return "";
-                },
                 dataType: 'string',
                 lookup: {
-                    dataSource: {
-                        store: employeeTypeStore,
-                        filter: ['code', '=', 'MD03'],
-                    },
-                    displayExpr: 'valueName',
+                    dataSource: employeeTypeStore,
+                    displayExpr: 'displayName',
                     valueExpr: 'id',
                 }
             },
