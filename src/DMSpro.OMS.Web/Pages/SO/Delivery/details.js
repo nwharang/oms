@@ -453,7 +453,6 @@ $(async function () {
                             dataSource: discountTypeStore,
                             displayExpr: 'text',
                             valueExpr: 'id',
-                            value: 0,
                             showClearButton: true,
                             onValueChanged: function (e) {
                                 calculatorDocTotal()
@@ -754,7 +753,6 @@ $(async function () {
                         newData.lineAmt = value * currentData.price - currentData.discountAmt;
                         newData.lineAmtAfterTax = currentData.priceAfterTax * value - currentData.discountAmt;
                     },
-                    value: 0,
                     validationRules: [
                         {
                             type: 'required', message: ''
@@ -814,7 +812,6 @@ $(async function () {
                                 newData.discountAmt = 0;
                         }
                     },
-                    value: 0,
                     validationRules: [{ type: 'required', message: '' }],
                     width: 150,
                     visible: false

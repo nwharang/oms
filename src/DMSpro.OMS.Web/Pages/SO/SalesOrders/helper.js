@@ -1,6 +1,5 @@
 let preLoad = getInfoSO()
 
-let currentData = {}, isDocOpen
 let helper = ({ companyId, mainStore, vatList }) => {
     let { discountTypeStore, transactionTypeStore, docStatusStore } = store()
     let gridInitialized = false, popup, form, grid;
@@ -13,6 +12,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
             return data
         }
     })
+
     let loadNavigationButton = (docId) => {
         if (docId) {
             mainService.getPrevDoc(docId).done(data => {
@@ -212,7 +212,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             editorOptions: {
                                 format: '#,##0.##',
                                 min: 0,
-                                value: 0,
                                 onValueChanged: () => {
                                     setTimeout(() => {
                                         recalulateDocTotal()
@@ -307,20 +306,14 @@ let helper = ({ companyId, mainStore, vatList }) => {
                         })
                         routeId.option('value', mainStore.customerRoutesList.find(arr => arr.id == selectedItem.id).data[0].id)
                         employeeId.option('value', mainStore.customerEmployeesList.find(arr => arr.id == selectedItem.id).data[0].id)
-                        routeId.option('readOnly', false)
-                        employeeId.option('readOnly', false)
                     }
                     else {
                         routeId.option('value', null)
                         employeeId.option('value', null)
-                        routeId.option('readOnly', true)
-                        employeeId.option('readOnly', true)
                     }
                 })
             }
         })
-        let formInstance = form.dxForm('instance')
-        savedFormData = { ...formInstance.option('formData') }
         let resizeBox = $('<div>').dxResizable({
             handles: "bottom",
             maxHeight: 320, // 20 rem
@@ -368,11 +361,11 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 allowColumnDragging: false,
                 visible: false,
             },
-            stateStoring: {
-                enabled: true,
-                type: 'localStorage',
-                storageKey: 'dgSalesRequestDetails',
-            },
+            // stateStoring: {
+            //     enabled: true,
+            //     type: 'localStorage',
+            //     storageKey: 'dgSalesRequestDetails',
+            // },
             toolbar: {
                 items: [{
                     widget: 'dxButton',
@@ -393,19 +386,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 {
                     type: 'buttons',
                     caption: l('Actions'),
-                    buttons: [{
-                        name: 'delete',
-                        onClick(e) {
-                            let index = currentData.details.findIndex(v => v.itemId == e.row?.data.itemId)
-                            if (index > -1)
-                                currentData.details.splice(index, 1)
-                            e.component.refresh().done(() => {
-                                setTimeout(() => {
-                                    recalulateDocTotal()
-                                }, 200)
-                            })
-                        }
-                    }],
+                    buttons: ["delete"],
                     width: 75,
                     fixed: true,
                     fixedPosition: 'left',
@@ -574,15 +555,27 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
                     dataField: 'qty',
-                    dataType: 'number',
                     setCellValue: function (newData, value, currentRowData) {
                         newData.qty = value;
                         newData.lineAmt = (value * currentRowData.price - (currentRowData.discountAmt || 0)) * (100 - (currentRowData.discountPerc || 0)) / 100;
                         newData.lineAmtAfterTax = (currentRowData.priceAfterTax * value - (currentRowData.discountAmt || 0)) * (100 - (currentRowData.discountPerc || 0)) / 100;
                     },
                     validationRules: [{ type: 'required', message: '' }],
-                    editorOptions: {
-                        min: 1
+                    editCellTemplate: (cellElement, cellInfo) => {
+                        return $("<div/>").dxNumberBox({
+                            value: cellInfo.data.qty,
+                            min: 1,
+                            onValueChanged: (e) => {
+                                cellInfo.setValue(e.value);
+                            },
+                            onKeyDown(e) {
+                                const { event } = e;
+                                const str = event.key || String.fromCharCode(event.which);
+                                if (/^[.,e]$/.test(str)) {
+                                    event.preventDefault();
+                                }
+                            },
+                        })
                     }
                 },
                 {
@@ -759,8 +752,18 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     setTimeout(() => {
                         recalulateDocTotal()
                     }, 200)
-                if (currentData.details.length < 1)
-                    form.dxForm('instance').getEditor('businessPartnerId').option('readOnly', false);
+                let formInstance = $("#form-container").dxForm('instance')
+                if (currentData.details.length > 0) {
+                    $('#saveButtonPopup').dxButton('instance').option('disabled', false);
+                    formInstance.getEditor('businessPartnerId').option('readOnly', true);
+                    formInstance.getEditor('routeId').option('readOnly', true);
+                    formInstance.getEditor('employeeId').option('readOnly', true);
+                } else {
+                    $('#saveButtonPopup').dxButton('instance').option('disabled', true);
+                    formInstance.getEditor('businessPartnerId').option('readOnly', false);
+                    formInstance.getEditor('routeId').option('readOnly', false);
+                    formInstance.getEditor('employeeId').option('readOnly', false);
+                }
             },
             onInitNewRow: (e) => {
                 e.data = {
@@ -800,6 +803,20 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 //     }, 200)
                 // }
 
+            },
+            onRowRemoved: (e) => {
+                let formInstance = $("#form-container").dxForm('instance')
+                if (currentData.details.length > 0) {
+                    $('#saveButtonPopup').dxButton('instance').option('disabled', false);
+                    formInstance.getEditor('businessPartnerId').option('readOnly', true);
+                    formInstance.getEditor('routeId').option('readOnly', true);
+                    formInstance.getEditor('employeeId').option('readOnly', true);
+                } else {
+                    $('#saveButtonPopup').dxButton('instance').option('disabled', true);
+                    formInstance.getEditor('businessPartnerId').option('readOnly', false);
+                    formInstance.getEditor('routeId').option('readOnly', false);
+                    formInstance.getEditor('employeeId').option('readOnly', false);
+                }
             }
         })
         gridInstance = grid.dxDataGrid('instance')
@@ -836,21 +853,37 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             },
                             disabled: true,
                             onClick: function (e) {
+                                let formInstance = form.dxForm("instance")
+                                let gridInstance = grid.dxDataGrid("instance")
+                                let popupInstance = popup.dxPopup('instance')
+                                popupInstance.beginUpdate()
+                                docId = comingData.previous.header.id;
                                 let newEditingOption = {
                                     ...grid.dxDataGrid('instance').option("editing"),
                                     allowAdding: !Boolean(comingData.previous.header.docStatus),
                                     allowUpdating: !Boolean(comingData.previous.header.docStatus),
                                     allowDeleting: !Boolean(comingData.previous.header.docStatus),
                                 }
-                                docId = comingData.previous.header.id;
-                                form.dxForm("instance").option("formData", comingData.previous.header)
-                                savedFormData = { ...form.dxForm('instance').option('formData') }
-                                grid.dxDataGrid("instance").option('dataSource', comingData.previous.details)
-                                form.dxForm('instance').option("readOnly", Boolean(comingData.previous.header.docStatus))
-                                grid.dxDataGrid('instance').option("editing", newEditingOption)
+                                currentData = comingData.previous
+                                formInstance.option("formData", comingData.previous.header)
+                                gridInstance.option('dataSource', comingData.previous.details)
+                                formInstance.option("readOnly", Boolean(comingData.previous.header.docStatus))
+                                gridInstance.option("editing", newEditingOption)
                                 $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", Boolean(comingData.previous.header.docStatus))
-                                popup.dxPopup('instance').option("title", `Sale Order - #${docId ? comingData.previous.header.docNbr : "New"} - ${docStatusStore[comingData.previous.header.docStatus || 0].text}`)
+                                popupInstance.option("title", `Sale Order - #${docId ? comingData.previous.header.docNbr : "New"} - ${docStatusStore[comingData.previous.header.docStatus || 0].text}`)
+                                if (currentData.details.length > 0) {
+                                    $('#saveButtonPopup').dxButton('instance').option('disabled', false);
+                                    formInstance.getEditor('businessPartnerId').option('readOnly', true);
+                                    formInstance.getEditor('routeId').option('readOnly', true);
+                                    formInstance.getEditor('employeeId').option('readOnly', true);
+                                } else {
+                                    $('#saveButtonPopup').dxButton('instance').option('disabled', true);
+                                    formInstance.getEditor('businessPartnerId').option('readOnly', false);
+                                    formInstance.getEditor('routeId').option('readOnly', false);
+                                    formInstance.getEditor('employeeId').option('readOnly', false);
+                                }
                                 loadNavigationButton(docId)
+                                popupInstance.endUpdate()
                             }
                         }
                     },
@@ -866,21 +899,37 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             },
                             disabled: true,
                             onClick: function (e) {
+                                let formInstance = form.dxForm("instance")
+                                let gridInstance = grid.dxDataGrid("instance")
+                                let popupInstance = popup.dxPopup('instance')
+                                popupInstance.beginUpdate()
+                                docId = comingData.next.header.id;
                                 let newEditingOption = {
                                     ...grid.dxDataGrid('instance').option("editing"),
                                     allowAdding: !Boolean(comingData.next.header.docStatus),
                                     allowUpdating: !Boolean(comingData.next.header.docStatus),
                                     allowDeleting: !Boolean(comingData.next.header.docStatus),
                                 }
-                                docId = comingData.next.header.id;
-                                form.dxForm("instance").option("formData", comingData.next.header)
-                                savedFormData = { ...form.dxForm('instance').option('formData') }
-                                grid.dxDataGrid("instance").option('dataSource', comingData.next.details)
-                                form.dxForm('instance').option("readOnly", Boolean(comingData.next.header.docStatus))
-                                grid.dxDataGrid('instance').option("editing", newEditingOption)
+                                currentData = comingData.next
+                                formInstance.option("formData", comingData.next.header)
+                                gridInstance.option('dataSource', comingData.next.details)
+                                formInstance.option("readOnly", Boolean(comingData.next.header.docStatus))
+                                gridInstance.option("editing", newEditingOption)
                                 $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", Boolean(comingData.next.header.docStatus))
-                                popup.dxPopup('instance').option("title", `Sale Order - #${docId ? comingData.next.header.docNbr : "New"} - ${docStatusStore[comingData.next.header.docStatus || 0].text}`)
+                                popupInstance.option("title", `Sale Order - #${docId ? comingData.next.header.docNbr : "New"} - ${docStatusStore[comingData.next.header.docStatus || 0].text}`)
+                                if (currentData.details.length > 0) {
+                                    $('#saveButtonPopup').dxButton('instance').option('disabled', false);
+                                    formInstance.getEditor('businessPartnerId').option('readOnly', true);
+                                    formInstance.getEditor('routeId').option('readOnly', true);
+                                    formInstance.getEditor('employeeId').option('readOnly', true);
+                                } else {
+                                    $('#saveButtonPopup').dxButton('instance').option('disabled', true);
+                                    formInstance.getEditor('businessPartnerId').option('readOnly', false);
+                                    formInstance.getEditor('routeId').option('readOnly', false);
+                                    formInstance.getEditor('employeeId').option('readOnly', false);
+                                }
                                 loadNavigationButton(docId)
+                                popupInstance.endUpdate()
                             }
                         }
                     },
@@ -1152,6 +1201,7 @@ function recalulateDocTotal() {
         formInstance.getEditor('routeId').option('readOnly', true);
         formInstance.getEditor('employeeId').option('readOnly', true);
     } else {
+        $('#saveButtonPopup').dxButton('instance').option('disabled', true);
         formInstance.getEditor('businessPartnerId').option('readOnly', false);
         formInstance.getEditor('routeId').option('readOnly', false);
         formInstance.getEditor('employeeId').option('readOnly', false);

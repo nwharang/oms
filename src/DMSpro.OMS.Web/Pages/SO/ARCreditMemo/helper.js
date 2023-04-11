@@ -317,19 +317,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 {
                     type: 'buttons',
                     caption: l('Actions'),
-                    buttons: [{
-                        name: 'delete',
-                        onClick(e) {
-                            let index = currentData.details.findIndex(v => v.itemId == e.row?.data.itemId)
-                            if (index > -1)
-                                currentData.details.splice(index, 1)
-                            e.component.refresh().done(() => {
-                                setTimeout(() => {
-                                    recalulateDocTotal()
-                                }, 200)
-                            })
-                        }
-                    }],
+                    buttons: ["delete"],
                     width: 75,
                     fixed: true,
                     fixedPosition: 'left',
@@ -490,15 +478,27 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
                     dataField: 'qty',
-                    dataType: 'number',
                     setCellValue: function (newData, value, currentRowData) {
                         newData.qty = value;
                         newData.lineAmt = value * currentRowData.price - (currentRowData.discountAmt || 0)
                         newData.lineAmtAfterTax = currentRowData.priceAfterTax * value - (currentRowData.discountAmt || 0)
                     },
                     validationRules: [{ type: 'required', message: '' }],
-                    editorOptions: {
-                        min: 1
+                    editCellTemplate: (cellElement, cellInfo) => {
+                        return $("<div/>").dxNumberBox({
+                            value: cellInfo.data.qty,
+                            min: 1,
+                            onValueChanged: (e) => {
+                                cellInfo.setValue(e.value);
+                            },
+                            onKeyDown(e) {
+                                const { event } = e;
+                                const str = event.key || String.fromCharCode(event.which);
+                                if (/^[.,e]$/.test(str)) {
+                                    event.preventDefault();
+                                }
+                            },
+                        })
                     }
                 },
                 {
@@ -913,6 +913,7 @@ function recalulateDocTotal() {
         formInstance.getEditor('routeId').option('readOnly', true);
         formInstance.getEditor('employeeId').option('readOnly', true);
     } else {
+        $('#saveButtonPopup').dxButton('instance').option('disabled', true);
         formInstance.getEditor('businessPartnerId').option('readOnly', false);
         formInstance.getEditor('routeId').option('readOnly', false);
         formInstance.getEditor('employeeId').option('readOnly', false);

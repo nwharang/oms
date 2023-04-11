@@ -436,7 +436,6 @@ var loadControl = function (data) {
                             dataSource: discountTypeStore,
                             displayExpr: 'text',
                             valueExpr: 'id',
-                            value: 0,
                             showClearButton: true,
                             onValueChanged: function (e) {
                                 calculatorDocTotal()
@@ -757,7 +756,6 @@ var loadControl = function (data) {
                         newData.lineAmt = value * currentData.price - currentData.discountAmt;
                         newData.lineAmtAfterTax = currentData.priceAfterTax * value - currentData.discountAmt;
                     },
-                    value: 0,
                     validationRules: [
                         {
                             type: 'required', message: ''
@@ -817,7 +815,6 @@ var loadControl = function (data) {
                                 newData.discountAmt = 0;
                         }
                     },
-                    value: 0,
                     validationRules: [{ type: 'required', message: '' }],
                     width: 200,
                     visible: false
