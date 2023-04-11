@@ -346,14 +346,6 @@ $(function () {
         searchPanel: {
             visible: true
         },
-        //scrolling: {
-        //    mode: 'standard'
-        //},
-        stateStoring: { //save state in localStorage
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'priceUpdateDetailContainer',
-        },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -379,27 +371,27 @@ $(function () {
         },
         toolbar: {
             items: [
-                "groupPanel",
+                //"groupPanel",
                 "addRowButton",
-                'columnChooserButton',
-                "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    }
-                },
-                "searchPanel"
+                //'columnChooserButton',
+                //"exportButton",
+                // {
+                //     location: 'after',
+                //     widget: 'dxButton',
+                //     options: {
+                //         icon: "import",
+                //         elementAttr: {
+                //             class: "import-excel",
+                //         },
+                //         onClick(e) {
+                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //             var gridName = gridControl.attr('id');
+                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //             if (popup) popup.show();
+                //         },
+                //     }
+                // },
+                // "searchPanel"
             ],
         },
         onInitNewRow(e) {
@@ -432,7 +424,8 @@ $(function () {
                         return {
                             store: priceListDetailStore,
                             paginate: true,
-                            pageSize: pageSizeForLookup
+                            pageSize: pageSizeForLookup,
+                            filter: ['', '', price], //thanhhq
                         };
                     },
                     displayExpr(data) {

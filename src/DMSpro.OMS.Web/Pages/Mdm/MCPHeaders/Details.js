@@ -422,11 +422,11 @@ $(function () {
             searchPanel: {
                 visible: true
             },
-            stateStoring: { //save state in localStorage
-                enabled: true,
-                type: 'localStorage',
-                storageKey: 'dgMCPDetails',
-            },
+            //stateStoring: { //save state in localStorage
+            //    enabled: true,
+            //    type: 'localStorage',
+            //    storageKey: 'dgMCPDetails',
+            //},
             paging: {
                 enabled: true,
                 pageSize: pageSize
@@ -520,7 +520,7 @@ $(function () {
                 e.data.week2 = true;
                 e.data.week3 = true;
                 e.data.week4 = true,
-                    e.data.customerId = null;
+                e.data.customerId = null;
                 //e.data.mcpHeaderId = MCPModel ? MCPModel.id : null;
             },
             columns: [
@@ -534,7 +534,13 @@ $(function () {
                 {
                     caption: l1("EntityFieldName:MDMService:MCPDetail:Customer"),
                     dataField: "customerId",
-                    calculateDisplayValue: "customer.name",
+                    calculateDisplayValue(rowData) {
+                        if (rowData.customer) {
+                            return rowData.customer.name;
+                        } else {
+                            return "";
+                        }
+                    },
                     validationRules: [{ type: "required", message: '' }],
                     lookup: {
                         dataSource() {
@@ -551,12 +557,12 @@ $(function () {
                         searchMode: 'contains'
                     }
                 },
-                //{
-                //    caption: "Address",
-                //    dataField: "customer.address",
-                //    width: 150,
-                //    allowEditing: false,
-                //},
+                {
+                    caption: "Address",
+                    dataField: "customer.fullAddress",
+                    width: 150,
+                    allowEditing: false,
+                },
                 {
                     caption: l("EntityFieldName:MDMService:MCPDetail:EffectiveDate"),
                     dataField: "effectiveDate",

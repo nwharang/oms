@@ -56,6 +56,7 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
+            console.log(args);
 
             mCPHeaderService.getListDevextremes(args)
                 .done(result => {
@@ -144,11 +145,11 @@ $(function () {
             searchPanel: {
                 visible: true
             },
-            stateStoring: { //save state in localStorage
-                enabled: true,
-                type: 'localStorage',
-                storageKey: 'dgMCPHeaders',
-            },
+            //stateStoring: { //save state in localStorage
+            //    enabled: true,
+            //    type: 'localStorage',
+            //    storageKey: 'dgMCPHeaders',
+            //},
             paging: {
                 enabled: true,
                 pageSize: pageSize

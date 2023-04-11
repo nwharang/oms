@@ -89,8 +89,6 @@ public class OMSMenuContributor : IMenuContributor
             ).RequirePermissions(AdministrationServicePermissions.Dashboard.Tenant)
         );
 
-        context.Menu.SetSubItemOrder(ProductServiceMenus.ProductManagement, 2);
-
         context.Menu.SetSubItemOrder(SaasHostMenuNames.GroupName, 3);
 
         //saas
@@ -828,7 +826,7 @@ public class OMSMenuContributor : IMenuContributor
     {
         ApplicationMenuItem groupMenu = new ApplicationMenuItem(
                MdmServiceMenus.Companies,
-               context.GetLocalizer<OMSResource>()["Menu:MdmService:Company"],
+               context.GetLocalizer<OMSResource>()["Menu:MdmService:CompanySetup"],
                null,
                icon: "fa fa-building"
            )
@@ -1235,7 +1233,7 @@ public class OMSMenuContributor : IMenuContributor
             new ApplicationMenuItem(
                 MdmServiceMenus.CustomerAttributeValues,
                 context.GetLocalizer<OMSResource>()["Menu:MdmService:CusAttributeValues"],
-                "/Mdm/CusAttributeValues",
+                "/Mdm/CustomerAttributeValues",
                 icon: "fa fa-check-square",
                 requiredPermissionName: MdmServicePermissions.CustomerAttributes.Default
             ).RequireFeatures(MdmFeatures.CustomerAttributes)

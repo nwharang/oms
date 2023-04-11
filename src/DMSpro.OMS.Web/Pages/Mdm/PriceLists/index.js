@@ -309,41 +309,34 @@ $(function () {
         //     //     e.editorOptions.disabled = true
         // },
         onEditorPrepared: function (e) {
-            if (e.row?.rowType == "data" && Boolean(e.dataField) && e.parentType == 'dataRow' && e.row.isNewRow){
-                console.log("ThUY");
-                const items = e.component.getDataSource().items();
-                const value = e.component.option("value");
-            }
+            //if (e.row?.rowType == "data" && Boolean(e.dataField) && e.parentType == 'dataRow' && e.row.isNewRow){
+            //    const items = e.component.getDataSource().items();
+            //    const value = e.component.option("value");
+            //}
         },
         toolbar: {
             items: [
-                "groupPanel",
-                {
-                    location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        dataGrid.addRow();
-                    },
-                },
-                'columnChooserButton',
-                "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    }
-                },
-                "searchPanel"
+                //"groupPanel",
+                "addRowButton",
+                "columnChooserButton",
+                //"exportButton",
+                //{
+                //    location: 'after',
+                //    widget: 'dxButton',
+                //    options: {
+                //        icon: "import",
+                //        elementAttr: {
+                //            class: "import-excel",
+                //        },
+                //        onClick(e) {
+                //            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //            var gridName = gridControl.attr('id');
+                //            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //            if (popup) popup.show();
+                //        },
+                //    }
+                //},
+                //"searchPanel"
             ],
         },
         columns:
@@ -352,7 +345,7 @@ $(function () {
                     type: 'buttons',
                     buttons: ['edit'],
                     caption: l('Actions'),
-                    width: 120,
+                    width: 100,
                     fixedPosition: 'left'
                 },
                 {
@@ -365,18 +358,18 @@ $(function () {
                     caption: l("EntityFieldName:MDMService:PriceList:Name"),
                     validationRules: [{ type: "required" }]
                 },
-                {
-                    dataField: 'active',
-                    caption: l("EntityFieldName:MDMService:PriceList:Active"),
-                    alignment: 'center',
-                    dataType: 'boolean',
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                            .appendTo(container);
-                    },
-                    width: 120
-                },
+                //{
+                //    dataField: 'active',
+                //    caption: l("EntityFieldName:MDMService:PriceList:Active"),
+                //    alignment: 'center',
+                //    dataType: 'boolean',
+                //    cellTemplate(container, options) {
+                //        $('<div>')
+                //            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                //            .appendTo(container);
+                //    },
+                //    width: 120
+                //},
                 {
                     caption: l("EntityFieldName:MDMService:PriceList:BasePriceList"),
                     dataField: "basePriceListId",
@@ -390,19 +383,20 @@ $(function () {
                         //dataSource: getPriceList,
                         dataSource: {
                             store: getPriceList,
+                            filter: ["isBase", "=", true],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         },
                         valueExpr: 'id',
                         displayExpr: 'code'
                     },
-                    // editorOptions: {
-                    //     dataSource: {
-                    //         store: getPriceList,
-                    //         filter: ["isFirstPriceList", "=", true],
-                    //     },
-                    //     valueExpr: 'id',
-                    //     displayExpr: 'code'
+                    //editorOptions: {
+                    //     //dataSource: {
+                    //     //    store: getPriceList,
+                    //     //    filter: ["isFirstPriceList", "=", true],
+                    //     //},
+                    //     //valueExpr: 'id',
+                    //     //displayExpr: 'code'
                     // },
                     width: 200
                 },
@@ -558,7 +552,7 @@ $(function () {
                             items: [
                                 //"addRowButton",
                                 "groupPanel", 
-                                "columnChooserButton",
+                                //"columnChooserButton",
                                 "exportButton",
                                 "searchPanel"
                             ],
