@@ -3,7 +3,7 @@
     var l1 = abp.localization.getResource("OMS");
     var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
-    var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
+    var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.customerAttributeValues.customerAttributeValue;
     var cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
     var geoMasterStore = new DevExpress.data.CustomStore({

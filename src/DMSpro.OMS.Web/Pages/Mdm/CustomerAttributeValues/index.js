@@ -1,6 +1,6 @@
 $(function () {
     var l = abp.localization.getResource("OMS");
-    var cusAttributesValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
+    var cusAttributesValueService = window.dMSpro.oMS.mdmService.controllers.customerAttributeValues.customerAttributeValue;
     var cusAttributeService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
 
     var cusAttributes = new DevExpress.data.CustomStore({
@@ -58,8 +58,8 @@ $(function () {
         insert(values) {
             return cusAttributesValueService.create(values, { contentType: "application/json" });
         },
-        update(key, values) {
-            return cusAttributesValueService.update(key, values, { contentType: "application/json" });
+        update(key, { attrValName }) {
+            return cusAttributesValueService.update(key, { attrValName }, { contentType: "application/json" });
         },
         remove(key) {
             return cusAttributesValueService.delete(key);
@@ -188,14 +188,21 @@ $(function () {
                 fixedPosition: 'left'
             },
             {
-                dataField: 'attrValName',
-                caption: l("EntityFieldName:MDMService:CusAttributeValue:Name"),
+                dataField: 'code',
+                caption: l("EntityFieldName:MDMService:CustomerAttributeValue:Code"),
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
             {
+                dataField: 'attrValName',
+                caption: l("EntityFieldName:MDMService:CustomerAttributeValue:Name"),
+                dataType: 'string',
+                validationRules: [{ type: "required" }]
+            },
+
+            {
                 dataField: 'customerAttributeId',
-                caption: l("EntityFieldName:MDMService:CusAttributeValue:AttrNo"),
+                caption: l("EntityFieldName:MDMService:CustomerAttributeValue:Attribute"),
                 lookup: {
                     dataSource: {
                         store: cusAttributes,

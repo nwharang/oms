@@ -241,7 +241,7 @@ $(function () {
                 defaultContent: ""
             },
             {
-                data: "cusAttributeValue.attrValName",
+                data: "customerAttributeValue.attrValName",
                 defaultContent: ""
             },
             {
