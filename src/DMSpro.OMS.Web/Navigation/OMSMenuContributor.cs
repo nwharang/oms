@@ -826,7 +826,7 @@ public class OMSMenuContributor : IMenuContributor
     {
         ApplicationMenuItem groupMenu = new ApplicationMenuItem(
                MdmServiceMenus.Companies,
-               context.GetLocalizer<OMSResource>()["Menu:MdmService:CompanySetup"],
+               context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:CompanySetup"],
                null,
                icon: "fa fa-building"
            )
