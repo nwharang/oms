@@ -623,5 +623,5 @@ $(function () {
         }
     }).dxDataGrid('instance');
 
-    initImportPopup('api/mdm-service/price-lists', 'PriceLists_Template', 'gridPriceLists');
+    // initImportPopup('api/mdm-service/price-lists', 'PriceLists_Template', 'gridPriceLists');
 });

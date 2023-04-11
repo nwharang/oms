@@ -202,7 +202,6 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 readOnly: true,
                                 format: '#,##0.##',
                                 min: 0,
-                                value: 0,
                             }
                         },
                         {

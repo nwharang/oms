@@ -208,22 +208,22 @@ $(function () {
                 },
                 'columnChooserButton',
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    }
-                },
+                // {
+                //     location: 'after',
+                //     widget: 'dxButton',
+                //     options: {
+                //         icon: "import",
+                //         elementAttr: {
+                //             class: "import-excel",
+                //         },
+                //         onClick(e) {
+                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //             var gridName = gridControl.attr('id');
+                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //             if (popup) popup.show();
+                //         },
+                //     }
+                // },
                 "searchPanel"
             ],
         },
@@ -290,5 +290,5 @@ $(function () {
     /****button*****/
 
     /****function*****/
-    initImportPopup('api/mdm-service/price-updates', 'PriceUpdateSchedules_Template', 'priceUpdateContainer');
+    // initImportPopup('api/mdm-service/price-updates', 'PriceUpdateSchedules_Template', 'priceUpdateContainer');
 });

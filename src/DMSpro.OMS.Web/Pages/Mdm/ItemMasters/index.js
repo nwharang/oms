@@ -1,306 +1,263 @@
-﻿$(function () {
-    var l = abp.localization.getResource("OMS");
-    var itemMasterService = window.dMSpro.oMS.mdmService.controllers.items.item;
-    var itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
-    var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
-    var itemTypeService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
+﻿$(async function () {
+    let l = abp.localization.getResource("OMS");
+    let rpcService = {
+        itemMasterService: window.dMSpro.oMS.mdmService.controllers.items.item,
+        itemAttrValueService: window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue,
+        itemAttrService: window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute,
+        itemTypeService: window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData,
+        uomService: window.dMSpro.oMS.mdmService.controllers.uOMs.uOM,
+        uomGroupService: window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGroup,
+        uomGroupDetailService: window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail,
+        vatService: window.dMSpro.oMS.mdmService.controllers.vATs.vAT,
+        itemImageService: window.dMSpro.oMS.mdmService.controllers.itemImages.itemImage,
+    }
+    let enumValue = {
+        manageItem: [
+            {
+                id: 0,
+                text: l('EntityFieldValue:MDMService:Item:ManageItemBy:NONE')
+            },
+            {
+                id: 1,
+                text: l('EntityFieldValue:MDMService:Item:ManageItemBy:LOT')
+            },
+            {
+                id: 2,
+                text: l('EntityFieldValue:MDMService:Item:ManageItemBy:SERIAL')
+            }
+        ],
+        expiredType: [
+            {
+                id: 0,
+                text: l('EntityFieldValue:MDMService:Item:ExpiredType:DAY')
+            },
+            {
+                id: 1,
+                text: l('EntityFieldValue:MDMService:Item:ExpiredType:WEEK')
+            },
+            {
+                id: 2,
+                text: l('EntityFieldValue:MDMService:Item:ExpiredType:MONTH')
+            },
+            {
+                id: 3,
+                text: l('EntityFieldValue:MDMService:Item:ExpiredType:YEAR')
+            }
+        ],
+        issueMethod: [
+            {
+                id: 0,
+                text: l('EntityFieldValue:MDMService:Item:IssueMethod:FEFO')
+            },
+            {
+                id: 1,
+                text: l('EntityFieldValue:MDMService:Item:IssueMethod:SERIAL')
+            }
 
-    var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
-    var uomGroupService = window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGroup;
-    var uomGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail;
-    var vatService = window.dMSpro.oMS.mdmService.controllers.vATs.vAT;
-    let disableColumn = ["inventoryUOMId", "purUOMId", "salesUOMId"]
+        ],
+        itemTypes: [
+            {
+                id: 0,
+                text: l('EntityFieldValue:MDMService:Item:ItemTypes:Item'),
+            },
+            {
+                id: 1,
+                text: l('EntityFieldValue:MDMService:Item:ItemTypes:POSM'),
+            },
+            {
+                id: 2,
+                text: l('EntityFieldValue:MDMService:Item:ItemTypes:Discount'),
+            },
+            {
+                id: 3,
+                text: l('EntityFieldValue:MDMService:Item:ItemTypes:Voucher'),
+            }
+        ]
+    }
+    let store = {
+        getVATs: new DevExpress.data.CustomStore({
+            key: 'id',
+            loadMode: 'raw',
+            cacheRawData: true,
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                const args = {};
+
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+                rpcService.vatService.getListDevextremes(args)
+                    .done(result => {
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount,
+                        });
+                    });
+                return deferred.promise();
+            },
+        }),
+        getUOMs: new DevExpress.data.CustomStore({
+            key: 'id',
+            loadMode: 'raw',
+            cacheRawData: true,
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                const args = {};
+
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+                rpcService.uomService.getListDevextremes(args)
+                    .done(result => {
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount,
+                        });
+                    });
+                return deferred.promise();
+            },
+        }),
+        getUOMsGroup: new DevExpress.data.CustomStore({
+            key: 'id',
+            loadMode: 'raw',
+            cacheRawData: true,
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                const args = {};
+
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+                rpcService.uomGroupService.getListDevextremes(args)
+                    .done(result => {
+                        let lastResult = { ...result }
+                        // Validate UOM group where UOM group must have asleast 1 row and have base UOM
+                        lastResult.data = result.data.filter(e => e.details.filter(detail => detail.baseUOMId === detail.altUOMId).length > 0)
+                        deferred.resolve(lastResult.data, {
+                            totalCount: lastResult.totalCount,
+                            summary: lastResult.summary,
+                            groupCount: lastResult.groupCount,
+                        });
+                    });
+                return deferred.promise();
+            },
+        }),
+        getUOMsGroupDetailStore: new DevExpress.data.CustomStore({
+            key: 'id',
+            loadMode: 'raw',
+            cacheRawData: true,
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                const args = {};
+
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+                rpcService.uomGroupDetailService.getListDevextremes(args)
+                    .done(result => {
+                        getUOMsGroupDetaiArr = result.data
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount,
+                        });
+                    });
+                return deferred.promise();
+            },
+        }),
+        itemStore: new DevExpress.data.CustomStore({
+            key: 'id',
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                const args = {};
+
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+                rpcService.itemMasterService.getListDevextremes(args)
+                    .done(result => {
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount,
+                        });
+                    });
+                return deferred.promise();
+            },
+            byKey: function (key) {
+                if (key == 0) return null;
+
+                let d = new $.Deferred();
+                rpcService.itemMasterService.get(key)
+                    .done(data => {
+                        d.resolve(data);
+                    });
+                return d.promise();
+            },
+            insert(values) {
+                return rpcService.itemMasterService.create(values, { contentType: "application/json" });
+            },
+            update(key, values) {
+                return rpcService.itemMasterService.update(key, values, { contentType: "application/json" });
+            },
+            remove(key) {
+                return rpcService.itemMasterService.delete(key);
+            }
+        }),
+        getItemAttrValue: new DevExpress.data.CustomStore({
+            key: 'id',
+            loadMode: 'raw',
+            cacheRawData: true,
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                const args = {};
+
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+
+                rpcService.itemAttrValueService.getListDevextremes(args)
+                    .done(result => {
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount,
+                        });
+                    });
+                return deferred.promise();
+            },
+        })
+    }
     /****custom store*****/
-    let defaultItemType;
-    let getUOMsGroupDetaiArr
-    var getVATs = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
+    let defaultItemType, getUOMsGroupDetaiArr;
+    let disableColumn = ["inventoryUOMId", "purUOMId", "salesUOMId"], gridInfo = {}
 
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            vatService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        },
-    });
-    var getItemTypes = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            itemTypeService.getListDevextremes(args)
-                .done(result => {
-                    defaultItemType = result
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        },
-    });
-    var getUOMs = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            uomService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        },
-    });
-    var getUOMsGroup = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            uomGroupService.getListDevextremes(args)
-                .done(result => {
-                    let lastResult = { ...result }
-                    // Validate UOM group where UOM group must have asleast 1 row and have base UOM
-                    lastResult.data = result.data.filter(e => e.details.filter(detail => detail.baseUOMId === detail.altUOMId).length > 0)
-                    deferred.resolve(lastResult.data, {
-                        totalCount: lastResult.totalCount,
-                        summary: lastResult.summary,
-                        groupCount: lastResult.groupCount,
-                    });
-                });
-            return deferred.promise();
-        },
-    });
-    var getUOMsGroupDetailStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            uomGroupDetailService.getListDevextremes(args)
-                .done(result => {
-                    getUOMsGroupDetaiArr = result.data
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        },
-    });
-    // get Item Master
-    var itemStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            itemMasterService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            itemMasterService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        },
-        insert(values) {
-            return itemMasterService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return itemMasterService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return itemMasterService.delete(key);
-        }
-    });
 
     // get item attribute value
-    var getItemAttrValue = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            itemAttrValueService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-            var d = new $.Deferred();
-            itemAttrValueService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        },
-    });
-
-    var getItemAttr = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            itemAttrService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-            var d = new $.Deferred();
-            itemAttrService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        },
-    });
-
-    const manageItem = [
-        {
-            id: 0,
-            text: l('EntityFieldValue:MDMService:Item:ManageItemBy:NONE')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldValue:MDMService:Item:ManageItemBy:LOT')
-        },
-        {
-            id: 2,
-            text: l('EntityFieldValue:MDMService:Item:ManageItemBy:SERIAL')
+    await rpcService.itemAttrService.getListDevextremes({ filter: JSON.stringify(['active', '=', true]) }).then(({ data }) => {
+        gridInfo.itemAttr = {
+            hierarchy: data.filter(e => e.hierarchyLevel != null).sort((a, b) => a.attrNo - b.attrNo),
+            flat: data.filter(e => e.hierarchyLevel == null).sort((a, b) => a.attrNo - b.attrNo),
+            count: data.length
         }
-    ];
+    })
 
-    const expiredType = [
-        {
-            id: 0,
-            text: l('EntityFieldValue:MDMService:Item:ExpiredType:DAY')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldValue:MDMService:Item:ExpiredType:WEEK')
-        },
-        {
-            id: 2,
-            text: l('EntityFieldValue:MDMService:Item:ExpiredType:MONTH')
-        },
-        {
-            id: 3,
-            text: l('EntityFieldValue:MDMService:Item:ExpiredType:YEAR')
-        }
-    ];
-
-    const issueMethod = [
-        {
-            id: 0,
-            text: l('EntityFieldValue:MDMService:Item:IssueMethod:FEFO')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldValue:MDMService:Item:IssueMethod:SERIAL')
-        }
-    ];
-
-    /****control*****/
-
-    var gridItemMasters = $('#dataGridItemMasters').dxDataGrid({
-        dataSource: itemStore,
+    let gridItemMasters = $('#dataGridItemMasters').dxDataGrid({
+        dataSource: store.itemStore,
         editing: {
             mode: 'popup',
             allowAdding: abp.auth.isGranted('MdmService.Items.Create'),
@@ -356,18 +313,22 @@
                                 dataType: 'string'
                             },
                             {
-                                dataField: 'itemTypeId',
-                                // label: l('ItemTypeName'),
+                                dataField: 'itemType',
                                 editorType: 'dxSelectBox',
+                                editorOptions: {
+                                    dataSource: {
+                                        store: enumValue.itemTypes,
+                                    },
+                                    valueExpr: 'id',
+                                    displayExpr: 'text'
+                                }
                             },
                             {
                                 dataField: 'barcode',
-                                // label: l('Barcode'),
                                 dataType: 'string'
                             },
                             {
                                 dataField: 'erpCode',
-                                // label: l('ERPCode'),
                                 dataType: 'string'
                             },
                             {
@@ -443,7 +404,7 @@
                                 dataField: 'issueMethod',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
-                                    items: issueMethod,
+                                    items: enumValue.issueMethod,
                                     elementAttr: {
                                         id: 'issueMethod'
                                     },
@@ -457,6 +418,7 @@
                         ]
 
                     },
+                    // Options
                     {
                         itemType: 'group',
                         caption: 'OPTIONS',
@@ -480,11 +442,11 @@
                         ]
 
                     },
-                    // Tabs Groups
+                    // Sys settings
                     {
-                        caption: 'OPTIONS',
+                        caption: 'SYSTEM SETTINGS',
                         itemType: 'group',
-                        colSpan: 3,
+                        colSpan: 2,
                         items: [
                             {
                                 dataField: 'uomGroupId',
@@ -511,7 +473,7 @@
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
                                     dataSource: {
-                                        store: getVATs,
+                                        store: store.getVATs,
                                         paginate: true,
                                     },
                                     valueExpr: 'id',
@@ -527,20 +489,32 @@
                             },
                         ],
                     },
+                    // ATTRIBUTE
                     {
                         caption: 'ATTRIBUTE',
                         itemType: 'group',
-                        colSpan: 3,
-                        items: getAttrOptions()
-                        // DMS Attributes
+                        colCount: 2,
+                        colSpan: 4,
+                        items: [
+                            {
+                                itemType: 'group',
+                                items: getAttrField('hierarchy')
+                            },
+                            {
+                                itemType: 'group',
+                                items: getAttrField('flat')
+                            },
+                        ]
                     },
-                ]
+                ],
+                onContentReady: (e) => {
+                }
             },
         },
-        remoteOperations: true,
+        // remoteOperations: true,
         showRowLines: true,
         showBorders: true,
-        cacheEnabled: true,
+        // cacheEnabled: true,
         allowColumnReordering: true,
         rowAlternationEnabled: true,
         allowColumnResizing: true,
@@ -564,6 +538,11 @@
         columnFixing: {
             enabled: true,
         },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'dataGridItemMasters',
+        // },
         export: {
             enabled: true,
         },
@@ -585,11 +564,7 @@
         headerFilter: {
             visible: true,
         },
-        // stateStoring: {
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'dataGridItemMasters',
-        // },
+
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -608,8 +583,7 @@
             e.data.isPurchasable = true;
             e.data.isSaleable = true;
             e.data.manageItemBy = 0
-            e.data.itemTypeId = defaultItemType.data.find(e => e.code == 'MD02' && e.valueCode == "I").id;
-            // getItemTypes.
+            e.data.itemType = 0
         },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
@@ -635,9 +609,9 @@
                             class: "import-excel",
                         },
                         onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            let gridControl = e.element.closest('div.dx-datagrid').parent();
+                            let gridName = gridControl.attr('id');
+                            let popup = $(`div.${gridName}.popupImport`).data('dxPopup');
                             if (popup) popup.show();
                         },
                     }
@@ -676,17 +650,14 @@
                 dataType: 'string'
             },
             {
-                dataField: 'itemTypeId',
+                dataField: 'itemType',
                 caption: l("EntityFieldName:MDMService:Item:ItemTypeName"),
                 editorType: 'dxSelectBox',
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource: {
-                        store: getItemTypes,
-                        filter: ['code', '=', 'MD02'],
-                    },
+                    dataSource: enumValue.itemTypes,
                     valueExpr: 'id',
-                    displayExpr: 'valueName'
+                    displayExpr: 'text'
                 }
             },
             {
@@ -700,7 +671,7 @@
                 dataType: 'string',
                 visible: false,
                 lookup: {
-                    dataSource: getUOMsGroup,
+                    dataSource: store.getUOMsGroup,
                     valueExpr: "id",
                     displayExpr: "name"
                 },
@@ -757,7 +728,7 @@
                 validationRules: [{ type: "required" }],
                 dataType: 'string',
                 lookup: {
-                    dataSource: manageItem,
+                    dataSource: enumValue.manageItem,
                     valueExpr: "id",
                     displayExpr: "text",
                 },
@@ -768,7 +739,7 @@
                 caption: l('EntityFieldName:MDMService:Item:ExpiredType'),
                 dataType: 'string',
                 lookup: {
-                    dataSource: expiredType,
+                    dataSource: enumValue.expiredType,
                     valueExpr: "id",
                     displayExpr: "text"
                 },
@@ -787,7 +758,7 @@
                 dataField: 'issueMethod',
                 caption: l('EntityFieldName:MDMService:Item:IssueMethod'),
                 lookup: {
-                    dataSource: issueMethod,
+                    dataSource: enumValue.issueMethod,
                     valueExpr: "id",
                     displayExpr: "text"
                 },
@@ -805,10 +776,10 @@
                     dataSource(options) {
                         if (options?.data)
                             return {
-                                store: getUOMsGroupDetailStore,
+                                store: store.getUOMsGroupDetailStore,
                                 filter: ["uomGroupId", "=", options.data.uomGroupId || 0],
                             }
-                        return getUOMsGroupDetailStore
+                        return store.getUOMsGroupDetailStore
                     },
                     valueExpr: "altUOMId",
                     displayExpr: "altUOM.name",
@@ -818,15 +789,16 @@
                 dataField: 'purUOMId',
                 caption: l('EntityFieldName:MDMService:Item:PurUnitName'),
                 validationRules: [{ type: "required" }],
-                visible: false,
+                // visible: false,
                 lookup: {
                     dataSource(options) {
-                        if (options?.data)
+                        if (options?.data?.uomGroupId) {
                             return {
-                                store: getUOMsGroupDetailStore,
-                                filter: ["uomGroupId", "=", options.data.uomGroupId || 0]
+                                store: store.getUOMsGroupDetailStore,
+                                filter: ["uomGroupId", "=", options.data.uomGroupId]
                             }
-                        return getUOMsGroupDetailStore
+                        }
+                        return store.getUOMsGroupDetailStore
                     },
                     valueExpr: "altUOMId",
                     displayExpr: "altUOM.name",
@@ -841,14 +813,16 @@
                     dataSource(options) {
                         if (options?.data)
                             return {
-                                store: getUOMsGroupDetailStore,
-                                filter: ["uomGroupId", "=", options.data.uomGroupId || 0]
+                                store: store.getUOMsGroupDetailStore,
+                                filter: ["uomGroupId", "=", options.data.uomGroupId || 0],
+                                paginate: true,
                             }
-                        return getUOMsGroupDetailStore
+                        return store.getUOMsGroupDetailStore
                     },
                     valueExpr: "altUOMId",
                     displayExpr: "altUOM.name",
                 },
+
             },
             {
                 dataField: 'vatId',
@@ -859,7 +833,7 @@
                 },
                 lookup: {
                     dataSource: {
-                        store: getVATs,
+                        store: store.getVATs,
                         paginate: true,
                     },
                     valueExpr: 'id',
@@ -886,254 +860,13 @@
                         .appendTo(container);
                 }
             },
-            {
-                dataField: 'attr0Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr0Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(0)
-                    },
-                },
-            },
-            {
-                dataField: 'attr1Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr1Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(1)
-                    },
-                },
-            },
-            {
-                dataField: 'attr2Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr2Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(2)
-                    },
-                },
-            },
-            {
-                dataField: 'attr3Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr3Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(3)
-                    },
-                },
-            },
-            {
-                dataField: 'attr4Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr4Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(4)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr5Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr5Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(5)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr6Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr6Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(6)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr7Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr7Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(7)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr8Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr8Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(8)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr9Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr9Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(9)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr10Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr10Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(10)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr11Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr11Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(11)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr12Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr12Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(12)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr13Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr13Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(13)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr14Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr14Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(14)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr15Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr15Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(15)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr16Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr16Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(16)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr17Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr17Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(17)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr18Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr18Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(18)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr19Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr19Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(19)
-                    },
-                },
-                visible: false,
-            }
+            ...getAttrColumn("hierarchy"),
+            ...getAttrColumn("flat"),
         ]
     }).dxDataGrid('instance');
 
     /****function*****/
     initImportPopup('api/mdm-service/items', 'Items_Template', 'dataGridItemMasters');
-
-    function dsAttrValue(n) {
-        return {
-            store: getItemAttrValue,
-            filter: ['itemAttribute.attrNo', '=', n],
-        };
-    }
 
     let disableCell = (e, arg) => {
         if (arg) {
@@ -1142,60 +875,77 @@
         }
     }
 
-    /**
-     * Fetch Attribute Item API
-     * @returns {Array} Array Item's dataFields
-     */
-    function getAttrOptions() {
-        let obj = []
-        let deferred = $.Deferred();
-        itemAttrService
-            .getListDevextremes({})
-            .done(result => {
-                deferred.resolve(result.data);
-            })
-        deferred.promise().then(data => {
-            data.filter(e => e.active).forEach(e => obj.push(generateAttrOptions(e)))
+    function getAttrField(type) {
+        return gridInfo.itemAttr[type].map(({ attrNo, attrName, hierarchyLevel, id }, index) => {
+            return {
+                name: 'attr' + attrNo + 'Id',
+                dataField: 'attr' + attrNo + 'Id',
+                label: { text: l(`${attrName}`) },
+                editorOptions: {
+                    valueExpr: "id",
+                    // readOnly: type === "hierarchy" && hierarchyLevel != 0,
+                    displayExpr: "attrValName",
+                    dataSource: {
+                        store: store.getItemAttrValue,
+                        filter: ['itemAttributeId', '=', id],
+                    },
+                    onContentReady: (e) => {
+                        let selectboxInstance = e.component
+                        if (selectboxInstance.option('value')) {
+                            selectboxInstance.option('readOnly', false);
+                        }
+                    },
+                },
+            }
         })
-        return obj
     }
-    /**
-     * Get Attribute Item's dataField
-     * @param {Number} attrNo - Attribute Id
-     * @returns {object}
-     */
-    function generateAttrOptions({ attrNo, attrName }) {
-        return {
-            dataField: 'attr' + attrNo + 'Id',
-            label: { text: l(`${attrName}`) },
-            editorOptions: {
-                valueExpr: "id",
-                displayExpr: "attrValName",
-                dataSource: dsAttrValue(attrNo)
-            },
-        }
+    function getAttrColumn(type) {
+        return gridInfo.itemAttr[type].map(({ attrNo, attrName, hierarchyLevel, id }, index, arr) => {
+            let referenceArrayNo = arr.map(e => e.attrNo)
+            referenceArrayNo.shift()
+            return {
+                dataField: 'attr' + attrNo + 'Id',
+                caption: l(`EntityFieldName:MDMService:Item:Attr${attrNo}Name`),
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource: {
+                        store: store.getItemAttrValue,
+                        filter: ['itemAttributeId', '=', id],
+                    }
+                },
+                setCellValue: (newData, value, currentRowData) => {
+                    newData['attr' + attrNo + 'Id'] = value;
+                    referenceArrayNo.forEach(value => {
+                        newData['attr' + value + 'Id'] = null
+                    })
+                }
+            }
+        })
     }
-
 
     function renderItemImage(data, itemElement) {
         // change in future versions
-        function getuserImage(userId) {
-            var d = new $.Deferred();
+        function getImage(id) {
+            // Sample id : 8998d7c8-bbb6-97c0-bc54-3a09f05f64f5
+            let d = new $.Deferred();
             /// Get item src attribute value here 
             Promise.resolve(d.resolve(null))
+            // rpcService.itemImageService.getList('')
             return d.promise();
         }
 
-        getuserImage("Customer Id Go Here").done(dataUrl => {
+        getImage("Customer Id Go Here").done(dataUrl => {
             itemElement.addClass("d-flex flex-column justify-content-center align-items-center");
             itemElement.append($("<img>").attr({
                 // https://source.unsplash.com/random/ for testing image size
                 // /images/default-avatar-image.jpg for default image size
-                src: dataUrl || "/images/default-avatar-image.jpg",
-                style: "object-fit:contain;object-position:center center;max-height:150px;max-width:150px;cursor:pointer;border-radius:50%",
+                src: dataUrl || "https://source.unsplash.com/random/",
+                style: "object-fit:cover;object-position:center center;max-height:150px;max-width:150px;cursor:pointer;border-radius:1rem;",
             }))
-            itemElement.append($("<div>").addClass('mt-3 w-75').attr("id", "file-uploader").dxFileUploader({
+            itemElement.append($("<div/>").addClass('mt-3').dxFileUploader({
                 accept: 'image/*',
+                labelText: "",
                 uploadMode: 'instantly',
                 uploadUrl: 'API_URL_POST', // Upload Image Endpoint Go Here
                 selectButtonText: "Choose Image",
@@ -1204,12 +954,9 @@
                     if (files.length > 0) {
                         $('#selected-files .selected-item').remove();
                         $.each(files, (i, file) => {
-                            const $selectedItem = $('<div />').addClass('selected-item');
+                            const $selectedItem = $('<div class="selected-item" />')
                             $selectedItem.append(
                                 $('<span />').html(`Name: ${file.name}<br/>`),
-                                $('<span />').html(`Size ${file.size} bytes<br/>`),
-                                $('<span />').html(`Type ${file.type}<br/>`),
-                                $('<span />').html(`Last Modified Date: ${file.lastModifiedDate}`),
                             );
                             $selectedItem.appendTo($('#selected-files'));
                         });

@@ -472,7 +472,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             },
                             items: [
                                 {
-                                    text: "Close",
+                                    text: "Release",
                                     icon: "close",
                                     onClick: () => {
                                         if (docId)
