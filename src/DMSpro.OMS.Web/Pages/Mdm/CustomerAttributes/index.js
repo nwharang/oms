@@ -38,14 +38,14 @@ $(function () {
         byKey: function (key) {
             return key == 0 ? customerAttributeService.get(key) : null;
         },
-        insert(values) {
-            return customerAttributeService.create(values, { contentType: "application/json" });
+        insert({ attrName }) {
+            return customerAttributeService.create({ attrName }, { contentType: "application/json" });
         },
-        update(key, values) {
-            return customerAttributeService.update(key, values, { contentType: "application/json" });
+        update(key, { attrName }) {
+            return customerAttributeService.update(key, { attrName }, { contentType: "application/json" });
         },
         remove(key) {
-            return customerAttributeService.delete(key);
+            return customerAttributeService.delete(key, { contentType: "application/json" });
         }
     });
     customStore.load().then(() => {
