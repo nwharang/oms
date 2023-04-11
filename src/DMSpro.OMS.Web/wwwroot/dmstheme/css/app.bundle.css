@@ -1315,7 +1315,7 @@ html body {
       padding-bottom: 10px; }
       .nav-menu li > ul li a {
         color: #84a3d6;
-        padding: 0.8125rem 2rem 0.8125rem 4rem; }
+        padding: 0.8125rem 2rem 0.8125rem 3rem; }
         .nav-menu li > ul li a b.collapse-sign > [class*='fa-'],
         .nav-menu li > ul li a b.collapse-sign > .ni {
           font-size: inherit-2; }
@@ -1355,7 +1355,7 @@ html body {
         color: white; }
       .nav-menu li > ul li > ul li a {
         color: #7c9dd3;
-        padding: 0.8125rem 2rem 0.8125rem 6rem; }
+        padding: 0.8125rem 2rem 0.8125rem 4rem; }
         .nav-menu li > ul li > ul li a .dl-ref {
           margin-left: 0;
           margin-right: 0.20833rem; }
