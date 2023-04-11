@@ -7,7 +7,7 @@ if (customerGroup != null) {
 
 var customerGroupAttributeService = window.dMSpro.oMS.mdmService.controllers.customerGroupByAtts.customerGroupByAtt;
 var customerAttributeService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
-var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
+var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.customerAttributeValues.customerAttributeValue;
 var customerListService = window.dMSpro.oMS.mdmService.controllers.customerGroupByLists.customerGroupByList;
 var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
 var customerGroupService = window.dMSpro.oMS.mdmService.controllers.customerGroups.customerGroup;
