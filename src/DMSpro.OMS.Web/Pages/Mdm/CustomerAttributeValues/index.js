@@ -1,5 +1,6 @@
 $(function () {
     var l = abp.localization.getResource("OMS");
+    var l1 = abp.localization.getResource("MdmService");
     var cusAttributesValueService = window.dMSpro.oMS.mdmService.controllers.customerAttributeValues.customerAttributeValue;
     var cusAttributeService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
 
@@ -189,20 +190,20 @@ $(function () {
             },
             {
                 dataField: 'code',
-                caption: l("EntityFieldName:MDMService:CustomerAttributeValue:Code"),
+                caption: l1("EntityFieldName:MDMService:CustomerAttributeValue:Code"),
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'attrValName',
-                caption: l("EntityFieldName:MDMService:CustomerAttributeValue:Name"),
+                caption: l1("EntityFieldName:MDMService:CustomerAttributeValue:Name"),
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
             },
 
             {
                 dataField: 'customerAttributeId',
-                caption: l("EntityFieldName:MDMService:CustomerAttributeValue:Attribute"),
+                caption: l1("EntityFieldName:MDMService:CustomerAttributeValue:Attribute"),
                 lookup: {
                     dataSource: {
                         store: cusAttributes,

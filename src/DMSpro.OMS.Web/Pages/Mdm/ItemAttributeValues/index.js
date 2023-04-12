@@ -1,6 +1,7 @@
 $(function () {
     // language
     let l = abp.localization.getResource("OMS");
+    let l1 = abp.localization.getResource("MdmService");
     // load mdmService
     let itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
     let itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
@@ -245,7 +246,7 @@ $(function () {
                         },
                         items: [
                             {
-                                text: l('Button:MDMService:ItemAttribute:CreateRoot'),
+                                text: l1('Button:MDMService:ItemAttribute:CreateRoot'),
                                 icon: "add",
                                 onClick: () => {
                                     createMode = 0
@@ -253,7 +254,7 @@ $(function () {
                                 }
                             },
                             {
-                                text: l('Button:MDMService:ItemAttribute:CreateHierarchy'),
+                                text: l1('Button:MDMService:ItemAttribute:CreateHierarchy'),
                                 icon: "add",
                                 onClick: () => {
                                     createMode = 1
@@ -320,7 +321,7 @@ $(function () {
             },
             {
                 dataField: 'code',
-                caption: l("EntityFieldName:MDMService:ItemAttributeValue:Code"),
+                caption: l1("EntityFieldName:MDMService:ItemAttributeValue:Code"),
                 validationRules: [
                     {
                         type: "required",
