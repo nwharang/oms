@@ -59,13 +59,6 @@ function renderItemAttr(headerId) {
         onInitNewRow: (e) => {
             e.data.itemGroupId = headerId;
         },
-        onContentReady: (e) => {
-            if (e.component.getDataSource().items().length > 0) {
-                formInstance.getEditor('type').option('readOnly', true);
-            } else {
-                formInstance.getEditor('type').option('readOnly', false);
-            }
-        },
         toolbar: {
             items: [
                 "addRowButton",

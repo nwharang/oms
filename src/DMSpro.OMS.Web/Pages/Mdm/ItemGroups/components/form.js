@@ -70,27 +70,15 @@ function renderForm(e, headerData) {
             {
                 dataField: 'description',
                 editorType: 'dxTextBox',
-                colSpan: 6,
-            },
-            {
-                label: {
-                    text: l('EntityFieldName:MDMService:SalesOrgHeader:Code'),
-                },
-                itemType: 'button',
-                name: 'Button',
-                cssClass: "h-100 d-flex align-items-end",
-                buttonOptions: {
-                    text: "Edit",
-                    disabled: headerData.status != 0,
-                    width: '100%',
-                    onClick(event) {
-                        popupInstance.beginUpdate()
-                        console.log("Hello World!");
-                        popupInstance.endUpdate()
-                    }
-                }
+                colSpan: 7,
             },
         ],
+        onContentReady: (e) => {
+            if (headerData.status >= 0)
+                e.component.getEditor('type').option('readOnly', true);
+            else
+                e.component.getEditor('type').option('readOnly', false);
+        },
         onFieldDataChanged: (e) => {
             if (e.dataField === 'type' && headerData.id) {
                 switch (e.value) {
