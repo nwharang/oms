@@ -1,5 +1,6 @@
 ﻿$(async function () {
     let l = abp.localization.getResource("OMS");
+    let l1 = abp.localization.getResource("MdmService");
     let rpcService = {
         itemMasterService: window.dMSpro.oMS.mdmService.controllers.items.item,
         itemAttrValueService: window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue,
@@ -58,19 +59,19 @@
         itemTypes: [
             {
                 id: 0,
-                text: l('EntityFieldValue:MDMService:Item:ItemTypes:Item'),
+                text: l1('EntityFieldValue:MDMService:Item:ItemTypes:Item'),
             },
             {
                 id: 1,
-                text: l('EntityFieldValue:MDMService:Item:ItemTypes:POSM'),
+                text: l1('EntityFieldValue:MDMService:Item:ItemTypes:POSM'),
             },
             {
                 id: 2,
-                text: l('EntityFieldValue:MDMService:Item:ItemTypes:Discount'),
+                text: l1('EntityFieldValue:MDMService:Item:ItemTypes:Discount'),
             },
             {
                 id: 3,
-                text: l('EntityFieldValue:MDMService:Item:ItemTypes:Voucher'),
+                text: l1('EntityFieldValue:MDMService:Item:ItemTypes:Voucher'),
             }
         ]
     }
