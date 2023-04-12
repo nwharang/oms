@@ -6,10 +6,50 @@ $(function () {
     let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     let customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
     let itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
+    let geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
+
+
+
 
     let salesOrgHierarchyId = null;
     let popup, popupInstance, grid, gridInstance
     /****custom store*****/
+
+
+    var geoMasterStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        useDefaultSearch: true,
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            geoMasterService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            geoMasterService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
     var itemGroupStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
@@ -288,6 +328,7 @@ $(function () {
         columnAutoWidth: true,
         allowColumnDragging: false,
         columnMinWidth: 50,
+        dateSerializationFormat: "yyyy-MM-dd",
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -450,6 +491,7 @@ $(function () {
         allowColumnResizing: true,
         columnResizingMode: 'widget',
         columnAutoWidth: true,
+        dateSerializationFormat: "yyyy-MM-dd",
         allowColumnDragging: false,
         filterRow: {
             visible: true
@@ -627,7 +669,7 @@ $(function () {
 
     function renderMassInputCus() {
         popup = $("<div id='popup'>").dxPopup({
-            // title: l('EntityFieldName:MDMService:CustomerInZone:MassInput'),
+            title: l('EntityFieldName:MDMService:CustomerInZone:MassInput'),
             height: '75vh',
             width: '80vw',
             dragEnabled: false,
@@ -655,6 +697,7 @@ $(function () {
                         columnAutoWidth: true,
                         showRowLines: true,
                         rowAlternationEnabled: true,
+                        dateSerializationFormat: "yyyy-MM-dd",
                         showColumnLines: true,
                         columnChooser: {
                             enabled: true,
@@ -722,6 +765,103 @@ $(function () {
                                     valueExpr: 'code',
                                     displayExpr: 'code'
                                 }
+                            },
+                            {
+                                caption: l("EntityFieldName:MDMService:GeoMaster:Level4"),
+                                dataField: "geoMaster4.id",
+                                width: 110,
+                                lookup: {
+                                    dataSource(options) {
+                                        return {
+                                            store: geoMasterStore,
+                                            filter: options.data ? [['level', '=', 4], 'and', ['parentId', '=', options.data.geoMaster3Id]] : ['level', '=', 4],
+                                            paginate: true,
+                                            pageSize: pageSizeForLookup
+                                        };
+                                    },
+                                    valueExpr: 'id',
+                                    displayExpr: 'name',
+                                },
+                            },
+                            {
+                                caption: l("EntityFieldName:MDMService:GeoMaster:Level3"),
+                                dataField: "geoMaster3.id",
+                                width: 110,
+                                lookup: {
+                                    dataSource(options) {
+                                        return {
+                                            store: geoMasterStore,
+                                            filter: options.data ? [['level', '=', 3], 'and', ['parentId', '=', options.data.geoMaster2Id]] : ['level', '=', 3],
+                                            paginate: true,
+                                            pageSize: pageSizeForLookup
+                                        };
+                                    },
+                                    valueExpr: 'id',
+                                    displayExpr: 'name',
+                                },
+                            },
+                            {
+                                caption: l("EntityFieldName:MDMService:GeoMaster:Level2"),
+                                dataField: "geoMaster2.id",
+                                width: 110,
+                                lookup: {
+                                    dataSource(options) {
+                                        return {
+                                            store: geoMasterStore,
+                                            filter: options.data ? [['level', '=', 2], 'and', ['parentId', '=', options.data.geoMaster1Id]] : ['level', '=', 2],
+                                            paginate: true,
+                                            pageSize: pageSizeForLookup
+                                        };
+                                    },
+                                    valueExpr: 'id',
+                                    displayExpr: 'name',
+                                },
+                            },
+                            {
+                                caption: l("EntityFieldName:MDMService:GeoMaster:Level1"),
+                                dataField: "geoMaster1.id",
+                                width: 110,
+                                lookup: {
+                                    dataSource(options) {
+                                        return {
+                                            store: geoMasterStore,
+                                            filter: options.data ? [['level', '=', 1], 'and', ['parentId', '=', options.data.geoMaster0Id]] : ['level', '=', 1],
+                                            paginate: true,
+                                            pageSize: pageSizeForLookup
+                                        };
+                                    },
+                                    lookup: {
+                                        dataSource(options) {
+                                            return {
+                                                store: geoMasterStore,
+                                                filter: options.data ? [['level', '=', 3], 'and', ['parentId', '=', options.data.geoMaster2Id]] : ['level', '=', 3],
+                                                paginate: true,
+                                                pageSize: pageSizeForLookup
+                                            };
+                                        },
+                                        valueExpr: 'id',
+                                        displayExpr: 'name',
+                                    },
+                                    valueExpr: 'id',
+                                    displayExpr: 'name',
+                                },
+                            },
+                            {
+                                caption: l("EntityFieldName:MDMService:GeoMaster:Level0"),
+                                dataField: "geoMaster0.id",
+                                width: 110,
+                                lookup: {
+                                    dataSource(options) {
+                                        return {
+                                            store: geoMasterStore,
+                                            filter: ['level', '=', 0],
+                                            paginate: true,
+                                            pageSize: pageSizeForLookup
+                                        };
+                                    },
+                                    valueExpr: "id",
+                                    displayExpr: "name"
+                                },
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:CustomerContact:Address"),
