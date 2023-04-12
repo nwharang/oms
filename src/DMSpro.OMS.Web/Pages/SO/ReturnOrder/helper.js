@@ -491,7 +491,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                                     popup.dxPopup('instance').option("title", `Return Order - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[1].text}`)
                                                 })
                                                 .fail(() => {
-                                                    notify({ type: 'error', message: "Close Credit Memo Failed" })
+                                                    notify({ type: 'error', message: "Close Return Order Failed" })
                                                     popup.dxPopup('instance').option("title", `Return Order - #${docId ? currentData.header.docNbr : "New"} - ${docStatusStore[0].text}`)
                                                     popup.dxPopup('instance').repaint()
                                                 })
