@@ -20,9 +20,9 @@ let renderPopup = async (args) => {
             renderForm(popupHeader, args)
             switch (args.type) {
                 case 0:
-                    return renderItemAttr(args.id)
+                    return renderItemAttr(args.id, args.status)
                 case 1:
-                    return renderItemList(args.id)
+                    return renderItemList(args.id, args.status)
                 default:
                     return
             }

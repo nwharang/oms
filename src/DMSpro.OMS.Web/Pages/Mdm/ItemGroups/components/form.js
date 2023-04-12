@@ -56,8 +56,6 @@ function renderForm(e, headerData) {
                                 break;
                             case 0:
                                 itemGroupService.release(headerData.id, { contentType: "application/json" }).done(e => {
-                                    headerData = e
-                                    formInstance.option('formData', e)
                                     popupInstance.option('title', `${l("Page.Title.ItemGroups")}} - #${store.status.find(e => e.id == e.status)?.text()}`)
                                     event.component.option('disabled', true)
                                 })
@@ -83,9 +81,9 @@ function renderForm(e, headerData) {
             if (e.dataField === 'type' && headerData.id) {
                 switch (e.value) {
                     case 0:
-                        return renderItemAttr(headerData.id)
+                        return renderItemAttr(headerData.id, headerData.status)
                     case 1:
-                        return renderItemList(headerData.id)
+                        return renderItemList(headerData.id, headerData.status)
                     default:
                         return;
 
