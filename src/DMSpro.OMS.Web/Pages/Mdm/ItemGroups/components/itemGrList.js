@@ -1,4 +1,4 @@
-function renderItemList(headerId) {
+function renderItemList(headerId, status) {
     if (!grid)
         grid = $('<div id=dataGridContainer class="ps-2">');
     grid.dxDataGrid({
@@ -46,9 +46,9 @@ function renderItemList(headerId) {
         },
         editing: {
             mode: 'row',
-            allowAdding: true,
-            allowUpdating: true,
-            allowDeleting: true,
+            allowAdding: status < 1,
+            allowUpdating: status < 1,
+            allowDeleting: status < 1,
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
