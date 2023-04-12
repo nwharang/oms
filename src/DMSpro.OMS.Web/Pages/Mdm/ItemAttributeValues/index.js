@@ -5,7 +5,7 @@ $(function () {
     // load mdmService
     let itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
     let itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
-    let isFirstLoad = false;
+    let isFirstLoad = false, lastLevel, currentView = "Hierarchy", editingComponent;
 
     /**
      * 0 : Root
@@ -92,6 +92,7 @@ $(function () {
     });
     getItemAttr.load({}).then((data) => {
         itemAttr = [...data]
+        lastLevel = Math.max(...itemAttr.map(e => e.hierarchyLevel))
     })
     const dataTreeContainer = $('#treeProdAttributeValue').dxTreeList({
         dataSource: customStore,
@@ -176,13 +177,18 @@ $(function () {
             if (!e.row?.isNewRow) return
             if (e.dataField === "itemAttributeId" && createMode == 2) {
                 let findChild = itemAttr.find(v => v.hierarchyLevel == e.row.data.level)
-                e.cancel = !findChild
-                e.setValue(findChild.id)
-                e.editorOptions.value = findChild.id;
-                e.editorOptions.disabled = true;
+                if (findChild) {
+                    e.setValue(findChild.id)
+                    e.editorOptions.value = findChild.id;
+                    e.editorOptions.disabled = true;
+                }
+
             }
         },
         onInitNewRow(e) {
+
+            // Assign this edit to local varible for future close 
+            editingComponent = e.component
             let row = e.component.getNodeByKey(e.data.parentId);
             e.data.level = row?.level + 1 || 0;
         },
@@ -209,13 +215,32 @@ $(function () {
                         selectedItemKeys: ['Hierarchy'],
                         keyExpr: 'text',
                         onItemClick: (e) => {
-                            if (e.itemData.text === 'Hierarchy')
+                            if (editingComponent)
+                                editingComponent.cancelEditData()
+                            let createRootButton = $('#buttonCreateRoot').dxButton('instance');
+                            let createFlatButton = $('#buttonCreateFlat').dxButton('instance');
+                            let createDetailsPanel = $('#actionButtonDetailsPanel').dxDropDownButton('instance')
+                            if (e.itemData.text === 'Hierarchy') {
+                                currentView = 'Hierarchy'
+                                createRootButton.option('visible', true)
+                                createFlatButton.option('visible', false)
+                                createDetailsPanel.option('visible', false)
                                 dataTreeContainer.option('filterValue', ['itemAttribute.hierarchyLevel', '<>', null])
-
-                            if (e.itemData.text === 'Attributes')
+                            }
+                            if (e.itemData.text === 'Attributes') {
+                                currentView = 'Attributes'
+                                createRootButton.option('visible', false)
+                                createFlatButton.option('visible', true)
+                                createDetailsPanel.option('visible', false)
                                 dataTreeContainer.option('filterValue', ['itemAttribute.hierarchyLevel', '=', null])
-                            if (e.itemData.text === 'All')
+                            }
+                            if (e.itemData.text === 'All') {
+                                currentView = 'All'
+                                createRootButton.option('visible', false)
+                                createFlatButton.option('visible', false)
+                                createDetailsPanel.option('visible', true)
                                 dataTreeContainer.option('filterValue', [])
+                            }
                         },
                         items: [
                             {
@@ -231,6 +256,36 @@ $(function () {
                     }
                 },
                 {
+                    widget: "dxButton",
+                    location: "after",
+                    options: {
+                        icon: "add",
+                        visible: true,
+                        elementAttr: {
+                            id: "buttonCreateRoot",
+                        },
+                        onClick: () => {
+                            createMode = 0
+                            dataTreeContainer.addRow();
+                        }
+                    }
+                },
+                {
+                    widget: "dxButton",
+                    location: "after",
+                    options: {
+                        icon: "add",
+                        visible: false,
+                        elementAttr: {
+                            id: "buttonCreateFlat",
+                        },
+                        onClick: () => {
+                            createMode = 1
+                            dataTreeContainer.addRow();
+                        }
+                    }
+                },
+                {
                     widget: "dxDropDownButton",
                     location: "after",
                     options: {
@@ -239,7 +294,7 @@ $(function () {
                         },
                         icon: 'preferences',
                         text: l('Actions'),
-                        visible: true,
+                        visible: false,
                         width: 120,
                         elementAttr: {
                             id: "actionButtonDetailsPanel",
@@ -298,7 +353,7 @@ $(function () {
                         dataTreeContainer.addRow(e.row.key)
                     },
                     cssClass: 'btnAddNewRow',
-                    disabled: (e) => !(e.row.data?.itemAttribute?.hierarchyLevel !== null && !e.row.isEditing && abp.auth.isGranted('MdmService.ItemAttributes.Create'))
+                    disabled: (e) => !(e.row.data?.itemAttribute?.hierarchyLevel !== null && e.row.data?.itemAttribute?.hierarchyLevel < lastLevel && !e.row.isEditing && abp.auth.isGranted('MdmService.ItemAttributes.Create'))
 
 
                 }, {
