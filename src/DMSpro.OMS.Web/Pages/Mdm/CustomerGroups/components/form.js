@@ -2,12 +2,13 @@ function renderForm(e, headerData) {
     if (!form) form = $('<div id="form">')
     form.dxForm({
         labelMode: "floatting",
-        colCount: 5,
+        colCount: 7,
         formData: headerData,
         items: [
             {
                 dataField: 'groupBy',
                 editorType: 'dxSelectBox',
+                colSpan: 2,
                 editorOptions: {
                     dataSource: store.GroupModes,
                     valueExpr: 'id',
@@ -18,6 +19,7 @@ function renderForm(e, headerData) {
             {
                 dataField: 'code',
                 editorType: 'dxTextBox',
+                colSpan: 2,
                 validationRules: [{ type: "required" }],
                 editorOptions: {
                     readOnly: headerData.active
@@ -26,13 +28,10 @@ function renderForm(e, headerData) {
             {
                 dataField: 'name',
                 editorType: 'dxTextBox',
+                colSpan: 2,
                 validationRules: [{ type: "required" }],
             },
-            {
-                dataField: 'effectiveDate',
-                editorType: 'dxDateBox',
-                validationRules: [{ type: "required" }],
-            },
+
             {
                 label: {
                     text: l('EntityFieldName:MDMService:SalesOrgHeader:Code'),
@@ -68,6 +67,11 @@ function renderForm(e, headerData) {
                         popupInstance.endUpdate()
                     }
                 }
+            },
+            {
+                dataField: 'description',
+                editorType: 'dxTextBox',
+                colSpan: 7,
             },
         ],
         onFieldDataChanged: (e) => {

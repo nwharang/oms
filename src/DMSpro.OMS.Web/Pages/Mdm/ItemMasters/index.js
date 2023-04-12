@@ -879,7 +879,6 @@
     function getAttrField(type) {
         return gridInfo.itemAttr[type].map(({ attrNo, attrName, hierarchyLevel, id }, index) => {
             return {
-                name: 'attr' + attrNo + 'Id',
                 dataField: 'attr' + attrNo + 'Id',
                 label: { text: l(`${attrName}`) },
                 editorOptions: {
@@ -896,6 +895,12 @@
                             selectboxInstance.option('readOnly', false);
                         }
                     },
+                    setCellValue: (newData, value, currentRowData) => {
+                        newData[`attr${attrNo}Id`] = value;
+                        referenceArrayNo.forEach(value => {
+                            newData['attr' + value + 'Id'] = null
+                        })
+                    }
                 },
             }
         })
@@ -915,12 +920,6 @@
                         filter: ['itemAttributeId', '=', id],
                     }
                 },
-                setCellValue: (newData, value, currentRowData) => {
-                    newData['attr' + attrNo + 'Id'] = value;
-                    referenceArrayNo.forEach(value => {
-                        newData['attr' + value + 'Id'] = null
-                    })
-                }
             }
         })
     }
