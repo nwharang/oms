@@ -38,15 +38,15 @@ $(function () {
                 });
             return deferred.promise();
         },
-        byKey: function (key) {
-            if (key == 0) return null;
-            let d = new $.Deferred();
-            itemAttrValueService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                })
-            return d.promise();
-        },
+        // byKey: function (key) {
+        //     if (key == 0) return null;
+        //     let d = new $.Deferred();
+        //     itemAttrValueService.get(key)
+        //         .done(data => {
+        //             d.resolve(data);
+        //         })
+        //     return d.promise();
+        // },
         insert({ attrValName, code, itemAttributeId, parentId }) {
             switch (createMode) {
                 case 0:
