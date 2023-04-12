@@ -134,18 +134,6 @@ $(function () {
                 dataType: 'string',
             },
             {
-                dataField: 'active',
-                caption: l("EntityFieldName:MDMService:CustomerGroup:Active"),
-                width: 100,
-                alignment: 'center',
-                dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                },
-            },
-            {
                 dataField: 'effectiveDate',
                 caption: l("EntityFieldName:MDMService:CustomerGroup:EffectiveDate"),
                 dataType: 'date',

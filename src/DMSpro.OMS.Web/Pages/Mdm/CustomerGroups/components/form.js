@@ -47,7 +47,7 @@ function renderForm(e, headerData) {
                         console.log(headerData.status);
                         switch (headerData.status) {
                             default:
-                                customerGroupService.create({ ...headerData, active: true }, { contentType: "application/json" }).done(e => {
+                                customerGroupService.create({ ...headerData }, { contentType: "application/json" }).done(e => {
                                     headerData = e
                                     formInstance.option('formData', e)
                                     popupInstance.option('title', `Customer Groups - #${store.cusStatus.find(e => e.id == e.status)?.text()}`)
@@ -55,9 +55,7 @@ function renderForm(e, headerData) {
                                 })
                                 break;
                             case 0:
-                                customerGroupService.update(headerData.id, { ...headerData, active: true, status: 1 }, { contentType: "application/json" }).done(e => {
-                                    headerData = e
-                                    formInstance.option('formData', e)
+                                customerGroupService.release(headerData.id, { contentType: "application/json" }).done(e => {
                                     popupInstance.option('title', `Customer Groups - #${store.cusStatus.find(e => e.id == e.status)?.text()}`)
                                     event.component.option('disabled', true)
                                     gridInstance.option('editing', {
