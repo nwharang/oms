@@ -627,7 +627,7 @@ $(function () {
 
     function renderMassInputCus() {
         popup = $("<div id='popup'>").dxPopup({
-            title: l('EntityFieldName:MDMService:CustomerInZone:MassInput'),
+            // title: l('EntityFieldName:MDMService:CustomerInZone:MassInput'),
             height: '75vh',
             width: '80vw',
             dragEnabled: false,
@@ -724,29 +724,8 @@ $(function () {
                                 }
                             },
                             {
-                                caption: l("EntityFieldName:MDMService:GeoMaster:Level4"),
-                                dataField: "geoMaster4.name",
-                            },
-                            {
-                                caption: l("EntityFieldName:MDMService:GeoMaster:Level3"),
-                                dataField: "geoMaster3.name",
-                            },
-                            {
-                                caption: l("EntityFieldName:MDMService:GeoMaster:Level2"),
-                                dataField: "geoMaster2.name",
-                            },
-                            {
-                                caption: l("EntityFieldName:MDMService:GeoMaster:Level1"),
-                                dataField: "geoMaster1.name",
-                            },
-                            {
-                                caption: l("EntityFieldName:MDMService:GeoMaster:Level0"),
-                                dataField: "geoMaster0.name",
-                            },
-                            {
                                 caption: l("EntityFieldName:MDMService:CustomerContact:Address"),
-                                dataField: "address",
-                                calculateDisplayValue: () => 'delete this field when api ready'
+                                dataField: "fullAddress",
                             }
                         ]
                     })
