@@ -1,77 +1,6 @@
-var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
 $(function () {
-    var l = abp.localization.getResource("OMS");
-
-    const status = [
-        {
-            id: 0,
-            text: l('EntityFieldValue:MDMService:ItemGroup:Status:OPEN')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldValue:MDMService:ItemGroup:Status:RELEASED')
-        },
-        {
-            id: 2,
-            text: l('EntityFieldValue:MDMService:ItemGroup:Status:CANCELLED')
-        }
-    ];
-
-    const types = [
-        {
-            id: 0,
-            text: l('EntityFieldValue:MDMService:ItemGroup:Type:ATTRIBUTE')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldValue:MDMService:ItemGroup:Type:LIST')
-        }
-    ];
-
-    // custom store
-    var groupStore = new DevExpress.data.CustomStore({
-        key: "id",
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            itemGroupService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            itemGroupService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                })
-            return d.promise();
-        },
-        insert(values) {
-            return itemGroupService.create(values, { contentType: 'application/json' });
-        },
-        update(key, values) {
-            return itemGroupService.update(key, values, { contentType: 'application/json' });
-        },
-        remove(key) {
-            return itemGroupService.delete(key);
-        }
-    });
-
-    const dataGrid = $('#gridItemGroups').dxDataGrid({
-        dataSource: groupStore,
+    dataGridContainer = $('#gridItemGroups').dxDataGrid({
+        dataSource: store.groupStore,
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
@@ -95,9 +24,9 @@ $(function () {
             enabled: true,
             mode: "select"
         },
-        columnFixing: {
-            enabled: true,
-        },
+        // columnFixing: {
+        //     enabled: true,
+        // },
         export: {
             enabled: true,
         },
@@ -163,8 +92,8 @@ $(function () {
                 {
                     location: 'after',
                     template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        dataGrid.addRow();
+                    onClick(e) {
+                        renderPopup({})
                     },
                 },
                 'columnChooserButton',
@@ -192,7 +121,7 @@ $(function () {
             if (e.dataField == "type" && e.parentType == "dataRow") {
                 if (e.row.data.status != 0)
                     e.editorOptions.disabled = false;
-                    //e.editorOptions.disabled = !e.row.inserted;
+                //e.editorOptions.disabled = !e.row.inserted;
             }
         },
         onRowInserting: function (e) {
@@ -218,17 +147,10 @@ $(function () {
                             return !e.row.isNewRow;
                         },
                         onClick: function (e) {
-                            var w = window.open('/Mdm/ItemGroups/Details', '_blank');
-                            if (e.row.isNewRow) {
-                                w.sessionStorage.setItem("itemGroup", JSON.stringify({ id: 0 }));
-                            } else {
-                                w.sessionStorage.setItem("itemGroup", JSON.stringify(e.row.data));
-                            }
-
-                        }
+                            renderPopup(e.row.data)
+                        },
                     },
-                    'edit', 'delete'],
-                fixedPosition: 'left'
+                ],
             },
             {
                 caption: l("EntityFieldName:MDMService:ItemGroup:Code"),
@@ -245,7 +167,7 @@ $(function () {
                 dataField: "type",
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource: types,
+                    dataSource: store.type,
                     displayExpr: 'text',
                     valueExpr: 'id',
                     paginate: true,
@@ -257,7 +179,7 @@ $(function () {
                 dataField: "status",
                 allowEditing: false,
                 lookup: {
-                    dataSource: status,
+                    dataSource: store.status,
                     displayExpr: 'text',
                     valueExpr: 'id',
                     paginate: true,
