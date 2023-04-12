@@ -255,11 +255,11 @@
         headerFilter: {
             visible: true,
         },
-        // stateStoring: {
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'dgCustomerProfile',
-        // },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgCustomerProfile',
+        },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -311,7 +311,10 @@
                 caption: l("Code"),
                 //allowEditing: false,
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                editorOptions: {
+                    readOnly: true,
+                },
+                //validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'name',
@@ -328,6 +331,7 @@
                 dataField: 'phone2',
                 caption: l("Phone2"),
                 dataType: 'string',
+                visible: false
             },
             {
                 dataField: 'erpCode',
@@ -339,11 +343,13 @@
                 dataField: 'license',
                 caption: l("License"),
                 dataType: 'string',
+                visible: false
             },
             {
                 dataField: 'taxCode',
                 caption: l("TaxCode"),
                 dataType: 'string',
+                visible: false
             },
             {
                 dataField: 'vatName',
@@ -357,12 +363,12 @@
                 dataType: 'string',
                 visible: false
             },
-            {
-                dataField: 'sfaCustomerCode',
-                caption: l("SfaCustomerCode"),
-                dataType: 'string',
-                validationRules: [{ type: "required" }]
-            },
+            // {
+            //     dataField: 'sfaCustomerCode',
+            //     caption: l("SfaCustomerCode"),
+            //     dataType: 'string',
+            //     //validationRules: [{ type: "required" }]
+            // },
             {
                 dataField: 'active',
                 caption: l("Active"),
@@ -384,18 +390,18 @@
                     displayFormat: 'dd/MM/yyyy',
                 },
                 format: 'dd/MM/yyyy',
-                validationRules: [{ type: "required" }]
+                visible: false,
+                validationRules: [{ type: "required" }],
             },
             {
                 dataField: 'endDate',
                 caption: l("EndDate"),
+                visible: false,
                 dataType: 'date',
-            },
-            {
-                dataField: 'creationTime',
-                caption: l("CreationTime"),
-                dataType: 'date',
-                visible: false
+                editorOptions: {
+                    displayFormat: 'dd/MM/yyyy',
+                },
+                format: 'dd/MM/yyyy',
             },
             {
                 dataField: 'isCompany',
@@ -408,6 +414,7 @@
                         .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
                         .appendTo(container);
                 },
+                visible: false,
             },
             {
                 dataField: 'creditLimit',
@@ -421,27 +428,21 @@
                 dataType: 'string',
                 visible: false,
             },
-            {
-                dataField: 'linkedCompanyId',
-                caption: l("LinkedCompany"),
-                //dataType: 'string',
-                //lookup: {
-                //    dataSource: {
-                //        store: companyData,
-                //        paginate: true,
-                //        pageSize: pageSizeForLookup
-                //    },
-                //    valueExpr: "id",
-                //    displayExpr: "code"
-                //},
-                visible: false
-            },
-            {
-                dataField: 'warehouseId',
-                caption: l("Warehouse"),
-                dataType: 'string',
-                visible: false
-            },
+            // {
+            //     dataField: 'linkedCompanyId',
+            //     caption: l("LinkedCompany"),
+            //     dataType: 'string',
+            //     lookup: {
+            //        dataSource: {
+            //            store: companyData,
+            //            paginate: true,
+            //            pageSize: pageSizeForLookup
+            //        },
+            //        valueExpr: "id",
+            //        displayExpr: "code"
+            //     },
+            //     visible: false
+            // },
             {
                 dataField: 'lastOrderDate',
                 caption: l("LastOrderDate"),
@@ -453,7 +454,7 @@
                 caption: l("PriceList"),
                 dataType: 'string',
                 visible: false,
-                validationRules: [{ type: "required" }],
+                //validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource: {
                         store: priceListStore,
