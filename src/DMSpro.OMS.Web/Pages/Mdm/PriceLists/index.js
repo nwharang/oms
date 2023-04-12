@@ -36,7 +36,7 @@ $(function () {
             return d.promise();
         },
         insert(values) {
-            return priceListService.create(values, { contentType: 'application/json' });
+            return priceListService.create({ ...values, active: true }, { contentType: 'application/json' });
         },
         update(key, values) {
             return priceListService.update(key, values, { contentType: 'application/json' });
@@ -304,7 +304,7 @@ $(function () {
         //     if (["action", 'name', 'code'].indexOf(e.dataField) === -1 && items.length < 1){
         //         e.editorOptions.disabled = true
         //     }
-                
+
         //     // if (e.dataField == 'basePriceListId')
         //     //     e.editorOptions.disabled = true
         // },
@@ -551,7 +551,7 @@ $(function () {
                         toolbar: {
                             items: [
                                 //"addRowButton",
-                                "groupPanel", 
+                                "groupPanel",
                                 //"columnChooserButton",
                                 "exportButton",
                                 "searchPanel"
