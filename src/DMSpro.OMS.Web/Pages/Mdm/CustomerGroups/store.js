@@ -21,10 +21,10 @@ let store = {
             id: 1,
             text: () => l('EntityFieldValue:MDMService:CustomerGroup:Status:RELEASED')
         },
-        {
-            id: 2,
-            text: () => l('EntityFieldValue:MDMService:CustomerGroup:Status:CANCELLED')
-        }
+        // {
+        //     id: 2,
+        //     text: () => l('EntityFieldValue:MDMService:CustomerGroup:Status:CANCELLED')
+        // }
     ],
     GroupModes: [
         {

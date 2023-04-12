@@ -6,8 +6,8 @@ function renderCusGrGeo(headerId) {
         remoteOperations: true,
         repaintChangesOnly: true,
         showBorders: true,
-        showRowLines: true,
-        showColumnLines: false,
+        showRowLines: false,
+        showColumnLines: true,
         cacheEnabled: true,
         allowColumnReordering: true,
         rowAlternationEnabled: true,
@@ -18,9 +18,9 @@ function renderCusGrGeo(headerId) {
         searchPanel: {
             visible: true
         },
-        columnFixing: {
-            enabled: true,
-        },
+        // columnFixing: {
+        //     enabled: true,
+        // },
         columnMinWidth: 50,
         columnChooser: {
             enabled: true,
@@ -77,8 +77,6 @@ function renderCusGrGeo(headerId) {
                 type: 'buttons',
                 width: 100,
                 buttons: ['edit', 'delete'],
-                fixed: true,
-                fixedPosition: "left"
             },
             {
                 dataField: "geoMaster0Id",
@@ -138,9 +136,10 @@ function renderCusGrGeo(headerId) {
                     valueExpr: 'id',
                     displayExpr: 'name',
                     dataSource(options) {
+                        console.log(options);
                         return {
                             store: store.geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoMaster0Id] : ['level', '=', 1],
+                            filter: options.data.geoMaster0Id ? ['parentId', '=', options.data.geoMaster0Id] : ['level', '=', 1],
                             paginate: true,
                         };
                     },
@@ -167,7 +166,7 @@ function renderCusGrGeo(headerId) {
                     dataSource(options) {
                         return {
                             store: store.geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoMaster1Id] : ['level', '=', 2],
+                            filter: options.data.geoMaster1Id ? ['parentId', '=', options.data.geoMaster1Id] : ['level', '=', 2],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
@@ -197,7 +196,7 @@ function renderCusGrGeo(headerId) {
                     dataSource(options) {
                         return {
                             store: store.geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoMaster2Id] : ['level', '=', 3],
+                            filter: options.data.geoMaster2Id ? ['parentId', '=', options.data.geoMaster2Id] : ['level', '=', 3],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
@@ -225,7 +224,7 @@ function renderCusGrGeo(headerId) {
                     dataSource(options) {
                         return {
                             store: store.geoMasterStore,
-                            filter: options.data ? ['parentId', '=', options.data.geoMaster3Id] : ['level', '=', 4],
+                            filter: options.data.geoMaster3Id ? ['parentId', '=', options.data.geoMaster3Id] : ['level', '=', 4],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };

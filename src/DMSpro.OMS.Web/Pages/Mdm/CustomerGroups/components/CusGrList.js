@@ -2,12 +2,12 @@ function renderCusGrList(headerId) {
     if (!grid)
         grid = $('<div id=dataGridContainer class="ps-2">');
     grid.dxDataGrid({
-        dataSource: store.customerGroupAttributeStore(headerId),
+        dataSource: store.customerListStore(headerId),
         remoteOperations: true,
         repaintChangesOnly: true,
         showBorders: true,
-        showRowLines: true,
-        showColumnLines: false,
+        showRowLines: false,
+        showColumnLines: true,
         cacheEnabled: true,
         allowColumnReordering: true,
         rowAlternationEnabled: true,
@@ -18,9 +18,9 @@ function renderCusGrList(headerId) {
         searchPanel: {
             visible: true
         },
-        columnFixing: {
-            enabled: true,
-        },
+        // columnFixing: {
+        //     enabled: true,
+        // },
         columnMinWidth: 50,
         columnChooser: {
             enabled: true,
@@ -77,8 +77,6 @@ function renderCusGrList(headerId) {
                 type: 'buttons',
                 width: 100,
                 buttons: ['edit', 'delete'],
-                fixed: true,
-                fixedPosition: "left"
             },
             {
                 caption: l("EntityFieldName:MDMService:CustomerInZone:Customer"),

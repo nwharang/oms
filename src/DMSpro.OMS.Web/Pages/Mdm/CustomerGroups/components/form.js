@@ -41,8 +41,8 @@ function renderForm(e, headerData) {
                 name: 'Button',
                 cssClass: "h-100 d-flex align-items-end",
                 buttonOptions: {
-                    text: !headerData.status ? "Create" : headerData.status === 0 ? "Release" : "Hide",
-                    disabled: headerData.status == 2,
+                    text: headerData.status >= 0 ? "Release" : "Create",
+                    disabled: headerData.status == 1,
                     width: '100%',
                     onClick(event) {
                         popupInstance.beginUpdate()
@@ -61,16 +61,8 @@ function renderForm(e, headerData) {
                                     headerData = e
                                     formInstance.option('formData', e)
                                     popupInstance.option('title', `Customer Groups - #${store.cusStatus.find(e => e.id == e.status)?.text()}`)
-                                    event.component.option('text', 'Release')
+                                    event.component.option('disabled', true)
                                 })
-                                break;
-                            case 1:
-                                customerGroupService.update(headerData.id, { ...headerData, active: true, status: 2 }, { contentType: "application/json" }).done(e => {
-                                    headerData = e
-                                    formInstance.option('formData', e)
-                                    popupInstance.option('title', `Customer Groups - #${store.cusStatus.find(e => e.id == e.status)?.text()}`)
-                                    event.component.option('text', 'Hide')
-                                });
                                 break;
                         }
                         popupInstance.endUpdate()
@@ -79,7 +71,7 @@ function renderForm(e, headerData) {
             },
         ],
         onFieldDataChanged: (e) => {
-            if (e.dataField === 'groupBy') {
+            if (e.dataField === 'groupBy' && headerData.id) {
                 switch (e.value) {
                     case 0:
                         renderCusGrAtt(headerData.id)

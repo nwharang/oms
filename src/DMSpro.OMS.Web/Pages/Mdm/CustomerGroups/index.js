@@ -96,7 +96,8 @@ $(function () {
                         icon: 'add',
                         onClick(e) {
                             renderPopup({})
-                        }
+                        },
+                        visible: abp.auth.isGranted('MdmService.CustomerGroups.Create')
                     }
 
                 },
@@ -115,7 +116,8 @@ $(function () {
                     icon: "fieldchooser",
                     onClick: function (e) {
                         renderPopup(e.row.data)
-                    }
+                    },
+                    visible: abp.auth.isGranted('MdmService.CustomerGroups.Edit')
                 }],
                 fixedPosition: 'left'
             },

@@ -6,8 +6,8 @@ function renderCusGrAtt(headerId) {
         remoteOperations: true,
         repaintChangesOnly: true,
         showBorders: true,
-        showRowLines: true,
-        showColumnLines: false,
+        showRowLines: false,
+        showColumnLines: true,
         cacheEnabled: true,
         allowColumnReordering: true,
         rowAlternationEnabled: true,
@@ -18,9 +18,9 @@ function renderCusGrAtt(headerId) {
         searchPanel: {
             visible: true
         },
-        columnFixing: {
-            enabled: true,
-        },
+        // columnFixing: {
+        //     enabled: true,
+        // },
         columnMinWidth: 50,
         columnChooser: {
             enabled: true,
@@ -77,8 +77,6 @@ function renderCusGrAtt(headerId) {
                 type: 'buttons',
                 width: 100,
                 buttons: ['edit', 'delete'],
-                fixed: true,
-                fixedPosition: "left"
             },
             ...customerAttr.map(e => {
                 return {
