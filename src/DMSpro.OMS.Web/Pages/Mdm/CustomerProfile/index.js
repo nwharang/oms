@@ -72,6 +72,7 @@
             return customerService.create(values, { contentType: "application/json" });
         },
         update(key, values) {
+            console.log(values);
             return customerService.update(key, values, { contentType: "application/json" });
         },
         remove(key) {
@@ -624,7 +625,7 @@
                 visible: false
             },
             {
-                dataField: "attribute0Id",
+                dataField: "attr0Id",
                 caption: l1("Attribute0Name"),
                 visible: false,
                 lookup: {
@@ -636,7 +637,7 @@
                 }
             },
             {
-                dataField: "attribute1Id",
+                dataField: "attr1Id",
                 caption: l1("Attribute1Name"),
                 visible: false,
                 lookup: {
@@ -648,7 +649,7 @@
                 }
             },
             {
-                dataField: "attribute2Id",
+                dataField: "attr2Id",
                 caption: l1("Attribute2Name"),
                 visible: false,
                 lookup: {
@@ -660,7 +661,7 @@
                 }
             },
             {
-                dataField: "attribute3Id",
+                dataField: "attr3Id",
                 caption: l1("Attribute3Name"),
                 visible: false,
                 lookup: {
@@ -672,7 +673,7 @@
                 }
             },
             {
-                dataField: "attribute4Id",
+                dataField: "attr4Id",
                 caption: l1("Attribute4Name"),
                 visible: false,
                 lookup: {
@@ -684,7 +685,7 @@
                 }
             },
             {
-                dataField: "attribute5Id",
+                dataField: "attr5Id",
                 caption: l1("Attribute5Name"),
                 visible: false,
                 lookup: {
@@ -696,7 +697,7 @@
                 }
             },
             {
-                dataField: "attribute6Id",
+                dataField: "attr6Id",
                 caption: l1("Attribute6Name"),
                 visible: false,
                 lookup: {
@@ -708,7 +709,7 @@
                 }
             },
             {
-                dataField: "attribute7Id",
+                dataField: "attr7Id",
                 caption: l1("Attribute7Name"),
                 visible: false,
                 lookup: {
@@ -720,7 +721,7 @@
                 }
             },
             {
-                dataField: "attribute8Id",
+                dataField: "attr8Id",
                 caption: l1("Attribute8Name"),
                 visible: false,
                 lookup: {
@@ -732,7 +733,7 @@
                 }
             },
             {
-                dataField: "attribute9Id",
+                dataField: "attr9Id",
                 caption: l1("Attribute9Name"),
                 visible: false,
                 lookup: {
@@ -744,7 +745,7 @@
                 }
             },
             {
-                dataField: "attribute10Id",
+                dataField: "attr10Id",
                 caption: l1("Attribute10Name"),
                 visible: false,
                 lookup: {
@@ -768,7 +769,7 @@
                 }
             },
             {
-                dataField: "attribute12Id",
+                dataField: "attr12Id",
                 caption: l1("Attribute12Name"),
                 visible: false,
                 lookup: {
@@ -780,7 +781,7 @@
                 }
             },
             {
-                dataField: "attribute13Id",
+                dataField: "attr13Id",
                 caption: l1("Attribute13Name"),
                 visible: false,
                 lookup: {
@@ -792,7 +793,7 @@
                 }
             },
             {
-                dataField: "attribute14Id",
+                dataField: "attr14Id",
                 caption: l1("Attribute14Name"),
                 visible: false,
                 lookup: {
@@ -804,7 +805,7 @@
                 }
             },
             {
-                dataField: "attribute15Id",
+                dataField: "attr15Id",
                 caption: l1("Attribute15Name"),
                 visible: false,
                 lookup: {
@@ -816,7 +817,7 @@
                 }
             },
             {
-                dataField: "attribute16Id",
+                dataField: "attr16Id",
                 caption: l1("Attribute16Name"),
                 visible: false,
                 lookup: {
@@ -828,7 +829,7 @@
                 }
             },
             {
-                dataField: "attribute17Id",
+                dataField: "attr17Id",
                 caption: l1("Attribute17Name"),
                 visible: false,
                 lookup: {
@@ -840,7 +841,7 @@
                 }
             },
             {
-                dataField: "attribute18Id",
+                dataField: "attr18Id",
                 caption: l1("Attribute18Name"),
                 visible: false,
                 lookup: {
@@ -852,7 +853,7 @@
                 }
             },
             {
-                dataField: "attribute19Id",
+                dataField: "attr19Id",
                 caption: l1("Attribute19Name"),
                 visible: false,
                 lookup: {
@@ -949,7 +950,7 @@
 
     function generateAttrOptions(attr) {
         return {
-            dataField: 'attribute' + attr.attrNo + 'Id',
+            dataField: 'attr' + attr.attrNo + 'Id',
             label: {
                 text: attr.attrName
             },
