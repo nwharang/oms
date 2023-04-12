@@ -14,10 +14,24 @@
     PageLayout.Content.MenuItemName = MdmServiceMenus.CustomerGroups;
 }
 
+@section styles {
+        <style> 
+        .dx-col-fixed.dx-cell-focus-disabled[role="columnheader"]{
+            background-color : #2b4c81 !important;
+        }
+        </style>
+}
+
 @section scripts
     {
     <script src="/js/devextreme/exceljs.min.js"></script>
     <script src="/js/devextreme/filesaver.min.js"></script>
+    <abp-script src="/Pages/Mdm/CustomerGroups/store.js" /> 
+    <abp-script src="/Pages/Mdm/CustomerGroups/components/CusGrAtt.js" />
+    <abp-script src="/Pages/Mdm/CustomerGroups/components/CusGrList.js" />
+    <abp-script src="/Pages/Mdm/CustomerGroups/components/CusGrGeo.js" />
+    <abp-script src="/Pages/Mdm/CustomerGroups/components/popup.js" />
+    <abp-script src="/Pages/Mdm/CustomerGroups/components/form.js" />
     <abp-script src="/Pages/Mdm/CustomerGroups/index.js" />
 }
 
