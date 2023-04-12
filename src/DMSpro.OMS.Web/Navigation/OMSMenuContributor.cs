@@ -1208,9 +1208,9 @@ public class OMSMenuContributor : IMenuContributor
                 MdmServicePermissions.CustomerAttributes.Default,
                 MdmServicePermissions.Vendors.Default,
                 MdmServicePermissions.CustomerGroups.Default,
-                MdmServicePermissions.CustomerGroupByAtts.Default,
-                MdmServicePermissions.CustomerGroupByLists.Default,
-                MdmServicePermissions.CustomerGroupByGeos.Default,
+                // MdmServicePermissions.CustomerGroupByAtts.Default,
+                // MdmServicePermissions.CustomerGroupByLists.Default,
+                // MdmServicePermissions.CustomerGroupByGeos.Default,
                 MdmServicePermissions.Customers.Default,
                 MdmServicePermissions.CustomerAssignments.Default)
             .RequireFeatures(false, MdmFeatures.CustomerAttributes,
