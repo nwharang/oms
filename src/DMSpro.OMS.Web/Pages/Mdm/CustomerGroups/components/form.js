@@ -31,7 +31,6 @@ function renderForm(e, headerData) {
                 colSpan: 2,
                 validationRules: [{ type: "required" }],
             },
-
             {
                 label: {
                     text: l('EntityFieldName:MDMService:SalesOrgHeader:Code'),
@@ -61,6 +60,11 @@ function renderForm(e, headerData) {
                                     formInstance.option('formData', e)
                                     popupInstance.option('title', `Customer Groups - #${store.cusStatus.find(e => e.id == e.status)?.text()}`)
                                     event.component.option('disabled', true)
+                                    gridInstance.option('editing', {
+                                        allowAdding: false,
+                                        allowUpdating: false,
+                                        allowDeleting: false,
+                                    })
                                 })
                                 break;
                         }
@@ -74,17 +78,23 @@ function renderForm(e, headerData) {
                 colSpan: 7,
             },
         ],
+        onContentReady: (e) => {
+            if (headerData.status >= 0)
+                e.component.getEditor('groupBy').option('readOnly', true);
+            else
+                e.component.getEditor('groupBy').option('readOnly', false);
+        },
         onFieldDataChanged: (e) => {
             if (e.dataField === 'groupBy' && headerData.id) {
                 switch (e.value) {
                     case 0:
-                        renderCusGrAtt(headerData.id)
+                        renderCusGrAtt(headerData.id, headerData.status)
                         break;
                     case 1:
-                        renderCusGrList(headerData.id)
+                        renderCusGrList(headerData.id, headerData.status)
                         break;
                     case 2:
-                        renderCusGrGeo(headerData.id)
+                        renderCusGrGeo(headerData.id, headerData.status)
                         break;
                     default:
                         return;

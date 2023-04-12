@@ -20,11 +20,11 @@ let renderPopup = async (args) => {
             renderForm(popupHeader, args)
             switch (args.groupBy) {
                 case 0:
-                    return renderCusGrAtt(args.id)
+                    return renderCusGrAtt(args.id , args.status)
                 case 1:
-                    return renderCusGrList(args.id)
+                    return renderCusGrList(args.id, args.status)
                 case 2:
-                    return renderCusGrGeo(args.id)
+                    return renderCusGrGeo(args.id, args.status)
                 default:
                     return
             }

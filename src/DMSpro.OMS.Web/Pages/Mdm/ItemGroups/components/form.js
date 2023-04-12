@@ -58,6 +58,11 @@ function renderForm(e, headerData) {
                                 itemGroupService.release(headerData.id, { contentType: "application/json" }).done(e => {
                                     popupInstance.option('title', `${l("Page.Title.ItemGroups")}} - #${store.status.find(e => e.id == e.status)?.text()}`)
                                     event.component.option('disabled', true)
+                                    gridInstance.option('editing', {
+                                        allowAdding: false,
+                                        allowUpdating: false,
+                                        allowDeleting: false,
+                                    })
                                 })
                                 break;
                         }

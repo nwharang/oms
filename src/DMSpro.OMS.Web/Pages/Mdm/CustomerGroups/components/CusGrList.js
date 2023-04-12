@@ -1,4 +1,4 @@
-function renderCusGrList(headerId) {
+function renderCusGrList(headerId, status) {
     if (!grid)
         grid = $('<div id=dataGridContainer class="ps-2">');
     grid.dxDataGrid({
@@ -46,9 +46,9 @@ function renderCusGrList(headerId) {
         },
         editing: {
             mode: 'row',
-            allowAdding: true,
-            allowUpdating: true,
-            allowDeleting: true,
+            allowAdding: status < 1,
+            allowUpdating: status < 1,
+            allowDeleting: status < 1,
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -58,13 +58,6 @@ function renderCusGrList(headerId) {
         },
         onInitNewRow: (e) => {
             e.data.customerGroupId = headerId;
-        },
-        onContentReady: (e) => {
-            if (e.component.getDataSource().items().length > 0) {
-                formInstance.getEditor('groupBy').option('readOnly', true);
-            } else {
-                formInstance.getEditor('groupBy').option('readOnly', false);
-            }
         },
         toolbar: {
             items: [
