@@ -911,7 +911,7 @@
             referenceArrayNo.shift()
             return {
                 dataField: 'attr' + attrNo + 'Id',
-                caption: l(`EntityFieldName:MDMService:Item:Attr${attrNo}Name`),
+                caption: attrName,
                 lookup: {
                     valueExpr: "id",
                     displayExpr: "attrValName",

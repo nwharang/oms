@@ -1,4 +1,4 @@
-﻿$(function () {
+﻿$(async function () {
     var l = abp.localization.getResource("OMS");
     var l1 = abp.localization.getResource("OMS");
     var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
@@ -6,6 +6,10 @@
     var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.customerAttributeValues.customerAttributeValue;
     var cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
+
+
+    let cusAttrStore = cusAttrService.getListDevextremes({ filter: JSON.stringify(['active', "=", true]) })
+
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
         useDefaultSearch: true,
@@ -624,246 +628,7 @@
                 dataType: 'string',
                 visible: false
             },
-            {
-                dataField: "attr0Id",
-                caption: l1("Attribute0Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(0)
-                    }
-                }
-            },
-            {
-                dataField: "attr1Id",
-                caption: l1("Attribute1Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(1)
-                    },
-                }
-            },
-            {
-                dataField: "attr2Id",
-                caption: l1("Attribute2Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(2)
-                    },
-                }
-            },
-            {
-                dataField: "attr3Id",
-                caption: l1("Attribute3Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(3)
-                    },
-                }
-            },
-            {
-                dataField: "attr4Id",
-                caption: l1("Attribute4Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(4)
-                    },
-                }
-            },
-            {
-                dataField: "attr5Id",
-                caption: l1("Attribute5Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(5)
-                    },
-                }
-            },
-            {
-                dataField: "attr6Id",
-                caption: l1("Attribute6Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(6)
-                    },
-                }
-            },
-            {
-                dataField: "attr7Id",
-                caption: l1("Attribute7Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(7)
-                    },
-                }
-            },
-            {
-                dataField: "attr8Id",
-                caption: l1("Attribute8Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(8)
-                    },
-                }
-            },
-            {
-                dataField: "attr9Id",
-                caption: l1("Attribute9Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(9)
-                    },
-                }
-            },
-            {
-                dataField: "attr10Id",
-                caption: l1("Attribute10Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(10)
-                    },
-                }
-            },
-            {
-                dataField: "attribute11Id",
-                caption: l1("Attribute11Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(11)
-                    },
-                }
-            },
-            {
-                dataField: "attr12Id",
-                caption: l1("Attribute12Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(12)
-                    },
-                }
-            },
-            {
-                dataField: "attr13Id",
-                caption: l1("Attribute13Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(13)
-                    },
-                }
-            },
-            {
-                dataField: "attr14Id",
-                caption: l1("Attribute14Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(14)
-                    },
-                }
-            },
-            {
-                dataField: "attr15Id",
-                caption: l1("Attribute15Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(15)
-                    },
-                }
-            },
-            {
-                dataField: "attr16Id",
-                caption: l1("Attribute16Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(16)
-                    },
-                }
-            },
-            {
-                dataField: "attr17Id",
-                caption: l1("Attribute17Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(17)
-                    },
-                }
-            },
-            {
-                dataField: "attr18Id",
-                caption: l1("Attribute18Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(18)
-                    },
-                }
-            },
-            {
-                dataField: "attr19Id",
-                caption: l1("Attribute19Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(19)
-                    },
-                }
-            },
+            ...await genCustomerAttrColumn()
         ],
         onInitNewRow: function (e) {
             e.data.effectiveDate = new Date().toISOString();
@@ -926,28 +691,31 @@
             }))
         })
     }
-
-    function getAttrOptions() {
-        const options = [];
-
-        const deferred = $.Deferred();
-        cusAttrService.getListDevextremes({})
-            .done(result => {
-                deferred.resolve(result.data, {
-                    totalCount: result.totalCount,
-                    summary: result.summary,
-                    groupCount: result.groupCount,
-                });
-            });
-        deferred.promise().then(u => {
-            var listAttrActive = u.filter(x => x.active == true);
-            listAttrActive.forEach((i) => {
-                options.push(generateAttrOptions(i))
-            });
-        });
-        return options;
+    function genCustomerAttrColumn() {
+        return cusAttrStore.then(({ data }) =>
+            data.map(({ attrNo, attrName }) => {
+                return {
+                    dataField: 'attr' + attrNo + 'Id',
+                    caption: attrName,
+                    lookup: {
+                        valueExpr: "id",
+                        displayExpr: "attrValName",
+                        dataSource: {
+                            store: getCusAttrValue,
+                            filter: ['customerAttribute.attrNo', '=', attrNo],
+                        }
+                    }
+                }
+            })
+        )
     }
-
+    function getAttrOptions() {
+        let res = []
+        cusAttrStore.then(({ data }) => {
+            data.forEach(e => { res.push(generateAttrOptions(e)) })
+        })
+        return res
+    }
     function generateAttrOptions(attr) {
         return {
             dataField: 'attr' + attr.attrNo + 'Id',
