@@ -74,7 +74,7 @@ function renderCusGrAtt(headerId, status) {
             ...customerAttr.map(e => {
                 return {
                     dataField: 'attr' + e.attrNo + 'Id',
-                    caption: l('EntityFieldName:MDMService:Customer:Attr' + e.attrNo),
+                    caption: e.attrName,
                     lookup: {
                         dataSource: {
                             store: store.customerValueStore,

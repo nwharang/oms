@@ -133,18 +133,18 @@ $(function () {
                 validationRules: [{ type: "required" }],
                 dataType: 'string',
             },
-            {
-                dataField: 'effectiveDate',
-                caption: l("EntityFieldName:MDMService:CustomerGroup:EffectiveDate"),
-                dataType: 'date',
-            },
+            // {
+            //     dataField: 'effectiveDate',
+            //     caption: l("EntityFieldName:MDMService:CustomerGroup:EffectiveDate"),
+            //     dataType: 'date',
+            // },
             {
                 dataField: 'groupBy',
                 caption: l("EntityFieldName:MDMService:CustomerGroup:GroupBy"),
                 lookup: {
                     dataSource: store.GroupModes,
                     valueExpr: "id",
-                    displayExpr: "displayName",
+                    displayExpr: "text",
                     paginate: true,
                     pageSize: pageSizeForLookup
                 }

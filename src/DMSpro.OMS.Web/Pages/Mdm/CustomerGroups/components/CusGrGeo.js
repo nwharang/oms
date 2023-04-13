@@ -1,4 +1,4 @@
-function renderCusGrGeo(headerId , status) {
+function renderCusGrGeo(headerId, status) {
     if (!grid)
         grid = $('<div id=dataGridContainer class="ps-2">');
     grid.dxDataGrid({
@@ -129,10 +129,9 @@ function renderCusGrGeo(headerId , status) {
                     valueExpr: 'id',
                     displayExpr: 'name',
                     dataSource(options) {
-                        console.log(options);
                         return {
                             store: store.geoMasterStore,
-                            filter: options.data.geoMaster0Id ? ['parentId', '=', options.data.geoMaster0Id] : ['level', '=', 1],
+                            filter: options.data.geoMaster0Id ? ['parentId', '=', options.data.geoMaster0Id] : ['level', '=', null],
                             paginate: true,
                         };
                     },
@@ -144,7 +143,6 @@ function renderCusGrGeo(headerId , status) {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Level2"),
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
-                    //console.log(rowData.geoMaster2);
                     if (rowData.geoMaster2) {
                         return rowData.geoMaster2.name;
                     }
@@ -159,7 +157,7 @@ function renderCusGrGeo(headerId , status) {
                     dataSource(options) {
                         return {
                             store: store.geoMasterStore,
-                            filter: options.data.geoMaster1Id ? ['parentId', '=', options.data.geoMaster1Id] : ['level', '=', 2],
+                            filter: options.data.geoMaster1Id ? ['parentId', '=', options.data.geoMaster1Id] : ['level', '=', null],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
@@ -175,7 +173,6 @@ function renderCusGrGeo(headerId , status) {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Level3"),
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
-                    //console.log(rowData.geoMaster2);
                     if (rowData.geoMaster3) {
                         return rowData.geoMaster3.name;
                     }
@@ -189,7 +186,7 @@ function renderCusGrGeo(headerId , status) {
                     dataSource(options) {
                         return {
                             store: store.geoMasterStore,
-                            filter: options.data.geoMaster2Id ? ['parentId', '=', options.data.geoMaster2Id] : ['level', '=', 3],
+                            filter: options.data.geoMaster2Id ? ['parentId', '=', options.data.geoMaster2Id] : ['level', '=', null],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };
@@ -204,7 +201,6 @@ function renderCusGrGeo(headerId , status) {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Level4"),
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
-                    //console.log(rowData.geoMaster2);
                     if (rowData.geoMaster4) {
                         return rowData.geoMaster4.name;
                     }
@@ -217,7 +213,7 @@ function renderCusGrGeo(headerId , status) {
                     dataSource(options) {
                         return {
                             store: store.geoMasterStore,
-                            filter: options.data.geoMaster3Id ? ['parentId', '=', options.data.geoMaster3Id] : ['level', '=', 4],
+                            filter: options.data.geoMaster3Id ? ['parentId', '=', options.data.geoMaster3Id] : ['level', '=', null],
                             paginate: true,
                             pageSize: pageSizeForLookup
                         };

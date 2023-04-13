@@ -244,7 +244,6 @@ let store = {
             return d.promise();
         },
         insert(values) {
-            console.log(values);
             return customerGeoService.create(values, { contentType: 'application/json' });
         },
         update(key, values) {
