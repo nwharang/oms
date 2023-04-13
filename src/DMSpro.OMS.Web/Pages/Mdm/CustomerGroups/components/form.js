@@ -22,7 +22,7 @@ function renderForm(e, headerData) {
                 colSpan: 2,
                 validationRules: [{ type: "required" }],
                 editorOptions: {
-                    readOnly: headerData.active
+                    readOnly: headerData.status >= 0
                 }
             },
             {
@@ -30,6 +30,9 @@ function renderForm(e, headerData) {
                 editorType: 'dxTextBox',
                 colSpan: 2,
                 validationRules: [{ type: "required" }],
+                editorOptions: {
+                    readOnly: headerData.status >= 0
+                }
             },
             {
                 label: {
@@ -52,10 +55,16 @@ function renderForm(e, headerData) {
                                     formInstance.option('formData', e)
                                     popupInstance.option('title', `Customer Groups - #${store.cusStatus.find(v => v.id == e.status)?.text()}`)
                                     event.component.option('text', 'Release')
-                                    if (headerData.status >= 0)
+                                    if (headerData.status >= 0) {
                                         formInstance.getEditor('groupBy').option('readOnly', true);
-                                    else
+                                        formInstance.getEditor('code').option('readOnly', true);
+                                        formInstance.getEditor('name').option('readOnly', true);
+                                    }
+                                    else {
                                         formInstance.getEditor('groupBy').option('readOnly', false);
+                                        formInstance.getEditor('code').option('readOnly', true);
+                                        formInstance.getEditor('name').option('readOnly', true);
+                                    }
                                 })
                                 break;
                             case 0:
