@@ -891,7 +891,7 @@ public class OMSMenuContributor : IMenuContributor
                 MdmServicePermissions.PriceLists.Default,
                 MdmServicePermissions.PriceListDetails.Default,
                 MdmServicePermissions.PriceUpdates.Default,
-                MdmServicePermissions.PriceUpdateDetails.Default,
+                // MdmServicePermissions.PriceUpdateDetails.Default,
                 MdmServicePermissions.PriceListAssignments.Default)
             .RequireFeatures(false, MdmFeatures.UOMs,
                 MdmFeatures.UOMGroups,
