@@ -1,4 +1,4 @@
-function renderItemAttr(headerId,status) {
+function renderItemAttr(headerId, status) {
     if (!grid)
         grid = $('<div id=dataGridContainer class="ps-2">');
     grid.dxDataGrid({
@@ -74,7 +74,7 @@ function renderItemAttr(headerId,status) {
             ...itemAttr.map(e => {
                 return {
                     dataField: 'attr' + e.attrNo + 'Id',
-                    caption: l('EntityFieldName:MDMService:Item:Attr' + e.attrNo + 'Name'),
+                    caption: e.attrName,
                     lookup: {
                         dataSource: {
                             store: store.itemAttrValueStore,
