@@ -50,13 +50,17 @@ function renderForm(e, headerData) {
                                 customerGroupService.create({ ...headerData }, { contentType: "application/json" }).done(e => {
                                     headerData = e
                                     formInstance.option('formData', e)
-                                    popupInstance.option('title', `Customer Groups - #${store.cusStatus.find(e => e.id == e.status)?.text()}`)
+                                    popupInstance.option('title', `Customer Groups - #${store.cusStatus.find(v => v.id == e.status)?.text()}`)
                                     event.component.option('text', 'Release')
+                                    if (headerData.status >= 0)
+                                        formInstance.getEditor('groupBy').option('readOnly', true);
+                                    else
+                                        formInstance.getEditor('groupBy').option('readOnly', false);
                                 })
                                 break;
                             case 0:
                                 customerGroupService.release(headerData.id, { contentType: "application/json" }).done(e => {
-                                    popupInstance.option('title', `Customer Groups - #${store.cusStatus.find(e => e.id == e.status)?.text()}`)
+                                    popupInstance.option('title', `Customer Groups - #${store.cusStatus.find(v => v.id == e.status)?.text()}`)
                                     event.component.option('disabled', true)
                                     gridInstance.option('editing', {
                                         allowAdding: false,

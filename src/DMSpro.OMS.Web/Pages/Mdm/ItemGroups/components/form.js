@@ -50,13 +50,17 @@ function renderForm(e, headerData) {
                                 itemGroupService.create({ ...headerData, selectable: true }, { contentType: "application/json" }).done(e => {
                                     headerData = e
                                     formInstance.option('formData', e)
-                                    popupInstance.option('title', `${l("Page.Title.ItemGroups")}} - #${store.status.find(e => e.id == e.status)?.text()}`)
+                                    popupInstance.option('title', `${l("Page.Title.ItemGroups")}} - #${store.status.find(v => v.id == e.status)?.text()}`)
                                     event.component.option('text', 'Release')
+                                    if (headerData.status >= 0)
+                                        formInstance.getEditor('type').option('readOnly', true);
+                                    else
+                                        formInstance.getEditor('type').option('readOnly', false);
                                 })
                                 break;
                             case 0:
                                 itemGroupService.release(headerData.id, { contentType: "application/json" }).done(e => {
-                                    popupInstance.option('title', `${l("Page.Title.ItemGroups")}} - #${store.status.find(e => e.id == e.status)?.text()}`)
+                                    popupInstance.option('title', `${l("Page.Title.ItemGroups")}} - #${store.status.find(v => v.id == e.status)?.text()}`)
                                     event.component.option('disabled', true)
                                     gridInstance.option('editing', {
                                         allowAdding: false,
