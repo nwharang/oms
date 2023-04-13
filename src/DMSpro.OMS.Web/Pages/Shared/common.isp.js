@@ -190,7 +190,7 @@ function initChooseItemsPopup(items) {
         height: 'fit-content',
         container: '.panel-container',
         showTitle: true,
-        title: l('Popup.Title.ChooseItems'),
+        title: l('Popup:Title:Chooseitems'),
         visible: false,
         dragEnabled: false,
         hideOnOutsideClick: false,

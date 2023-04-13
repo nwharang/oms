@@ -1211,11 +1211,12 @@ public class OMSMenuContributor : IMenuContributor
                 // MdmServicePermissions.CustomerGroupByAtts.Default,
                 // MdmServicePermissions.CustomerGroupByLists.Default,
                 // MdmServicePermissions.CustomerGroupByGeos.Default,
-                MdmServicePermissions.Customers.Default,
-                MdmServicePermissions.CustomerAssignments.Default)
+                MdmServicePermissions.Customers.Default
+            )
+                //MdmServicePermissions.CustomerAssignments.Default)
             .RequireFeatures(false, MdmFeatures.CustomerAttributes,
                 MdmFeatures.CustomerProfiles,
-                MdmFeatures.CustomerGroups, MdmFeatures.CustomerAssignments);
+                MdmFeatures.CustomerGroups);
 
         parentMenu.AddItem(groupMenu);
 
@@ -1279,15 +1280,15 @@ public class OMSMenuContributor : IMenuContributor
             ).RequireFeatures(MdmFeatures.Vendors)
         );
 
-        groupMenu.AddItem(
-           new ApplicationMenuItem(
-               MdmServiceMenus.CustomerAssignments,
-               context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerAssignments"],
-               "/Mdm/CustomerAssignments",
-               icon: "fa fa-tasks",
-               requiredPermissionName: MdmServicePermissions.CustomerAssignments.Default
-           ).RequireFeatures(MdmFeatures.CustomerAssignments)
-       );
+    //     groupMenu.AddItem(
+    //        new ApplicationMenuItem(
+    //            MdmServiceMenus.CustomerAssignments,
+    //            context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerAssignments"],
+    //            "/Mdm/CustomerAssignments",
+    //            icon: "fa fa-tasks",
+    //            requiredPermissionName: MdmServicePermissions.CustomerAssignments.Default
+    //        ).RequireFeatures(MdmFeatures.CustomerAssignments)
+    //    );
 
         groupMenu.AddItem(
             new ApplicationMenuItem(
