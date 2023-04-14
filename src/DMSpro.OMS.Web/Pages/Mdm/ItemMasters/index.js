@@ -483,8 +483,10 @@
                             },
                             {
                                 dataField: 'basePrice',
+                                dataType: 'number',
                                 editorOptions: {
-                                    format: '#,##0.##',
+                                    format: '#,##0',
+                                    min: 0
                                 },
                                 validationRules: [{ type: 'required' }]
                             },
