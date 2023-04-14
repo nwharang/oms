@@ -316,7 +316,14 @@ $(function () {
                             mode: "row",
                             allowAdding: abp.auth.isGranted('MdmService.PricelistAssignments.Create'),
                             allowUpdating: false,
-                            allowDeleting: false
+                            allowDeleting: false,
+                            useIcons: true,
+                            texts: {
+                                editRow: l("Edit"),
+                                deleteRow: l("Delete"),
+                                confirmDeleteMessage: l("DeleteConfirmationMessage")
+                            }
+
                         },
                         onRowInserting: function (e) {
                             e.data.priceListId = options.key
@@ -348,6 +355,41 @@ $(function () {
                         },
                         columns: [
                             {
+                                caption: l('Actions'),
+                                type: 'buttons',
+                                buttons: [
+                                    'save', 'cancel',
+                                    {
+                                        text: l('Button:MDMService:PriceListAssignment:Release'),
+                                        icon: 'tags',
+                                        onClick: (e) => {
+                                            // pricelistAssignmentService.release(e.row.data.id, { contentType: "application/json" }).then(() => {
+                                            //     dataGridDetail.dxDataGrid('instance').refresh()
+                                            // })
+                                        },
+                                        visible: (e) => !e.row.isNewRow
+                                    }
+                                ],
+                                width: 100,
+                                fixedPosition: 'left'
+                            },
+                            // {
+                            //     caption: l('Actions'),
+                            //     width: 150,
+                            //     cellTemplate: (cellElement, cellInfo) => {
+                            //         if (!cellInfo.row.isNewRow && !cellInfo.data.isReleased)
+                            //             return $('<div>').dxButton({
+                            //                 text: l('Button:MDMService:PriceListAssignment:Release'),
+                            //                 onClick: () => {
+                            //                     pricelistAssignmentService.release(cellInfo.data.id, { contentType: "application/json" }).then(() => {
+                            //                         dataGridDetail.dxDataGrid('instance').refresh()
+                            //                     })
+                            //                 }
+                            //             })
+                            //         else return $('<div>').css('height', '2em')
+                            //     },
+                            // },
+                            {
                                 caption: l("EntityFieldName:MDMService:PriceListAssignment:PriceListName"),
                                 dataField: "customerGroupId",
                                 editorType: 'dxSelectBox',
@@ -374,22 +416,7 @@ $(function () {
                                 },
                                 allowEditing: false,
                             },
-                            {
-                                caption: l('Actions'),
-                                width: 150,
-                                cellTemplate: (cellElement, cellInfo) => {
-                                    if (!cellInfo.row.isNewRow && !cellInfo.data.isReleased)
-                                        return $('<div>').dxButton({
-                                            text: l('Button:MDMService:PriceListAssignment:Release'),
-                                            onClick: () => {
-                                                pricelistAssignmentService.release(cellInfo.data.id, { contentType: "application/json" }).then(() => {
-                                                    dataGridDetail.dxDataGrid('instance').refresh()
-                                                })
-                                            }
-                                        })
-                                    else return $('<div>').css('height', '2em')
-                                },
-                            }
+
                         ]
                     }).appendTo(container);
                 initImportPopup('api/mdm-service/pricelist-assignments', 'PricelistAssignments_Template', `grid_${currentHeaderData.id}`);
