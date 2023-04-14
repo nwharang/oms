@@ -626,25 +626,12 @@ $(function () {
                 dataField: "effectiveDate",
                 dataType: "date",
                 validationRules: [{ type: "required" }],
-                editorOptions: {
-                    min: new Date()
-                }
             },
             {
                 caption: l("EntityFieldName:MDMService:CustomerInZone:EndDate"),
                 dataField: "endDate",
                 dataType: "date",
-                editorOptions: {
-                    min: new Date()
-                }
             },
-            {
-                dataField: 'address',
-                caption: l("EntityFieldName:MDMService:CustomerContact:Address"),
-                dataType: "string",
-                allowEditing: false,
-                visible: false
-            }
             //{
             //    caption: l("Active"),
             //    dataField: "active",
