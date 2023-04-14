@@ -171,7 +171,7 @@ $(function () {
             }
         },
         onEditorPreparing: (e) => {
-            if ((e.dataField === 'code' || e.dataField === "itemAttributeId") && !e.row?.isNewRow)
+            if ((e.dataField === 'code' || e.dataField === "itemAttributeId") && !e.row?.isNewRow && e.row?.rowType === 'data')
                 e.editorOptions.disabled = true;
             // Creating
             if (!e.row?.isNewRow) return
@@ -409,7 +409,7 @@ $(function () {
             },
             {
                 dataField: 'itemAttribute.hierarchyLevel',
-                caption: l("EntityFieldName:MDMService:ItemAttributeValue:ItemAttributeName"),
+                caption: l("EntityFieldName:MDMService:ItemAttributeValue:HierarchyLevel"),
                 visible: false
             },
         ]
