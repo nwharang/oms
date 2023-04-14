@@ -1,7 +1,6 @@
 ﻿var l = abp.localization.getResource("OMS");
 var l1 = abp.localization.getResource("OMS");
-var MCPModel;
-var mcpDetailData = [];
+var MCPModel, mcpDetailData = [], sellingZoneId = null;
 $(function () {
 
     DevExpress.config({
@@ -11,6 +10,7 @@ $(function () {
     var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
     var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
     var companyInZoneService = window.dMSpro.oMS.mdmService.controllers.companyInZones.companyInZone;
+    var customerInZoneService = window.dMSpro.oMS.mdmService.controllers.customerInZones.customerInZone;
     var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
     var mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
     var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
@@ -20,16 +20,18 @@ $(function () {
 
     var customerStore = new DevExpress.data.CustomStore({
         key: 'id',
+        loadMode: 'raw',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
+            loadOptions.filter = ["salesOrgHierarchyId", "=", sellingZoneId],
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
 
-            customerService.getListDevextremes(args)
+            customerInZoneService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -39,16 +41,6 @@ $(function () {
                 });
 
             return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            customerService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
         }
     });
     var mCPDetailsStore = new DevExpress.data.CustomStore({
@@ -170,7 +162,6 @@ $(function () {
             return deferred.promise();
         },
         byKey: function (key) {
-            console.log(key);
             if (key == undefined) return null;
             var d = new $.Deferred();
             salesOrgHierarchyService.get(key)
@@ -464,49 +455,53 @@ $(function () {
                     "searchPanel",
                 ],
             },
-            onEditorPreparing: function (e) {
-                var component = e.component,
-                    rowIndex = e.row && e.row.rowIndex;
-                if (e.dataField === "customerId") {
-                    e.editorOptions.placeholder = '';
-                    var onValueChanged = e.editorOptions.onValueChanged;
-                    e.editorOptions.onValueChanged = function (e) {
-                        onValueChanged.call(this, e);
-                        component.cellValue(rowIndex, "customerIdExtra", e.component.option('selectedItem').id);
-                    }
-                } else if (e.dataField == "effectiveDate" || e.dataField == "endDate") {
-                    e.editorOptions.displayFormat = "dd/MM/yyyy";
-                    e.editorOptions.min = new Date();
-                }
-            },
+            // onEditorPreparing: function (e) {
+            //     // var component = e.component,
+            //     //     rowIndex = e.row && e.row.rowIndex;
+            //     if (e.parentType === "dataRow" && e.dataField === "customerId") {
+            //         // e.editorOptions.placeholder = '';
+            //         // var onValueChanged = e.editorOptions.onValueChanged;
+            //         e.editorOptions.onValueChanged = function (ev) {
+            //             // onValueChanged.call(this, ev);
+            //             // component.cellValue(rowIndex, "customerIdExtra", e.component.option('selectedItem').id);
+                        
+            //             let selectedItem = ev.component.option('selectedItem'); 
+            //             e.setValue(selectedItem);  
+            //         }
+            //     } 
+            //     // else if (e.dataField == "effectiveDate" || e.dataField == "endDate") {
+            //     //     e.editorOptions.displayFormat = "dd/MM/yyyy";
+            //     //     e.editorOptions.min = new Date();
+            //     // }
+            // },
             onRowUpdating: function (e) {
-                var objectRequire = ['customerId',
-                    'effectiveDate',
-                    'endDate',
-                    'distance',
-                    'visitOrder',
-                    'monday',
-                    "tuesday",
-                    "wednesday",
-                    "thursday",
-                    "friday",
-                    "saturday",
-                    "sunday",
-                    "week1",
-                    "week2",
-                    "week3",
-                    "week4"];
-                for (var property in e.oldData) {
-                    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                        e.newData[property] = e.oldData[property];
-                    }
-                }
+                // var objectRequire = ['customerId',
+                //     'effectiveDate',
+                //     'endDate',
+                //     'distance',
+                //     'visitOrder',
+                //     'monday',
+                //     "tuesday",
+                //     "wednesday",
+                //     "thursday",
+                //     "friday",
+                //     "saturday",
+                //     "sunday",
+                //     "week1",
+                //     "week2",
+                //     "week3",
+                //     "week4"];
+                // for (var property in e.oldData) {
+                //     if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+                //         e.newData[property] = e.oldData[property];
+                //     }
+                // }
+                e.newData = Object.assign({}, e.oldData, e.newData);
             },
             onInitNewRow: function (e) {
                 $('#SaveButton').data('dxButton').option('disabled', true);
                 e.data.code = "1";
-                e.data.effectiveDate = null;
-                e.data.endDate = null;
+                e.data.effectiveDate = new Date();
                 e.data.distance = 0;
                 e.data.visitOrder = 0;
                 e.data.monday = false;
@@ -519,10 +514,10 @@ $(function () {
                 e.data.week1 = true;
                 e.data.week2 = true;
                 e.data.week3 = true;
-                e.data.week4 = true,
-                e.data.customerId = null;
+                e.data.week4 = true;
                 //e.data.mcpHeaderId = MCPModel ? MCPModel.id : null;
             },
+            dateSerializationFormat: "yyyy-MM-dd",
             columns: [
                 {
                     type: 'buttons',
@@ -541,20 +536,30 @@ $(function () {
                             return "";
                         }
                     },
-                    validationRules: [{ type: "required", message: '' }],
+                    editorOptions: {
+                        dropDownOptions: {
+                            width: 500,
+                        },
+                    },
+                    // setCellValue: function(rowData, value) {
+                    //     console.log("setvalue");
+                    //     console.log(value);
+                    //     console.log(value.customer);
+                    //     rowData.customerId = value.customerId;
+                    //     //rowData.customer = value.customer;
+                    // },
+                    validationRules: [{ type: "required" }],
                     lookup: {
                         dataSource() {
                             return {
                                 store: customerStore,
-                                /*  filter: ["employeeTypeId", "=", "4623cb59-c099-1615-149f-3a0861252b0d"],//salesman*/
+                                // filter: ["salesOrgHierarchyId", "=", sellingZoneId],
                                 paginate: true,
                                 pageSize: pageSizeForLookup
                             };
                         },
-                        displayExpr: 'name',
-                        valueExpr: 'id',
-                        searchEnabled: true,
-                        searchMode: 'contains'
+                        displayExpr: 'customer.name',
+                        valueExpr: 'customerId',
                     }
                 },
                 {
@@ -574,7 +579,7 @@ $(function () {
                     dataField: "endDate",
                     dataType: "date",
                     format: 'dd/MM/yyyy',
-                    validationRules: [{ type: "required", message: '' }],
+                    //validationRules: [{ type: "required", message: '' }],
                 }, {
 
                     caption: l1("EntityFieldName:MDMService:MCPDetail:Distance"),
@@ -853,6 +858,8 @@ $(function () {
             $('#EnddateButton').data('dxButton').option('disabled', false);
 
             salesOrgHierarchyService.get(MCPModel.routeId).done(u => {
+                sellingZoneId = u.parentId;
+
                 var dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
                 dxCompany.option('readOnly', false);
                 dxCompany.option('dataSource', new DevExpress.data.DataSource({
@@ -892,6 +899,7 @@ $(function () {
             });
 
     }
+
     LoadData();
 
     function routeChangedHandler(data) {
