@@ -387,6 +387,7 @@ $(function () {
                                                 })
                                             }
                                         })
+                                    else return $('<div>').css('height', '2em')
                                 },
                             }
                         ]
