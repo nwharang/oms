@@ -35,7 +35,9 @@ function renderForm(e, headerData) {
                 dataField: 'description',
                 editorType: 'dxTextBox',
                 colSpan: 4,
-                readOnly: headerData.status >= 0
+                editorOptions: {
+                    readOnly: headerData.status >= 0
+                }
             },
             {
                 label: {
