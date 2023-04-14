@@ -196,11 +196,11 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'gridPriceListAssignment',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'gridPriceListAssignment',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -253,17 +253,17 @@ $(function () {
                         showRowLines: true,
                         showBorders: true,
                         cacheEnabled: true,
+                        columnAutoWidth: true,
                         allowColumnReordering: true,
                         rowAlternationEnabled: true,
                         allowColumnResizing: true,
                         columnResizingMode: 'widget',
-                        columnAutoWidth: true,
                         filterRow: {
                             visible: true
                         },
-                        groupPanel: {
-                            visible: true,
-                        },
+                        // groupPanel: {
+                        //     visible: true,
+                        // },
                         searchPanel: {
                             visible: true
                         },
@@ -296,11 +296,11 @@ $(function () {
                         headerFilter: {
                             visible: true,
                         },
-                        stateStoring: {
-                            enabled: true,
-                            type: 'localStorage',
-                            storageKey: 'dgPriceListAssignmentDetail' + options.key,
-                        },
+                        // stateStoring: {
+                        //     enabled: true,
+                        //     type: 'localStorage',
+                        //     storageKey: 'dgPriceListAssignmentDetail' + options.key,
+                        // },
                         paging: {
                             enabled: true,
                             pageSize: pageSize
@@ -348,11 +348,10 @@ $(function () {
                         },
                         columns: [
                             {
-                                caption: l("EntityFieldName:MDMService:CustomerGroup:Name"),
+                                caption: l("EntityFieldName:MDMService:PriceListAssignment:PriceListName"),
                                 dataField: "customerGroupId",
                                 editorType: 'dxSelectBox',
                                 lookup: {
-                                    //dataSource: getCustomers,
                                     dataSource: {
                                         store: getCustomers,
                                         paginate: true,
@@ -363,6 +362,32 @@ $(function () {
                                         return e.code + ' - ' + e.name
                                     }
                                 }
+                            },
+                            {
+                                caption: l("EntityFieldName:MDMService:PriceListAssignment:Status"),
+                                dataField: 'isReleased',
+                                dataType: 'text',
+                                width: 100,
+                                alignment: 'center',
+                                calculateDisplayValue: (e) => {
+                                    return e.isReleased ? l("EntityFieldName:MDMService:PriceListAssignment:Status:Released") : l('EntityFieldName:MDMService:PriceListAssignment:Status:Open')
+                                },
+                                allowEditing: false,
+                            },
+                            {
+                                caption: l('Actions'),
+                                width: 100,
+                                cellTemplate: (cellElement, cellInfo) => {
+                                    if (!cellInfo.row.isNewRow && !cellInfo.data.isReleased)
+                                        return $('<div>').dxButton({
+                                            text: l('Button:MDMService:PriceListAssignment:Release'),
+                                            onClick: () => {
+                                                pricelistAssignmentService.release(cellInfo.data.id, { contentType: "application/json" }).then(() => {
+                                                    dataGridDetail.dxDataGrid('instance').refresh()
+                                                })
+                                            }
+                                        })
+                                },
                             }
                         ]
                     }).appendTo(container);
