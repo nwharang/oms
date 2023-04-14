@@ -367,7 +367,7 @@ $(function () {
                                 caption: l("EntityFieldName:MDMService:PriceListAssignment:Status"),
                                 dataField: 'isReleased',
                                 dataType: 'text',
-                                width: 100,
+                                width: 150,
                                 alignment: 'center',
                                 calculateDisplayValue: (e) => {
                                     return e.isReleased ? l("EntityFieldName:MDMService:PriceListAssignment:Status:Released") : l('EntityFieldName:MDMService:PriceListAssignment:Status:Open')
@@ -376,7 +376,7 @@ $(function () {
                             },
                             {
                                 caption: l('Actions'),
-                                width: 100,
+                                width: 150,
                                 cellTemplate: (cellElement, cellInfo) => {
                                     if (!cellInfo.row.isNewRow && !cellInfo.data.isReleased)
                                         return $('<div>').dxButton({
