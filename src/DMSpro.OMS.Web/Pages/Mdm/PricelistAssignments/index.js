@@ -363,9 +363,9 @@ $(function () {
                                         text: l('Button:MDMService:PriceListAssignment:Release'),
                                         icon: 'tags',
                                         onClick: (e) => {
-                                            // pricelistAssignmentService.release(e.row.data.id, { contentType: "application/json" }).then(() => {
-                                            //     dataGridDetail.dxDataGrid('instance').refresh()
-                                            // })
+                                            pricelistAssignmentService.release(e.row.data.id, { contentType: "application/json" }).then(() => {
+                                                dataGridDetail.dxDataGrid('instance').refresh()
+                                            })
                                         },
                                         visible: (e) => !e.row.isNewRow
                                     }
