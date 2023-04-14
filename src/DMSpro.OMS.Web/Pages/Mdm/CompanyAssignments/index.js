@@ -30,22 +30,22 @@ $(function () {
         },
         insert(values) {
             return assignmentService.create({
-                companyId: values.companyIdentityUserAssignment.companyId,
-                identityUserId: values.companyIdentityUserAssignment.identityUserId,
+                companyId: values.companyId,
+                identityUserId: values.identityUserId,
             }, { contentType: "application/json" });
         },
         update(key, values) {
             // console.log(key);
             // console.log(values);
-            return assignmentService.update(key.companyIdentityUserAssignment.id,
+            return assignmentService.update(key.id,
                 {
-                    companyId: values.companyIdentityUserAssignment.companyId,
-                    identityUserId: values.companyIdentityUserAssignment.identityUserId
+                    companyId: values.companyId,
+                    identityUserId: values.identityUserId
                 }, { contentType: "application/json" });
         },
         remove(key) {
 
-            return assignmentService.delete(key.companyIdentityUserAssignment.id);
+            return assignmentService.delete(key.id);
         },
         byKey: function (key) {
             if (key == 0) return null;
@@ -228,14 +228,14 @@ $(function () {
                 fixedPosition: "left",
             },
             {
-                dataField: 'companyIdentityUserAssignment.identityUserId',
+                dataField: 'identityUserId',
                 caption: l("UserName"),
                 validationRules: [{ type: "required" }],
                 allowSearch: false,
-                calculateDisplayValue(rowData){
-                    if (!rowData.identityUser || rowData.identityUser === null) return "";
-                    return rowData.identityUser.userName;
-                },
+                // calculateDisplayValue(rowData){
+                //     if (!rowData.identityUser || rowData.identityUser === null) return "";
+                //     return rowData.identityUser.userName;
+                // },
                 lookup: {
                     dataSource() {
                         return {
@@ -253,7 +253,7 @@ $(function () {
                 }
             },
             {
-                dataField: 'companyIdentityUserAssignment.companyId',
+                dataField: 'companyId',
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
                 validationRules: [{ type: "required" }],
                 allowSearch: false,
