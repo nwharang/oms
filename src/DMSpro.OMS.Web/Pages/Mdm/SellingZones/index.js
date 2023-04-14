@@ -203,9 +203,6 @@ $(function () {
             return d.promise();
         },
         insert({ customerId, effectiveDate, endDate, salesOrgHierarchyId }) {
-            // To do , Update when new api coming 😘
-            // For new API requests , customerId is Array[]
-            // return customerInZoneService.Some Thing Here({ customerId, effectiveDate, endDate, salesOrgHierarchyId }, { contentType: "application/json" })
             return customerId.forEach((e) => {
                 customerInZoneService.create({ customerId: e, effectiveDate, endDate, salesOrgHierarchyId }, { contentType: "application/json" })
             })
@@ -451,29 +448,27 @@ $(function () {
                 dataType: "date",
                 validationRules: [{ type: "required" }],
                 editorOptions: {
-                    min: new Date()
-                }
+                    format: 'dd/MM/yyyy',
+                },
+                format: 'dd/MM/yyyy',
             },
             {
                 caption: l("EntityFieldName:MDMService:CompanyInZone:EndDate"),
                 dataField: "endDate",
                 dataType: "date",
                 editorOptions: {
-                    min: new Date()
-                }
+                    format: 'dd/MM/yyyy',
+                },
+                format: 'dd/MM/yyyy',
             },
             {
                 caption: l("Page.Title.ItemGroups"),
                 dataField: "itemGroupId",
-                dataType: "date",
                 lookup: {
                     dataSource: itemGroupStore,
                     valueExpr: "id",
                     displayExpr: "name"
                 },
-                editorOptions: {
-                    min: new Date()
-                }
             }
         ]
     }).dxDataGrid("instance");
@@ -625,11 +620,13 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:CustomerInZone:EffectiveDate"),
                 dataField: "effectiveDate",
                 dataType: "date",
+                format: 'dd/MM/yyyy',
                 validationRules: [{ type: "required" }],
             },
             {
                 caption: l("EntityFieldName:MDMService:CustomerInZone:EndDate"),
                 dataField: "endDate",
+                format: 'dd/MM/yyyy',
                 dataType: "date",
             },
             //{
