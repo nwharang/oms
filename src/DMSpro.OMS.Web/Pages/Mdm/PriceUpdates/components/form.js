@@ -60,7 +60,6 @@ function renderForm(e, headerData) {
                                     priceListId: headerData.priceListId || ""
                                 };
                                 priceUpdateService.create(dataSend, { contentType: "application/json" }).done(e => {
-                                    preLoadData = store.priceListDetailStore(e.priceListId);
                                     headerData = e
                                     formInstance.option('formData', e)
                                     popupInstance.option('title', `${l("Page.Title.PriceUpdates")} - #${store.status.find(v => v.id == e.status)?.text()}`)

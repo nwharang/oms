@@ -8,7 +8,9 @@ let uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 
 let mainGridInstance, popup, popupInstance, grid, gridInstance, form, formInstance, massInputGrid, massInputGridInstance, massInputPopup, massInputPopupInstance
 let preLoadData
-
+let globalVar = {
+    currentPriceListID: null
+}
 let store = {
     status: [
         {
@@ -154,10 +156,30 @@ let store = {
             return deferred.promise();
         },
     }),
-    priceListDetailStore: (priceListId) => priceListDetailService.getListDevextremes({ filter: JSON.stringify(['priceListId', '=', priceListId]) })
-        .done(({ data }) => {
-            temp = [...data]
-        }),
+    priceListDetailStore: new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            // args.filter = JSON.stringify(['priceListDetailId', '=', globalVar.currentPriceListID])
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            priceListDetailService.getListDevextremes(args)
+                .done(result => {
+                    let temp = {...result}
+                    deferred.resolve(temp.data, {
+                        totalCount: temp.totalCount,
+                        summary: temp.summary,
+                        groupCount: temp.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+    }),
     priceUpdateDetailStore: (priceUpdateId) => new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
