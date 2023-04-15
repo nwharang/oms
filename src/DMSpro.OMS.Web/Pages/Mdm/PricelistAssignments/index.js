@@ -147,6 +147,7 @@ $(function () {
         rowAlternationEnabled: true,
         allowColumnResizing: true,
         columnResizingMode: 'widget',
+        dateSerializationFormat: "yyyy-MM-dd",
         columnAutoWidth: true,
         filterRow: {
             visible: true
@@ -196,11 +197,11 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        // stateStoring: {
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'gridPriceListAssignment',
-        // },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'gridPriceListAssignment',
+        },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -247,7 +248,7 @@ $(function () {
                     .dxDataGrid({
                         dataSource: {
                             store: pricelistAssignmentStore,
-                            filter: ['priceListId', '=', options.key]
+                            filter: ['priceListId', '=', options.key],
                         },
                         remoteOperations: true,
                         showRowLines: true,
@@ -390,18 +391,23 @@ $(function () {
                             //     },
                             // },
                             {
-                                caption: l("EntityFieldName:MDMService:PriceListAssignment:PriceListName"),
+                                caption: l("EntityFieldName:MDMService:PriceListAssignment:Customer"),
                                 dataField: "customerGroupId",
                                 editorType: 'dxSelectBox',
+                                calculateDisplayValue: (e) => {
+                                    if (e?.customerGroup)
+                                        return e.customerGroup.code + " " + e.customerGroup.name
+                                },
                                 lookup: {
                                     dataSource: {
                                         store: getCustomers,
                                         paginate: true,
-                                        pageSize: pageSizeForLookup
+                                        pageSize
                                     },
                                     valueExpr: 'id',
                                     displayExpr: function (e) {
-                                        return e.code + ' - ' + e.name
+                                        if (e)
+                                            return e.code + ' - ' + e.name
                                     }
                                 }
                             },
@@ -416,7 +422,14 @@ $(function () {
                                 },
                                 allowEditing: false,
                             },
-
+                            {
+                                caption: l("EntityFieldName:MDMService:PriceListAssignment:ReleasedDate"),
+                                dataField: 'releasedDate',
+                                dataType: 'date',
+                                width: 150,
+                                format: 'dd/MM/yyyy',
+                                allowEditing: false,
+                            },
                         ]
                     }).appendTo(container);
                 initImportPopup('api/mdm-service/pricelist-assignments', 'PricelistAssignments_Template', `grid_${currentHeaderData.id}`);
