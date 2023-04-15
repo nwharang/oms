@@ -1,5 +1,5 @@
 ﻿let companyIdentityUserAssignment = window.dMSpro.oMS.mdmService.controllers.companyIdentityUserAssignments.companyIdentityUserAssignment
-$(function () {
+$(async function () {
     $('button[data-id=action-add-grid]').click(function () {
         var controlName = $(this).attr('data-effect-grid');
         var controlType = $(this).attr('data-effect-type');
@@ -17,16 +17,19 @@ $(function () {
     if (!$.isEmptyObject(abp.auth.grantedPolicies)) {
         //if (abp.auth.isAnyGranted()) { };
         // return;
-        companyIdentityUserAssignment.getCurrentlySelectedCompany().done(({ name }) => $('#selected-company').text(name))
+        $('#selected-company').text((await Common.getCurrentCompany()).name);
+        //companyIdentityUserAssignment.getCurrentlySelectedCompany().done(({ name }) => $('#selected-company').text(name))
         companyIdentityUserAssignment.getListCompanyByCurrentUser({})
             .done(({ data }) => {
                 data.forEach(({ company }, index) => {
                     $('table.companies > tbody').append(`<tr data-id=${company.id}><td>${index + 1}</td><td>${company.code}</td><td>${company.name}</td></tr>`);
                 });
                 $('table.companies > tbody > tr').click(function () {
-                    companyIdentityUserAssignment.setCurrentlySelectedCompany($(this).data('id')).then(() => {
+                    companyIdentityUserAssignment.setCurrentlySelectedCompany($(this).data('id')).then((result) => {
+                        let keyString = `currentlySelectedCompany|${abp.currentUser.id}`;
+                        localStorage.removeItem(keyString);
+                        Common.saveToStorage(keyString, result);
                         window.location.reload()
-
                     })
                 });
             });
