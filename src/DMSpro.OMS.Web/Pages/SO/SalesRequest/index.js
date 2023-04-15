@@ -73,11 +73,11 @@
         headerFilter: {
             visible: true,
         },
-        // stateStoring: {
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'dgSalesRequestHeader',
-        // },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgSalesRequestHeader',
+        },
         paging: {
             enabled: true,
             pageSize: 10

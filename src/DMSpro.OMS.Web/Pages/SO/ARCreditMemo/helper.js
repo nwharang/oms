@@ -775,41 +775,44 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 $('#saveButtonPopup').dxButton('instance').option('disabled', true);
                                 grid.dxDataGrid('instance').saveEditData().then(() => {
                                     currentData.header = form.dxForm('instance').option('formData');
-                                    currentData.details = grid.dxDataGrid('instance').getDataSource().items().filter(detail => detail.itemId)
+                                    let tempData = grid.dxDataGrid('instance').getDataSource().store().load()
                                     currentData.header.requestDate = new Date().toString();;
                                     if (currentData.details.length < 1) {
                                         return
                                     }
-                                    if (docId && currentData.header && currentData.details.length > 0)
-                                        mainService.updateDoc(docId, currentData)
-                                            .done((data) => {
-                                                currentData = data
-                                                grid.dxDataGrid('instance').option('dataSource', data.details)
-                                                grid.dxDataGrid('instance').refresh()
-                                                notify({ type: 'success', message: "Updated SO" })
-                                                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
-                                            })
-                                            .fail(() => {
-                                                notify({ type: 'error', message: "SO Update Failed" })
-                                                $('#saveButtonPopup').dxButton('instance').option('disabled', false);
-                                            })
-                                    else
-                                        mainService.createDoc(currentData)
-                                            .done((data) => {
-                                                docId = data.header.id
-                                                currentData = data
-                                                grid.dxDataGrid('instance').option('dataSource', data.details)
-                                                grid.dxDataGrid('instance').refresh()
-                                                notify({ type: 'success', message: "SO Created" })
-                                                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
-                                                popup.dxPopup('instance').option("title", `AR Credit Memo - #${docId ? data.header.docNbr : "New"} - ${docStatusStore[data.header.docStatus || 0].text}`)
-                                                loadNavigationButton(docId)
-                                            })
-                                            .fail(() => {
-                                                notify({ type: 'error', message: "SO Create Failed" })
-                                                $('#saveButtonPopup').dxButton('instance').option('disabled', false);
-                                            })
+                                    tempData.then((data) => {
+                                        currentData.details = data.filter(detail => detail.itemId)
 
+                                        if (docId && currentData.header && currentData.details.length > 0)
+                                            mainService.updateDoc(docId, currentData)
+                                                .done((data) => {
+                                                    currentData = data
+                                                    grid.dxDataGrid('instance').option('dataSource', data.details)
+                                                    grid.dxDataGrid('instance').refresh()
+                                                    notify({ type: 'success', message: "Updated SO" })
+                                                    $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
+                                                })
+                                                .fail(() => {
+                                                    notify({ type: 'error', message: "SO Update Failed" })
+                                                    $('#saveButtonPopup').dxButton('instance').option('disabled', false);
+                                                })
+                                        else
+                                            mainService.createDoc(currentData)
+                                                .done((data) => {
+                                                    docId = data.header.id
+                                                    currentData = data
+                                                    grid.dxDataGrid('instance').option('dataSource', data.details)
+                                                    grid.dxDataGrid('instance').refresh()
+                                                    notify({ type: 'success', message: "SO Created" })
+                                                    $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
+                                                    popup.dxPopup('instance').option("title", `AR Credit Memo - #${docId ? data.header.docNbr : "New"} - ${docStatusStore[data.header.docStatus || 0].text}`)
+                                                    loadNavigationButton(docId)
+                                                })
+                                                .fail(() => {
+                                                    notify({ type: 'error', message: "SO Create Failed" })
+                                                    $('#saveButtonPopup').dxButton('instance').option('disabled', false);
+                                                })
+                                    })
                                 })
                             }
                         }
