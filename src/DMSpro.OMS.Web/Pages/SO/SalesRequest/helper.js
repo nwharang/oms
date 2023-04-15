@@ -263,7 +263,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
         let resizeBox = $('<div>').dxResizable({
             handles: "bottom",
             maxHeight: 320, // 20 rem
-            height: 176,
+            height: 208,
             minHeight: 32,
             elementAttr: {
                 id: "resizeBox",
