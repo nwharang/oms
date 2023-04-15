@@ -112,7 +112,7 @@ $(function () {
         showRowLines: false,
         rowAlternationEnabled: true,
         showBorders: true,
-
+        dateSerializationFormat: "yyyy-MM-dd",
         /*keyExpr: "id",*/
         /*Export Excel*/
         export: {
@@ -581,18 +581,18 @@ $(function () {
                 dataType: 'string',
                 visible: false,
             },
-            {
-                dataField: 'active',
-                caption: l("EntityFieldName:MDMService:CompanyProfile:Active"),
-                //width: 70,
-                alignment: 'center',
-                dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                },
-            },
+            // {
+            //     dataField: 'active',
+            //     caption: l("EntityFieldName:MDMService:CompanyProfile:Active"),
+            //     //width: 70,
+            //     alignment: 'center',
+            //     dataType: 'boolean',
+            //     cellTemplate(container, options) {
+            //         $('<div>')
+            //             .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+            //             .appendTo(container);
+            //     },
+            // },
             {
                 dataField: 'isHO',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:IsHO"),
@@ -689,6 +689,11 @@ $(function () {
                 e.data.geoLevel3Id = null
             if (e.data.geoLevel4Id == '')
                 e.data.geoLevel4Id = null
+        },
+        onInitNewRow: (e) => {
+            e.data.active = true;
+            e.data.isHO = false;
+            e.data.effectiveDate = new Date()
         }
     }).dxDataGrid("instance");
     initImportPopup('api/mdm-service/companies', 'Company_Template', 'dgCompanies');
