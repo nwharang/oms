@@ -455,25 +455,25 @@ $(function () {
                     "searchPanel",
                 ],
             },
-            // onEditorPreparing: function (e) {
-            //     // var component = e.component,
-            //     //     rowIndex = e.row && e.row.rowIndex;
-            //     if (e.parentType === "dataRow" && e.dataField === "customerId") {
-            //         // e.editorOptions.placeholder = '';
-            //         // var onValueChanged = e.editorOptions.onValueChanged;
-            //         e.editorOptions.onValueChanged = function (ev) {
-            //             // onValueChanged.call(this, ev);
-            //             // component.cellValue(rowIndex, "customerIdExtra", e.component.option('selectedItem').id);
+            onEditorPreparing: function (e) {
+                // var component = e.component,
+                //     rowIndex = e.row && e.row.rowIndex;
+                if (e.parentType === "dataRow" && e.dataField === "customerId") {
+                    // e.editorOptions.placeholder = '';
+                    // var onValueChanged = e.editorOptions.onValueChanged;
+                    e.editorOptions.onValueChanged = function (ev) {
+                        // onValueChanged.call(this, ev);
+                        // component.cellValue(rowIndex, "customerIdExtra", e.component.option('selectedItem').id);
                         
-            //             let selectedItem = ev.component.option('selectedItem'); 
-            //             e.setValue(selectedItem);  
-            //         }
-            //     } 
-            //     // else if (e.dataField == "effectiveDate" || e.dataField == "endDate") {
-            //     //     e.editorOptions.displayFormat = "dd/MM/yyyy";
-            //     //     e.editorOptions.min = new Date();
-            //     // }
-            // },
+                        let selectedItem = ev.component.option('selectedItem'); 
+                        e.setValue(selectedItem);  
+                    }
+                } 
+                // else if (e.dataField == "effectiveDate" || e.dataField == "endDate") {
+                //     e.editorOptions.displayFormat = "dd/MM/yyyy";
+                //     e.editorOptions.min = new Date();
+                // }
+            },
             onRowUpdating: function (e) {
                 // var objectRequire = ['customerId',
                 //     'effectiveDate',
@@ -541,13 +541,10 @@ $(function () {
                             width: 500,
                         },
                     },
-                    // setCellValue: function(rowData, value) {
-                    //     console.log("setvalue");
-                    //     console.log(value);
-                    //     console.log(value.customer);
-                    //     rowData.customerId = value.customerId;
-                    //     //rowData.customer = value.customer;
-                    // },
+                    setCellValue: function(rowData, value) {
+                        rowData.customerId = value.customerId;
+                        rowData.customer = value.customer;
+                    },
                     validationRules: [{ type: "required" }],
                     lookup: {
                         dataSource() {
@@ -564,7 +561,10 @@ $(function () {
                 },
                 {
                     caption: "Address",
-                    dataField: "customer.fullAddress",
+                    dataField: "fullAddress",
+                    calculateDisplayValue(rowData){
+                        if(rowData.customer) return rowData.customer.fullAddress;
+                    },
                     width: 150,
                     allowEditing: false,
                 },
