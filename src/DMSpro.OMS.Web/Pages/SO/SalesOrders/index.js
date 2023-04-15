@@ -219,6 +219,11 @@
                 validationRules: [{ type: 'required' }],
             },
             {
+                caption: l('EntityFieldName:OrderService:SalesRequest:BaseDoc'),
+                dataField: 'baseDoc',
+                dataType: 'string',
+            },
+            {
                 caption: l('EntityFieldName:OrderService:SalesRequest:Route'),
                 dataField: 'routeId',
                 calculateDisplayValue: "routeDisplay",
