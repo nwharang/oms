@@ -123,11 +123,11 @@
                                     })
                                     mainService.createListDODoc(array)
                                         .done(() => {
-                                            notify({ type: 'success', message: `${array.length} SRs Approved` })
+                                            notify({ type: 'success', message: `${array.length} SOs Approved` })
                                             $('#dgSalesOrderHeader').dxDataGrid('instance').getDataSource().reload()
                                         }
                                         ).fail(() => {
-                                            notify({ type: 'error', message: "SRs Approve Failed" })
+                                            notify({ type: 'error', message: "SOs Approve Failed" })
                                         })
                                 }
                             },
