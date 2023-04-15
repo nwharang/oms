@@ -81,7 +81,15 @@ $(function () {
         load(loadOptions) {
             var filter = ["isSellingZone", "=", true];
             if (loadOptions.searchValue != null && loadOptions.searchValue != '') {
-                filter = [["isSellingZone", "=", true], "and", [loadOptions.searchExpr, loadOptions.searchOperation, loadOptions.searchValue]];
+                filter = [
+                    ["isSellingZone", "=", true],
+                    "and",
+                    [
+                        ["name", loadOptions.searchOperation, loadOptions.searchValue],
+                        'or',
+                        ["code", loadOptions.searchOperation, loadOptions.searchValue]
+                    ],
+                ];
             }
 
             const deferred = $.Deferred();
@@ -660,105 +668,226 @@ $(function () {
             allowColumnReordering: false,
             allowColumnDragging: false,
             contentTemplate: (e) => {
-                customerService.getListDevextremes({ filter: JSON.stringify(["active", "=", "true"]) }).done(({ data }) => {
-                    grid = $("<div id='grid'>").dxDataGrid({
-                        dataSource: data,
-                        height: '100%',
-                        width: '100%',
-                        filterRow: {
-                            visible: true,
-                        },
-                        headerFilter: {
-                            visible: true,
-                        },
-                        selection: {
-                            mode: 'multiple',
-                            showCheckBoxesMode: 'always',
-                            selectAllMode: 'page'
-                        },
-                        showBorders: true,
-                        allowColumnDragging: false,
-                        columnAutoWidth: true,
-                        showRowLines: true,
-                        rowAlternationEnabled: true,
-                        dateSerializationFormat: "yyyy-MM-dd",
-                        showColumnLines: true,
-                        columnChooser: {
-                            enabled: true,
-                            mode: "select"
-                        },
-                        paging: {
-                            enabled: true,
-                            pageSize: pageSize
-                        },
-                        pager: {
-                            visible: true,
-                            showPageSizeSelector: true,
-                            allowedPageSizes: allowedPageSizes,
-                            showInfo: true,
-                            showNavigationButtons: true
-                        },
-                        toolbar: {
+                let store = new DevExpress.data.CustomStore({
+                    key: 'id',
+                    load(loadOptions) {
+                        const deferred = $.Deferred();
+                        const args = {};
+                        requestOptions.forEach((i) => {
+                            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                                args[i] = JSON.stringify(loadOptions[i]);
+                            }
+                        });
 
-                            items: [
-                                {
-                                    widget: "dxDateBox",
-                                    location: 'before',
-                                    options: {
-                                        width: '20rem',
-                                        label: 'effectiveDate',
-                                        labelMode: 'floating',
-                                        displayFormat: "dd/MM/yyyy",
-                                        type: 'date',
-                                        value: new Date(),
-                                        elementAttr: {
-                                            id: 'cusBatchInputEffectiveDate'
-                                        }
-                                    }
-                                },
-                                {
-                                    widget: "dxDateBox",
-                                    location: 'before',
-                                    options: {
-                                        width: '20rem',
-                                        label: 'endDate',
-                                        labelMode: 'floating',
-                                        displayFormat: "dd/MM/yyyy",
-                                        type: 'date',
-                                        value: null,
-                                        elementAttr: {
-                                            id: 'cusBatchInputEndDate'
-                                        }
-                                    }
-                                },
-                                'columnChooserButton'
-                            ]
-                        }
-                        ,
-                        columns: [
+                        customerService.getListDevextremes(args)
+                            .done(result => {
+                                deferred.resolve(result.data, {
+                                    totalCount: result.totalCount,
+                                    summary: result.summary,
+                                    groupCount: result.groupCount,
+                                });
+                            });
+
+                        return deferred.promise();
+                    },
+                    byKey: function (key) {
+                        if (key == 0) return null;
+
+                        var d = new $.Deferred();
+                        customerService.get(key)
+                            .done(data => {
+                                d.resolve(data);
+                            });
+                        return d.promise();
+                    }
+                });
+                grid = $("<div id='grid'>").dxDataGrid({
+                    dataSource: {
+                        store,
+                        filter: ["active", "=", "true"],
+                        paginate: true,
+                        pageSize
+                    },
+                    height: '100%',
+                    width: '100%',
+                    filterRow: {
+                        visible: true,
+                    },
+                    headerFilter: {
+                        visible: true,
+                    },
+                    selection: {
+                        mode: 'multiple',
+                        showCheckBoxesMode: 'always',
+                        selectAllMode: 'page'
+                    },
+                    remoteOperations: true,
+                    showBorders: true,
+                    allowColumnDragging: false,
+                    columnAutoWidth: true,
+                    showRowLines: true,
+                    rowAlternationEnabled: true,
+                    dateSerializationFormat: "yyyy-MM-dd",
+                    showColumnLines: true,
+                    columnChooser: {
+                        enabled: true,
+                        mode: "select"
+                    },
+                    paging: {
+                        enabled: true,
+                        pageSize: pageSize
+                    },
+                    pager: {
+                        visible: true,
+                        showPageSizeSelector: true,
+                        allowedPageSizes: allowedPageSizes,
+                        showInfo: true,
+                        showNavigationButtons: true
+                    },
+                    toolbar: {
+
+                        items: [
                             {
-                                // Custom column
-                                dataField: 'code',
-                                calculateDisplayValue(e) {
-                                    if (e)
-                                        return `${e.code} - ${e.name}`
-                                    return "None"
-                                },
-                                lookup: {
-                                    dataSource: customerStore,
-                                    valueExpr: 'code',
-                                    displayExpr: 'code'
+                                widget: "dxDateBox",
+                                location: 'before',
+                                options: {
+                                    width: '20rem',
+                                    label: 'effectiveDate',
+                                    labelMode: 'floating',
+                                    displayFormat: "dd/MM/yyyy",
+                                    type: 'date',
+                                    value: new Date(),
+                                    elementAttr: {
+                                        id: 'cusBatchInputEffectiveDate'
+                                    }
                                 }
                             },
                             {
-                                caption: l("EntityFieldName:MDMService:CustomerContact:Address"),
-                                dataField: "fullAddress",
-                            }
+                                widget: "dxDateBox",
+                                location: 'before',
+                                options: {
+                                    width: '20rem',
+                                    label: 'endDate',
+                                    labelMode: 'floating',
+                                    displayFormat: "dd/MM/yyyy",
+                                    type: 'date',
+                                    value: null,
+                                    elementAttr: {
+                                        id: 'cusBatchInputEndDate'
+                                    }
+                                }
+                            },
+                            'columnChooserButton'
                         ]
-                    })
-                    gridInstance = grid.dxDataGrid('instance')
-                    grid.appendTo(e)
+                    }
+                    ,
+                    columns: [
+                        {
+                            // Custom column
+                            dataField: 'code',
+                            calculateDisplayValue(e) {
+                                if (e)
+                                    return `${e.code} - ${e.name}`
+                                return "None"
+                            },
+                            lookup: {
+                                dataSource: customerStore,
+                                valueExpr: 'code',
+                                displayExpr: 'code'
+                            }
+                        },
+                        {
+                            caption: l("EntityFieldName:MDMService:GeoMaster:Level3"),
+                            dataField: "geoMaster3.id",
+                            calculateDisplayValue: "geoMaster3.name",
+                            width: 110,
+                            lookup: {
+                                dataSource(options) {
+                                    return {
+                                        store: geoMasterStore,
+                                        filter: options.data ? [['level', '=', 3], 'and', ['parentId', '=', options.data.geoMaster2Id]] : ['level', '=', 3],
+                                        paginate: true,
+                                        pageSize: pageSizeForLookup
+                                    };
+                                },
+                                valueExpr: 'id',
+                                displayExpr: 'name',
+                            },
+                        },
+                        {
+                            caption: l("EntityFieldName:MDMService:GeoMaster:Level2"),
+                            dataField: "geoMaster2.id",
+                            calculateDisplayValue: "geoMaster2.name",
+                            width: 110,
+                            lookup: {
+                                dataSource(options) {
+                                    return {
+                                        store: geoMasterStore,
+                                        filter: options.data ? [['level', '=', 2], 'and', ['parentId', '=', options.data.geoMaster1Id]] : ['level', '=', 2],
+                                        paginate: true,
+                                        pageSize: pageSizeForLookup
+                                    };
+                                },
+                                valueExpr: 'id',
+                                displayExpr: 'name',
+                            },
+                        },
+                        {
+                            caption: l("EntityFieldName:MDMService:GeoMaster:Level1"),
+                            dataField: "geoMaster1.id",
+                            calculateDisplayValue: "geoMaster1.name",
+                            width: 110,
+                            lookup: {
+                                dataSource(options) {
+                                    return {
+                                        store: geoMasterStore,
+                                        filter: options.data ? [['level', '=', 1], 'and', ['parentId', '=', options.data.geoMaster0Id]] : ['level', '=', 1],
+                                        paginate: true,
+                                        pageSize: pageSizeForLookup
+                                    };
+                                },
+                                lookup: {
+                                    dataSource(options) {
+                                        return {
+                                            store: geoMasterStore,
+                                            filter: options.data ? [['level', '=', 3], 'and', ['parentId', '=', options.data.geoMaster2Id]] : ['level', '=', 3],
+                                            paginate: true,
+                                            pageSize: pageSizeForLookup
+                                        };
+                                    },
+                                    valueExpr: 'id',
+                                    displayExpr: 'name',
+                                },
+                                valueExpr: 'id',
+                                displayExpr: 'name',
+                            },
+                        },
+                        {
+                            caption: l("EntityFieldName:MDMService:GeoMaster:Level0"),
+                            dataField: "geoMaster0.id",
+                            calculateDisplayValue: "geoMaster0.name",
+                            width: 110,
+                            lookup: {
+                                dataSource(options) {
+                                    return {
+                                        store: geoMasterStore,
+                                        filter: ['level', '=', 0],
+                                        paginate: true,
+                                        pageSize: pageSizeForLookup
+                                    };
+                                },
+                                valueExpr: "id",
+                                displayExpr: "name"
+                            },
+                        },
+                        {
+                            caption: l("EntityFieldName:MDMService:CustomerContact:Address"),
+                            dataField: "fullAddress",
+                        },
+                    ]
                 })
+                gridInstance = grid.dxDataGrid('instance')
+                grid.appendTo(e)
             },
 
             toolbarItems: [{
