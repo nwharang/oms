@@ -88,7 +88,7 @@ function renderGrid(e, { status, priceListId, id }) {
                             id: 'massInputButton'
                         },
                         onClick(e) {
-                            renderMassInputCus(id)
+                            renderMassInputCus(id, priceListId)
                         },
                         visible: abp.auth.isGranted('MdmService.PriceUpdates.Create') && status == 0
                     },

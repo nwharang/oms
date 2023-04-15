@@ -1,5 +1,4 @@
 let renderPopup = async (args) => {
-    preLoadData = store.priceListDetailStore(args.priceListId);
     if (!popup) popup = $('<div id="popup">')
     popup.dxPopup({
         // Popup title : title + status
@@ -43,6 +42,7 @@ let renderPopup = async (args) => {
         onHiding: () => {
             // Reload main content grid
             mainGridInstance.getDataSource().reload()
+            globalVar.currentPriceListID = null 
         },
     })
     popup.appendTo('body')
