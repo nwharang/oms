@@ -514,7 +514,7 @@
                 }
             },
         },
-        // remoteOperations: true,
+        remoteOperations: true,
         showRowLines: true,
         showBorders: true,
         // cacheEnabled: true,
