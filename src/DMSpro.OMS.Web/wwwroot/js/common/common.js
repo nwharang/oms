@@ -1,6 +1,6 @@
 class Common {
     static async getCurrentCompany() {
-        let keyString = `currentlySelectedCompany|${abp.currentUser.id}`;
+        let keyString = `${abp.currentTenant.name}|currentlySelectedCompany|${abp.currentUser.id}`;
         let storedObject =
             await this.loadFromStorage(keyString);
         if (storedObject == null) {

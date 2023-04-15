@@ -26,7 +26,7 @@ $(async function () {
                 });
                 $('table.companies > tbody > tr').click(function () {
                     companyIdentityUserAssignment.setCurrentlySelectedCompany($(this).data('id')).then((result) => {
-                        let keyString = `currentlySelectedCompany|${abp.currentUser.id}`;
+                        let keyString = `${abp.currentTenant.name}|currentlySelectedCompany|${abp.currentUser.id}`;
                         localStorage.removeItem(keyString);
                         Common.saveToStorage(keyString, result);
                         window.location.reload()
