@@ -343,7 +343,20 @@ $(function () {
             [
                 {
                     type: 'buttons',
-                    buttons: ['edit'],
+                    buttons: [
+                        'edit',
+                        {
+                            text: l('Button:MDMService:PriceListAssignment:Release'),
+                            icon: 'tags',
+                            onClick: (e) => {
+                                console.log(e);
+                                priceListService.release(e.row.data.id, { contentType: "application/json" }).then(() => {
+                                    dataGrid.refresh()
+                                })
+                            },
+                            disabled: (e) => e.row.isNewRow || e.row.data.isReleased
+                        }
+                    ],
                     caption: l('Actions'),
                     width: 100,
                     fixedPosition: 'left'

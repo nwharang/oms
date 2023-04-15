@@ -98,8 +98,15 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                             dataField: "businessPartnerId",
                             editorType: 'dxSelectBox',
                             editorOptions: {
-                                dataSource: salesOrderStore.customerList,
-                                displayExpr: 'name',
+                                dataSource: {
+                                    store: salesOrderStore.customerList,
+                                    paginate: true,
+                                    pageSize
+                                },
+                                displayExpr(e) {
+                                    if (e)
+                                        return `${e.code} - ${e.name}`
+                                },
                                 valueExpr: 'id',
                                 searchEnabled: true,
                                 elementAttr: {
@@ -256,7 +263,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
         let resizeBox = $('<div>').dxResizable({
             handles: "bottom",
             maxHeight: 320, // 20 rem
-            height: 176,
+            height: 208,
             minHeight: 32,
             elementAttr: {
                 id: "resizeBox",
@@ -301,7 +308,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                 visible: false,
             },
             stateStoring: {
-                // enabled: true,
+                enabled: true,
                 type: 'localStorage',
                 storageKey: 'dgSalesRequestDetails',
             },
@@ -510,7 +517,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     validationRules: [{ type: 'required', message: '' }],
                     editCellTemplate: (cellElement, cellInfo) => {
                         return $("<div/>").dxNumberBox({
-                            value : cellInfo.data.qty,
+                            value: cellInfo.data.qty,
                             min: 1,
                             onValueChanged: (e) => {
                                 cellInfo.setValue(e.value);
@@ -911,41 +918,44 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                 $('#saveButtonPopup').dxButton('instance').option('disabled', true);
                                 grid.dxDataGrid('instance').saveEditData().then((e) => {
                                     currentData.header = form.dxForm('instance').option('formData');
-                                    currentData.details = grid.dxDataGrid('instance').getDataSource().items().filter(detail => detail.itemId)
+                                    let tempData = grid.dxDataGrid('instance').getDataSource().store().load()
                                     currentData.header.requestDate = new Date().toString();;
                                     if (currentData.details.length < 1) {
                                         return
                                     }
-                                    if (docId && currentData.header && currentData.details.length > 0)
-                                        salesRequestsHeaderService.updateDoc(docId, currentData)
-                                            .done((data) => {
-                                                currentData = data
-                                                grid.dxDataGrid('instance').option('dataSource', data.details)
-                                                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
-                                                grid.dxDataGrid('instance').refresh()
-                                                notify({ type: 'success', message: "Updated SR" })
-                                            })
-                                            .fail(() => {
-                                                notify({ type: 'error', message: "SR Update Failed" })
-                                                $('#saveButtonPopup').dxButton('instance').option('disabled', false);
-                                            })
-                                    else
-                                        salesRequestsHeaderService.createDoc(currentData)
-                                            .done((data) => {
-                                                docId = data.header.id
-                                                currentData = data
-                                                grid.dxDataGrid('instance').option('dataSource', data.details)
-                                                grid.dxDataGrid('instance').refresh()
-                                                notify({ type: 'success', message: "SR Created" })
-                                                $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
-                                                popup.dxPopup('instance').option("title", `Sale Request - #${docId ? data.header.docNbr : "New"} - ${docStatusStore[data.header.docStatus || 0].text}`)
-                                                loadNavigationButton(docId)
-                                            })
-                                            .fail(() => {
-                                                notify({ type: 'error', message: "SR Create Failed" })
-                                                $('#saveButtonPopup').dxButton('instance').option('disabled', false);
-                                            })
+                                    tempData.then((data) => {
+                                        currentData.details = data.filter(detail => detail.itemId)
+                                        if (docId && currentData.header && currentData.details.length > 0)
+                                            salesRequestsHeaderService.updateDoc(docId, currentData)
+                                                .done((data) => {
+                                                    currentData = data
+                                                    grid.dxDataGrid('instance').option('dataSource', data.details)
+                                                    $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
+                                                    grid.dxDataGrid('instance').refresh()
+                                                    notify({ type: 'success', message: "Updated SR" })
+                                                })
+                                                .fail(() => {
+                                                    notify({ type: 'error', message: "SR Update Failed" })
+                                                    $('#saveButtonPopup').dxButton('instance').option('disabled', false);
+                                                })
+                                        else
+                                            salesRequestsHeaderService.createDoc(currentData)
+                                                .done((data) => {
+                                                    docId = data.header.id
+                                                    currentData = data
+                                                    grid.dxDataGrid('instance').option('dataSource', data.details)
+                                                    grid.dxDataGrid('instance').refresh()
+                                                    notify({ type: 'success', message: "SR Created" })
+                                                    $('#actionButtonDetailsPanel').dxDropDownButton('instance').option("disabled", false)
+                                                    popup.dxPopup('instance').option("title", `Sale Request - #${docId ? data.header.docNbr : "New"} - ${docStatusStore[data.header.docStatus || 0].text}`)
+                                                    loadNavigationButton(docId)
+                                                })
+                                                .fail(() => {
+                                                    notify({ type: 'error', message: "SR Create Failed" })
+                                                    $('#saveButtonPopup').dxButton('instance').option('disabled', false);
+                                                })
 
+                                    })
                                 })
                             }
                         }

@@ -52,7 +52,7 @@
             visible: true,
         },
         stateStoring: {
-            // enabled: true,
+            enabled: true,
             type: 'localStorage',
             storageKey: 'dgReturnOrderHeader',
         },

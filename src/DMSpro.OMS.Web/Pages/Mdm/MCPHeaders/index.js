@@ -236,7 +236,7 @@ $(function () {
                 },
                 {
                     caption: l("EntityFieldName:MDMService:MCPHeader:ItemGroup"),
-                    dataField: "itemGroup.description",
+                    dataField: "itemGroup.name",
                 },
                 {
                     caption: l("EntityFieldName:MDMService:MCPHeader:Code"),
@@ -258,6 +258,6 @@ $(function () {
             ],
         })
 
-    initImportPopup('api/mdm-service/m-cPHeaders', 'MCPHeaders_Template', 'dgMCPHeaders'); 
+    initImportPopup('api/mdm-service/m-cPHeaders', 'MCPHeaders_Template', 'dgMCPHeaders');
 
 });

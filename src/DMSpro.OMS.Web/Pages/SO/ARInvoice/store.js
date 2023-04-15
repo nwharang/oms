@@ -21,7 +21,7 @@ let store = () => {
 
                 mainService.getHeaderListDevextremes(args)
                     .done(result => {
-                        deferred.resolve(result.data, {
+                        deferred.resolve(result.data.sort((a, b) => Date.parse(a.requestDate) - Date.parse(b.requestDate)), {
                             totalCount: result.totalCount,
                             summary: result.summary,
                             groupCount: result.groupCount,

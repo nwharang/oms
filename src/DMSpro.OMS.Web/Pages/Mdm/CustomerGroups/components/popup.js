@@ -10,9 +10,9 @@ let renderPopup = async (args) => {
         dragEnabled: false,
 
         contentTemplate: (e) => {
-            let poupcontainer = $('<div class="w-100 h-100 d-flex flex-column">')
+            let poupcontainer = $('<div class="w-100 h-100 d-flex flex-column">').css('overflow', 'hidden')
             let popupHeader = $('<div class="w-100 mb-2">')
-            let popupBody = $('<div id="popupBody" class="position-relative d-flex flex-grow-1 gap-2"/>')
+            let popupBody = $('<div id="popupBody" class="position-relative d-flex flex-grow-1 gap-2"/>').css('overflow-y', 'auto')
             popupHeader.appendTo(poupcontainer)
             popupBody.appendTo(poupcontainer)
             poupcontainer.appendTo(e)
