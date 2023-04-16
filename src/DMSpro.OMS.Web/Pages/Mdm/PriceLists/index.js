@@ -476,31 +476,6 @@ $(function () {
                 }
             ],
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         masterDetail: {
             enabled: true,
             template(container, options) {
@@ -634,24 +609,18 @@ $(function () {
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Price"),
                                 dataField: "price",
+                                validationRules: [{ type: "required" }]
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Description"),
                                 dataField: "description",
-                                dataType: "string"
+                                dataType: "string",
+                                validationRules: [{ type: "required" }]
                             }
                         ],
                         onRowUpdating: (e) => {
                             // console.log(e.newData?.description);
                             let { uomId, itemId, concurrencyStamp, description, basedOnPrice } = e.oldData
-                            // {
-                            //     "price": 0,
-                            //     "basedOnPrice": 0,
-                            //     "description": "string",
-                            //     "uomId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                            //     "itemId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                            //     "concurrencyStamp": "string"
-                            //   }
                             let newData = {
                                 uomId, itemId, concurrencyStamp, description, basedOnPrice,
                                 ...e.newData,
