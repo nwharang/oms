@@ -349,7 +349,6 @@ $(function () {
                             text: l('Button:MDMService:PriceListAssignment:Release'),
                             icon: 'tags',
                             onClick: (e) => {
-                                console.log(e);
                                 priceListService.release(e.row.data.id, { contentType: "application/json" }).then(() => {
                                     dataGrid.refresh()
                                 })
@@ -371,18 +370,15 @@ $(function () {
                     caption: l("EntityFieldName:MDMService:PriceList:Name"),
                     validationRules: [{ type: "required" }]
                 },
-                //{
-                //    dataField: 'active',
-                //    caption: l("EntityFieldName:MDMService:PriceList:Active"),
-                //    alignment: 'center',
-                //    dataType: 'boolean',
-                //    cellTemplate(container, options) {
-                //        $('<div>')
-                //            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                //            .appendTo(container);
-                //    },
-                //    width: 120
-                //},
+                {
+                    dataField: 'isReleased',
+                    caption: l("EntityFieldName:MDMService:PriceList:Active"),
+                    alignment: 'center',
+                    dataType: 'text',
+                    calculateDisplayValue: (e) => e.isReleased ? l('EntityFieldValue:MDMService:PriceList:Status:Released') : l('EntityFieldValue:MDMService:PriceList:Status:Open'),
+                    allowEditing: false,
+                    width: 120
+                },
                 {
                     caption: l("EntityFieldName:MDMService:PriceList:BasePriceList"),
                     dataField: "basePriceListId",
@@ -479,6 +475,32 @@ $(function () {
                     width: 120
                 }
             ],
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         masterDetail: {
             enabled: true,
             template(container, options) {
@@ -489,15 +511,17 @@ $(function () {
                             store: detailStore,
                             filter: ['priceListId', '=', options.key],
                             paginate: true,
-                            pageSize: pageSize,
+                            pageSize,
                         },
                         key: "id",
-                        // editing: {
-                        //     mode: 'row',
-                        //     allowUpdating: true,
-                        //     //allowDeleting: true,
-                        //     allowAdding: true,
-                        // },
+                        editing: {
+                            mode: 'row',
+                            allowUpdating: !options.data.isReleased && abp.auth.isGranted('MdmService.PriceLists.Edit'),
+                            useIcons: true,
+                            texts: {
+                                editRow: l("Edit"),
+                            }
+                        },
                         remoteOperations: true,
                         showRowLines: true,
                         showBorders: true,
@@ -563,7 +587,7 @@ $(function () {
                         },
                         toolbar: {
                             items: [
-                                //"addRowButton",
+                                "addRowButton",
                                 "groupPanel",
                                 //"columnChooserButton",
                                 "exportButton",
@@ -572,53 +596,40 @@ $(function () {
                         },
                         columns: [
                             {
+                                type: 'buttons',
+                                buttons: [
+                                    'edit',
+                                ],
+                                caption: l('Actions'),
+                                width: 100,
+                                fixedPosition: 'left'
+                            },
+                            {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:PriceList"),
                                 dataField: "priceListId",
-                                lookup: {
-                                    //dataSource: getPriceList,
-                                    dataSource: {
-                                        store: getPriceList,
-                                        paginate: true,
-                                        pageSize: pageSizeForLookup
-                                    },
-                                    valueExpr: 'id',
-                                    displayExpr: 'code'
-                                }
+                                calculateDisplayValue: 'priceList.code',
+                                allowEditing: false,
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Item"),
                                 dataField: "itemId",
                                 sortIndex: 0, sortOrder: "asc",
-                                lookup: {
-                                    //dataSource: getItemList,
-                                    dataSource: {
-                                        store: getItemList,
-                                        paginate: true,
-                                        pageSize: pageSizeForLookup
-                                    },
-                                    valueExpr: 'id',
-                                    displayExpr: function (e) {
-                                        return e.code + ' - ' + e.name
-                                    }
-                                }
+                                calculateDisplayValue: (e) => {
+                                    if (e)
+                                        return e.item.code + " - " + e.item.name
+                                },
+                                allowEditing: false,
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:UOM"),
                                 dataField: "uomId",
-                                lookup: {
-                                    //dataSource: getUOMs,
-                                    dataSource: {
-                                        store: getUOMs,
-                                        paginate: true,
-                                        pageSize: pageSizeForLookup
-                                    },
-                                    valueExpr: 'id',
-                                    displayExpr: 'code'
-                                }
+                                calculateDisplayValue: 'uom.name',
+                                allowEditing: false,
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:BasedOnPrice"),
-                                dataField: "basedOnPrice"
+                                dataField: "basedOnPrice",
+                                allowEditing: false,
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Price"),
@@ -629,7 +640,24 @@ $(function () {
                                 dataField: "description",
                                 dataType: "string"
                             }
-                        ]
+                        ],
+                        onRowUpdating: (e) => {
+                            // console.log(e.newData?.description);
+                            let { uomId, itemId, concurrencyStamp, description, basedOnPrice } = e.oldData
+                            // {
+                            //     "price": 0,
+                            //     "basedOnPrice": 0,
+                            //     "description": "string",
+                            //     "uomId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                            //     "itemId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                            //     "concurrencyStamp": "string"
+                            //   }
+                            let newData = {
+                                uomId, itemId, concurrencyStamp, description, basedOnPrice,
+                                ...e.newData,
+                            }
+                            e.newData = newData;
+                        }
                     }).appendTo(container);
                 // initImportPopup('api/mdm-service/price-list-details', 'PriceListDetails_Template', `grid_${currentHeaderData.id}`);
             }
