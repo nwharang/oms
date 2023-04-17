@@ -528,8 +528,9 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     setCellValue: function (newData, value, currentRowData) {
                         newData.price = value;
                         newData.priceAfterTax = value + (value * currentRowData.taxRate) / 100;
-                        newData.lineAmt = (value * currentRowData.qty - (currentRowData.discountAmt || 0)) * (100 - (currentRowData.discountPerc || 0)) / 100;
-                        newData.lineAmtAfterTax = (newData.priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0)) * (100 - (currentRowData.discountPerc || 0)) / 100
+                        let discountAmt = newData.price * (currentRowData.discountPerc || 0) / 100 - (currentRowData.discountAmt || 0)
+                        newData.lineAmt = value * currentRowData.qty - discountAmt;
+                        newData.lineAmtAfterTax = newData.priceAfterTax * currentRowData.qty - discountAmt
                     },
                 },
                 {
@@ -662,9 +663,14 @@ let helper = ({ companyId, mainStore, vatList }) => {
                         newData.discountPerc = null;
                         switch (currentRowData.discountType) {
                             case 0:
-                                newData.lineDiscountAmt = value;
-                                newData.lineAmt = currentRowData.qty * currentRowData.price - value;
-                                newData.lineAmtAfterTax = currentRowData.priceAfterTax * currentRowData.qty - value;
+                                if (value > currentRowData.qty * currentRowData.price) {
+                                    newData.discountAmt = currentRowData.qty * currentRowData.price
+                                }
+                                else
+                                    newData.discountAmt = value
+                                newData.lineDiscountAmt = newData.discountAmt;
+                                newData.lineAmt = currentRowData.qty * currentRowData.price - newData.discountAmt;
+                                newData.lineAmtAfterTax = currentRowData.priceAfterTax * currentRowData.qty - newData.discountAmt;
                                 break;
 
                         }
