@@ -135,13 +135,14 @@ let store = {
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
+            args.filter = JSON.stringify(["customerGroupId", "=", headerId || null])
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
 
-            customerGroupAttributeService.getListDevextremes({ filter: JSON.stringify(["customerGroupId", "=", headerId || null]) })
+            customerGroupAttributeService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -176,6 +177,7 @@ let store = {
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
+            args.filter = JSON.stringify(["customerGroupId", "=", headerId || null])
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
@@ -217,13 +219,14 @@ let store = {
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
+            args.filter = JSON.stringify(headerId ? ["customerGroupId", "=", headerId] : [])
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
 
-            customerGeoService.getListDevextremes({ filter: JSON.stringify(headerId ? ["customerGroupId", "=", headerId ] : []) })
+            customerGeoService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,

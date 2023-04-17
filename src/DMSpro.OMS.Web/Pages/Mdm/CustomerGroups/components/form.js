@@ -47,7 +47,6 @@ function renderForm(e, headerData) {
                     width: '100%',
                     onClick(event) {
                         popupInstance.beginUpdate()
-                        console.log(headerData.status);
                         switch (headerData.status) {
                             default:
                                 customerGroupService.create({ ...headerData }, { contentType: "application/json" }).done(e => {
@@ -69,7 +68,7 @@ function renderForm(e, headerData) {
                                 break;
                             case 0:
                                 customerGroupService.release(headerData.id, { contentType: "application/json" }).done(e => {
-                                    popupInstance.option('title', `Customer Groups - #${store.cusStatus.find(v => v.id == e.status)?.text()}`)
+                                    popupInstance.option('title', `${l('Page.Title.CustomerGroups')} - #${store.cusStatus.find(v => v.id == e.status)?.text()}`)
                                     event.component.option('disabled', true)
                                     gridInstance.option('editing', {
                                         allowAdding: false,

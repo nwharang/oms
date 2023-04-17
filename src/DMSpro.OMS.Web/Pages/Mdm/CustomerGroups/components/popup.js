@@ -2,7 +2,7 @@ let renderPopup = async (args) => {
     if (!popup) popup = $('<div id="popup">')
     popup.dxPopup({
         // Popup title : title + status
-        title: `Customer Groups - #${store.cusStatus.find(e => e.id == args.status)?.text() || "New"}`,
+        title: `${l('Page.Title.CustomerGroups')} - #${store.cusStatus.find(e => e.id == args.status)?.text() || "New"}`,
         showTitle: true,
         height: '99%',
         width: "99%",
@@ -20,7 +20,7 @@ let renderPopup = async (args) => {
             renderForm(popupHeader, args)
             switch (args.groupBy) {
                 case 0:
-                    return renderCusGrAtt(args.id , args.status)
+                    return renderCusGrAtt(args.id, args.status)
                 case 1:
                     return renderCusGrList(args.id, args.status)
                 case 2:

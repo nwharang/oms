@@ -3,11 +3,12 @@
 $(function () {
     //Custom store - for load, update, delete
     dataGridContainer = $('#dgCusGroups').dxDataGrid({
-        dataSource: store.customerGroupStore,
-        // allowAdding: abp.auth.isGranted('MdmService.CustomerGroups.Create'),
-        // allowUpdating: abp.auth.isGranted('MdmService.CustomerGroups.Edit'),
-        // allowDeleting: abp.auth.isGranted('MdmService.CustomerGroups.Delete'),
-        // remoteOperations: true,
+        dataSource: {
+            store: store.customerGroupStore,
+            paginate: true,
+            pageSize
+        },
+        remoteOperations: true,
         showRowLines: true,
         showBorders: true,
         cacheEnabled: true,
