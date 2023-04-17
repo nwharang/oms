@@ -296,23 +296,40 @@ $(function () {
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
-        // onEditorPreparing: (e) => {
-        //     if (e.row?.rowType != "data" && !Boolean(e.dataField) && e.parentType != 'dataRow' && !e.row?.isNewRow){
-        //         return
-        //     }
-        //     const items = e.component.getDataSource().items();
-        //     if (["action", 'name', 'code'].indexOf(e.dataField) === -1 && items.length < 1){
-        //         e.editorOptions.disabled = true
-        //     }
+        onEditorPreparing: (e) => {
+            //     if (e.row?.rowType != "data" && !Boolean(e.dataField) && e.parentType != 'dataRow' && !e.row?.isNewRow){
+            //         return
+            //     }
+            //     const items = e.component.getDataSource().items();
+            //     if (["action", 'name', 'code'].indexOf(e.dataField) === -1 && items.length < 1){
+            //         e.editorOptions.disabled = true
+            //     }
 
-        //     // if (e.dataField == 'basePriceListId')
-        //     //     e.editorOptions.disabled = true
-        // },
+            //     // if (e.dataField == 'basePriceListId')
+            //     //     e.editorOptions.disabled = true
+            // 🥲
+            // Disable Edit some field if Base PriceList
+            if (e.row?.rowType == "data" && e.row?.data.isBase) {
+                if (['name', 'isDefaultForCustomer', 'isDefaultForVendor'].indexOf(e.dataField) == -1) {
+                    e.editorOptions.readOnly = true
+                    e.editorOptions.placeholder = null
+                }
+            }
+        },
         onEditorPrepared: function (e) {
             //if (e.row?.rowType == "data" && Boolean(e.dataField) && e.parentType == 'dataRow' && e.row.isNewRow){
             //    const items = e.component.getDataSource().items();
             //    const value = e.component.option("value");
             //}
+        },
+        onInitNewRow: (e) => {
+            // on new row ,set 3 checkbox default value to false
+            e.data = {
+                ...e.data,
+                isDefaultForCustomer: false,
+                isDefaultForVendor: false,
+                isBase: false,
+            }
         },
         toolbar: {
             items: [
@@ -425,6 +442,9 @@ $(function () {
                     caption: l("EntityFieldName:MDMService:PriceList:ArithmeticFactor"),
                     cssClass: 'fieldFactor',
                     dataType: 'number',
+                    editorOptions: {
+                        min: 0,
+                    },
                     width: 180
                 },
                 {
@@ -442,19 +462,28 @@ $(function () {
                     dataField: 'isBase',
                     caption: l("EntityFieldName:MDMService:PriceList:IsBase"),
                     alignment: 'center',
-                    dataType: 'boolean',
                     cellTemplate(container, options) {
                         $('<div>')
                             .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
                             .appendTo(container);
                     },
-                    width: 120
+                    width: 120,
                 },
                 {
                     dataField: 'isDefaultForCustomer',
                     caption: l("EntityFieldName:MDMService:PriceList:IsDefaultForCustomer"),
                     alignment: 'center',
-                    dataType: 'boolean',
+                    cellTemplate(container, options) {
+                        $('<div>')
+                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                            .appendTo(container);
+                    },
+                    width: 120,
+                },
+                {
+                    dataField: 'isDefaultForVendor',
+                    caption: l("EntityFieldName:MDMService:PriceList:IsDefaultForVendor"),
+                    alignment: 'center',
                     cellTemplate(container, options) {
                         $('<div>')
                             .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
@@ -462,18 +491,6 @@ $(function () {
                     },
                     width: 120
                 },
-                {
-                    dataField: 'isDefaultForVendor',
-                    caption: l("EntityFieldName:MDMService:PriceList:IsDefaultForVendor"),
-                    alignment: 'center',
-                    dataType: 'boolean',
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                            .appendTo(container);
-                    },
-                    width: 120
-                }
             ],
 
         masterDetail: {
