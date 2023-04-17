@@ -206,10 +206,11 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            e.newData = {
-                ...e.oldData,
-                email: e.newData.email.length > 0 ? e.newData.email : null
-            }
+            if (e.newData.email?.length == 0)
+                e.newData = { ...e.oldData, ...e.newData, email: null }
+            else
+                e.newData = { ...e.oldData, ...e.newData }
+
         },
         onEditorPreparing: function (e) {
             if (e.dataField == "workingPositionId") {
