@@ -633,37 +633,23 @@ $(function () {
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:PriceList"),
-                                dataField: "priceListId",
-                                calculateDisplayValue: 'priceList.code',
+                                dataField: "priceList.code",
                                 allowEditing: false,
-                                allowFiltering: false,
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Item"),
-                                dataField: "itemId",
+                                dataField: "item.name",
                                 sortIndex: 0, sortOrder: "asc",
                                 calculateDisplayValue: (e) => {
                                     if (e)
                                         return e.item.code + " - " + e.item.name
                                 },
                                 allowEditing: false,
-                                allowFiltering: false,
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:UOM"),
-                                dataField: "uomId",
-                                calculateDisplayValue: 'uom.name',
+                                dataField: "uom.name",
                                 allowEditing: false,
-                                allowFiltering: false,
-                                // lookup: {
-                                //     dataSource: {
-                                //         store: getUOMs,
-                                //         paginate: true,
-                                //         pageSize,
-                                //     },
-                                //     displayExpr : 'name',
-                                //     valueExpr : ''
-                                // }
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:BasedOnPrice"),
