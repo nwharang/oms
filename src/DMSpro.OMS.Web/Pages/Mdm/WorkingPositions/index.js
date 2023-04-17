@@ -180,7 +180,6 @@
                 caption: l("EntityFieldName:MDMService:WorkingPosition:Code"),
                 dataField: "code",
                 dataType: 'string',
-                allowEditing: false,
             },
             {
                 caption: l("EntityFieldName:MDMService:WorkingPosition:Name"),
@@ -198,7 +197,14 @@
                 dataField: "active",
                 dataType: 'boolean'
             }
-        ]
+        ],
+        onEditorPreparing: (e) => {
+            if (e.row?.rowType != 'data' || e.row?.isNewRow) return
+            console.log(e);
+            if (e.dataField == 'code') {
+                e.editorOptions.readOnly = true
+            }
+        }
     }).dxDataGrid("instance");
 
     /****event*****/
