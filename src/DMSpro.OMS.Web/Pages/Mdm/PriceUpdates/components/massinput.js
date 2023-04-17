@@ -75,21 +75,19 @@ function renderMassInputCus(headerId, priceListId) {
                 columns: [
                     {
                         caption: l("EntityFieldName:MDMService:PriceUpdateDetail:Item"),
-                        dataField: "itemId",
+                        dataField: "item.name",
                         calculateDisplayValue(e) {
                             if (e)
                                 return `${e.item.code} - ${e.item.name}`
-                            return 'name'
                         },
                         allowEditing: false
                     },
                     {
                         caption: l('EntityFieldName:MDMService:PriceUpdateDetail:UOM'),
-                        dataField: "uomId",
+                        dataField: "uom.name",
                         calculateDisplayValue(e) {
                             if (e)
                                 return `${e.uom.code} - ${e.uom.name}`
-                            return 'name'
                         },
                         width: 200,
                         allowEditing: false
