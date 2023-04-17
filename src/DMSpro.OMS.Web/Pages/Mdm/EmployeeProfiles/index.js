@@ -62,7 +62,6 @@ $(function () {
 
             workingPositionService.getListDevextremes(args)
                 .done(result => {
-                    console.log(result);
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -83,25 +82,6 @@ $(function () {
             return d.promise();
         }
     });
-
-    var employeeTypeStore = [
-        {
-            id: 0,
-            displayName: l('EntityFieldValue:MDMService:EmployeeType:Salesman')
-        },
-        {
-            id: 1,
-            displayName: l('EntityFieldValue:MDMService:EmployeeType:Deliveryman')
-        },
-        {
-            id: 2,
-            displayName: l('EntityFieldValue:MDMService:EmployeeType:Supervisor')
-        },
-        {
-            id: 3,
-            displayName: l('EntityFieldValue:MDMService:EmployeeType:PromotionGirl')
-        },
-    ];
 
     /****control*****/
     //DataGrid - Employee Profile
@@ -170,8 +150,9 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
-        initNewRow(e) {
+        onInitNewRow(e) {
             rowEditing = -1;
+            e.data.active = true
         },
         onEditingStart(e) {
             rowEditing = e.component.getRowIndexByKey(e.key);
@@ -189,8 +170,7 @@ $(function () {
             },
             popup: {
                 title: l("Page.Title.EmployeeProfiles"),
-                showTitle: false,
-                width: 'fit-content',
+                width: '99%',
                 height: 'fit-content'
             },
             form: {
@@ -220,21 +200,19 @@ $(function () {
                         colCount: 2,
                         colSpan: 2,
                         caption: '',
-                        items: ['dateOfBirth', 'employeeType', 'idCardNumber', 'address', 'phone', 'email', 'effectiveDate', 'endDate', 'active']
+                        items: ['dateOfBirth', 'idCardNumber', 'address', 'phone', 'email', 'effectiveDate', 'endDate', 'active']
                     }
                 ],
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ["code", "erpCode", "firstName", "lastName", "dateOfBirth", "idCardNumber", "email", "phone", "address", "active", "effectiveDate", "endDate", "workingPositionId", "employeeTypeId"];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
+            e.newData = {
+                ...e.oldData,
+                email: e.newData.email.length > 0 ? e.newData.email : null
             }
         },
         onEditorPreparing: function (e) {
-            if (e.dataField == "workingPositionId" || e.dataField == "employeeType") {
+            if (e.dataField == "workingPositionId") {
                 e.editorOptions.showClearButton = true;
             }
         },
@@ -334,35 +312,24 @@ $(function () {
                 dataField: "workingPositionId",
                 //calculateDisplayValue: "workingPosition.name",
                 allowSearch: false,
-                calculateDisplayValue(rowData){
+                calculateDisplayValue(rowData) {
                     //console.log(rowData.geoLevel2);
-                    if(rowData.workingPosition){
+                    if (rowData.workingPosition) {
                         return rowData.workingPosition.name;
                     }
                     return "";
                 },
                 dataType: 'string',
                 lookup: {
-                    dataSource() {
+                    dataSource(e) {
                         return {
                             store: workingPositionStore,
-                            filer: ["active", "=", "true"],
+                            filter: ["active", "=", true],
                             paginate: true,
-                            pageSize: pageSizeForLookup
+                            pageSize
                         };
                     },
                     displayExpr: 'name',
-                    valueExpr: 'id',
-                }
-            },
-            {
-                caption: l("EntityFieldName:MDMService:EmployeeProfile:EmployeeTypeName"),
-                dataField: "employeeType",
-                allowSearch: false,
-                dataType: 'string',
-                lookup: {
-                    dataSource: employeeTypeStore,
-                    displayExpr: 'displayName',
                     valueExpr: 'id',
                 }
             },
