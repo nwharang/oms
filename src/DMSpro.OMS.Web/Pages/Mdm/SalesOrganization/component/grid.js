@@ -118,6 +118,7 @@ let renderGrid = (e, headerData) => {
                 lookup: {
                     dataSource: {
                         store: store.employeeProfileStore,
+                        filter: ['active', '=', true],
                         paginate: true,
                         pageSize: pageSizeForLookup
                     },
