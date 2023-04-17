@@ -297,11 +297,11 @@ $(function () {
                         headerFilter: {
                             visible: true,
                         },
-                        // stateStoring: {
-                        //     enabled: true,
-                        //     type: 'localStorage',
-                        //     storageKey: 'dgPriceListAssignmentDetail' + options.key,
-                        // },
+                        stateStoring: {
+                            enabled: true,
+                            type: 'localStorage',
+                            storageKey: 'dgPriceListAssignmentDetail' + options.key,
+                        },
                         paging: {
                             enabled: true,
                             pageSize: pageSize
@@ -368,7 +368,8 @@ $(function () {
                                                 dataGridDetail.dxDataGrid('instance').refresh()
                                             })
                                         },
-                                        visible: (e) => !e.row.isNewRow
+                                        visible: (e) => !e.row.isNewRow,
+                                        disabled: (e) => e.row.data.isReleased
                                     }
                                 ],
                                 width: 100,

@@ -52,11 +52,11 @@ $(() => {
         searchPanel: {
             visible: true
         },
-        stateStoring: { //save state in localStorage
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dgMCPDetails',
-        },
+        // stateStoring: { //save state in localStorage
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'dgMCPDetails',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -277,11 +277,11 @@ $(() => {
                         searchPanel: {
                             visible: true
                         },
-                        stateStoring: { //save state in localStorage
-                            enabled: true,
-                            type: 'localStorage',
-                            storageKey: 'dgMCPDetails',
-                        },
+                        // stateStoring: { //save state in localStorage
+                        //     enabled: true,
+                        //     type: 'localStorage',
+                        //     storageKey: 'dgMCPDetails',
+                        // },
                         paging: {
                             enabled: true,
                             pageSize: pageSize
@@ -346,9 +346,9 @@ $(() => {
 
                                 if (e.row && e.row.data.endDate) {
                                     var maxDate = new Date(e.row.data.endDate);
-                                    maxDate.setDate(maxDate.getDate() - 1); 
+                                    maxDate.setDate(maxDate.getDate());
                                     e.editorOptions.max = maxDate;
-                                } 
+                                }
 
                                 var onValueChanged = e.editorOptions.onValueChanged;
                                 e.editorOptions.onValueChanged = function (e) {
@@ -358,23 +358,23 @@ $(() => {
                                     var endDateDateBox = $(endDateCell).find('div.dx-datebox').data('dxDateBox');
                                     if (endDateDateBox) {
                                         var minDate = new Date(e.value);
-                                        minDate.setDate(minDate.getDate() + 1);
+                                        minDate.setDate(minDate.getDate());
                                         endDateDateBox.option('min', minDate);
                                     }
                                 }
                             }
                             else if (e.dataField == "endDate") {
                                 var minDate = new Date();
-                                minDate.setDate(minDate.getDate() + 1); 
+                                minDate.setDate(minDate.getDate());
                                 e.editorOptions.min = minDate;
                                 e.editorOptions.max = new Date(2099, 12, 31);
 
                                 if (e.row && e.row.data.startDate) {
                                     minDate = new Date(e.row.data.startDate);
-                                    minDate.setDate(minDate.getDate() + 1);
+                                    minDate.setDate(minDate.getDate());
                                     e.editorOptions.min = minDate;
-                                } 
-                                 
+                                }
+
                                 var onValueChanged = e.editorOptions.onValueChanged;
                                 e.editorOptions.onValueChanged = function (e) {
                                     onValueChanged.call(this, e);
@@ -383,7 +383,7 @@ $(() => {
                                     var startDateDateBox = $(startDateCell).find('div.dx-datebox').data('dxDateBox');
                                     if (startDateDateBox) {
                                         var maxDate = new Date(e.value);
-                                        maxDate.setDate(maxDate.getDate() - 1);
+                                        maxDate.setDate(maxDate.getDate());
                                         startDateDateBox.option('max', maxDate);
                                     }
                                 }

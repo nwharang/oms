@@ -2,7 +2,11 @@ function renderCusGrGeo(headerId, status) {
     if (!grid)
         grid = $('<div id=dataGridContainer class="ps-2">');
     grid.dxDataGrid({
-        dataSource: store.customerGeoStore(headerId),
+        dataSource: {
+            store: store.customerGeoStore(headerId),
+            paginate: true,
+            pageSize,
+        },
         remoteOperations: true,
         repaintChangesOnly: true,
         showBorders: true,
@@ -28,6 +32,17 @@ function renderCusGrGeo(headerId, status) {
         },
         export: {
             enabled: true,
+        },
+        paging: {
+            enabled: true,
+            pageSize: pageSize
+        },
+        pager: {
+            visible: true,
+            showPageSizeSelector: true,
+            allowedPageSizes: allowedPageSizes,
+            showInfo: true,
+            showNavigationButtons: true
         },
         onExporting(e) {
             const workbook = new ExcelJS.Workbook();

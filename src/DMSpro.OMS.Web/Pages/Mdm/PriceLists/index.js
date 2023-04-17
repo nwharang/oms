@@ -4,7 +4,16 @@ var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
 $(function () {
     var l = abp.localization.getResource("OMS");
-
+    var isReleasedStore = [
+        {
+            id: true,
+            text: l('EntityFieldValue:MDMService:PriceList:Status:Released')
+        },
+        {
+            id: false,
+            text: l('EntityFieldValue:MDMService:PriceList:Status:Open')
+        }
+    ]
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
@@ -90,6 +99,7 @@ $(function () {
     // get price list
     var getPriceList = new DevExpress.data.CustomStore({
         key: "id",
+        useDefaultSearch: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -155,6 +165,7 @@ $(function () {
     // get item list
     var getItemList = new DevExpress.data.CustomStore({
         key: "id",
+        useDefaultSearch: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -172,6 +183,15 @@ $(function () {
                     });
                 });
             return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+            var d = new $.Deferred();
+            uomService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
         }
     });
 
@@ -296,23 +316,40 @@ $(function () {
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
-        // onEditorPreparing: (e) => {
-        //     if (e.row?.rowType != "data" && !Boolean(e.dataField) && e.parentType != 'dataRow' && !e.row?.isNewRow){
-        //         return
-        //     }
-        //     const items = e.component.getDataSource().items();
-        //     if (["action", 'name', 'code'].indexOf(e.dataField) === -1 && items.length < 1){
-        //         e.editorOptions.disabled = true
-        //     }
+        onEditorPreparing: (e) => {
+            //     if (e.row?.rowType != "data" && !Boolean(e.dataField) && e.parentType != 'dataRow' && !e.row?.isNewRow){
+            //         return
+            //     }
+            //     const items = e.component.getDataSource().items();
+            //     if (["action", 'name', 'code'].indexOf(e.dataField) === -1 && items.length < 1){
+            //         e.editorOptions.disabled = true
+            //     }
 
-        //     // if (e.dataField == 'basePriceListId')
-        //     //     e.editorOptions.disabled = true
-        // },
+            //     // if (e.dataField == 'basePriceListId')
+            //     //     e.editorOptions.disabled = true
+            // 🥲
+            // Disable Edit some field if Base PriceList
+            if (e.row?.rowType == "data" && e.row?.data.isBase) {
+                if (['name', 'isDefaultForCustomer', 'isDefaultForVendor'].indexOf(e.dataField) == -1) {
+                    e.editorOptions.readOnly = true
+                    e.editorOptions.placeholder = null
+                }
+            }
+        },
         onEditorPrepared: function (e) {
             //if (e.row?.rowType == "data" && Boolean(e.dataField) && e.parentType == 'dataRow' && e.row.isNewRow){
             //    const items = e.component.getDataSource().items();
             //    const value = e.component.option("value");
             //}
+        },
+        onInitNewRow: (e) => {
+            // on new row ,set 3 checkbox default value to false
+            e.data = {
+                ...e.data,
+                isDefaultForCustomer: false,
+                isDefaultForVendor: false,
+                isBase: false,
+            }
         },
         toolbar: {
             items: [
@@ -375,7 +412,11 @@ $(function () {
                     caption: l("EntityFieldName:MDMService:PriceList:Active"),
                     alignment: 'center',
                     dataType: 'text',
-                    calculateDisplayValue: (e) => e.isReleased ? l('EntityFieldValue:MDMService:PriceList:Status:Released') : l('EntityFieldValue:MDMService:PriceList:Status:Open'),
+                    lookup: {
+                        dataSource: isReleasedStore,
+                        valueExpr: 'id',
+                        displayExpr: 'text',
+                    },
                     allowEditing: false,
                     width: 120
                 },
@@ -389,12 +430,23 @@ $(function () {
                         class: "basePriceListSelectBox",
                     },
                     lookup: {
-                        //dataSource: getPriceList,
-                        dataSource: {
-                            store: getPriceList,
-                            filter: ["isBase", "=", true],
-                            paginate: true,
-                            pageSize: pageSizeForLookup
+                        dataSource: (e) => {
+                            console.log(e.data);
+                            if (e.data)
+                                return {
+                                    store: getPriceList,
+                                    filter: ["isBase", "=", true],
+                                    paginate: true,
+                                    pageSize
+                                }
+                            else {
+                                return {
+                                    store: getPriceList,
+                                    filter: ['id', '<>', null],
+                                    paginate: true,
+                                    pageSize
+                                }
+                            }
                         },
                         valueExpr: 'id',
                         displayExpr: 'code'
@@ -425,6 +477,9 @@ $(function () {
                     caption: l("EntityFieldName:MDMService:PriceList:ArithmeticFactor"),
                     cssClass: 'fieldFactor',
                     dataType: 'number',
+                    editorOptions: {
+                        min: 0,
+                    },
                     width: 180
                 },
                 {
@@ -442,19 +497,28 @@ $(function () {
                     dataField: 'isBase',
                     caption: l("EntityFieldName:MDMService:PriceList:IsBase"),
                     alignment: 'center',
-                    dataType: 'boolean',
                     cellTemplate(container, options) {
                         $('<div>')
                             .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
                             .appendTo(container);
                     },
-                    width: 120
+                    width: 120,
                 },
                 {
                     dataField: 'isDefaultForCustomer',
                     caption: l("EntityFieldName:MDMService:PriceList:IsDefaultForCustomer"),
                     alignment: 'center',
-                    dataType: 'boolean',
+                    cellTemplate(container, options) {
+                        $('<div>')
+                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                            .appendTo(container);
+                    },
+                    width: 120,
+                },
+                {
+                    dataField: 'isDefaultForVendor',
+                    caption: l("EntityFieldName:MDMService:PriceList:IsDefaultForVendor"),
+                    alignment: 'center',
                     cellTemplate(container, options) {
                         $('<div>')
                             .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
@@ -462,18 +526,6 @@ $(function () {
                     },
                     width: 120
                 },
-                {
-                    dataField: 'isDefaultForVendor',
-                    caption: l("EntityFieldName:MDMService:PriceList:IsDefaultForVendor"),
-                    alignment: 'center',
-                    dataType: 'boolean',
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                            .appendTo(container);
-                    },
-                    width: 120
-                }
             ],
 
         masterDetail: {
@@ -584,6 +636,7 @@ $(function () {
                                 dataField: "priceListId",
                                 calculateDisplayValue: 'priceList.code',
                                 allowEditing: false,
+                                allowFiltering: false,
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Item"),
@@ -594,12 +647,23 @@ $(function () {
                                         return e.item.code + " - " + e.item.name
                                 },
                                 allowEditing: false,
+                                allowFiltering: false,
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:UOM"),
                                 dataField: "uomId",
                                 calculateDisplayValue: 'uom.name',
                                 allowEditing: false,
+                                allowFiltering: false,
+                                // lookup: {
+                                //     dataSource: {
+                                //         store: getUOMs,
+                                //         paginate: true,
+                                //         pageSize,
+                                //     },
+                                //     displayExpr : 'name',
+                                //     valueExpr : ''
+                                // }
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:BasedOnPrice"),
@@ -609,6 +673,8 @@ $(function () {
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Price"),
                                 dataField: "price",
+                                dataType: 'number',
+
                                 validationRules: [{ type: "required" }]
                             },
                             {

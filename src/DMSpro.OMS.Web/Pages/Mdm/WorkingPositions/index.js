@@ -180,6 +180,7 @@
                 caption: l("EntityFieldName:MDMService:WorkingPosition:Code"),
                 dataField: "code",
                 dataType: 'string',
+                allowEditing: false,
             },
             {
                 caption: l("EntityFieldName:MDMService:WorkingPosition:Name"),
