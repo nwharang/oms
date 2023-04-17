@@ -402,6 +402,7 @@ $(function () {
                                 lookup: {
                                     dataSource: {
                                         store: getCustomers,
+                                        filter: ['status', '=', 1],
                                         paginate: true,
                                         pageSize
                                     },

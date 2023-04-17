@@ -132,21 +132,8 @@ let renderTree = (e, headerData) => {
                     contextMenu.option('items[3].visible', false);
                 }
             }
-            if (status == 1) {
-                if (isSellingZone) {
-                    contextMenu.option('items[0].visible', true);
-                    contextMenu.option('items[1].visible', false);
-                    contextMenu.option('items[2].visible', true);
-                    contextMenu.option('items[3].visible', false);
-                }
-                else {
-                    contextMenu.option('items[0].visible', false);
-                    contextMenu.option('items[1].visible', false);
-                    contextMenu.option('items[2].visible', false);
-                    contextMenu.option('items[3].visible', false);
-                }
-            }
-            if (status == 2) {
+
+            if (status > 0) {
                 e.items = []
             }
         },
