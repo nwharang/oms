@@ -363,11 +363,11 @@ $(function () {
             return;
 
         var formData = new FormData();
-        formData.append("file", files[0]);
+        formData.append("inputFile", files[0]);
 
         $.ajax({
             type: "POST",
-            url: `${urlUploadFile}?EmployeeProfileId=${employeeProfileId}`,
+            url: `${urlUploadFile}?employeeId=${employeeProfileId}`,
             async: true,
             processData: false,
             mimeType: 'multipart/form-data',
