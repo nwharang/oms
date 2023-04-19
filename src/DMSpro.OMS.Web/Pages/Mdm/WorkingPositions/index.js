@@ -125,11 +125,8 @@
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        onInitNewRow(e) {
-            e.data.active = true;
-        },
         onRowUpdating: function (e) {
-            var objectRequire = ['name', 'description', 'active'];
+            var objectRequire = ['name', 'description'];
             for (var property in e.oldData) {
                 if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                     e.newData[property] = e.oldData[property];
@@ -175,11 +172,6 @@
                 caption: l("EntityFieldName:MDMService:WorkingPosition:Description"),
                 dataField: "description",
                 dataType: 'string',
-            },
-            {
-                caption: l("EntityFieldName:MDMService:WorkingPosition:Active"),
-                dataField: "active",
-                dataType: 'boolean'
             }
         ],
         onEditorPreparing: function (e) {
