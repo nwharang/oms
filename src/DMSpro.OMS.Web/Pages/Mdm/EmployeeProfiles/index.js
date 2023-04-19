@@ -213,7 +213,7 @@ $(function () {
                         colCount: 1,
                         colSpan: 2,
                         items:
-                            ['code', 'erpCode', 'firstName', 'lastName', 'workingPositionId']
+                            ['erpCode', 'firstName', 'lastName', 'workingPositionId']
                     },
                     {
                         itemType: 'group',
@@ -226,7 +226,7 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ["code", "erpCode", "firstName", "lastName", "dateOfBirth", "idCardNumber", "email", "phone", "address", "active", "effectiveDate", "endDate", "workingPositionId", "employeeTypeId"];
+            var objectRequire = ["erpCode", "firstName", "lastName", "dateOfBirth", "idCardNumber", "email", "phone", "address", "active", "effectiveDate", "endDate", "workingPositionId", "employeeTypeId"];
             for (var property in e.oldData) {
                 if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                     e.newData[property] = e.oldData[property];
