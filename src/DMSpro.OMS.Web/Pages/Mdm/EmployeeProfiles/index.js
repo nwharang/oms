@@ -96,6 +96,7 @@ $(function () {
         allowColumnResizing: true,
         columnResizingMode: 'widget',
         columnAutoWidth: true,
+        dateSerializationFormat: "yyyy-MM-dd",
         filterRow: {
             visible: true
         },
@@ -152,7 +153,8 @@ $(function () {
         },
         onInitNewRow(e) {
             rowEditing = -1;
-            e.data.active = true
+            e.data.active = true;
+            e.data.effectiveDate = new Date()
         },
         onEditingStart(e) {
             rowEditing = e.component.getRowIndexByKey(e.key);
@@ -200,10 +202,26 @@ $(function () {
                         colCount: 2,
                         colSpan: 2,
                         caption: '',
-                        items: ['dateOfBirth', 'idCardNumber', 'address', 'phone', 'email', 'effectiveDate', 'endDate', 'active']
+                        items: ['dateOfBirth', 'idCardNumber', 'address', 'phone', 'email',
+                            {
+                                dataField: 'effectiveDate',
+                                editorOptions: {
+                                    format: 'dd/MM/yyyy',
+                                }
+                            },
+                            {
+                                dataField: 'endDate',
+                                editorOptions: {
+                                    format: 'dd/MM/yyyy',
+                                },
+                            }
+                            , 'active']
                     }
                 ],
             }
+        },
+        onRowInserting: e => {
+            if (!e.data.effectiveDate) e.data.effectiveDate = moment().format('yyyy-MM-DD')
         },
         onRowUpdating: function (e) {
             if (e.newData.email?.length == 0)
@@ -338,11 +356,13 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:EffectiveDate"),
                 dataField: "effectiveDate",
                 dataType: 'date',
+                format: 'dd/MM/yyyy',
                 visible: false
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:EndDate"),
                 dataField: "endDate",
+                format: 'dd/MM/yyyy',
                 dataType: 'date',
                 visible: false
             },
@@ -363,11 +383,11 @@ $(function () {
             return;
 
         var formData = new FormData();
-        formData.append("inputFile", files[0]);
+        formData.append("file", files[0]);
 
         $.ajax({
             type: "POST",
-            url: `${urlUploadFile}?employeeId=${employeeProfileId}`,
+            url: `${urlUploadFile}?EmployeeProfileId=${employeeProfileId}`,
             async: true,
             processData: false,
             mimeType: 'multipart/form-data',
