@@ -1,5 +1,9 @@
-﻿let companyIdentityUserAssignment = window.dMSpro.oMS.mdmService.controllers.companyIdentityUserAssignments.companyIdentityUserAssignment
-$(async function () {
+﻿$(async function () {
+    if (!abp.currentTenant?.id) {
+        return
+    }
+    $('.wraper-select-company').css('display', 'block')
+    let companyIdentityUserAssignment = window.dMSpro.oMS.mdmService.controllers.companyIdentityUserAssignments.companyIdentityUserAssignment
     $('button[data-id=action-add-grid]').click(function () {
         var controlName = $(this).attr('data-effect-grid');
         var controlType = $(this).attr('data-effect-type');
@@ -18,6 +22,7 @@ $(async function () {
         //if (abp.auth.isAnyGranted()) { };
         // return;
         $('#selected-company').text((await Common.getCurrentCompany()).name);
+
         //companyIdentityUserAssignment.getCurrentlySelectedCompany().done(({ name }) => $('#selected-company').text(name))
         companyIdentityUserAssignment.getListCompanyByCurrentUser({})
             .done(({ data }) => {
