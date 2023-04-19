@@ -8,7 +8,7 @@ function renderGrid(e, { status, priceListId, id }) {
             store: store.priceUpdateDetailStore(id),
             paginate: true,
         },
-        remoteOperations: true,
+        // remoteOperations: true,
         repaintChangesOnly: true,
         showBorders: true,
         showRowLines: false,
