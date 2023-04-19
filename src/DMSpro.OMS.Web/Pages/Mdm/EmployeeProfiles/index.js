@@ -226,12 +226,8 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            var objectRequire = ["erpCode", "firstName", "lastName", "dateOfBirth", "idCardNumber", "email", "phone", "address", "active", "effectiveDate", "endDate", "workingPositionId", "employeeTypeId"];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            e.newData = { ...e.oldData, ...e.newData, }
+            if (e.newData?.email == "") e.newData.email = null
         },
         onEditorPreparing: function (e) {
             if (e.dataField == "workingPositionId" || e.dataField == "employeeType") {
@@ -273,16 +269,16 @@ $(function () {
                 fixedPosition: 'left'
             },
             {
-                caption: l("EntityFieldName:MDMService:EmployeeProfile:ERPCode"),
-                dataField: "erpCode",
-                dataType: 'string',
-                visible: false
-            },
-            {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:Code"),
                 dataField: "code",
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
+            },
+            {
+                caption: l("EntityFieldName:MDMService:EmployeeProfile:ERPCode"),
+                dataField: "erpCode",
+                dataType: 'string',
+                visible: false
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:FirstName"),
