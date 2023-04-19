@@ -129,7 +129,7 @@
             e.data.active = true;
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['code', 'name', 'description', 'active'];
+            var objectRequire = ['name', 'description', 'active'];
             for (var property in e.oldData) {
                 if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                     e.newData[property] = e.oldData[property];
@@ -148,23 +148,6 @@
                 },
                 'columnChooserButton',
                 "exportButton",
-                // {
-                //     location: 'after',
-                //     widget: 'dxButton',
-                //     options: {
-                //         icon: "import",
-                //         elementAttr: {
-                //             //id: "import-excel",
-                //             class: "import-excel",
-                //         },
-                //         onClick(e) {
-                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
-                //             var gridName = gridControl.attr('id');
-                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                //             if (popup) popup.show();
-                //         }
-                //     }
-                // },
                 "searchPanel"
             ],
         },
@@ -180,7 +163,7 @@
                 caption: l("EntityFieldName:MDMService:WorkingPosition:Code"),
                 dataField: "code",
                 dataType: 'string',
-                allowEditing: false,
+                validationRules: [{ type: "required" }]
             },
             {
                 caption: l("EntityFieldName:MDMService:WorkingPosition:Name"),
@@ -198,35 +181,11 @@
                 dataField: "active",
                 dataType: 'boolean'
             }
-        ]
+        ],
+        onEditorPreparing: function (e) {
+            if (e.dataField === "code" && e.parentType === "dataRow") {
+                e.editorOptions.disabled = !e.row.isNewRow;
+            }
+        },
     }).dxDataGrid("instance");
-
-    /****event*****/
-    //$("input#Search").on("input", function () {
-    //    dataGridContainer.searchByText($(this).val());
-    //});
-
-    ///****button*****/
-    //$("#NewWorkingPositionButton").click(function () {
-    //    dataGridContainer.addRow();
-    //});
-
-    //$("#ExportToExcelButton").click(function (e) {
-    //    e.preventDefault();
-
-    //    workingPositionService.getDownloadToken().then(
-    //        function (result) {
-    //            var url = abp.appPath + 'api/mdm-service/working-positions/as-excel-file' +
-    //                abp.utils.buildQueryString([
-    //                    { name: 'downloadToken', value: result.token }
-    //                ]);
-
-    //            var downloadWindow = window.open(url, '_blank');
-    //            downloadWindow.focus();
-    //        }
-    //    )
-    //});
-
-    /****function*****/
-    // initImportPopup('api/mdm-service/working-positions', 'WorkingPositions_Template', 'dataGridContainer');
 });
