@@ -2,7 +2,6 @@ $(function () {
     var l = abp.localization.getResource("OMS");
     var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
     var workingPositionService = window.dMSpro.oMS.mdmService.controllers.workingPositions.workingPosition;
-    var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
     var employeeProfileImageService = window.dMSpro.oMS.mdmService.controllers.employeeImages.employeeImage;
 
     var urlUploadFile = `${abp.appPath}api/mdm-service/employee-images/avatar`;
@@ -246,7 +245,6 @@ $(function () {
                     options: {
                         icon: "import",
                         elementAttr: {
-                            //id: "import-excel",
                             class: "import-excel",
                         },
                         onClick(e) {
@@ -254,8 +252,8 @@ $(function () {
                             var gridName = gridControl.attr('id');
                             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
                             if (popup) popup.show();
-                        }
-                    }
+                        },
+                    },
                 },
                 "searchPanel",
             ],
@@ -330,9 +328,9 @@ $(function () {
                 dataField: "workingPositionId",
                 //calculateDisplayValue: "workingPosition.name",
                 allowSearch: false,
-                calculateDisplayValue(rowData){
+                calculateDisplayValue(rowData) {
                     //console.log(rowData.geoLevel2);
-                    if(rowData.workingPosition){
+                    if (rowData.workingPosition) {
                         return rowData.workingPosition.name;
                     }
                     return "";
@@ -385,6 +383,8 @@ $(function () {
             }
         ]
     }).dxDataGrid("instance");
+
+    initImportPopup('api/mdm-service/employee-profiles', 'EmployeeProfiles_Template', 'dataGridContainer');
 
     function uploadAvatar(employeeProfileId) {
         if (files.length === 0)
@@ -476,6 +476,4 @@ $(function () {
 
         return d.promise();
     }
-
-    initImportPopup('api/mdm-service/employee-profiles', 'EmployeeProfiles_Template', 'dataGridContainer');
 });
