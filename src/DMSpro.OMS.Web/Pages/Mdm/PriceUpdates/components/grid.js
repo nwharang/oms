@@ -114,7 +114,7 @@ function renderGrid(e, { status, priceListId, id }) {
                     displayExpr: (e) => {
                         if (e)
                             return `${e.code} - ${e.name}`
-                        return 'name'
+                        return ''
                     },
                 },
                 allowEditing: false
