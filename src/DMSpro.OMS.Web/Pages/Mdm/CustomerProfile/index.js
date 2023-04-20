@@ -288,7 +288,6 @@
                     options: {
                         icon: "import",
                         elementAttr: {
-                            //id: "import-excel",
                             class: "import-excel",
                         },
                         onClick(e) {

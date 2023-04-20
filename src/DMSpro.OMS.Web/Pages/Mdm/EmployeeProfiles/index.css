@@ -4,7 +4,7 @@
 }
 
 .dx-fileuploader-content .dx-fileuploader-files-container{
-    display:none;
+    display: block;
 }
 
 

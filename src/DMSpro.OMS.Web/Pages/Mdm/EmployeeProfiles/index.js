@@ -2,7 +2,6 @@ $(function () {
     var l = abp.localization.getResource("OMS");
     var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
     var workingPositionService = window.dMSpro.oMS.mdmService.controllers.workingPositions.workingPosition;
-    var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
     var employeeProfileImageService = window.dMSpro.oMS.mdmService.controllers.employeeImages.employeeImage;
 
     var urlUploadFile = `${abp.appPath}api/mdm-service/employee-images/avatar`;
@@ -224,12 +223,8 @@ $(function () {
             if (!e.data.effectiveDate) e.data.effectiveDate = moment().format('yyyy-MM-DD')
         },
         onRowUpdating: function (e) {
-            var objectRequire = ["erpCode", "firstName", "lastName", "dateOfBirth", "idCardNumber", "email", "phone", "address", "active", "effectiveDate", "endDate", "workingPositionId", "employeeTypeId"];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            e.newData = { ...e.oldData, ...e.newData, }
+            if (e.newData?.email == "") e.newData.email = null
         },
         onEditorPreparing: function (e) {
             if (e.dataField == "workingPositionId") {
@@ -248,7 +243,6 @@ $(function () {
                     options: {
                         icon: "import",
                         elementAttr: {
-                            //id: "import-excel",
                             class: "import-excel",
                         },
                         onClick(e) {
@@ -256,8 +250,8 @@ $(function () {
                             var gridName = gridControl.attr('id');
                             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
                             if (popup) popup.show();
-                        }
-                    }
+                        },
+                    },
                 },
                 "searchPanel",
             ],
@@ -271,16 +265,16 @@ $(function () {
                 fixedPosition: 'left'
             },
             {
-                caption: l("EntityFieldName:MDMService:EmployeeProfile:ERPCode"),
-                dataField: "erpCode",
-                dataType: 'string',
-                visible: false
-            },
-            {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:Code"),
                 dataField: "code",
                 dataType: 'string',
                 validationRules: [{ type: "required" }]
+            },
+            {
+                caption: l("EntityFieldName:MDMService:EmployeeProfile:ERPCode"),
+                dataField: "erpCode",
+                dataType: 'string',
+                visible: false
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:FirstName"),
@@ -379,6 +373,8 @@ $(function () {
         ]
     }).dxDataGrid("instance");
 
+    initImportPopup('api/mdm-service/employee-profiles', 'EmployeeProfiles_Template', 'dataGridContainer');
+
     function uploadAvatar(employeeProfileId) {
         if (files.length === 0)
             return;
@@ -469,6 +465,4 @@ $(function () {
 
         return d.promise();
     }
-
-    initImportPopup('api/mdm-service/employee-profiles', 'EmployeeProfiles_Template', 'dataGridContainer');
 });
