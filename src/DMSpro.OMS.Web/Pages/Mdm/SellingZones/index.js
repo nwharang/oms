@@ -79,10 +79,12 @@ $(function () {
     var salesOrgHierarchyStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
-            var filter = ["isSellingZone", "=", true];
+            var filter = [["isSellingZone", "=", true], 'and', ['salesOrgHeader.status', "=", 1]];
             if (loadOptions.searchValue != null && loadOptions.searchValue != '') {
                 filter = [
                     ["isSellingZone", "=", true],
+                    "and",
+                    ["salesOrgHeader.status", "=", 1],
                     "and",
                     [
                         ["name", loadOptions.searchOperation, loadOptions.searchValue],
@@ -211,8 +213,12 @@ $(function () {
             return d.promise();
         },
         insert({ customerId, effectiveDate, endDate, salesOrgHierarchyId }) {
-            return customerId.forEach((e) => {
-                customerInZoneService.create({ customerId: e, effectiveDate, endDate, salesOrgHierarchyId }, { contentType: "application/json" })
+            return new Promise((resolve, reject) => {
+                customerId.forEach((e, index, arr) => {
+                    customerInZoneService.create({ customerId: e, effectiveDate, endDate, salesOrgHierarchyId }, { contentType: "application/json" }).then(() => {
+                        if (index == arr.length - 1) resolve();
+                    })
+                })
             })
         },
         update(key, values) {
@@ -475,8 +481,11 @@ $(function () {
                 lookup: {
                     dataSource: itemGroupStore,
                     valueExpr: "id",
-                    displayExpr: "name"
+                    displayExpr: "name",
                 },
+                editorOptions: {
+                    showClearButton: true,
+                }
             }
         ]
     }).dxDataGrid("instance");
