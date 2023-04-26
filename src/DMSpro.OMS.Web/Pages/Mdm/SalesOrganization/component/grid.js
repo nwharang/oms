@@ -1,7 +1,11 @@
 let renderGrid = (e, headerData) => {
-    if (!grid) grid = $('<div id=dataGridContainer class="ps-2">').css('flex-basis', '65%')
+    if (!grid) grid = $('<div id=dataGridContainer class="ps-2">')
+        .css('max-width', '65%').css('width', "100%")
+        .css('height', "100%")
+
     grid.dxDataGrid({
         dataSource: store.salesOrgEmpAssignmentStore,
+        dateSerializationFormat: "yyyy-MM-dd",
         remoteOperations: true,
         showBorders: true,
         showRowLines: true,
@@ -136,17 +140,13 @@ let renderGrid = (e, headerData) => {
                 dataField: "effectiveDate",
                 dataType: 'date',
                 validationRules: [{ type: "required" }],
-                editorOptions: {
-                    min: new Date()
-                }
+
             },
             {
                 caption: l('EntityFieldName:MDMService:SalesOrgEmpAssignment:EndDate'),
                 dataField: "endDate",
                 dataType: 'date',
-                editorOptions: {
-                    min: new Date()
-                }
+
             },
             {
                 caption: l('EntityFieldName:MDMService:SalesOrgEmpAssignment:SalesOrgHierarchy'),
