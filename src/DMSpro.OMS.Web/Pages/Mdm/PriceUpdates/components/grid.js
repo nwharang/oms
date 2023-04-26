@@ -8,7 +8,6 @@ function renderGrid(e, { status, priceListId, id }) {
             store: store.priceUpdateDetailStore(id),
             paginate: true,
         },
-        // remoteOperations: true,
         repaintChangesOnly: true,
         showBorders: true,
         showRowLines: false,
@@ -114,7 +113,7 @@ function renderGrid(e, { status, priceListId, id }) {
                     displayExpr: (e) => {
                         if (e)
                             return `${e.code} - ${e.name}`
-                        return ''
+                        return
                     },
                 },
                 allowEditing: false
@@ -148,7 +147,6 @@ function renderGrid(e, { status, priceListId, id }) {
 
                 }
             }
-
         ]
     });
     if (e)
