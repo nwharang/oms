@@ -215,16 +215,34 @@ $(function () {
                 title: l("Page:Title:CompanyProfiles"),
                 showTitle: true,
                 width: "95%",
-                height: "95%"
             },
-            // popup: {
-            //     title: 'Customer Info',
-            //     showTitle: true,
-            //     width: "95%",
-            //     height: "95%",
-            //     hideOnOutsideClick: true,
-            //     dragEnabled: false,
-            // },
+            form: {
+                labelMode: "outside",
+                colCount: 2,
+                items: [
+                    'name',
+                    'geoLevel0Id',
+                    'geoLevel1Id',
+                    'geoLevel2Id',
+                    'geoLevel3Id',
+                    'geoLevel4Id',
+                    'street',
+                    'address',
+                    'phone',
+                    'license',
+                    'taxCode',
+                    'erpCode',
+                    'parentId',
+                    'vatName',
+                    'vatAddress',
+                    'effectiveDate',
+                    'endDate',
+                    'latitude',
+                    'longitude',
+                    'contactName',
+                    'contactPhone',
+                ]
+            },
             texts: {
                 editRow: l("Edit"),
                 deleteRow: l("Delete"),
@@ -282,7 +300,6 @@ $(function () {
             {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Code"),
-                validationRules: [{ type: "required" }],
                 dataType: 'string',
                 fixed: true,
                 fixedPosition: "left",
@@ -293,7 +310,7 @@ $(function () {
                 validationRules: [{ type: "required" }],
                 dataType: 'string',
                 fixed: true,
-                fixedPosition: "left"
+                fixedPosition: "left",
             },
             {
                 dataField: "geoLevel0Id",
@@ -692,7 +709,7 @@ $(function () {
         },
         onInitNewRow: (e) => {
             e.data.active = true;
-            e.data.isHO = false;
+            // e.data.isHO = false;
             e.data.effectiveDate = new Date()
         }
     }).dxDataGrid("instance");
