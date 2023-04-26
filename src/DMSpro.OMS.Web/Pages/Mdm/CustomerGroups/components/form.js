@@ -82,11 +82,6 @@ function renderForm(e, headerData) {
                     }
                 }
             },
-            // {
-            //     dataField: 'description',
-            //     editorType: 'dxTextBox',
-            //     colSpan: 7,
-            // },
         ],
         onContentReady: (e) => {
             if (headerData.status >= 0)
