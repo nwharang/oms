@@ -1,6 +1,5 @@
 ﻿var holidayDetail = window.dMSpro.oMS.mdmService.controllers.holidayDetails.holidayDetail;
 var l = abp.localization.getResource("OMS");
-var l1 = abp.localization.getResource("OMS");
 $(() => {
 
     var holidayService = window.dMSpro.oMS.mdmService.controllers.holidays.holiday;
@@ -97,7 +96,7 @@ $(() => {
         editing: {
             mode: "row",
             allowAdding: abp.auth.isGranted('MdmService.Holidays.Create'),
-            allowUpdating: true,
+            allowUpdating: abp.auth.isGranted('MdmService.Holidays.Edit'),
             allowDeleting: abp.auth.isGranted('MdmService.Holidays.Delete'),
             useIcons: true,
             texts: {
@@ -147,7 +146,7 @@ $(() => {
         // keyExpr: 'Id', 
         errorRowEnabled: false,
         onEditorPreparing: function (e) {
-            if (e.dataField === "year") {
+            if (e.dataField === "year" && e.rowType === 'data') {
                 e.editorOptions.min = (new Date()).getFullYear();
                 e.editorOptions.max = 2099;
             }
@@ -170,7 +169,6 @@ $(() => {
             {
                 dataField: 'description',
                 caption: l("EntityFieldName:MDMService:Holiday:Description"),
-                validationRules: [{ type: "required" }, { type: "stringLength", max: 255, message: l1('Message.MaximumLength').replace('{0}', 255) }],
             },
         ],
         masterDetail: {
@@ -203,31 +201,12 @@ $(() => {
                                 return deferred.promise();
                             },
                             insert(values) {
-                                if (values.startDate) {
-                                    values.startDate = removeTimezoneFromDate(values.startDate);
-                                }
-                                if (values.endDate) {
-                                    values.endDate = removeTimezoneFromDate(values.endDate);
-                                }
                                 return holidayDetail.create(values, { contentType: "application/json" });
                             },
-                            update(key, values) {
-                                if (values.startDate) {
-                                    values.startDate = removeTimezoneFromDate(new Date(values.startDate));
-                                }
-                                if (values.endDate) {
-                                    values.endDate = removeTimezoneFromDate(new Date(values.endDate));
-                                }
-                                return holidayDetail.update(key, values, { contentType: "application/json" });
+                            update(key, { startDate, endDate, description }) {
+                                return holidayDetail.update(key, { startDate, endDate, description }, { contentType: "application/json" });
                             },
                             remove(key) {
-                                var dxDataGrid = $(`#grid_${currentHeaderData.id}`).data('dxDataGrid');
-                                let rows = dxDataGrid.getVisibleRows();
-                                var row = rows.filter(u => u.key == key)[0];
-                                if (row.data.startDate && new Date(row.data.startDate) <= new Date()) {
-                                    abp.message.info(l1('CanNotDeleteHolidayYearsDetail'));
-                                    return;
-                                }
                                 return holidayDetail.delete(key);
                             },
                         }),
@@ -255,6 +234,7 @@ $(() => {
                         allowColumnReordering: true,
                         allowColumnResizing: true,
                         columnResizingMode: 'widget',
+                        dateSerializationFormat: "yyyy-MM-dd",
                         columnMinWidth: 50,
                         columnAutoWidth: true,
                         columnChooser: {
@@ -320,12 +300,9 @@ $(() => {
                         },
                         editing: {
                             mode: "row",
-                            //allowAdding: abp.auth.isGranted('MdmService.u-oMs.Create'),
-                            //allowUpdating: abp.auth.isGranted('MdmService.u-oMs.Edit'),
-                            //allowDeleting: abp.auth.isGranted('MdmService.u-oMs.Delete'),
-                            allowAdding: true,
-                            allowUpdating: true,
-                            allowDeleting: true,
+                            allowAdding: abp.auth.isGranted('MdmService.Holidays.Create'),
+                            allowUpdating: abp.auth.isGranted('MdmService.Holidays.Edit'),
+                            allowDeleting: abp.auth.isGranted('MdmService.Holidays.Delete'),
                             useIcons: true,
                             texts: {
                                 editRow: l("Edit"),
@@ -340,6 +317,7 @@ $(() => {
                             e.newData = Object.assign({}, e.oldData, e.newData);
                         },
                         onEditorPreparing: function (e) {
+
                             if (e.dataField == "startDate") {
                                 e.editorOptions.min = new Date();
                                 e.editorOptions.max = new Date(2099, 12, 30);
@@ -406,7 +384,8 @@ $(() => {
                                 caption: l("EntityFieldName:MDMService:HolidayDetail:StartDate"),
                                 width: 130, dataType: "date",
                                 format: "dd/MM/yyyy",
-                                alignment: "right"
+                                alignment: "right",
+                                validationRules: [{ type: "required" }]
                             },
                             {
                                 dataField: 'endDate',
@@ -414,12 +393,13 @@ $(() => {
                                 width: 130,
                                 dataType: "date",
                                 format: "dd/MM/yyyy",
-                                alignment: "right"
-                            }, {
+                                alignment: "right",
+                                validationRules: [{ type: "required" }]
+                            },
+                            {
                                 allowEditing: false,
                                 dataType: "number",
                                 dataField: 'Days',
-                                caption: l1("EntityFieldName:MDMService:HolidayDetail:Days"),
                                 width: 120, alignment: "center",
                                 calculateCellValue: function (rowData) {
                                     if (!rowData.startDate || !rowData.endDate)
@@ -437,12 +417,6 @@ $(() => {
             },
         },
     }).dxDataGrid("instance");
-    function removeTimezoneFromDate(currentDate) {
-        if (!currentDate || (typeof currentDate == "string")) return currentDate;
-
-        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2);
-        return date;
-    }
     // initImportPopup('api/mdm-service/holidays', 'Holidays_Template', 'gridHolidays');
 
 });
