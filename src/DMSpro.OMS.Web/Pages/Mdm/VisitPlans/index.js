@@ -9,31 +9,31 @@ $(function () {
 
     const dayOfWeek = [
         {
-            id: 'MONDAY',
+            id: 1,
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:MONDAY')
         },
         {
-            id: 'TUESDAY',
+            id: 2,
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:TUESDAY')
         },
         {
-            id: 'WEDNESDAY',
+            id: 3,
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:WEDNESDAY')
         },
         {
-            id: 'THURSDAY',
+            id: 4,
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:THURSDAY')
         },
         {
-            id: 'FRIDAY',
+            id: 5,
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:FRIDAY')
         },
         {
-            id: 'SATURDAY',
+            id: 6,
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:SATURDAY')
         },
         {
-            id: 'SUNDAY',
+            id: 7,
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:SUNDAY')
         }
     ]
@@ -476,7 +476,7 @@ $(function () {
         onSelectionChanged: function (e) {
             var selectedRows = e.component.getSelectedRowsData();
             if (selectedRows.length > 0) {
-                $('#ChangeVisitPlanButton').prop('disabled',false);
+                $('#ChangeVisitPlanButton').prop('disabled', false);
             }
             else $('#ChangeVisitPlanButton').prop('disabled', true);
         }
@@ -500,8 +500,7 @@ $(function () {
             message: '',
         }],
     });
-    function getCurrentDateFormat()
-    { 
+    function getCurrentDateFormat() {
         var currentDate = new Date();
         var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2) + "T00:00:00";
         return date;
