@@ -740,10 +740,13 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
             onEditorPreparing: (e) => {
                 if (e.row?.rowType != 'data') return
                 let discountType = e.row.data.discountType
+                if (e.dataField == "discountType") {
+                    e.cancel = e.row.data.isFree
+                }
                 if (e.dataField == "discountAmt")
-                    e.cancel = discountType == 0 ? false : true
+                    e.cancel = discountType == 0 && !e.row.data.isFree ? false : true
                 if (e.dataField == "discountPerc")
-                    e.cancel = discountType > 0 ? false : true
+                    e.cancel = discountType > 0 && !e.row.data.isFree ? false : true
 
                 // e.editorOptions.onValueChanged = (v) => {
                 //     e.setValue(v.value)
