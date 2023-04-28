@@ -1,8 +1,44 @@
-﻿var holidayDetail = window.dMSpro.oMS.mdmService.controllers.holidayDetails.holidayDetail;
-var l = abp.localization.getResource("OMS");
+﻿var l = abp.localization.getResource("OMS");
 $(() => {
 
     var holidayService = window.dMSpro.oMS.mdmService.controllers.holidays.holiday;
+    var holidayDetail = window.dMSpro.oMS.mdmService.controllers.holidayDetails.holidayDetail;
+
+    let holidayStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            holidayService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        insert(values) {
+            return holidayService.create(values, { contentType: "application/json" });
+        },
+        update(key, values) {
+            return holidayService.update(key, values, { contentType: "application/json" });
+        },
+        remove(key) {
+            return holidayService.delete(key);
+        },
+        errorHandler: function (error) {
+
+        }
+    })
 
     var gridHolidays = $('#gridHolidays').dxDataGrid({
         remoteOperations: true,
@@ -105,50 +141,41 @@ $(() => {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        onRowUpdating: function (e) {
-            e.newData = Object.assign({}, e.oldData, e.newData);
-        },
-        dataSource: new DevExpress.data.CustomStore({
-            key: 'id',
-            load(loadOptions) {
-                const deferred = $.Deferred();
-                const args = {};
-                requestOptions.forEach((i) => {
-                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                        args[i] = JSON.stringify(loadOptions[i]);
-                    }
-                });
 
-                holidayService.getListDevextremes(args)
-                    .done(result => {
-                        deferred.resolve(result.data, {
-                            totalCount: result.totalCount,
-                            summary: result.summary,
-                            groupCount: result.groupCount,
-                        });
-                    });
-
-                return deferred.promise();
-            },
-            insert(values) {
-                return holidayService.create(values, { contentType: "application/json" });
-            },
-            update(key, values) {
-                return holidayService.update(key, values, { contentType: "application/json" });
-            },
-            remove(key) {
-                return holidayService.delete(key);
-            },
-            errorHandler: function (error) {
-
-            }
-        }),
+        dataSource: holidayStore,
         // keyExpr: 'Id', 
         errorRowEnabled: false,
         onEditorPreparing: function (e) {
             if (e.dataField === "year" && e.rowType === 'data') {
                 e.editorOptions.min = (new Date()).getFullYear();
                 e.editorOptions.max = 2099;
+            }
+        },
+        onRowUpdating: (e) => {
+            e.newData = Object.assign({}, e.oldData, e.newData);
+            if (e.newData.year) {
+                e.cancel = new Promise((resolve, reject) => {
+                    holidayService.getListDevextremes({ filter: JSON.stringify(['year', '=', e.newData.year]) }).then(({ data }) => {
+                        if (data?.length > 0) {
+                            resolve(true)
+                            abp.message.warn(l("WarningMessage:MDMService:Holiday:InvalidInputYear"));
+                        }
+                        resolve(false)
+                    })
+                })
+            }
+        },
+        onRowInserting: (e) => {
+            if (e.data.year) {
+                e.cancel = new Promise((resolve, reject) => {
+                    holidayService.getListDevextremes({ filter: JSON.stringify(['year', '=', e.data.year]) }).then(({ data }) => {
+                        if (data?.length > 0) {
+                            abp.message.warn(l("WarningMessage:MDMService:Holiday:InvalidInputYear"));
+                            resolve(true)
+                        }
+                        resolve(false)
+                    })
+                })
             }
         },
         columns: [
@@ -169,6 +196,7 @@ $(() => {
             {
                 dataField: 'description',
                 caption: l("EntityFieldName:MDMService:Holiday:Description"),
+                validationRules: [{ type: "required" }]
             },
         ],
         masterDetail: {
@@ -203,8 +231,8 @@ $(() => {
                             insert(values) {
                                 return holidayDetail.create(values, { contentType: "application/json" });
                             },
-                            update(key, { startDate, endDate, description }) {
-                                return holidayDetail.update(key, { startDate, endDate, description }, { contentType: "application/json" });
+                            update(key, values) {
+                                return holidayDetail.update(key, values, { contentType: "application/json" });
                             },
                             remove(key) {
                                 return holidayDetail.delete(key);
@@ -418,5 +446,4 @@ $(() => {
         },
     }).dxDataGrid("instance");
     // initImportPopup('api/mdm-service/holidays', 'Holidays_Template', 'gridHolidays');
-
 });
