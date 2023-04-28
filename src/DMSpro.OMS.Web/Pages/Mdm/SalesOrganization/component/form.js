@@ -16,6 +16,16 @@ let renderForm = (e, headerData) => {
                 dataField: 'code',
                 name: 'salesOrgHeaderCode',
                 editorType: 'dxTextBox',
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateingCodeField')
+                    }
+                ]
             },
             {
                 label: {

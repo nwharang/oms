@@ -170,13 +170,12 @@ $(function () {
                 dataType: 'string',
                 validationRules: [
                     {
-                        type: 'required',
-                        message: l("WarnMessage.RequiredField")
+                        type: "required"
                     },
                     {
-                        type: "stringLength",
-                        max: 50,
-                        message: l('WarnMessage.FieldLength')
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateingCodeField')
                     }
                 ]
             },

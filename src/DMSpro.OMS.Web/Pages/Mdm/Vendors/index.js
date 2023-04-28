@@ -257,7 +257,16 @@ $(function () {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:Vendor:Code"),
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateingCodeField')
+                    }
+                ]
             },
             {
                 dataField: 'name',

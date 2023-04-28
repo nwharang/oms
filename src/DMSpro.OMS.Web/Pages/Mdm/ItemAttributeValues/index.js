@@ -379,8 +379,12 @@ $(function () {
                 caption: l1("EntityFieldName:MDMService:ItemAttributeValue:Code"),
                 validationRules: [
                     {
-                        type: "required",
-                        message: 'Attribute value code is required'
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateingCodeField')
                     }
                 ],
                 width: 200

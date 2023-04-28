@@ -803,7 +803,7 @@ $(function () {
                                 dataSource: customerStore,
                                 valueExpr: 'code',
                                 displayExpr: 'code'
-                            }
+                            },
                         },
                         {
                             caption: l("EntityFieldName:MDMService:GeoMaster:Level3"),

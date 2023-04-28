@@ -155,7 +155,16 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:ItemGroup:Code"),
                 dataField: "code",
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateingCodeField')
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:ItemGroup:Name"),

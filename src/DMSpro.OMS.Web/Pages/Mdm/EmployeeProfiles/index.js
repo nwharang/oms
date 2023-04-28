@@ -280,7 +280,16 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:Code"),
                 dataField: "code",
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateingCodeField')
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:FirstName"),

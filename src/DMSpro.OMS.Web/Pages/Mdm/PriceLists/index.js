@@ -398,7 +398,16 @@ $(function () {
                 {
                     dataField: 'code',
                     caption: l("EntityFieldName:MDMService:PriceList:Code"),
-                    validationRules: [{ type: "required" }],
+                    validationRules: [
+                        {
+                            type: "required"
+                        },
+                        {
+                            type: 'pattern',
+                            pattern: '^[a-zA-Z0-9]{1,20}$',
+                            message: l('ValidateingCodeField')
+                        }
+                    ],
                     cellTemplate: (cellElement, component, c) => {
                         return $('<div />').text(component.value).css('color', component.data.isBase ? "#1d4ed8" : "")
                     }

@@ -25,11 +25,11 @@ $(function () {
             const deferred = $.Deferred();
             const args = {};
             loadOptions.filter = ["salesOrgHierarchyId", "=", sellingZoneId],
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
 
             customerInZoneService.getListDevextremes(args)
                 .done(result => {
@@ -214,15 +214,16 @@ $(function () {
                     {
                         dataField: 'Code',
                         editorType: 'dxTextBox',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        },
-                        {
-                            type: "pattern",
-                            pattern: /^[a-zA-Z0-9]*$/,
-                            message: l1('Message.NonSpecialCharacters').replace('{0}', 'Code')
-                        }]
+                        validationRules: [
+                            {
+                                type: "required"
+                            },
+                            {
+                                type: 'pattern',
+                                pattern: '^[a-zA-Z0-9]{1,20}$',
+                                message: l('ValidateingCodeField')
+                            }
+                        ]
                     },
                     {
                         dataField: 'Name',
@@ -464,11 +465,11 @@ $(function () {
                     e.editorOptions.onValueChanged = function (ev) {
                         // onValueChanged.call(this, ev);
                         // component.cellValue(rowIndex, "customerIdExtra", e.component.option('selectedItem').id);
-                        
-                        let selectedItem = ev.component.option('selectedItem'); 
-                        e.setValue(selectedItem);  
+
+                        let selectedItem = ev.component.option('selectedItem');
+                        e.setValue(selectedItem);
                     }
-                } 
+                }
                 // else if (e.dataField == "effectiveDate" || e.dataField == "endDate") {
                 //     e.editorOptions.displayFormat = "dd/MM/yyyy";
                 //     e.editorOptions.min = new Date();
@@ -541,7 +542,7 @@ $(function () {
                             width: 500,
                         },
                     },
-                    setCellValue: function(rowData, value) {
+                    setCellValue: function (rowData, value) {
                         rowData.customerId = value.customerId;
                         rowData.customer = value.customer;
                     },
@@ -562,8 +563,8 @@ $(function () {
                 {
                     caption: "Address",
                     dataField: "fullAddress",
-                    calculateDisplayValue(rowData){
-                        if(rowData.customer) return rowData.customer.fullAddress;
+                    calculateDisplayValue(rowData) {
+                        if (rowData.customer) return rowData.customer.fullAddress;
                     },
                     width: 150,
                     allowEditing: false,

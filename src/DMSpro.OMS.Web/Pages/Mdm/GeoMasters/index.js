@@ -57,7 +57,7 @@
             filtering: true,
             sorting: true,
             grouping: true,
-          },
+        },
         keyExpr: 'id',
         parentIdExpr: 'parentId',
         rootValue: null,
@@ -221,10 +221,16 @@
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Code"),
                 dataField: "code",
-                editorOptions: {
-                    maxLength: 10
-                },
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateingCodeField')
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Name"),

@@ -241,8 +241,12 @@ $(function () {
                 dataField: "code",
                 validationRules: [
                     {
-                        type: "required",
-                        message: 'Code is required'
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateingCodeField')
                     }
                 ]
             },
@@ -491,8 +495,8 @@ $(function () {
                                 lookup: {
                                     dataSource: getUOMs,
                                     valueExpr: 'id',
-                                    displayExpr(e){
-                                        if(e){
+                                    displayExpr(e) {
+                                        if (e) {
                                             return `${e.code} - ${e.name}`
                                         }
                                         return "";
@@ -531,8 +535,8 @@ $(function () {
                                 lookup: {
                                     dataSource: getUOMs,
                                     valueExpr: 'id',
-                                    displayExpr(e){
-                                        if(e){
+                                    displayExpr(e) {
+                                        if (e) {
                                             return `${e.code} - ${e.name}`
                                         }
                                         return "";

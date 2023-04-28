@@ -304,6 +304,16 @@ $(function () {
                 dataType: 'string',
                 fixed: true,
                 fixedPosition: "left",
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateingCodeField')
+                    }
+                ]
             },
             {
                 dataField: 'name',
