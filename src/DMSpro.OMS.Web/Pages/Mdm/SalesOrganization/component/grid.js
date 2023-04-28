@@ -150,7 +150,7 @@ let renderGrid = (e, headerData) => {
                 lookup: {
                     dataSource: {
                         store: store.employeeProfileStore,
-                        filter: ['active', '=', true],
+                        filter: [['active', '=', true], "and", [['endDate', '>', moment().format('YYYY-MM-DD')], 'or', ['endDate', '=', null]]],
                         paginate: true,
                         pageSize: pageSizeForLookup
                     },

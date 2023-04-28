@@ -35,6 +35,11 @@ let renderForm = (e, headerData) => {
                 name: 'salesOrgHeaderName',
                 dataField: 'name',
                 editorType: 'dxTextBox',
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                ]
             },
             {
                 label: {
@@ -49,6 +54,7 @@ let renderForm = (e, headerData) => {
                     disabled: headerData.status == 2,
                     width: '100%',
                     onClick: function (e) {
+                        if (formInstance.validate().status == 'invalid') return
                         e.component.option('text', 'Loading...')
                         let code = formInstance.getEditor('salesOrgHeaderCode').option('value')
                         let name = formInstance.getEditor('salesOrgHeaderName').option('value')
@@ -114,6 +120,7 @@ let renderForm = (e, headerData) => {
                                 break;
                         }
                     }
+
                 }
             },
 
@@ -123,7 +130,7 @@ let renderForm = (e, headerData) => {
                 e.component.getEditor('salesOrgHeaderCode').option('readOnly', true)
                 e.component.getEditor('salesOrgHeaderName').option('readOnly', true)
             }
-        }
+        },
     })
     form.appendTo(e)
     formInstance = form.dxForm('instance')
