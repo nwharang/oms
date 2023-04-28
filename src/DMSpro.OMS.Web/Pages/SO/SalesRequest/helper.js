@@ -326,7 +326,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                         $("#popupItems").dxPopup('instance').show()
                     }
 
-                }, "revertButton", "columnChooserButton",]
+                }, "columnChooserButton",]
             },
             columns: [
                 {
