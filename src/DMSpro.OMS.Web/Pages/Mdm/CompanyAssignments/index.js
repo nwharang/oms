@@ -84,7 +84,6 @@ $(function () {
         },
         byKey: function (key) {
             if (key == 0) return null;
-            console.log('byKey')
             var d = new $.Deferred();
             companyService.get(key)
                 .done(data => {
@@ -131,7 +130,7 @@ $(function () {
         editing: {
             mode: "row",
             allowAdding: abp.auth.isGranted('MdmService.CustomerAssignments.Create'),
-            allowUpdating: abp.auth.isGranted('MdmService.CustomerAssignments.Edit'),
+            // allowUpdating: abp.auth.isGranted('MdmService.CustomerAssignments.Edit'),
             allowDeleting: abp.auth.isGranted('MdmService.CustomerAssignments.Delete'),
             useIcons: true,
             texts: {
@@ -215,8 +214,6 @@ $(function () {
                 "addRowButton",
                 "columnChooserButton",
                 "exportButton"
-                
-                
             ],
         },
         columns: [
@@ -224,7 +221,7 @@ $(function () {
                 type: 'buttons',
                 caption: l("Actions"),
                 width: 110,
-                buttons: ['edit', 'delete'],
+                buttons: ['delete'],
                 fixedPosition: "left",
             },
             {
@@ -257,7 +254,7 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
                 validationRules: [{ type: "required" }],
                 allowSearch: false,
-                calculateDisplayValue(rowData){
+                calculateDisplayValue(rowData) {
                     if (rowData.company)
                         return rowData.company.name;
                     else return "";
