@@ -250,7 +250,7 @@ $(function () {
                 type: 'buttons',
                 caption: l("Actions"),
                 width: 90,
-                buttons: ['edit'],
+                buttons: ['edit', 'delete'],
                 fixedPosition: 'left'
             },
             {
@@ -349,7 +349,7 @@ $(function () {
                 dataType: 'string',
                 validationRules: [{ type: "required" }],
                 calculateDisplayValue: (e) => {
-                    if (e)
+                    if (e && e.priceList)
                         return e.priceList.code
                     return
                 },
