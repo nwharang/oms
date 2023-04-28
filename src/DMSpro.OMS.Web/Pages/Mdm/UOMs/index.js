@@ -171,7 +171,12 @@ $(function () {
                 validationRules: [
                     {
                         type: 'required',
-                        message: 'Code is required'
+                        message: l("WarnMessage.RequiredField")
+                    },
+                    {
+                        type: "stringLength",
+                        max: 50,
+                        message: l('WarnMessage.FieldLength')
                     }
                 ]
             },
@@ -183,6 +188,11 @@ $(function () {
                     {
                         type: 'required',
                         message: 'Name is required'
+                    },
+                    {
+                        type: "stringLength",
+                        max: 50,
+                        message: l('WarnMessage.FieldLength')
                     }
                 ]
             }
