@@ -2,7 +2,6 @@ let renderGrid = (e, headerData) => {
     if (!grid) grid = $('<div id=dataGridContainer class="ps-2">')
         .css('max-width', '65%').css('width', "100%")
         .css('height', "100%")
-
     grid.dxDataGrid({
         dataSource: store.salesOrgEmpAssignmentStore,
         dateSerializationFormat: "yyyy-MM-dd",
@@ -87,6 +86,7 @@ let renderGrid = (e, headerData) => {
         onInitNewRow(e) {
             e.data.salesOrgHierarchyId = treeInstance.option("focusedRowKey");
             e.data.effectiveDate = new Date();
+            e.data.isBase = false
         },
         onRowUpdating: function (e) {
             var objectRequire = ['salesOrgHierarchyId', 'employeeProfileId', 'isBase', 'effectiveDate', 'endDate'];
@@ -94,6 +94,21 @@ let renderGrid = (e, headerData) => {
                 if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                     e.newData[property] = e.oldData[property];
                 }
+            }
+        },
+        onRowInserting: (e) => {
+            if (e.data.isBase) {
+                let promise = new Promise((resolve, reject) => {
+                    let findItem = e.component.getDataSource().load({}).then(data => data.filter(v => moment(e.data.effectiveDate).isBefore(v.endDate, 'day') && v.isBase))
+                    findItem.then(e => {
+                        if (e.length > 0) {
+                            abp.message.warn(l('WarningMessage:MDMService:SalesOrg:InvalidEffectiveDate'));
+                            resolve(true)
+                        }
+                        resolve(false)
+                    })
+                })
+                e.cancel = promise
             }
         },
         toolbar: {
@@ -139,23 +154,24 @@ let renderGrid = (e, headerData) => {
                 caption: l('EntityFieldName:MDMService:SalesOrgEmpAssignment:Effective Date'),
                 dataField: "effectiveDate",
                 dataType: 'date',
+                format: 'dd-MM-yyyy',
                 validationRules: [{ type: "required" }],
 
             },
             {
                 caption: l('EntityFieldName:MDMService:SalesOrgEmpAssignment:EndDate'),
                 dataField: "endDate",
+                format: 'dd-MM-yyyy',
                 dataType: 'date',
-
             },
             {
                 caption: l('EntityFieldName:MDMService:SalesOrgEmpAssignment:SalesOrgHierarchy'),
                 dataField: "salesOrgHierarchyId",
-                validationRules: [{ type: "required" }],
                 visible: false,
                 allowEditing: false,
             }
-        ]
+        ],
+
     })
     grid.appendTo(e)
     gridInstance = grid.dxDataGrid('instance')
