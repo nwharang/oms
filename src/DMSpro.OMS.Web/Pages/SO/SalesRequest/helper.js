@@ -106,6 +106,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                                 displayExpr(e) {
                                     if (e)
                                         return `${e.code} - ${e.name}`
+                                    return
                                 },
                                 valueExpr: 'id',
                                 searchEnabled: true,

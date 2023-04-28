@@ -96,8 +96,16 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             editorType: 'dxSelectBox',
                             editorOptions: {
                                 readOnly: true,
-                                dataSource: mainStore.customerList,
-                                displayExpr: 'name',
+                                dataSource: {
+                                    store: mainStore.customerList,
+                                    paginate: true,
+                                    pageSize
+                                },
+                                displayExpr(e) {
+                                    if (e)
+                                        return `${e.code} - ${e.name}`
+                                    return
+                                },
                                 valueExpr: 'id',
                                 searchEnabled: true,
                                 elementAttr: {
@@ -400,10 +408,10 @@ let helper = ({ companyId, mainStore, vatList }) => {
                         dataSource: (e) => {
                             if (e?.data?.uomGroupId) {
                                 // find Valid UomGroup 
-                                let validUom = salesOrderStore.uomGroupWithDetailsDictionary.find(v => v.id === e.data.uomGroupId)?.data
+                                let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === e.data.uomGroupId)?.data
                                 if (!validUom)
-                                    return salesOrderStore.uOMList
-                                let data = salesOrderStore.uOMList.map(e => {
+                                    return mainStore.uOMList
+                                let data = mainStore.uOMList.map(e => {
                                     return {
                                         ...e,
                                         ...validUom.find(v => v.altUOMId === e.id)
@@ -412,7 +420,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                                 console.log(data);
                                 return data
                             }
-                            return salesOrderStore.uOMList
+                            return mainStore.uOMList
                         },
                         displayExpr: (e) => {
                             if (e)
@@ -422,8 +430,8 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     },
                     setCellValue: function (newData, value, currentRowData) {
                         let customerId = form.dxForm('instance').getEditor('businessPartnerId').option('value');
-                        let customer = salesOrderStore.customerList.find(x => x.id == customerId);
-                        let price = salesOrderStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + value)?.value || 0;
+                        let customer = mainStore.customerList.find(x => x.id == customerId);
+                        let price = mainStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + value)?.value || 0;
                         let priceAfterTax = price + (price * currentRowData.taxRate) / 100;
                         let lineAmtAfterTax = priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0);
                         let lineAmt = price * currentRowData.qty - (currentRowData.discountAmt || 0);
