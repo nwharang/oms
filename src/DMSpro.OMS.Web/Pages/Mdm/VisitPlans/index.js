@@ -391,7 +391,9 @@ $(function () {
                     dataSource: getItemGroup,
                     valueExpr: 'id',
                     displayExpr: function (e) {
-                        return e.code + ' - ' + e.name
+                        if (e)
+                            return e.code + ' - ' + e.name
+                        return
                     }
                 },
                 allowEditing: false,
@@ -537,7 +539,7 @@ $(function () {
                 onClick() {
                     var newDate = $('#NewDate').data('dxDateBox');
                     var val = newDate.option('value');
-                    if(!val) {
+                    if (!val) {
                         newDate.option('isValid', false);
                         newDate.focus();
                         return;
