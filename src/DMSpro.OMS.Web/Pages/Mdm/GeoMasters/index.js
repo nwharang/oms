@@ -219,6 +219,15 @@
                 fixedPosition: 'left'
             },
             {
+                caption: l("EntityFieldName:MDMService:GeoMaster:Id"),
+                dataField: "id",
+                allowEditing: false,
+                editorOptions: {
+                    readOnly: true,
+                },
+                visible: false,
+            },
+            {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Code"),
                 dataField: "code",
                 validationRules: [
