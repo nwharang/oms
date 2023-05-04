@@ -87,11 +87,11 @@ $(() => {
         searchPanel: {
             visible: true
         },
-        // stateStoring: { //save state in localStorage
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'dgMCPDetails',
-        // },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgHolidaysHeaders',
+        },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -109,23 +109,6 @@ $(() => {
                 "addRowButton",
                 "columnChooserButton",
                 "exportButton",
-                // {
-                //     location: 'after',
-                //     widget: 'dxButton',
-                //     options: {
-                //         icon: "import",
-                //         elementAttr: {
-                //             //id: "import-excel",
-                //             class: "import-excel",
-                //         },
-                //         onClick(e) {
-                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
-                //             var gridName = gridControl.attr('id');
-                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                //             if (popup) popup.show();
-                //         },
-                //     },
-                // },
                 "searchPanel",
             ],
         },
@@ -285,11 +268,11 @@ $(() => {
                         searchPanel: {
                             visible: true
                         },
-                        // stateStoring: { //save state in localStorage
-                        //     enabled: true,
-                        //     type: 'localStorage',
-                        //     storageKey: 'dgMCPDetails',
-                        // },
+                        stateStoring: { //save state in localStorage
+                            enabled: true,
+                            type: 'localStorage',
+                            storageKey: 'dgHolidaysDetails',
+                        },
                         paging: {
                             enabled: true,
                             pageSize: pageSize
@@ -297,7 +280,7 @@ $(() => {
                         pager: {
                             visible: true,
                             showPageSizeSelector: true,
-                            allowedPageSizes: allowedPageSizes,
+                            allowedPageSizes,
                             showInfo: true,
                             showNavigationButtons: true
                         },
@@ -307,22 +290,22 @@ $(() => {
                                 "addRowButton",
                                 "columnChooserButton",
                                 "exportButton",
-                                {
-                                    location: 'after',
-                                    widget: 'dxButton',
-                                    options: {
-                                        icon: "import",
-                                        elementAttr: {
-                                            class: "import-excel",
-                                        },
-                                        onClick(e) {
-                                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                                            var gridName = gridControl.attr('id');
-                                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                                            if (popup) popup.show();
-                                        },
-                                    }
-                                },
+                                // {
+                                //     location: 'after',
+                                //     widget: 'dxButton',
+                                //     options: {
+                                //         icon: "import",
+                                //         elementAttr: {
+                                //             class: "import-excel",
+                                //         },
+                                //         onClick(e) {
+                                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                                //             var gridName = gridControl.attr('id');
+                                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                                //             if (popup) popup.show();
+                                //         },
+                                //     }
+                                // },
                                 "searchPanel"
                             ],
                         },
@@ -441,9 +424,7 @@ $(() => {
                                 validationRules: [{ type: "required" }, { type: "stringLength", max: 255 }],
                             }],
                     }).appendTo(container);
-                initImportPopup('api/mdm-service/holiday-details', 'HolidayDetails_Template', `grid_${currentHeaderData.id}`);
             },
         },
     }).dxDataGrid("instance");
-    // initImportPopup('api/mdm-service/holidays', 'Holidays_Template', 'gridHolidays');
 });
