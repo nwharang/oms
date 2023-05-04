@@ -224,6 +224,10 @@ $(function () {
                 validationRules: [{ type: "required" }]
             },
         ],
+        onEditorPreparing: (e) => {
+            if (e.row?.rowType != "data" || e.row?.isNewRow) return
+            if (e.dataField === "code") e.editorOptions.readOnly = true
+        }
     }).dxDataGrid("instance");
     // initImportPopup('api/mdm-service/cus-attribute-values', 'CustomerAttributeValues_Template', 'dgCustomerAttributeValues');
 
