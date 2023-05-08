@@ -267,12 +267,12 @@
         },
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes, // ?? 
+            allowedPageSizes, // ?? 
             showInfo: true,
             showNavigationButtons: true
         },
@@ -311,14 +311,24 @@
                 fixedPosition: "left",
             },
             {
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                fixed: true,
+                fixedPosition: "left",
+                formItem: {
+                    visible: false
+                },
+            },
+            {
                 //allowEditing: false,
                 dataField: 'code',
                 caption: l("Code"),
                 //allowEditing: false,
                 dataType: 'string',
-                editorOptions: {
-                    readOnly: true,
-                },
+                allowEditing: false,
                 //validationRules: [{ type: "required" }]
             },
             {
@@ -425,7 +435,11 @@
                 dataField: 'creditLimit',
                 caption: l("CreditLimit"),
                 dataType: 'number',
-                visible: false
+                visible: false,
+                editorOptions: {
+                    min: 0,
+                    format: '#'
+                }
             },
             {
                 dataField: 'paymentTermId',
