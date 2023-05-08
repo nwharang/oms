@@ -114,24 +114,7 @@ $(function () {
         columnFixing: {
             enabled: true,
         },
-        export: {
-            enabled: true,
-        },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
+        ...genaralConfig('Employees'),
         headerFilter: {
             visible: true,
         },
@@ -271,6 +254,18 @@ $(function () {
                 fixedPosition: 'left'
             },
             {
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                fixed: true,
+                fixedPosition: "left",
+                formItem: {
+                    visible: false
+                },
+            },
+            {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:ERPCode"),
                 dataField: "erpCode",
                 dataType: 'string',
@@ -305,7 +300,12 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:DateOfBirth"),
                 dataField: "dateOfBirth",
-                dataType: 'date'
+                dataType: 'date',
+                editorOptions: {
+                    max: new Date(),
+                    format: 'dd/MM/yyyy'
+                },
+                format: 'dd/MM/yyyy'
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:IdCardNumber"),

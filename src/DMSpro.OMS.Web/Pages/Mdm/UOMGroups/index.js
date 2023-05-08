@@ -141,34 +141,7 @@ $(function () {
         columnFixing: {
             enabled: true,
         },
-        export: {
-            enabled: true,
-        },
-        onExporting(e) {
-            if (e.format === 'xlsx') {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('UOMGroups');
-                DevExpress.excelExporter.exportDataGrid({
-                    component: e.component,
-                    worksheet,
-                    autoFilterEnabled: true,
-                }).then(() => {
-                    workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'UOMGroups.xlsx');
-                    });
-                });
-                e.cancel = true;
-            }
-            else if (e.format === 'pdf') {
-                const doc = new jsPDF();
-                DevExpress.pdfExporter.exportDataGrid({
-                    jsPDFDocument: doc,
-                    component: e.component,
-                }).then(() => {
-                    doc.save('UOMGroups.pdf');
-                });
-            }
-        },
+        ...genaralConfig('UOMGroupsHeader'),
         headerFilter: {
             visible: true,
         },
@@ -281,40 +254,13 @@ $(function () {
                         allowColumnResizing: true,
                         columnResizingMode: 'widget',
                         columnAutoWidth: true,
-                        // filterRow: {
-                        //     visible: true
-                        // },
-                        // groupPanel: {
-                        //     visible: true,
-                        // },
+                        ...genaralConfig('UOMGroupsDetails'),
                         searchPanel: {
                             visible: true
                         },
                         columnMinWidth: 50,
-                        // columnChooser: {
-                        //     enabled: true,
-                        //     mode: "select"
-                        // },
                         columnFixing: {
                             enabled: true,
-                        },
-                        export: {
-                            enabled: true,
-                        },
-                        onExporting(e) {
-                            const workbook = new ExcelJS.Workbook();
-                            const worksheet = workbook.addWorksheet('Data');
-
-                            DevExpress.excelExporter.exportDataGrid({
-                                component: e.component,
-                                worksheet,
-                                autoFilterEnabled: true,
-                            }).then(() => {
-                                workbook.xlsx.writeBuffer().then((buffer) => {
-                                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
-                                });
-                            });
-                            e.cancel = true;
                         },
                         editing: {
                             mode: "row",
@@ -450,10 +396,8 @@ $(function () {
                         },
                         toolbar: {
                             items: [
-                                //"groupPanel",
                                 "addRowButton",
-                                //'columnChooserButton',
-                                //"exportButton",
+                                "exportButton",
                                 // {
                                 //     location: 'after',
                                 //     template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,

@@ -541,29 +541,12 @@
         columnFixing: {
             enabled: true,
         },
-        // stateStoring: {
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'dataGridItemMasters',
-        // },
-        export: {
+        stateStoring: {
             enabled: true,
+            type: 'localStorage',
+            storageKey: 'dataGridItemMasters',
         },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
+        ...genaralConfig('Items'),
         headerFilter: {
             visible: true,
         },
@@ -629,6 +612,18 @@
                 buttons: ['edit'],
                 fixed: true,
                 fixedPosition: "left",
+            },
+            {
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                fixed: true,
+                fixedPosition: "left",
+                formItem: {
+                    visible: false
+                },
             },
             {
                 dataField: 'code',

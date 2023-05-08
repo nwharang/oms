@@ -113,39 +113,7 @@ $(function () {
         rowAlternationEnabled: true,
         showBorders: true,
         dateSerializationFormat: "yyyy-MM-dd",
-        /*keyExpr: "id",*/
-        /*Export Excel*/
-        export: {
-            enabled: true,
-            //formats: ['xlsx', 'pdf'],
-            //allowExportSelectedData: true,
-        },
-        onExporting: function (e) {
-            if (e.format === 'xlsx') {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Companies');
-                DevExpress.excelExporter.exportDataGrid({
-                    component: e.component,
-                    worksheet,
-                    autoFilterEnabled: true,
-                }).then(() => {
-                    workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Companies.xlsx');
-                    });
-                });
-                e.cancel = true;
-            }
-            else if (e.format === 'pdf') {
-                const doc = new jsPDF();
-                DevExpress.pdfExporter.exportDataGrid({
-                    jsPDFDocument: doc,
-                    component: e.component,
-                }).then(() => {
-                    doc.save('Companies.pdf');
-                });
-            }
-        },
-        /*End Export Excel*/
+        ...genaralConfig('Company'),
 
         //#region Setting Grid
         focusedRowEnabled: true,
@@ -176,16 +144,9 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-
-        //columnHidingEnabled: true,
-        //errorRowEnabled: false,
         searchPanel: {
             visible: true
         },
-        //scrolling: {
-        //    mode: 'standard'
-        //},
-
         stateStoring: { //save state in localStorage
             enabled: true,
             type: 'localStorage',
@@ -194,12 +155,12 @@ $(function () {
 
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -215,12 +176,12 @@ $(function () {
                 title: l("Page:Title:CompanyProfiles"),
                 showTitle: true,
                 width: "95%",
+                dragEnabled: false
             },
             form: {
                 labelMode: "outside",
                 colCount: 2,
                 items: [
-                    'code',
                     'name',
                     'geoLevel0Id',
                     'geoLevel1Id',
