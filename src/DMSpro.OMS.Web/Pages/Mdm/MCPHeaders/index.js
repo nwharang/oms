@@ -211,6 +211,18 @@ $(function () {
                     fixedPosition: "left",
                 },
                 {
+                    dataField: 'id',
+                    caption: l("Id"),
+                    dataType: 'string',
+                    allowEditing: false,
+                    visible: false,
+                    fixed: true,
+                    fixedPosition: "left",
+                    formItem: {
+                        visible: false
+                    },
+                },
+                {
                     caption: "Route",
                     dataField: "routeId",
                     lookup: {
