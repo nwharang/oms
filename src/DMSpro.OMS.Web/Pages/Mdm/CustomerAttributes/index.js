@@ -82,7 +82,7 @@ $(function () {
             onRowUpdating: function (e) {
                 e.newData = Object.assign({}, e.oldData, e.newData);
             },
-            onRowInserting: (e) => {
+            onInitNewRow: (e) => {
                 e.data.attrNo = gridInfo.lastLevel
                 e.data.active = true
             },
@@ -103,8 +103,17 @@ $(function () {
 
                 },
                 {
+                    dataField: 'attrNo',
+                    caption: l("EntityFieldName:MDMService:CustomerAttribute:AttrNo"),
+                    editorOptions: {
+                        readOnly: true,
+                        disabled: true,
+                    }
+                },
+                {
                     dataField: 'attrName',
-                    caption: l("CustomerAttribute.Name"),
+                    caption: l("EntityFieldName:MDMService:CustomerAttribute:AttrName"),
+                    width: '100%',
                     dataType: 'string',
                     validationRules: [{ type: "required" }]
                 },
