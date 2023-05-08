@@ -451,6 +451,13 @@ $(function () {
                 //width: 70,
                 dataType: 'string',
                 visible: false,
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]$',
+                        message: l('ValidateingCodeField')
+                    }
+                ]
             },
             {
                 dataField: 'taxCode',

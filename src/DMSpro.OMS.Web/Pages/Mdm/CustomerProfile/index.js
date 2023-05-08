@@ -358,7 +358,14 @@
                 dataField: 'license',
                 caption: l("License"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]$',
+                        message: l('ValidateingCodeField')
+                    }
+                ]
             },
             {
                 dataField: 'taxCode',
