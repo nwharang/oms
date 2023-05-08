@@ -45,9 +45,9 @@ $(function () {
             const deferred = $.Deferred();
             const args = {};
             if (loadOptions.filter == null) {
-                loadOptions.filter = ['dateVisit', '>', getCurrentDateFormat()];
+                loadOptions.filter = ['dateVisit', '>', moment().format('YYYY-MM-DD')];
             } else {
-                loadOptions.filter = [loadOptions.filter, "and", ['dateVisit', '>', getCurrentDateFormat()]];
+                loadOptions.filter = [loadOptions.filter, "and", ['dateVisit', '>', moment().format('YYYY-MM-DD')]];
             }
 
             requestOptions.forEach((i) => {
@@ -85,39 +85,6 @@ $(function () {
             return visitPlansService.delete(key);
         }
     });
-
-    //const getMCPHeaders = new DevExpress.data.CustomStore({
-    //    key: "id",
-    //    loadMode: 'processed',
-    //    load(loadOptions) {
-    //        const deferred = $.Deferred();
-    //        const args = {};
-    //        requestOptions.forEach((i) => {
-    //            if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-    //                args[i] = JSON.stringify(loadOptions[i]);
-    //            }
-    //        });
-    //        mcpHeaderService.getListDevextremes(args)
-    //            .done(result => {
-    //                deferred.resolve(result.data, {
-    //                    totalCount: result.totalCount,
-    //                    summary: result.summary,
-    //                    groupCount: result.groupCount
-    //                });
-    //            });
-    //        return deferred.promise();
-    //    },
-    //    byKey: function (key) {
-    //        if (key == 0) return null;
-
-    //        var d = new $.Deferred();
-    //        mcpHeaderService.get(key)
-    //            .done(data => {
-    //                d.resolve(data);
-    //            })
-    //        return d.promise();
-    //    }
-    //});
 
     const getItemGroup = new DevExpress.data.CustomStore({
         key: "id",
@@ -198,7 +165,9 @@ $(function () {
         columnAutoWidth: true,
         selection: {
             mode: 'multiple',
+            showCheckBoxesMode: 'always',
         },
+        dateSerializationFormat: 'yyyy-MM-dd',
         filterRow: {
             visible: true
         },
@@ -255,13 +224,6 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
-        //editing: {
-        //    mode: "row",
-        //    allowAdding: false,
-        //    allowUpdating: abp.auth.isGranted('MdmService.VisitPlans.Edit'),
-        //    allowDeleting: false,
-        //    useIcons: true
-        //},
         onRowUpdating: function (e) {
             var objectRequire = ['code', 'name'];
             for (var property in e.oldData) {
@@ -303,28 +265,19 @@ $(function () {
             ],
         },
         columns: [
-            //{
-            //    type: 'buttons',
-            //    caption: l('Actions'),
-            //    buttons: ['edit'],
-            //    width: 110,
-            //    fixedPosition: 'left'
-            //},
+
+            {
+                dataField: 'isCommando',
+                caption: l("EntityFieldName:MDMService:VisitPlan:IsCommando"),
+                dataType: 'boolean',
+                allowEditing: false,
+                width: 110
+            },
             {
                 dataField: 'route.name',
                 caption: l("EntityFieldName:MDMService:VisitPlan:RouteCode"),
                 dataType: 'string',
-                //lookup: {
-                //    valueExpr: "id",
-                //    displayExpr: "attrName"
-                //    dataSource: {
-                //        store: cusAttributes,
-                //        paginate: true,
-                //        pageSize: pageSizeForLookup,
-                //        filter: ["active", "=", "true"],
-                //    },
 
-                //},
                 allowEditing: false,
                 validationRules: [
                     {
@@ -343,13 +296,6 @@ $(function () {
                     }
                 ],
                 editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getCustomer,
-                //    valueExpr: 'id',
-                //    displayExpr: function (e) {
-                //        return e.code + ' - ' + e.name
-                //    }
-                //}
                 allowEditing: false,
             },
             {
@@ -491,31 +437,9 @@ $(function () {
         return feature;
     }
 
-    $('#NewDate').dxDateBox({
-        type: 'date',
-        showClearButton: true,
-        min: getNextDate(2),
-        displayFormat: 'dd/MM/yyyy',
-    }).dxValidator({
-        validationRules: [{
-            type: 'required',
-            message: '',
-        }],
-    });
-    function getCurrentDateFormat() {
-        var currentDate = new Date();
-        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2) + "T00:00:00";
-        return date;
-    }
-    function getNormalDate(currentDate) {
-        if (!currentDate || (typeof currentDate == "string")) return currentDate;
-
-        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2) + " 23:59:59";//a Ben và a kalick confirmed
-        return date;
-    }
-    const popupChangeVisitPlan = $('#popupChangeVisitPlan').dxPopup({
+    let popupChangeVisitPlan = $('#popupChangeVisitPlan').dxPopup({
         width: 400,
-        height: 280,
+        height: 'fit-content',
         container: '.panel-container',
         showTitle: true,
         title: 'Change visit plan',
@@ -529,47 +453,72 @@ $(function () {
             my: 'center',
             collision: 'fit',
         },
-        toolbarItems: [{
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'before',
-            options: {
-                icon: 'fa fa-check hvr-icon',
-                text: 'Submit',
-                onClick() {
-                    var newDate = $('#NewDate').data('dxDateBox');
-                    var val = newDate.option('value');
-                    if (!val) {
-                        newDate.option('isValid', false);
-                        newDate.focus();
-                        return;
-                    }
+        contentTemplate: () => {
+            let container = $('<div class="d-flex gap-2 flex-column" />')
+            $('<div id="NewDate"  />')
+                .dxDateBox({
+                    type: 'date',
+                    showClearButton: true,
+                    min: getNextDate(2),
+                    displayFormat: 'dd/MM/yyyy',
+                })
+                .dxValidator({
+                    validationRules: [{
+                        type: 'required',
+                        message: '',
+                    }],
+                }).appendTo(container)
+            $('<div id="isCommando" />')
+                .dxCheckBox({
+                    text: "Is Commando",
+                }).appendTo(container)
 
-                    var ids = [];
-                    var grid = $('#dgVisitPlans').data('dxDataGrid');
-                    var selected = grid.getSelectedRowsData();
-                    selected.forEach(u => {
-                        ids.push(u.id)
-                    });
+            return container
+        },
+        toolbarItems: [
+            {
+                widget: 'dxButton',
+                toolbar: 'bottom',
+                location: 'before',
+                options: {
+                    icon: 'fa fa-check hvr-icon',
+                    text: 'Submit',
+                    onClick() {
+                        let newDate = $('#NewDate').data('dxDateBox');
+                        let isCommando = $('#isCommando').data('dxCheckBox').option('value')
+                        let val = moment(newDate.option('value')).add(12, 'hours');
+                        if (!val) {
+                            newDate.option('isValid', false);
+                            newDate.focus();
+                            return;
+                        }
 
-                    visitPlansService.updateMultiple(ids, getNormalDate(val), { contentType: "application/json" }).done(result => {
-                        abp.message.success(l('Congratulations'));
+                        let ids = [];
+                        let grid = $('#dgVisitPlans').data('dxDataGrid');
+                        let selected = grid.getSelectedRowsData();
+                        selected.forEach(u => {
+                            ids.push(u.id)
+                        });
+                        console.log(val);
+                        visitPlansService.updateMultiple(ids, moment(val).format('YYYY-MM-DD HH:mm:ss'), isCommando, { contentType: "application/json" }).done(result => {
+                            abp.message.success(l('Congratulations'));
+                            popupChangeVisitPlan.hide();
+                            grid.refresh();
+                        }).fail(() => { });
+                    },
+                },
+            },
+            {
+                widget: 'dxButton',
+                toolbar: 'bottom',
+                location: 'after',
+                options: {
+                    text: 'Cancel',
+                    onClick() {
                         popupChangeVisitPlan.hide();
-                        grid.refresh();
-                    }).fail(() => { });
+                    },
                 },
-            },
-        }, {
-            widget: 'dxButton',
-            toolbar: 'bottom',
-            location: 'after',
-            options: {
-                text: 'Cancel',
-                onClick() {
-                    popupChangeVisitPlan.hide();
-                },
-            },
-        }],
+            }],
     }).dxPopup('instance');
 
     $('#ChangeVisitPlanButton').click(function () { $('#popupChangeVisitPlan').data('dxPopup').show(); });
