@@ -38,11 +38,13 @@
                 });
             return d.promise();
         },
-        insert(values) {
-            return geoMasterService.create(values, { contentType: "application/json" });
+        insert({ code, name, parentId }) {
+            if (code && name && parentId)
+                return geoMasterService.create({ code, name, parentId }, { contentType: "application/json" });
         },
-        update(key, values) {
-            return geoMasterService.update(key, values, { contentType: "application/json" });
+        update(key, { name }) {
+            if (name)
+                return geoMasterService.update(key, { name }, { contentType: "application/json" });
         },
         remove(key) {
             return geoMasterService.delete(key);
@@ -227,6 +229,7 @@
                 },
                 visible: false,
             },
+
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Code"),
                 dataField: "code",
