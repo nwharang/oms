@@ -109,8 +109,10 @@
             onRowUpdating: function (e) {
                 e.newData = Object.assign({}, e.oldData, e.newData);
             },
-            onRowInserting: (e) => {
+            onInitNewRow: (e) => {
+                let length = e.component.getDataSource().items().length
                 e.data.active = true
+                e.data.attrNo = length
             },
             toolbar: {
                 items: [
@@ -155,6 +157,14 @@
 
                 },
                 {
+                    dataField: 'attrNo',
+                    caption: l("EntityFieldName:MDMService:ItemAttribute:AttrNo"),
+                    editorOptions: {
+                        readOnly: true,
+                        disabled: true,
+                    }
+                },
+                {
                     dataField: 'attrName',
                     width: '100%',
                     caption: l("EntityFieldName:MDMService:ItemAttribute:AttrName"),
@@ -170,7 +180,6 @@
                     caption: l("EntityFieldName:MDMService:ItemAttribute:HierarchyLevel"),
                     alignment: 'center',
                     editCellTemplate: (cellElement, cellInfo) => {
-                        console.log(cellInfo.row.isNewRow);
                         if (cellInfo.row.isNewRow)
                             return $('<div>').dxCheckBox({
                                 value: false,
@@ -182,7 +191,7 @@
                                     }
                                 },
                             })
-                        return cellElement.css('background-color', "#5c95c5")
+                        return cellElement
                     },
                 },
             ]
