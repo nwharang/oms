@@ -341,11 +341,33 @@
                 dataField: 'phone1',
                 caption: l("Phone1"),
                 dataType: 'string',
+                editorOptions: {
+                    mask: '000-000-0000',
+                    maskRules: { h: /^[0-9]{10}$/ },
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateingPhoneField')
+                    }
+                ]
             },
             {
                 dataField: 'phone2',
                 caption: l("Phone2"),
                 dataType: 'string',
+                editorOptions: {
+                    mask: '000-000-0000',
+                    maskRules: { h: /^[0-9]{10}$/ },
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateingPhoneField')
+                    }
+                ],
                 visible: false
             },
             {

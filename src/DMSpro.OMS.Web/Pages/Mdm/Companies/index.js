@@ -444,6 +444,17 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Phone"),
                 //width: 110,
                 dataType: 'string',
+                editorOptions: {
+                    mask: '000-000-0000',
+                    maskRules: { h: /^[0-9]{10}$/ },
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateingPhoneField')
+                    }
+                ]
             },
             {
                 dataField: 'license',
@@ -574,6 +585,17 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:CompanyProfile:ContactPhone"),
                 dataType: 'string',
                 visible: false,
+                editorOptions: {
+                    mask: '000-000-0000',
+                    maskRules: { h: /^[0-9]{10}$/ },
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateingPhoneField')
+                    }
+                ]
             }
             //#endregion
         ],
