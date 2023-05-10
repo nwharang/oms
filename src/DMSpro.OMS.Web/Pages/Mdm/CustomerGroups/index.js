@@ -132,7 +132,7 @@ $(function () {
                     {
                         type: 'pattern',
                         pattern: '^[a-zA-Z0-9]{1,20}$',
-                        message: l('ValidateingCodeField')
+                        message: l('ValidateError:Code')
                     }
                 ],
                 dataType: 'string',

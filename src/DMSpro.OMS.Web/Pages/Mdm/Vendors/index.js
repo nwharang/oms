@@ -264,7 +264,7 @@ $(function () {
                     {
                         type: 'pattern',
                         pattern: '^[a-zA-Z0-9]{1,20}$',
-                        message: l('ValidateingCodeField')
+                        message: l('ValidateError:Code')
                     }
                 ]
             },
@@ -292,7 +292,7 @@ $(function () {
                     {
                         type: 'pattern',
                         pattern: '^[0-9]{10}$',
-                        message: l('ValidateingPhoneField')
+                        message: l('ValidateError:Phone')
                     }
                 ]
             },
@@ -308,7 +308,7 @@ $(function () {
                     {
                         type: 'pattern',
                         pattern: '^[0-9]{10}$',
-                        message: l('ValidateingPhoneField')
+                        message: l('ValidateError:Phone')
                     }
                 ]
             },
@@ -345,7 +345,7 @@ $(function () {
                     dataSource: {
                         store: companiesLookup,
                         paginate: true,
-                        pageSize: pageSizeForLookup
+                        pageSize
                     },
                     valueExpr: "id",
                     displayExpr: "code"

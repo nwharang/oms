@@ -182,6 +182,7 @@ $(function () {
                 labelMode: "outside",
                 colCount: 2,
                 items: [
+                    'code',
                     'name',
                     'geoLevel0Id',
                     'geoLevel1Id',
@@ -272,7 +273,7 @@ $(function () {
                     {
                         type: 'pattern',
                         pattern: '^[a-zA-Z0-9]{1,20}$',
-                        message: l('ValidateingCodeField')
+                        message: l('ValidateError:Code')
                     }
                 ]
             },
@@ -287,6 +288,7 @@ $(function () {
             {
                 dataField: "geoLevel0Id",
                 caption: l1("GeoLevel0Name"),
+                dataType: 'string',
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoLevel0 || rowData.geoLevel0 === null) return "";
@@ -316,6 +318,7 @@ $(function () {
             {
                 dataField: "geoLevel1Id",
                 caption: l1("GeoLevel1Name"),
+                dataType: 'string',
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoLevel1 || rowData.geoLevel1 === null) return "";
@@ -344,6 +347,7 @@ $(function () {
             {
                 dataField: "geoLevel2Id",
                 caption: l1("GeoLevel2Name"),
+                dataType: 'string',
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoLevel2 || rowData.geoLevel2 === null) return "";
@@ -371,6 +375,7 @@ $(function () {
             {
                 dataField: "geoLevel3Id",
                 caption: l1("GeoLevel3Name"),
+                dataType: 'string',
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoLevel3 || rowData.geoLevel3 === null) return "";
@@ -397,6 +402,7 @@ $(function () {
             {
                 dataField: "geoLevel4Id",
                 caption: l1("GeoLevel4Name"),
+                dataType: 'string',
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoLevel4 || rowData.geoLevel4 === null) return "";
@@ -452,7 +458,7 @@ $(function () {
                     {
                         type: 'pattern',
                         pattern: '^[0-9]{10}$',
-                        message: l('ValidateingPhoneField')
+                        message: l('ValidateError:Phone')
                     }
                 ]
             },
@@ -466,7 +472,7 @@ $(function () {
                     {
                         type: 'pattern',
                         pattern: '^[a-zA-Z0-9]$',
-                        message: l('ValidateingCodeField')
+                        message: l('ValidateError:Code')
                     }
                 ]
             },
@@ -483,6 +489,16 @@ $(function () {
                 //width: 80,
                 dataType: 'string',
                 visible: false,
+                editorOptions: {
+                    maxLength: '50',
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]$',
+                        message: l('ValidateingERPCodeField')
+                    }
+                ]
             },
             {
                 dataField: 'parentId',
@@ -593,7 +609,7 @@ $(function () {
                     {
                         type: 'pattern',
                         pattern: '^[0-9]{10}$',
-                        message: l('ValidateingPhoneField')
+                        message: l('ValidateError:Phone')
                     }
                 ]
             }
