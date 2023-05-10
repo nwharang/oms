@@ -226,7 +226,7 @@ $(function () {
                             {
                                 type: 'pattern',
                                 pattern: '^[a-zA-Z0-9]{1,20}$',
-                                message: l('ValidateingCodeField')
+                                message: l('ValidateError:Code')
                             }
                         ]
                     },
@@ -935,8 +935,8 @@ $(function () {
     $('#StartDate').dxDateBox({
         type: 'date',
         showClearButton: true,
-        min: moment($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')),
-        max: moment($("#top-section").dxForm('instance').getEditor('EndDate').option('value')),
+        min: new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) > new Date() ? new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) : new Date(),
+        max: $("#top-section").dxForm('instance').getEditor('EndDate').option('value') ? new Date($("#top-section").dxForm('instance').getEditor('EndDate').option('value')) : undefined,
         displayFormat: 'dd/MM/yyyy',
         onValueChanged: (e) => {
             console.log('StartDate');
@@ -946,8 +946,8 @@ $(function () {
     $('#EndDate').dxDateBox({
         type: 'date',
         showClearButton: true,
-        min: moment($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')),
-        max: moment($("#top-section").dxForm('instance').getEditor('EndDate').option('value')),
+        min: new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) > new Date() ? new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) : new Date(),
+        max: $("#top-section").dxForm('instance').getEditor('EndDate').option('value') ? new Date($("#top-section").dxForm('instance').getEditor('EndDate').option('value')) : undefined,
         displayFormat: 'dd/MM/yyyy',
         onValueChanged: (e) => {
             console.log('EndDate');
@@ -957,7 +957,7 @@ $(function () {
     $('#EndDateMCP').dxDateBox({
         type: 'date',
         showClearButton: true,
-        min: moment($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')),
+        min: new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) > new Date() ? new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) : new Date(),
         displayFormat: 'dd/MM/yyyy',
         onValueChanged: (e) => {
 
