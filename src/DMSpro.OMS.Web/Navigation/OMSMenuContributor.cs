@@ -1340,7 +1340,6 @@ public class OMSMenuContributor : IMenuContributor
                icon: "fa fa-calendar"
            )
             .RequirePermissions(false, MdmServicePermissions.Holidays.Default,
-                MdmServicePermissions.HolidayDetails.Default,
                 MdmServicePermissions.Routes.Default,
                 MdmServicePermissions.MCPs.Default,
                 MdmServicePermissions.VisitPlans.Default,
