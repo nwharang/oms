@@ -30,7 +30,6 @@
         },
         byKey: function (key) {
             if (key == 0) return null;
-
             var d = new $.Deferred();
             geoMasterService.get(key)
                 .done(data => {
@@ -39,12 +38,10 @@
             return d.promise();
         },
         insert({ code, name, parentId }) {
-            if (code && name && parentId)
-                return geoMasterService.create({ code, name, parentId }, { contentType: "application/json" });
+            return geoMasterService.create({ code, name, parentId }, { contentType: "application/json" });
         },
         update(key, { name }) {
-            if (name)
-                return geoMasterService.update(key, { name }, { contentType: "application/json" });
+            return geoMasterService.update(key, { name }, { contentType: "application/json" });
         },
         remove(key) {
             return geoMasterService.delete(key);
@@ -117,17 +114,6 @@
             type: 'localStorage',
             storageKey: 'tlGeoMaster',
         },
-        // paging: {
-        //     enabled: true,
-        //     pageSize: 10
-        // },
-        // pager: {
-        //     visible: true,
-        //     showPageSizeSelector: true,
-        //     allowedPageSizes: [10, 20,50],
-        //     showInfo: true,
-        //     showNavigationButtons: true
-        // },
         editing: {
             mode: 'row',
             allowAdding: function (e) {
@@ -163,7 +149,6 @@
             }
         },
         onRowInserting: function (e) {
-            // for create first data - if parentId = 0, update parentId = null
             if (e.data && e.data.parentId == 0) {
                 e.data.parentId = null;
             }
