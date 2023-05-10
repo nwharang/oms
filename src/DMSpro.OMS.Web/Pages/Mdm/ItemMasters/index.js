@@ -360,6 +360,7 @@
                                                 case 0:
                                                     expiredType.option('readOnly', true)
                                                     expiredValue.option('readOnly', true)
+                                                    expiredType.option('value', null)
                                                     break;
                                                 case 1:
                                                     expiredType.option('readOnly', false)
@@ -385,6 +386,7 @@
                                     elementAttr: {
                                         id: 'expiredType'
                                     },
+                                    placeholder: "",
                                     readOnly: true,
                                 }
                             },
