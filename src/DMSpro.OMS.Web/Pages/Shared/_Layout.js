@@ -1,4 +1,28 @@
 ﻿$(async function () {
+    (() => {
+        DevExpress.ui.forceIsoDateParsing = false;
+        DevExpress.ui.dxTextBox.defaultOptions({
+            options: {
+                maxLength: 255
+            }
+        });
+        DevExpress.ui.dxDataGrid.defaultOptions({
+            options: {
+                dateSerializationFormat: 'yyyy-MM-dd',
+            }
+        })
+        DevExpress.ui.dxDateBox.defaultOptions({
+            options: {
+                dateSerializationFormat: 'yyyy-MM-dd'
+            }
+        })
+        DevExpress.ui.dxTreeList.defaultOptions({
+            options: {
+                dateSerializationFormat: 'yyyy-MM-dd'
+            }
+        })
+        console.log("DefaultOptions Loaded");
+    })()
     if (!abp.currentTenant?.id) {
         return
     }
