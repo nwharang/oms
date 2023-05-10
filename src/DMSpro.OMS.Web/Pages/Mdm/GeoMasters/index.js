@@ -1,5 +1,13 @@
 ﻿$(function () {
     var l = abp.localization.getResource("OMS");
+    let columns = genaralCol("GeoMaster", {
+        code: {
+            defaultShow: true,
+        },
+        name: {
+            defaultShow: true,
+        }
+    })
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
 
     var isFirstLoad = true;
@@ -229,29 +237,7 @@
                 },
                 visible: false,
             },
-
-            {
-                caption: l("EntityFieldName:MDMService:GeoMaster:Code"),
-                dataField: "code",
-                validationRules: [
-                    {
-                        type: "required"
-                    },
-                    {
-                        type: 'pattern',
-                        pattern: '^[a-zA-Z0-9]{1,20}$',
-                        message: l('ValidateingCodeField')
-                    }
-                ]
-            },
-            {
-                caption: l("EntityFieldName:MDMService:GeoMaster:Name"),
-                dataField: "name",
-                editorOptions: {
-                    maxLength: 100
-                },
-                validationRules: [{ type: "required" }]
-            },
+            ...columns,
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Level"),
                 dataField: "level",
