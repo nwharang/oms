@@ -320,6 +320,10 @@
                     valueExpr: "id",
                     displayExpr: "text",
                 },
+                calculateDisplayValue: (e) => {
+                    if (e)
+                        return e.docDiscountPerc + " %"
+                },
                 validationRules: [{ type: 'required' }],
                 visible: true,
             },

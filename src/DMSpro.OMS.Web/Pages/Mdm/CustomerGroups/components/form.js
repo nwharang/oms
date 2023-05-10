@@ -20,7 +20,16 @@ function renderForm(e, headerData) {
                 dataField: 'code',
                 editorType: 'dxTextBox',
                 colSpan: 2,
-                validationRules: [{ type: "required" }],
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ],
                 editorOptions: {
                     readOnly: headerData.status >= 0
                 }
@@ -81,11 +90,6 @@ function renderForm(e, headerData) {
                         popupInstance.endUpdate()
                     }
                 }
-            },
-            {
-                dataField: 'description',
-                editorType: 'dxTextBox',
-                colSpan: 7,
             },
         ],
         onContentReady: (e) => {

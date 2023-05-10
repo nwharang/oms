@@ -211,6 +211,18 @@ $(function () {
                     fixedPosition: "left",
                 },
                 {
+                    dataField: 'id',
+                    caption: l("Id"),
+                    dataType: 'string',
+                    allowEditing: false,
+                    visible: false,
+                    fixed: true,
+                    fixedPosition: "left",
+                    formItem: {
+                        visible: false
+                    },
+                },
+                {
                     caption: "Route",
                     dataField: "routeId",
                     lookup: {
@@ -240,16 +252,29 @@ $(function () {
                 },
                 {
                     caption: l("EntityFieldName:MDMService:MCPHeader:Code"),
-                    dataField: "code"
-                }, {
+                    dataField: "code",
+                    validationRules: [
+                        {
+                            type: "required"
+                        },
+                        {
+                            type: 'pattern',
+                            pattern: '^[a-zA-Z0-9]{1,20}$',
+                            message: l('ValidateError:Code')
+                        }
+                    ]
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPHeader:Name"),
                     dataField: "name"
-                }, {
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPHeader:EffectiveDate"),
                     dataField: "effectiveDate",
                     format: "dd/MM/yyyy",
                     dataType: "date"
-                }, {
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPHeader:EndDate"),
                     dataField: "endDate",
                     format: "dd/MM/yyyy",

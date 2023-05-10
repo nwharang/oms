@@ -173,7 +173,21 @@ let getInfoSO = async () => {
                     return data.uomGroup[key];
                 }),
                 itemGroupList: Object.keys(data.itemsInItemGroupsDictionary).map((key) => data.itemsInItemGroupsDictionary[key]),
-                uomGroupWithDetailsDictionary: Object.keys(data.uomGroupWithDetailsDictionary).map((key) => data.uomGroupWithDetailsDictionary[key]),
+                uomGroupWithDetailsDictionary: Object.keys(data.uomGroupWithDetailsDictionary).map((key) => {
+                    return {
+                        id: key,
+                        data: [
+                            {
+                                altQty: 1,
+                                baseQty: 1,
+                                altUOMId: data.uomGroupWithDetailsDictionary[key].baseUOMId,
+                                isBase: true
+                            },
+                            ...Object.keys(data.uomGroupWithDetailsDictionary[key].detailsDictionary).map(key1 => data.uomGroupWithDetailsDictionary[key].detailsDictionary[key1])
+                        ]
+                    }
+
+                }),
                 employeesList,
                 routesList,
                 customerEmployeesList,

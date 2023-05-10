@@ -113,24 +113,7 @@ $(function () {
         columnFixing: {
             enabled: true,
         },
-        export: {
-            enabled: true,
-        },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
+        ...genaralConfig('Employees'),
         headerFilter: {
             visible: true,
         },
@@ -223,8 +206,12 @@ $(function () {
             if (!e.data.effectiveDate) e.data.effectiveDate = moment().format('yyyy-MM-DD')
         },
         onRowUpdating: function (e) {
-            e.newData = { ...e.oldData, ...e.newData, }
-            if (e.newData?.email == "") e.newData.email = null
+            var objectRequire = ["erpCode", "firstName", "lastName", "dateOfBirth", "idCardNumber", "email", "phone", "address", "active", "effectiveDate", "endDate", "workingPositionId", "employeeTypeId"];
+            for (var property in e.oldData) {
+                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
+                    e.newData[property] = e.oldData[property];
+                }
+            }
         },
         onEditorPreparing: function (e) {
             if (e.dataField == "workingPositionId") {
@@ -265,10 +252,37 @@ $(function () {
                 fixedPosition: 'left'
             },
             {
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                fixed: true,
+                fixedPosition: "left",
+                formItem: {
+                    visible: false
+                },
+            },
+            {
+                caption: l("EntityFieldName:MDMService:EmployeeProfile:ERPCode"),
+                dataField: "erpCode",
+                dataType: 'string',
+                visible: false
+            },
+            {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:Code"),
                 dataField: "code",
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:ERPCode"),
@@ -290,7 +304,12 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:DateOfBirth"),
                 dataField: "dateOfBirth",
-                dataType: 'date'
+                dataType: 'date',
+                editorOptions: {
+                    max: new Date(),
+                    format: 'dd/MM/yyyy'
+                },
+                format: 'dd/MM/yyyy'
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:IdCardNumber"),
@@ -313,6 +332,17 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:Phone"),
                 dataField: "phone",
                 dataType: 'string',
+                editorOptions: {
+                    mask: '000-000-0000',
+                    maskRules: { h: /^[0-9]{10}$/ },
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateError:Phone')
+                    }
+                ],
                 visible: false
             },
             {

@@ -1,7 +1,6 @@
 $(function () {
     var l = abp.localization.getResource("OMS");
-    var l1 = abp.localization.getResource("OMS");
-	
+
     var vendorService = window.dMSpro.oMS.mdmService.controllers.vendors.vendor;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
@@ -242,7 +241,7 @@ $(function () {
                             if (popup) popup.show();
                         },
                     },
-                }, 
+                },
                 "searchPanel"
             ],
         },
@@ -251,14 +250,23 @@ $(function () {
                 type: 'buttons',
                 caption: l("Actions"),
                 width: 90,
-                buttons: ['edit'],
+                buttons: ['edit', 'delete'],
                 fixedPosition: 'left'
             },
             {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:Vendor:Code"),
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 dataField: 'name',
@@ -276,11 +284,33 @@ $(function () {
                 dataField: 'phone1',
                 caption: l("EntityFieldName:MDMService:Vendor:Phone1"),
                 dataType: 'string',
+                editorOptions: {
+                    mask: '000-000-0000',
+                    maskRules: { h: /^[0-9]{10}$/ },
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateError:Phone')
+                    }
+                ]
             },
             {
                 dataField: 'phone2',
                 caption: l("EntityFieldName:MDMService:Vendor:Phone2"),
                 dataType: 'string',
+                editorOptions: {
+                    mask: '000-000-0000',
+                    maskRules: { h: /^[0-9]{10}$/ },
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateError:Phone')
+                    }
+                ]
             },
             {
                 dataField: 'erpCode',
@@ -301,7 +331,7 @@ $(function () {
                 },
             },
             {
-                dataField: 'linkedCompany',
+                dataField: 'linkedCompanyId',
                 caption: l("EntityFieldName:MDMService:Vendor:LinkedCompany"),
                 //validationRules: [{ type: "required" }],
                 dataType: 'string',
@@ -312,13 +342,16 @@ $(function () {
                 //     // return "";
                 // },
                 lookup: {
-                   dataSource: {
-                       store: companiesLookup,
-                       paginate: true,
-                       pageSize: pageSizeForLookup
-                   },
-                   valueExpr: "id",
-                   displayExpr: "code"
+                    dataSource: {
+                        store: companiesLookup,
+                        paginate: true,
+                        pageSize
+                    },
+                    valueExpr: "id",
+                    displayExpr: "code"
+                },
+                editorOptions: {
+                    showClearButton: true
                 }
             },
             //{
@@ -334,9 +367,14 @@ $(function () {
             //},
             {
                 dataField: 'priceListId',
-                caption: l1("PriceListName"),
+                caption: l("PriceListName"),
                 dataType: 'string',
                 validationRules: [{ type: "required" }],
+                calculateDisplayValue: (e) => {
+                    if (e && e.priceList)
+                        return e.priceList.code
+                    return
+                },
                 lookup: {
                     dataSource: {
                         store: pricelistLookup,

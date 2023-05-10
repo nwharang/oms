@@ -38,11 +38,13 @@
                 });
             return d.promise();
         },
-        insert(values) {
-            return geoMasterService.create(values, { contentType: "application/json" });
+        insert({ code, name, parentId }) {
+            if (code && name && parentId)
+                return geoMasterService.create({ code, name, parentId }, { contentType: "application/json" });
         },
-        update(key, values) {
-            return geoMasterService.update(key, values, { contentType: "application/json" });
+        update(key, { name }) {
+            if (name)
+                return geoMasterService.update(key, { name }, { contentType: "application/json" });
         },
         remove(key) {
             return geoMasterService.delete(key);
@@ -57,7 +59,7 @@
             filtering: true,
             sorting: true,
             grouping: true,
-          },
+        },
         keyExpr: 'id',
         parentIdExpr: 'parentId',
         rootValue: null,
@@ -219,12 +221,28 @@
                 fixedPosition: 'left'
             },
             {
+                caption: l("EntityFieldName:MDMService:GeoMaster:Id"),
+                dataField: "id",
+                allowEditing: false,
+                editorOptions: {
+                    readOnly: true,
+                },
+                visible: false,
+            },
+
+            {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Code"),
                 dataField: "code",
-                editorOptions: {
-                    maxLength: 10
-                },
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Name"),

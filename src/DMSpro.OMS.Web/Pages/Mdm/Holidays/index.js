@@ -1,9 +1,44 @@
-﻿var holidayDetail = window.dMSpro.oMS.mdmService.controllers.holidayDetails.holidayDetail;
-var l = abp.localization.getResource("OMS");
-var l1 = abp.localization.getResource("OMS");
+﻿var l = abp.localization.getResource("OMS");
 $(() => {
 
     var holidayService = window.dMSpro.oMS.mdmService.controllers.holidays.holiday;
+    var holidayDetail = window.dMSpro.oMS.mdmService.controllers.holidayDetails.holidayDetail;
+
+    let holidayStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            holidayService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        insert(values) {
+            return holidayService.create(values, { contentType: "application/json" });
+        },
+        update(key, values) {
+            return holidayService.update(key, values, { contentType: "application/json" });
+        },
+        remove(key) {
+            return holidayService.delete(key);
+        },
+        errorHandler: function (error) {
+
+        }
+    })
 
     var gridHolidays = $('#gridHolidays').dxDataGrid({
         remoteOperations: true,
@@ -52,11 +87,11 @@ $(() => {
         searchPanel: {
             visible: true
         },
-        // stateStoring: { //save state in localStorage
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'dgMCPDetails',
-        // },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgHolidaysHeaders',
+        },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -74,30 +109,13 @@ $(() => {
                 "addRowButton",
                 "columnChooserButton",
                 "exportButton",
-                // {
-                //     location: 'after',
-                //     widget: 'dxButton',
-                //     options: {
-                //         icon: "import",
-                //         elementAttr: {
-                //             //id: "import-excel",
-                //             class: "import-excel",
-                //         },
-                //         onClick(e) {
-                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
-                //             var gridName = gridControl.attr('id');
-                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                //             if (popup) popup.show();
-                //         },
-                //     },
-                // },
                 "searchPanel",
             ],
         },
         editing: {
             mode: "row",
             allowAdding: abp.auth.isGranted('MdmService.Holidays.Create'),
-            allowUpdating: true,
+            allowUpdating: abp.auth.isGranted('MdmService.Holidays.Edit'),
             allowDeleting: abp.auth.isGranted('MdmService.Holidays.Delete'),
             useIcons: true,
             texts: {
@@ -106,50 +124,41 @@ $(() => {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        onRowUpdating: function (e) {
-            e.newData = Object.assign({}, e.oldData, e.newData);
-        },
-        dataSource: new DevExpress.data.CustomStore({
-            key: 'id',
-            load(loadOptions) {
-                const deferred = $.Deferred();
-                const args = {};
-                requestOptions.forEach((i) => {
-                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                        args[i] = JSON.stringify(loadOptions[i]);
-                    }
-                });
 
-                holidayService.getListDevextremes(args)
-                    .done(result => {
-                        deferred.resolve(result.data, {
-                            totalCount: result.totalCount,
-                            summary: result.summary,
-                            groupCount: result.groupCount,
-                        });
-                    });
-
-                return deferred.promise();
-            },
-            insert(values) {
-                return holidayService.create(values, { contentType: "application/json" });
-            },
-            update(key, values) {
-                return holidayService.update(key, values, { contentType: "application/json" });
-            },
-            remove(key) {
-                return holidayService.delete(key);
-            },
-            errorHandler: function (error) {
-
-            }
-        }),
+        dataSource: holidayStore,
         // keyExpr: 'Id', 
         errorRowEnabled: false,
         onEditorPreparing: function (e) {
-            if (e.dataField === "year") {
+            if (e.dataField === "year" && e.rowType === 'data') {
                 e.editorOptions.min = (new Date()).getFullYear();
                 e.editorOptions.max = 2099;
+            }
+        },
+        onRowUpdating: (e) => {
+            e.newData = Object.assign({}, e.oldData, e.newData);
+            if (e.newData.year) {
+                e.cancel = new Promise((resolve, reject) => {
+                    holidayService.getListDevextremes({ filter: JSON.stringify(['year', '=', e.newData.year]) }).then(({ data }) => {
+                        if (data?.length > 0) {
+                            resolve(true)
+                            abp.message.warn(l("WarningMessage:MDMService:Holiday:InvalidInputYear"));
+                        }
+                        resolve(false)
+                    })
+                })
+            }
+        },
+        onRowInserting: (e) => {
+            if (e.data.year) {
+                e.cancel = new Promise((resolve, reject) => {
+                    holidayService.getListDevextremes({ filter: JSON.stringify(['year', '=', e.data.year]) }).then(({ data }) => {
+                        if (data?.length > 0) {
+                            abp.message.warn(l("WarningMessage:MDMService:Holiday:InvalidInputYear"));
+                            resolve(true)
+                        }
+                        resolve(false)
+                    })
+                })
             }
         },
         columns: [
@@ -170,7 +179,7 @@ $(() => {
             {
                 dataField: 'description',
                 caption: l("EntityFieldName:MDMService:Holiday:Description"),
-                validationRules: [{ type: "required" }, { type: "stringLength", max: 255, message: l1('Message.MaximumLength').replace('{0}', 255) }],
+                validationRules: [{ type: "required" }]
             },
         ],
         masterDetail: {
@@ -203,31 +212,12 @@ $(() => {
                                 return deferred.promise();
                             },
                             insert(values) {
-                                if (values.startDate) {
-                                    values.startDate = removeTimezoneFromDate(values.startDate);
-                                }
-                                if (values.endDate) {
-                                    values.endDate = removeTimezoneFromDate(values.endDate);
-                                }
                                 return holidayDetail.create(values, { contentType: "application/json" });
                             },
                             update(key, values) {
-                                if (values.startDate) {
-                                    values.startDate = removeTimezoneFromDate(new Date(values.startDate));
-                                }
-                                if (values.endDate) {
-                                    values.endDate = removeTimezoneFromDate(new Date(values.endDate));
-                                }
                                 return holidayDetail.update(key, values, { contentType: "application/json" });
                             },
                             remove(key) {
-                                var dxDataGrid = $(`#grid_${currentHeaderData.id}`).data('dxDataGrid');
-                                let rows = dxDataGrid.getVisibleRows();
-                                var row = rows.filter(u => u.key == key)[0];
-                                if (row.data.startDate && new Date(row.data.startDate) <= new Date()) {
-                                    abp.message.info(l1('CanNotDeleteHolidayYearsDetail'));
-                                    return;
-                                }
                                 return holidayDetail.delete(key);
                             },
                         }),
@@ -255,6 +245,7 @@ $(() => {
                         allowColumnReordering: true,
                         allowColumnResizing: true,
                         columnResizingMode: 'widget',
+                        dateSerializationFormat: "yyyy-MM-dd",
                         columnMinWidth: 50,
                         columnAutoWidth: true,
                         columnChooser: {
@@ -277,11 +268,11 @@ $(() => {
                         searchPanel: {
                             visible: true
                         },
-                        // stateStoring: { //save state in localStorage
-                        //     enabled: true,
-                        //     type: 'localStorage',
-                        //     storageKey: 'dgMCPDetails',
-                        // },
+                        stateStoring: { //save state in localStorage
+                            enabled: true,
+                            type: 'localStorage',
+                            storageKey: 'dgHolidaysDetails',
+                        },
                         paging: {
                             enabled: true,
                             pageSize: pageSize
@@ -289,7 +280,7 @@ $(() => {
                         pager: {
                             visible: true,
                             showPageSizeSelector: true,
-                            allowedPageSizes: allowedPageSizes,
+                            allowedPageSizes,
                             showInfo: true,
                             showNavigationButtons: true
                         },
@@ -299,33 +290,30 @@ $(() => {
                                 "addRowButton",
                                 "columnChooserButton",
                                 "exportButton",
-                                {
-                                    location: 'after',
-                                    widget: 'dxButton',
-                                    options: {
-                                        icon: "import",
-                                        elementAttr: {
-                                            class: "import-excel",
-                                        },
-                                        onClick(e) {
-                                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                                            var gridName = gridControl.attr('id');
-                                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                                            if (popup) popup.show();
-                                        },
-                                    }
-                                },
+                                // {
+                                //     location: 'after',
+                                //     widget: 'dxButton',
+                                //     options: {
+                                //         icon: "import",
+                                //         elementAttr: {
+                                //             class: "import-excel",
+                                //         },
+                                //         onClick(e) {
+                                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                                //             var gridName = gridControl.attr('id');
+                                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                                //             if (popup) popup.show();
+                                //         },
+                                //     }
+                                // },
                                 "searchPanel"
                             ],
                         },
                         editing: {
                             mode: "row",
-                            //allowAdding: abp.auth.isGranted('MdmService.u-oMs.Create'),
-                            //allowUpdating: abp.auth.isGranted('MdmService.u-oMs.Edit'),
-                            //allowDeleting: abp.auth.isGranted('MdmService.u-oMs.Delete'),
-                            allowAdding: true,
-                            allowUpdating: true,
-                            allowDeleting: true,
+                            allowAdding: abp.auth.isGranted('MdmService.Holidays.Create'),
+                            allowUpdating: abp.auth.isGranted('MdmService.Holidays.Edit'),
+                            allowDeleting: abp.auth.isGranted('MdmService.Holidays.Delete'),
                             useIcons: true,
                             texts: {
                                 editRow: l("Edit"),
@@ -340,6 +328,7 @@ $(() => {
                             e.newData = Object.assign({}, e.oldData, e.newData);
                         },
                         onEditorPreparing: function (e) {
+
                             if (e.dataField == "startDate") {
                                 e.editorOptions.min = new Date();
                                 e.editorOptions.max = new Date(2099, 12, 30);
@@ -406,7 +395,8 @@ $(() => {
                                 caption: l("EntityFieldName:MDMService:HolidayDetail:StartDate"),
                                 width: 130, dataType: "date",
                                 format: "dd/MM/yyyy",
-                                alignment: "right"
+                                alignment: "right",
+                                validationRules: [{ type: "required" }]
                             },
                             {
                                 dataField: 'endDate',
@@ -414,12 +404,13 @@ $(() => {
                                 width: 130,
                                 dataType: "date",
                                 format: "dd/MM/yyyy",
-                                alignment: "right"
-                            }, {
+                                alignment: "right",
+                                validationRules: [{ type: "required" }]
+                            },
+                            {
                                 allowEditing: false,
                                 dataType: "number",
                                 dataField: 'Days',
-                                caption: l1("EntityFieldName:MDMService:HolidayDetail:Days"),
                                 width: 120, alignment: "center",
                                 calculateCellValue: function (rowData) {
                                     if (!rowData.startDate || !rowData.endDate)
@@ -433,16 +424,7 @@ $(() => {
                                 validationRules: [{ type: "required" }, { type: "stringLength", max: 255 }],
                             }],
                     }).appendTo(container);
-                initImportPopup('api/mdm-service/holiday-details', 'HolidayDetails_Template', `grid_${currentHeaderData.id}`);
             },
         },
     }).dxDataGrid("instance");
-    function removeTimezoneFromDate(currentDate) {
-        if (!currentDate || (typeof currentDate == "string")) return currentDate;
-
-        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2);
-        return date;
-    }
-    // initImportPopup('api/mdm-service/holidays', 'Holidays_Template', 'gridHolidays');
-
 });

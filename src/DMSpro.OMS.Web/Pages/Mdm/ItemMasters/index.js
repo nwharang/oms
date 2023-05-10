@@ -360,6 +360,7 @@
                                                 case 0:
                                                     expiredType.option('readOnly', true)
                                                     expiredValue.option('readOnly', true)
+                                                    expiredType.option('value', null)
                                                     break;
                                                 case 1:
                                                     expiredType.option('readOnly', false)
@@ -385,6 +386,7 @@
                                     elementAttr: {
                                         id: 'expiredType'
                                     },
+                                    placeholder: "",
                                     readOnly: true,
                                 }
                             },
@@ -541,29 +543,12 @@
         columnFixing: {
             enabled: true,
         },
-        // stateStoring: {
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'dataGridItemMasters',
-        // },
-        export: {
+        stateStoring: {
             enabled: true,
+            type: 'localStorage',
+            storageKey: 'dataGridItemMasters',
         },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
+        ...genaralConfig('Items'),
         headerFilter: {
             visible: true,
         },
@@ -631,10 +616,31 @@
                 fixedPosition: "left",
             },
             {
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                fixed: true,
+                fixedPosition: "left",
+                formItem: {
+                    visible: false
+                },
+            },
+            {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:Item:Code"),
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 dataField: 'name',

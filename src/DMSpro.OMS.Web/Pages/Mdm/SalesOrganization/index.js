@@ -120,7 +120,17 @@ $(function () {
             },
             {
                 caption: l('EntityFieldName:MDMService:SalesOrgHeader:Code'),
-                dataField: "code"
+                dataField: "code",
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 caption: l('EntityFieldName:MDMService:SalesOrgHeader:Name'),

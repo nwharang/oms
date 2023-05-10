@@ -5,35 +5,7 @@ $(function () {
         dataSource: store.priceUpdateStore,
         remoteOperations: true,
         cacheEnabled: true,
-        export: {
-            enabled: true,
-            // allowExportSelectedData: true,
-        },
-        onExporting(e) {
-            if (e.format === 'xlsx') {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('PriceUpdates');
-                DevExpress.excelExporter.exportDataGrid({
-                    component: e.component,
-                    worksheet,
-                    autoFilterEnabled: true,
-                }).then(() => {
-                    workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PriceUpdates.xlsx');
-                    });
-                });
-                e.cancel = true;
-            }
-            else if (e.format === 'pdf') {
-                const doc = new jsPDF();
-                DevExpress.pdfExporter.exportDataGrid({
-                    jsPDFDocument: doc,
-                    component: e.component,
-                }).then(() => {
-                    doc.save('PriceUpdates.pdf');
-                });
-            }
-        },
+        ...genaralConfig('PriceUpdate'),
         showRowLines: true,
         showBorders: true,
         focusedRowEnabled: true,
@@ -62,14 +34,11 @@ $(function () {
         searchPanel: {
             visible: true
         },
-        //scrolling: {
-        //    mode: 'standard'
-        //},
-        // stateStoring: { 
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'priceUpdateContainer',
-        // },
+        stateStoring: { 
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'priceUpdateContainer',
+        },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -137,7 +106,17 @@ $(function () {
             {
                 caption: l('EntityFieldName:MDMService:PriceUpdate:Code'),
                 dataField: 'code',
-                dataType: 'string'
+                dataType: 'string',
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 caption: l('EntityFieldName:MDMService:PriceUpdate:Description'),

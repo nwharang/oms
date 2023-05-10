@@ -6,10 +6,40 @@
     var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.customerAttributeValues.customerAttributeValue;
     var cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
-
+    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
 
     let cusAttrStore = cusAttrService.getListDevextremes({ filter: JSON.stringify(['active', "=", true]) })
 
+    var companiesLookup = new DevExpress.data.CustomStore({
+        key: "id",
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            companyService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+            var d = new $.Deferred();
+            companyService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
+        }
+    });
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
         useDefaultSearch: true,
@@ -76,7 +106,6 @@
             return customerService.create(values, { contentType: "application/json" });
         },
         update(key, values) {
-            console.log(values);
             return customerService.update(key, values, { contentType: "application/json" });
         },
         remove(key) {
@@ -149,6 +178,9 @@
             form: {
                 labelMode: "outside",
                 colCount: 3,
+                elementAttr: {
+                    id: "customerForm",
+                },
                 items: [
                     {
                         itemType: "group",
@@ -181,11 +213,27 @@
                                         dataField: 'lastOrderDate',
                                         editorType: "dxDateBox"
                                     },
-                                    { dataField: 'creditLimit' },
-                                    { dataField: 'paymentTermId' },
-                                    { dataField: 'linkedCompanyId' },
+                                    {
+                                        dataField: 'creditLimit'
+                                    },
+                                    {
+                                        dataField: 'paymentTermId'
+                                    },
+                                    {
+                                        dataField: 'linkedCompanyId',
+                                        editorOptions: {
+                                            elementAttr: {
+                                                id: "linkedCompanyId",
+                                            }
+                                        }
+                                    },
+                                    {
+                                        dataField: 'isCompany',
+                                        elementAttr: {
+                                            id: "isCompany",
+                                        }
+                                    }
                                     // { dataField: 'sfaCustomerCode' },
-                                    { dataField: 'isCompany' }
                                 ]
                             },
                             {
@@ -202,8 +250,7 @@
                                 items: getAttrOptions(),
                             }
                         ]
-                    }]
-
+                    }],
             }
         },
         // onEditingStart(e) {
@@ -267,12 +314,12 @@
         },
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes, // ?? 
+            allowedPageSizes, // ?? 
             showInfo: true,
             showNavigationButtons: true
         },
@@ -310,14 +357,24 @@
                 fixedPosition: "left",
             },
             {
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                fixed: true,
+                fixedPosition: "left",
+                formItem: {
+                    visible: false
+                },
+            },
+            {
                 //allowEditing: false,
                 dataField: 'code',
                 caption: l("Code"),
                 //allowEditing: false,
                 dataType: 'string',
-                editorOptions: {
-                    readOnly: true,
-                },
+                allowEditing: false,
                 //validationRules: [{ type: "required" }]
             },
             {
@@ -330,11 +387,33 @@
                 dataField: 'phone1',
                 caption: l("Phone1"),
                 dataType: 'string',
+                editorOptions: {
+                    mask: '000-000-0000',
+                    maskRules: { h: /^[0-9]{10}$/ },
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateError:Phone')
+                    }
+                ]
             },
             {
                 dataField: 'phone2',
                 caption: l("Phone2"),
                 dataType: 'string',
+                editorOptions: {
+                    mask: '000-000-0000',
+                    maskRules: { h: /^[0-9]{10}$/ },
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateError:Phone')
+                    }
+                ],
                 visible: false
             },
             {
@@ -347,7 +426,14 @@
                 dataField: 'license',
                 caption: l("License"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 dataField: 'taxCode',
@@ -413,18 +499,22 @@
                 dataType: 'boolean',
                 width: 110,
                 alignment: 'center',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                },
                 visible: false,
+                setCellValue(rowData, value) {
+                    rowData.isCompany = value;
+                    if (!value)
+                        rowData.linkedCompanyId = null;
+                }
             },
             {
                 dataField: 'creditLimit',
                 caption: l("CreditLimit"),
                 dataType: 'number',
-                visible: false
+                visible: false,
+                editorOptions: {
+                    min: 0,
+                    format: '#'
+                }
             },
             {
                 dataField: 'paymentTermId',
@@ -432,21 +522,22 @@
                 dataType: 'string',
                 visible: false,
             },
-            // {
-            //     dataField: 'linkedCompanyId',
-            //     caption: l("LinkedCompany"),
-            //     dataType: 'string',
-            //     lookup: {
-            //        dataSource: {
-            //            store: companyData,
-            //            paginate: true,
-            //            pageSize: pageSizeForLookup
-            //        },
-            //        valueExpr: "id",
-            //        displayExpr: "code"
-            //     },
-            //     visible: false
-            // },
+            {
+                dataField: 'linkedCompanyId',
+                caption: l("LinkedCompany"),
+                lookup: {
+                    dataSource: {
+                        store: companiesLookup,
+                        paginate: true,
+                        pageSize
+                    },
+                    valueExpr: "id",
+                    displayExpr: "code",
+                },
+                editorOptions: {
+                    showClearButton: true,
+                }
+            },
             {
                 dataField: 'lastOrderDate',
                 caption: l("LastOrderDate"),
@@ -483,7 +574,7 @@
                             store: geoMasterStore,
                             filter: ['level', '=', 0],
                             paginate: true,
-                            pageSize: pageSizeForLookup
+                            pageSize
                         };
                     },
                     valueExpr: "id",
@@ -512,7 +603,7 @@
                             store: geoMasterStore,
                             filter: options.data ? [['level', '=', 1], 'and', ['parentId', '=', options.data.geoMaster0Id]] : ['level', '=', 1],
                             paginate: true,
-                            pageSize: pageSizeForLookup
+                            pageSize
                         };
                     },
                     valueExpr: 'id',
@@ -540,7 +631,7 @@
                             store: geoMasterStore,
                             filter: options.data ? [['level', '=', 2], 'and', ['parentId', '=', options.data.geoMaster1Id]] : ['level', '=', 2],
                             paginate: true,
-                            pageSize: pageSizeForLookup
+                            pageSize
                         };
                     },
                     valueExpr: 'id',
@@ -567,7 +658,7 @@
                             store: geoMasterStore,
                             filter: options.data ? [['level', '=', 3], 'and', ['parentId', '=', options.data.geoMaster2Id]] : ['level', '=', 3],
                             paginate: true,
-                            pageSize: pageSizeForLookup
+                            pageSize
                         };
                     },
                     valueExpr: 'id',
@@ -593,7 +684,7 @@
                             store: geoMasterStore,
                             filter: options.data ? [['level', '=', 4], 'and', ['parentId', '=', options.data.geoMaster3Id]] : ['level', '=', 4],
                             paginate: true,
-                            pageSize: pageSizeForLookup
+                            pageSize
                         };
                     },
                     valueExpr: 'id',

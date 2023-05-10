@@ -12,7 +12,7 @@ let renderPopup = async (headerData) => {
         contentTemplate: (e) => {
             let poupcontainer = $('<div class="w-100 h-100 d-flex flex-column">')
             let popupHeader = $('<div class="w-100 mb-2">')
-            let popupBody = $('<div class="position-relative d-flex flex-grow-1 gap-2">')
+            let popupBody = $('<div class="position-relative d-flex flex-grow-1 gap-2 h-100 w-100">')
             popupHeader.appendTo(poupcontainer)
             popupBody.appendTo(poupcontainer)
             poupcontainer.appendTo(e)

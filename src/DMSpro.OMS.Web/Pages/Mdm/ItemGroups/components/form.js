@@ -19,7 +19,16 @@ function renderForm(e, headerData) {
             {
                 dataField: 'code',
                 editorType: 'dxTextBox',
-                validationRules: [{ type: "required" }],
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ],
                 colSpan: 2,
                 editorOptions: {
                     readOnly: headerData.status >= 0
@@ -83,11 +92,11 @@ function renderForm(e, headerData) {
                     }
                 }
             },
-            {
-                dataField: 'description',
-                editorType: 'dxTextBox',
-                colSpan: 7,
-            },
+            // {
+            //     dataField: 'description',
+            //     editorType: 'dxTextBox',
+            //     colSpan: 7,
+            // },
         ],
         onContentReady: (e) => {
             if (headerData.status >= 0)

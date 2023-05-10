@@ -94,8 +94,16 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             editorType: 'dxSelectBox',
                             editorOptions: {
                                 readOnly: true,
-                                dataSource: mainStore.customerList,
-                                displayExpr: 'name',
+                                dataSource: {
+                                    store: mainStore.customerList,
+                                    paginate: true,
+                                    pageSize
+                                },
+                                displayExpr(e) {
+                                    if (e)
+                                        return `${e.code} - ${e.name}`
+                                    return
+                                },
                                 valueExpr: 'id',
                                 searchEnabled: true,
                                 elementAttr: {

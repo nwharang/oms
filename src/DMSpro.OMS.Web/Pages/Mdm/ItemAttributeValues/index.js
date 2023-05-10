@@ -131,33 +131,14 @@ $(function () {
         columnFixing: {
             enabled: true,
         },
-        export: {
-            enabled: true,
-        },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
         headerFilter: {
             visible: true,
         },
-        // stateStoring: {
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'treeProdAttributeValue',
-        // },
-
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'treeProdAttributeValue',
+        },
         editing: {
             mode: 'row',
             allowAdding: abp.auth.isGranted('MdmService.ItemAttributes.Create'),
@@ -320,7 +301,6 @@ $(function () {
                     },
                 },
                 'columnChooserButton',
-                "exportButton",
                 {
                     location: 'after',
                     widget: 'dxButton',
@@ -364,6 +344,18 @@ $(function () {
                 fixedPosition: 'left'
             },
             {
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                fixed: true,
+                fixedPosition: "left",
+                formItem: {
+                    visible: false
+                },
+            },
+            {
                 dataField: 'attrValName',
                 caption: l("EntityFieldName:MDMService:ItemAttributeValue:AttrValName"),
                 validationRules: [
@@ -379,8 +371,12 @@ $(function () {
                 caption: l1("EntityFieldName:MDMService:ItemAttributeValue:Code"),
                 validationRules: [
                     {
-                        type: "required",
-                        message: 'Attribute value code is required'
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
                     }
                 ],
                 width: 200

@@ -98,8 +98,16 @@ let helper = ({ companyId, mainStore, vatList }) => {
                             editorType: 'dxSelectBox',
                             editorOptions: {
                                 readOnly: true,
-                                dataSource: mainStore.customerList,
-                                displayExpr: 'name',
+                                dataSource: {
+                                    store: mainStore.customerList,
+                                    paginate: true,
+                                    pageSize
+                                },
+                                displayExpr(e) {
+                                    if (e)
+                                        return `${e.code} - ${e.name}`
+                                    return
+                                },
                                 valueExpr: 'id',
                                 searchEnabled: true,
                                 elementAttr: {
@@ -380,7 +388,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                         $("#popupItems").dxPopup('instance').show()
                     }
 
-                }, "revertButton", "columnChooserButton",]
+                }, "columnChooserButton",]
             },
             columns: [
                 {
@@ -472,8 +480,27 @@ let helper = ({ companyId, mainStore, vatList }) => {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:UOM'),
                     dataField: 'uomId',
                     lookup: {
-                        dataSource: mainStore.uOMList,
-                        displayExpr: "name",
+                        dataSource: (e) => {
+                            if (e?.data?.uomGroupId) {
+                                // find Valid UomGroup 
+                                let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === e.data.uomGroupId)?.data
+                                if (!validUom)
+                                    return mainStore.uOMList
+                                let data = mainStore.uOMList.map(e => {
+                                    return {
+                                        ...e,
+                                        ...validUom.find(v => v.altUOMId === e.id)
+                                    }
+                                })
+                                console.log(data);
+                                return data
+                            }
+                            return mainStore.uOMList
+                        },
+                        displayExpr: (e) => {
+                            if (e)
+                                return `${e.code} - ${e.name}`
+                        },
                         valueExpr: "id"
                     },
                     setCellValue: function (newData, value, currentRowData) {
@@ -797,10 +824,13 @@ let helper = ({ companyId, mainStore, vatList }) => {
             onEditorPreparing: (e) => {
                 if (e.row?.rowType != 'data') return
                 let discountType = e.row.data.discountType
+                if (e.dataField == "discountType") {
+                    e.cancel = e.row.data.isFree
+                }
                 if (e.dataField == "discountAmt")
-                    e.cancel = discountType == 0 ? false : true
+                    e.cancel = discountType == 0 && !e.row.data.isFree ? false : true
                 if (e.dataField == "discountPerc")
-                    e.cancel = discountType > 0 ? false : true
+                    e.cancel = discountType > 0 && !e.row.data.isFree ? false : true
 
                 // e.editorOptions.onValueChanged = (v) => {
                 //     e.setValue(v.value)

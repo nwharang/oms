@@ -192,7 +192,16 @@ $(function () {
                 dataField: 'code',
                 caption: l1("EntityFieldName:MDMService:CustomerAttributeValue:Code"),
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 dataField: 'attrValName',
@@ -215,6 +224,10 @@ $(function () {
                 validationRules: [{ type: "required" }]
             },
         ],
+        onEditorPreparing: (e) => {
+            if (e.row?.rowType != "data" || e.row?.isNewRow) return
+            if (e.dataField === "code") e.editorOptions.readOnly = true
+        }
     }).dxDataGrid("instance");
     // initImportPopup('api/mdm-service/cus-attribute-values', 'CustomerAttributeValues_Template', 'dgCustomerAttributeValues');
 

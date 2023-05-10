@@ -8,7 +8,16 @@ function renderForm(e, headerData) {
             {
                 dataField: 'code',
                 editorType: 'dxTextBox',
-                validationRules: [{ type: "required" }],
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ],
                 editorOptions: {
                     readOnly: headerData.status >= 0
                 }

@@ -370,6 +370,10 @@
                 dataField: 'docDiscountAmt',
                 dataType: 'number',
                 format: '#,##0.##',
+                calculateDisplayValue: (e) => {
+                    if (e)
+                        return e.docDiscountPerc + " %"
+                },
                 validationRules: [{ type: 'required' }],
                 width: 100,
             },

@@ -1,5 +1,5 @@
 let renderTree = (e, headerData) => {
-    if (!tree) tree = $('<div id=dataTreeContainer>').css('flex-basis', '35%')
+    if (!tree) tree = $('<div id=dataTreeContainer>').css('flex-basis', '35%').css('height', '100%');
     if (!context) context = $('<div id=contextMenu>')
     context.dxContextMenu({
         dataSource: store.menuItems,
@@ -36,7 +36,6 @@ let renderTree = (e, headerData) => {
     tree.dxTreeList({
         dataSource: headerData.id ? store.salesOrgHierarchyStore(headerData.id) : [],
         keyExpr: 'id',
-        height: '100%',
         parentIdExpr: "parentId",
         remoteOperations: true,
         autoExpandAll: true,
@@ -175,13 +174,12 @@ let renderTree = (e, headerData) => {
                 caption: 'Name',
                 dataField: "name",
                 cellTemplate: function (element, info) {
-                    // console.log(info);
                     if (info.data.isRoute) {
-                        element.append("<div class='isRoute'><span class='px-1'>" + info.text + "</span></div>");
+                        element.append("<div class='isRoute'><span class='px-1'>" + info.data.code + " - " + info.data.name + "</span></div>");
                     } else if (info.data.isSellingZone) {
-                        element.append("<div class='isSellingZone'><span class='px-1'>" + info.text + "</span></div>");
+                        element.append("<div class='isSellingZone'><span class='px-1'>" + info.data.code + " - " + info.data.name + "</span></div>");
                     } else {
-                        element.append("<div>" + info.text + "</div>");
+                        element.append("<div>" + info.data.code + " - " + info.data.name + "</div>");
                     }
                 },
                 validationRules: [{ type: "required" }]

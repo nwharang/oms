@@ -105,6 +105,10 @@ function renderMassInputCus(headerId, priceListId) {
                         dataType: 'number',
                         format: '#,##0',
                         width: 200,
+                        allowHeaderFiltering: false,
+                        allowReordering : false,
+                        allowSorting : false,
+                        allowFiltering : false,
                         editorOptions: {
                             format: '#,##0',
                         },
