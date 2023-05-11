@@ -128,6 +128,10 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:ItemGroup:Code"),
                 dataField: "code",
+                editorOptions: {
+                    maxLength: 20,
+                    valueChangeEvent: 'keyup',
+                },
                 validationRules: [
                     {
                         type: "required"

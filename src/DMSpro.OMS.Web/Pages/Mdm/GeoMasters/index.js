@@ -218,6 +218,10 @@
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Code"),
                 dataField: "code",
+                editorOptions: {
+                    maxLength: 20,
+                    valueChangeEvent: 'keyup',
+                },
                 validationRules: [
                     {
                         type: "required"

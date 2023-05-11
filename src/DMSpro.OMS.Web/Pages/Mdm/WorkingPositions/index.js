@@ -146,6 +146,10 @@
                 caption: l("EntityFieldName:MDMService:WorkingPosition:Code"),
                 dataField: "code",
                 dataType: 'string',
+                editorOptions: {
+                    maxLength: 20,
+                    valueChangeEvent: 'keyup',
+                },
                 validationRules: [
                     {
                         type: "required"

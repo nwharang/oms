@@ -407,7 +407,18 @@
                 dataField: 'erpCode',
                 caption: l("ERPCode"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                editorOptions: {
+                    maxLength: 20,
+                    valueChangeEvent: 'keyup',
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ],
             },
             {
                 dataField: 'license',

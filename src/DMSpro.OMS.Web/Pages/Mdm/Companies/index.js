@@ -264,6 +264,10 @@ $(function () {
                 dataType: 'string',
                 fixed: true,
                 fixedPosition: "left",
+                editorOptions: {
+                    maxLength: 20,
+                    valueChangeEvent: 'keyup',
+                },
                 validationRules: [
                     {
                         type: "required"
@@ -482,13 +486,14 @@ $(function () {
                 dataType: 'string',
                 visible: false,
                 editorOptions: {
-                    maxLength: '50',
+                    maxLength: 20,
+                    valueChangeEvent: 'keyup',
                 },
                 validationRules: [
                     {
                         type: 'pattern',
-                        pattern: '^[a-zA-Z0-9]$',
-                        message: l('ValidateingERPCodeField')
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
                     }
                 ]
             },

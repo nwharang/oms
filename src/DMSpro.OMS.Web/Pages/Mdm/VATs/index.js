@@ -150,7 +150,8 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:VAT:Code"),
                 dataType: 'string',
                 editorOptions: {
-                    maxLength: 20
+                    maxLength: 20,
+                    valueChangeEvent: 'keyup',
                 },
                 validationRules: [
                     {

@@ -151,6 +151,10 @@ $(function () {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:UOM:Code"),
                 dataType: 'string',
+                editorOptions: {
+                    maxLength: 20,
+                    valueChangeEvent: 'keyup',
+                },
                 validationRules: [
                     {
                         type: "required"

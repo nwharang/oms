@@ -107,6 +107,10 @@ $(function () {
                 caption: l('EntityFieldName:MDMService:PriceUpdate:Code'),
                 dataField: 'code',
                 dataType: 'string',
+                editorOptions: {
+                    maxLength: 20,
+                    valueChangeEvent: 'keyup',
+                },
                 validationRules: [
                     {
                         type: "required"

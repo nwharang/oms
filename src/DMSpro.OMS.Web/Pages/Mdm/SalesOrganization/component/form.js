@@ -16,6 +16,10 @@ let renderForm = (e, headerData) => {
                 dataField: 'code',
                 name: 'salesOrgHeaderCode',
                 editorType: 'dxTextBox',
+                editorOptions: {
+                    maxLength: 20,
+                    valueChangeEvent: 'keyup',
+                },
                 validationRules: [
                     {
                         type: "required"
