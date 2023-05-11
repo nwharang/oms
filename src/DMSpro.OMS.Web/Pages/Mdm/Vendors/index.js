@@ -154,6 +154,11 @@ $(function () {
             popup: {
                 height: "fit-content"
             },
+            form: {
+                items: [
+                    'name', 'shortname', 'phone1', 'phone2', 'erpCode', 'active', 'linkedCompanyId', 'priceListId', 'address'
+                ]
+            }
         },
         onInitNewRow: function (e) {
             e.data.active = true;
@@ -250,16 +255,6 @@ $(function () {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:Vendor:Code"),
                 dataType: 'string',
-                validationRules: [
-                    {
-                        type: "required"
-                    },
-                    {
-                        type: 'pattern',
-                        pattern: '^[a-zA-Z0-9]{1,20}$',
-                        message: l('ValidateError:Code')
-                    }
-                ]
             },
             {
                 dataField: 'name',
@@ -280,14 +275,9 @@ $(function () {
                 editorOptions: {
                     mask: '000-000-0000',
                     maskRules: { h: /^[0-9]{10}$/ },
+                    showMaskMode: 'onFocus',
+
                 },
-                validationRules: [
-                    {
-                        type: 'pattern',
-                        pattern: '^[0-9]{10}$',
-                        message: l('ValidateError:Phone')
-                    }
-                ]
             },
             {
                 dataField: 'phone2',
@@ -296,14 +286,8 @@ $(function () {
                 editorOptions: {
                     mask: '000-000-0000',
                     maskRules: { h: /^[0-9]{10}$/ },
+                    showMaskMode: 'onFocus'
                 },
-                validationRules: [
-                    {
-                        type: 'pattern',
-                        pattern: '^[0-9]{10}$',
-                        message: l('ValidateError:Phone')
-                    }
-                ]
             },
             {
                 dataField: 'erpCode',

@@ -329,14 +329,8 @@ $(function () {
                 editorOptions: {
                     mask: '000-000-0000',
                     maskRules: { h: /^[0-9]{10}$/ },
+                    showMaskMode: 'onFocus'
                 },
-                validationRules: [
-                    {
-                        type: 'pattern',
-                        pattern: '^[0-9]{10}$',
-                        message: l('ValidateError:Phone')
-                    }
-                ],
                 visible: false
             },
             {
