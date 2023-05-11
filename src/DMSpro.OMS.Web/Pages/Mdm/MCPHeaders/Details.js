@@ -513,8 +513,6 @@ $(function () {
                     dataType: 'string',
                     allowEditing: false,
                     visible: false,
-                    fixed: true,
-                    fixedPosition: "left",
                     formItem: {
                         visible: false
                     },
