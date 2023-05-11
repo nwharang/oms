@@ -1037,7 +1037,7 @@ $(function () {
                 onClick() {
                     let dxEndDate = $('#EndDateMCP').data('dxDateBox');
                     let endDate = dxEndDate.option('value');
-                    mCPHeaderService.setEndDate(MCPModel.id, moment(endDate).format('YYYY-MM-DD'), { contentType: "application/json" })
+                    mCPHeaderService.setEndDate(MCPModel.id, moment(endDate).format('YYYY-MM-DD 12:00:00'), { contentType: "application/json" })
                         .done(result => {
                             abp.message.success(l('Congratulations'));
                             popupEnddateMCP.hide();
