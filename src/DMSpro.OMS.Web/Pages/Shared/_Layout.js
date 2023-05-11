@@ -1,9 +1,11 @@
 ﻿$(async function () {
+    let l = abp.localization.getResource("OMS");
     (() => {
         DevExpress.ui.forceIsoDateParsing = false;
         DevExpress.ui.dxTextBox.defaultOptions({
             options: {
-                maxLength: 255
+                maxLength: 255,
+                valueChangeEvent : 'keyup',
             }
         });
         DevExpress.ui.dxDataGrid.defaultOptions({
@@ -19,6 +21,11 @@
         DevExpress.ui.dxTreeList.defaultOptions({
             options: {
                 dateSerializationFormat: 'yyyy-MM-dd'
+            }
+        })
+        DevExpress.ui.dxSelectBox.defaultOptions({
+            options: {
+                placeholder: l('DefaultOption:SelectBox:PlaceHolder'),
             }
         })
         console.log("DefaultOptions Loaded");
