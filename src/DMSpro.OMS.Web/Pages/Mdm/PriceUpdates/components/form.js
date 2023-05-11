@@ -10,7 +10,6 @@ function renderForm(e, headerData) {
                 editorType: 'dxTextBox',
                 editorOptions: {
                     maxLength: 20,
-                    valueChangeEvent: 'keyup',
                 },
                 validationRules: [
                     {

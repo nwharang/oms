@@ -127,7 +127,6 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:CustomerGroup:Code"),
                 editorOptions: {
                     maxLength: 20,
-                    valueChangeEvent: 'keyup',
                 },
                 validationRules: [
                     {

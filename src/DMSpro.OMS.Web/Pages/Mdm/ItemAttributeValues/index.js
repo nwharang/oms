@@ -369,7 +369,6 @@ $(function () {
                 caption: l1("EntityFieldName:MDMService:ItemAttributeValue:Code"),
                 editorOptions: {
                     maxLength: 20,
-                    valueChangeEvent: 'keyup',
                 },
                 validationRules: [
                     {

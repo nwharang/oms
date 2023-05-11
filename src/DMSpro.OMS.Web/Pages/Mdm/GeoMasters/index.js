@@ -220,7 +220,6 @@
                 dataField: "code",
                 editorOptions: {
                     maxLength: 20,
-                    valueChangeEvent: 'keyup',
                 },
                 validationRules: [
                     {

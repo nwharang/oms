@@ -153,7 +153,6 @@ $(function () {
                 dataType: 'string',
                 editorOptions: {
                     maxLength: 20,
-                    valueChangeEvent: 'keyup',
                 },
                 validationRules: [
                     {

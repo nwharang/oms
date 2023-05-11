@@ -22,7 +22,6 @@ function renderForm(e, headerData) {
                 colSpan: 2,
                 editorOptions: {
                     maxLength: 20,
-                    valueChangeEvent: 'keyup',
                 },
                 validationRules: [
                     {

@@ -5,7 +5,6 @@
         DevExpress.ui.dxTextBox.defaultOptions({
             options: {
                 maxLength: 255,
-                valueChangeEvent : 'keyup',
             }
         });
         DevExpress.ui.dxDataGrid.defaultOptions({

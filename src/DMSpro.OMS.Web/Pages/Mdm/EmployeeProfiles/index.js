@@ -270,7 +270,6 @@ $(function () {
                 visible: false,
                 editorOptions: {
                     maxLength: 20,
-                    valueChangeEvent: 'keyup',
                 },
                 validationRules: [
                     {
@@ -286,7 +285,6 @@ $(function () {
                 dataType: 'string',
                 editorOptions: {
                     maxLength: 20,
-                    valueChangeEvent: 'keyup',
                 },
                 validationRules: [
                     {
@@ -341,11 +339,13 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:Phone"),
                 dataField: "phone",
                 dataType: 'string',
-                editorOptions: {
-                    mask: '000-000-0000',
-                    maskRules: { h: /^[0-9]{10}$/ },
-                    showMaskMode: 'onFocus'
-                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateError:Phone')
+                    }
+                ],
                 visible: false
             },
             {

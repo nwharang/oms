@@ -386,21 +386,25 @@
                 dataField: 'phone1',
                 caption: l("Phone1"),
                 dataType: 'string',
-                editorOptions: {
-                    mask: '000-000-0000',
-                    maskRules: { h: /^[0-9]{10}$/ },
-                    showMaskMode: 'onFocus'
-                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateError:Phone')
+                    }
+                ]
             },
             {
                 dataField: 'phone2',
                 caption: l("Phone2"),
                 dataType: 'string',
-                editorOptions: {
-                    mask: '000-000-0000',
-                    maskRules: { h: /^[0-9]{10}$/ },
-                    showMaskMode: 'onFocus'
-                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateError:Phone')
+                    }
+                ],
                 visible: false
             },
             {
@@ -410,7 +414,6 @@
                 visible: false,
                 editorOptions: {
                     maxLength: 20,
-                    valueChangeEvent: 'keyup',
                 },
                 validationRules: [
                     {
