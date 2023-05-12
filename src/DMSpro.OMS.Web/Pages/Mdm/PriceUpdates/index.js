@@ -5,7 +5,23 @@ $(function () {
         dataSource: store.priceUpdateStore,
         remoteOperations: true,
         cacheEnabled: true,
-        ...genaralConfig('PriceUpdate'),
+        export: {
+            enabled: true,
+        },
+        onExporting: function (e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Companies');
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
+                });
+            });
+            e.cancel = true;
+        },
         showRowLines: true,
         showBorders: true,
         focusedRowEnabled: true,
@@ -34,7 +50,7 @@ $(function () {
         searchPanel: {
             visible: true
         },
-        stateStoring: { 
+        stateStoring: {
             enabled: true,
             type: 'localStorage',
             storageKey: 'priceUpdateContainer',
