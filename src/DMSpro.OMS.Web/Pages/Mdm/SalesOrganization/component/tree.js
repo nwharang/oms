@@ -70,7 +70,11 @@ let renderTree = (e, headerData) => {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        onRowInserting: function (e) {
+        onContentReady: (e) => {
+            $('#routeCount').text(routeCount);
+            $('#zoneCount').text(zoneCount);
+        },
+        onRowInserting: (e) => {
             // for create first data - if parentId = 0, update parentId = null
             if (e.data && e.data.parentId == 0) {
                 e.data.parentId = null;
@@ -78,7 +82,7 @@ let renderTree = (e, headerData) => {
             e.data.salesOrgHeaderId = headerData.id || salesOrgHeaderId;
             e.data.sendMode = sendMode;
         },
-        onRowUpdating: function (e) {
+        onRowUpdating: (e) => {
             var objectRequire = ['salesOrgHeaderId', 'parentId', 'name'];
             for (var property in e.oldData) {
                 if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
@@ -87,17 +91,13 @@ let renderTree = (e, headerData) => {
             }
             e.newData['salesOrgHeaderId'] = headerData.id;
         },
-        onFocusedRowChanged: function (e) {
-            //load data for Sales Org Employee Assignment
+        onFocusedRowChanged: (e) => {
             salesOrgHierarchyIdFilter = treeInstance.option("focusedRowKey");
             gridInstance.refresh();
         },
         onSaved(e) {
             e.component.option({ focusedRowKey: null });
         },
-        // onContentReady(e) {
-        //     console.log(e.component.getDataSource().items());
-        // },
         onContextMenuPreparing: (e) => {
             if (!e.row) return
             let isRoute = e.row.data.isRoute;
@@ -145,6 +145,12 @@ let renderTree = (e, headerData) => {
                     },
                 },
                 {
+                    location: 'center',
+                    template() {
+                        return $("<div class='d-flex gap-2'><div class='isRoute' id='routeCount'></div><div class='isSellingZone' id='zoneCount'></div></div>")
+                    },
+                },
+                {
                     widget: 'dxButton',
                     options: {
                         text: 'New Root',
@@ -175,8 +181,10 @@ let renderTree = (e, headerData) => {
                 dataField: "name",
                 cellTemplate: function (element, info) {
                     if (info.data.isRoute) {
+                        routeCount += 1
                         element.append("<div class='isRoute'><span class='px-1'>" + info.data.code + " - " + info.data.name + "</span></div>");
                     } else if (info.data.isSellingZone) {
+                        zoneCount += 1
                         element.append("<div class='isSellingZone'><span class='px-1'>" + info.data.code + " - " + info.data.name + "</span></div>");
                     } else {
                         element.append("<div>" + info.data.code + " - " + info.data.name + "</div>");

@@ -5,8 +5,7 @@ let salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrg
 let salesOrgEmpAssignmentService = window.dMSpro.oMS.mdmService.controllers.salesOrgEmpAssignments.salesOrgEmpAssignment;
 let employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
 let popup, tree, grid, form, context, popupInstance, treeInstance, gridInstance, formInstance, contextMenu, dataGridContainer
-let salesOrgHierarchyIdFilter = null, sendMode = 0, SalesOrgHeaderModel = null, salesOrgHeaderIdFilter = null, salesOrgHeaderId = null
-
+let salesOrgHierarchyIdFilter = null, sendMode = 0, SalesOrgHeaderModel = null, salesOrgHeaderIdFilter = null, salesOrgHeaderId = null, zoneCount = 0, routeCount = 0
 /** Create global notification */
 let notify = (option) => {
     obj = { type: "success", position: "bottom left", message: "Message Placeholder", ...option };
@@ -130,15 +129,25 @@ let store = {
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
-            salesOrgHierarchyService.getListDevextremes({ filter: JSON.stringify([["salesOrgHeaderId", "=", docId], "and", ["isDeleted", "=", false]]) })
+            const args = {};
+            if (!loadOptions.filter)
+                loadOptions.filter = [["salesOrgHeaderId", "=", docId], "and", ["isDeleted", "=", false]]
+            if (loadOptions.filter)
+                loadOptions.filter = [...loadOptions.filter, 'and', ["salesOrgHeaderId", "=", docId], "and", ["isDeleted", "=", false]]
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            salesOrgHierarchyService.getListDevextremes(args)
                 .done(result => {
+                    currentTreeTotalCount = result.totalCount
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
                         groupCount: result.groupCount,
                     });
                 });
-
             return deferred.promise();
         },
         byKey: function (key) {
