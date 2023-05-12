@@ -27,6 +27,11 @@
                 placeholder: l('DefaultOption:SelectBox:PlaceHolder'),
             }
         })
+        DevExpress.ui.dxNumberBox.defaultOptions({
+            options: {
+                min: 0
+            }
+        })
         console.log("DefaultOptions Loaded");
     })()
     if (!abp.currentTenant?.id) {
