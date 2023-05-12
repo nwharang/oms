@@ -8,13 +8,9 @@ $(function () {
     let itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
     let geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
 
-
-
-
     let salesOrgHierarchyId = null;
     let popup, popupInstance, grid, gridInstance
     /****custom store*****/
-
 
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
@@ -133,7 +129,7 @@ $(function () {
             if (loadOptions.filter == null) {
                 loadOptions.filter = ["salesOrgHierarchyId", "=", salesOrgHierarchyId];
             } else {
-                loadOptions.filter = [loadOptions.filter, "and", ["salesOrgHierarchyId", "=", salesOrgHierarchyId]];
+                loadOptions.filter = [...loadOptions.filter, "and", ["salesOrgHierarchyId", "=", salesOrgHierarchyId]];
             }
 
             const args = {};
@@ -143,14 +139,22 @@ $(function () {
                 }
             });
             const deferred = $.Deferred();
-            companyInZoneService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
+            if (salesOrgHierarchyId)
+                companyInZoneService.getListDevextremes(args)
+                    .done(result => {
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount,
+                        });
                     });
-                });
+            else
+                deferred.resolve({
+                    data: [],
+                    totalCount: 0,
+                    summary: 0,
+                    groupCount: 0,
+                })
 
             return deferred.promise();
         },
@@ -326,8 +330,12 @@ $(function () {
 
     //DataGrid - Company Assgin
     var companyAssginContainer = $('#companyAssgin').dxDataGrid({
-        dataSource: companyInZoneStore,
-        //keyExpr: "id",
+        dataSource: {
+            store: companyInZoneStore,
+            filter: ["endDate", '>', moment().format('YYYY-MM-DD')],
+            paginate: true,
+            pageSize
+        },
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
@@ -342,12 +350,12 @@ $(function () {
         dateSerializationFormat: "yyyy-MM-dd",
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -357,26 +365,6 @@ $(function () {
             allowUpdating: abp.auth.isGranted('MdmService.CompanyInZones.Edit'),
             allowDeleting: abp.auth.isGranted('MdmService.CompanyInZones.Delete'),
             useIcons: true,
-            // texts: {
-            //     editRow: l("Edit"),
-            //     deleteRow: l("Delete"),
-            //     confirmDeleteMessage: l("DeleteConfirmationMessage")
-            // },
-            // popup: {
-            //     showTitle: false,
-            //     width: 400,
-            //     height: 280
-            // },
-            // form: {
-            //     items: [
-            //         {
-            //             itemType: 'group',
-            //             colCount: 1,
-            //             colSpan: 2,
-            //             items: ["companyId", "effectiveDate", "endDate", "isBase"],
-            //         }
-            //     ],
-            // }
         },
         onRowInserting: function (e) {
             e.data.salesOrgHierarchyId = salesOrgHierarchyId;
@@ -432,25 +420,23 @@ $(function () {
                 type: 'buttons',
                 width: 120,
                 buttons: ['edit', 'delete'],
-                // fixedPosition: 'left'
             },
             {
                 caption: l("CompanyInZone.Company"),
                 dataField: "companyId",
                 allowSearch: false,
-                calculateDisplayValue(rowData) {
-                    if (rowData.company) return rowData.company.name;
-                    else return "";
-                }, //: "company.name",
+                calculateDisplayValue: (rowData) => {
+                    if (rowData?.company)
+                        return rowData.company.name;
+                    return
+                },
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource(options) {
-                        return {
-                            store: companyStore,
-                            filter: options.data ? ["!", ["id", "=", options.data.companyId]] : null,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
-                        };
+                    dataSource: {
+                        store: companyStore,
+                        filter: [['active', '=', true], 'and', ['endDate', '>', moment().format('YYYY-MM-DD')]],
+                        paginate: true,
+                        pageSize
                     },
                     displayExpr: 'name',
                     valueExpr: 'id'
