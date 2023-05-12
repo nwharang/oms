@@ -2,14 +2,16 @@ function renderForm(e, headerData) {
     if (!form) form = $('<div id="form">')
     form.dxForm({
         labelMode: "floatting",
-        colCount: 9,
+        colCount: 8,
         formData: headerData,
         items: [
             {
                 dataField: 'code',
                 editorType: 'dxTextBox',
+                colSpan: 3,
                 editorOptions: {
                     maxLength: 20,
+                    readOnly: headerData.status >= 0
                 },
                 validationRules: [
                     {
@@ -21,15 +23,12 @@ function renderForm(e, headerData) {
                         message: l('ValidateError:Code')
                     }
                 ],
-                editorOptions: {
-                    readOnly: headerData.status >= 0
-                }
             },
             {
                 label: l("EntityFieldName:MDMService:PriceUpdate:PriceList"),
                 dataField: 'priceListId',
                 editorType: 'dxSelectBox',
-                colSpan: 2,
+                colSpan: 3,
                 editorOptions: {
                     dataSource: store.priceListStore,
                     displayExpr(e) {
@@ -39,15 +38,6 @@ function renderForm(e, headerData) {
                         return "";
                     },
                     valueExpr: "id",
-                    readOnly: headerData.status >= 0
-                }
-            },
-            {
-                label: l('EntityFieldName:MDMService:PriceUpdate:Description'),
-                dataField: 'description',
-                editorType: 'dxTextBox',
-                colSpan: 4,
-                editorOptions: {
                     readOnly: headerData.status >= 0
                 }
             },
@@ -64,11 +54,11 @@ function renderForm(e, headerData) {
                     width: '100%',
                     onClick(event) {
                         popupInstance.beginUpdate()
+                        if (!formInstance.validate().inValid) return
                         switch (headerData.status) {
                             default:
                                 dataSend = {
                                     code: headerData.code,
-                                    description: headerData.description || "",
                                     priceListId: headerData.priceListId || ""
                                 };
                                 priceUpdateService.create(dataSend, { contentType: "application/json" }).done(e => {

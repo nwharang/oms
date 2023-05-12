@@ -653,16 +653,11 @@ $(function () {
                                 dataType: 'number',
                                 validationRules: [{ type: "required" }]
                             },
-                            {
-                                caption: l("EntityFieldName:MDMService:PriceListDetail:Description"),
-                                dataField: "description",
-                                dataType: "string",
-                            }
                         ],
                         onRowUpdating: (e) => {
-                            let { uomId, itemId, concurrencyStamp, description, basedOnPrice } = e.oldData
+                            let { uomId, itemId, concurrencyStamp, basedOnPrice } = e.oldData
                             let newData = {
-                                uomId, itemId, concurrencyStamp, description, basedOnPrice,
+                                uomId, itemId, concurrencyStamp, basedOnPrice,
                                 ...e.newData,
                             }
                             e.newData = newData;
