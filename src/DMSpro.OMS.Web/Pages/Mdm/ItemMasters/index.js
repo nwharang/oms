@@ -54,7 +54,12 @@
                 id: 1,
                 text: l('EntityFieldValue:MDMService:Item:IssueMethod:SERIAL')
             }
-
+        ],
+        issueMethod1: [
+            {
+                id: 0,
+                text: l('EntityFieldValue:MDMService:Item:IssueMethod:FEFO')
+            },
         ],
         itemTypes: [
             {
@@ -359,17 +364,27 @@
                                             switch (e.selectedItem.id) {
                                                 case 0:
                                                     expiredType.option('readOnly', true)
-                                                    expiredValue.option('readOnly', true)
                                                     expiredType.option('value', null)
+                                                    expiredValue.option('readOnly', true)
+                                                    expiredValue.option('value', null)
+                                                    issueMethod.option('dataSource', enumValue.issueMethod)
+                                                    issueMethod.option('readOnly', false)
+                                                    issueMethod.option('value', 0)
                                                     break;
                                                 case 1:
                                                     expiredType.option('readOnly', false)
                                                     expiredValue.option('readOnly', false)
+                                                    issueMethod.option('dataSource', enumValue.issueMethod1)
+                                                    issueMethod.option('readOnly', false)
                                                     issueMethod.option('value', 0)
                                                     break;
                                                 case 2:
                                                     expiredType.option('readOnly', true)
+                                                    expiredType.option('value', null)
                                                     expiredValue.option('readOnly', true)
+                                                    expiredValue.option('value', null)
+                                                    issueMethod.option('dataSource', enumValue.issueMethod)
+                                                    issueMethod.option('readOnly', true)
                                                     issueMethod.option('value', 1)
                                                     break;
                                                 default:
@@ -548,7 +563,23 @@
             type: 'localStorage',
             storageKey: 'dataGridItemMasters',
         },
-        ...genaralConfig('Items'),
+        export: {
+            enabled: true,
+        },
+        onExporting: function (e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Companies');
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
+                });
+            });
+            e.cancel = true;
+        },
         headerFilter: {
             visible: true,
         },
