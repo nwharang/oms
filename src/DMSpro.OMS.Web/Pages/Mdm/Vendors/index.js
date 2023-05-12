@@ -166,7 +166,6 @@ $(function () {
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
-        remoteOperations: true,
         showRowLines: true,
         showBorders: true,
         cacheEnabled: true,
