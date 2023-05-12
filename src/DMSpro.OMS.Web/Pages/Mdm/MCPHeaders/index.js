@@ -1,6 +1,5 @@
-﻿var l = abp.localization.getResource("OMS");
-var l1 = abp.localization.getResource("OMS");
-$(function () {
+﻿$(function () {
+    var l = abp.localization.getResource("OMS");
     var mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
     var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
 
@@ -56,8 +55,6 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            console.log(args);
-
             mCPHeaderService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -90,7 +87,6 @@ $(function () {
             editing: {
                 mode: "row",
                 allowAdding: abp.auth.isGranted('MdmService.MCPs.Create'),
-                // allowUpdating: abp.auth.isGranted('MdmService.MCPs.Edit'),
                 allowDeleting: abp.auth.isGranted('MdmService.MCPs.Delete'),
                 useIcons: true,
                 texts: {
@@ -99,25 +95,8 @@ $(function () {
                     confirmDeleteMessage: l("DeleteConfirmationMessage")
                 }
             },
-            //remoteOperations: true,
-            export: {
-                enabled: true,
-            },
-            onExporting(e) {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Data');
-
-                DevExpress.excelExporter.exportDataGrid({
-                    component: e.component,
-                    worksheet,
-                    autoFilterEnabled: true,
-                }).then(() => {
-                    workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
-                    });
-                });
-                e.cancel = true;
-            },
+            remoteOperations: true,
+            ...genaralConfig('MCPHeader'),
             showRowLines: true,
             showBorders: true,
             allowColumnReordering: true,
@@ -145,19 +124,19 @@ $(function () {
             searchPanel: {
                 visible: true
             },
-            //stateStoring: { //save state in localStorage
-            //    enabled: true,
-            //    type: 'localStorage',
-            //    storageKey: 'dgMCPHeaders',
-            //},
+            stateStoring: {
+                enabled: true,
+                type: 'localStorage',
+                storageKey: 'dgMCPHeaders',
+            },
             paging: {
                 enabled: true,
-                pageSize: pageSize
+                pageSize
             },
             pager: {
                 visible: true,
                 showPageSizeSelector: true,
-                allowedPageSizes: allowedPageSizes,
+                allowedPageSizes,
                 showInfo: true,
                 showNavigationButtons: true
             },
@@ -180,7 +159,6 @@ $(function () {
                         options: {
                             icon: "import",
                             elementAttr: {
-                                //id: "import-excel",
                                 class: "import-excel",
                             },
                             onClick(e) {
@@ -221,34 +199,6 @@ $(function () {
                     },
                 },
                 {
-                    caption: "Route",
-                    dataField: "routeId",
-                    lookup: {
-                        dataSource() {
-                            return {
-                                store: salesOrgHierarchyStore,
-                                paginate: true,
-                                pageSize: pageSizeForLookup,
-                                filter: ["isRoute", "=", true]
-                            };
-                        },
-                        displayExpr: 'name',
-                        valueExpr: 'id',
-                        searchEnabled: true,
-                        searchMode: 'contains',
-                        minSearchLength: 2,
-                        showDataBeforeSearch: true
-                    }
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPHeader:CompanyName"),
-                    dataField: "company.name",
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPHeader:ItemGroup"),
-                    dataField: "itemGroup.name",
-                },
-                {
                     caption: l("EntityFieldName:MDMService:MCPHeader:Code"),
                     dataField: "code",
                     validationRules: [
@@ -264,7 +214,36 @@ $(function () {
                 },
                 {
                     caption: l("EntityFieldName:MDMService:MCPHeader:Name"),
-                    dataField: "name"
+                    dataField: "name",
+                    dataType: 'string'
+                },
+                {
+                    caption: "Route",
+                    dataField: "routeId",
+                    lookup: {
+                        dataSource: {
+                            store: salesOrgHierarchyStore,
+                            filter: ["isRoute", "=", true],
+                            paginate: true,
+                            pageSize,
+                        },
+                        displayExpr: 'name',
+                        valueExpr: 'id',
+                        searchEnabled: true,
+                        searchMode: 'contains',
+                        minSearchLength: 2,
+                        showDataBeforeSearch: true
+                    }
+                },
+                {
+                    caption: l("EntityFieldName:MDMService:MCPHeader:CompanyName"),
+                    dataField: "company.name",
+                    dataType: 'string'
+                },
+                {
+                    caption: l("EntityFieldName:MDMService:MCPHeader:ItemGroup"),
+                    dataField: "itemGroup.name",
+                    dataType: 'string'
                 },
                 {
                     caption: l("EntityFieldName:MDMService:MCPHeader:EffectiveDate"),
