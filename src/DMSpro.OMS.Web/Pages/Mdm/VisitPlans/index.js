@@ -47,9 +47,8 @@ $(function () {
             if (loadOptions.filter == null) {
                 loadOptions.filter = ['dateVisit', '>', moment().format('YYYY-MM-DD')];
             } else {
-                loadOptions.filter = [loadOptions.filter, "and", ['dateVisit', '>', moment().format('YYYY-MM-DD')]];
+                loadOptions.filter = [...loadOptions.filter, "and", ['dateVisit', '>', moment().format('YYYY-MM-DD')]];
             }
-
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
@@ -154,8 +153,12 @@ $(function () {
 
     var dgVisitPlans = $('#dgVisitPlans').dxDataGrid({
         key: 'id',
-        dataSource: visitPlansStore,
-        //remoteOperations: true,
+        dataSource: {
+            store: visitPlansStore,
+            paginate: true,
+            pageSize
+        },
+        remoteOperations: true,
         showRowLines: true,
         showBorders: true,
         allowColumnReordering: true,
@@ -279,12 +282,6 @@ $(function () {
                 dataType: 'string',
 
                 allowEditing: false,
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: 'Route code is required'
-                    }
-                ]
             },
             {
                 dataField: 'customer.name',
@@ -303,44 +300,24 @@ $(function () {
                 caption: l('EntityFieldName:MDMService:VisitPlan:DateVisit'),
                 dataType: 'date',
                 format: 'dd/MM/yyyy',
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: ''
-                    }
-                ]
-            },
-            {
-                dataField: 'company.name',
-                caption: l("EntityFieldName:MDMService:VisitPlan:CompanyCode"),
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: 'Company is required'
-                    }
-                ],
-                allowEditing: false,
-                //editorType: 'dxSelectBox',
-                //lookup: {
-                //    dataSource: getMCPHeaders,
-                //    valueExpr: 'id',
-                //    displayExpr: function (e) {
-                //        return e.code + ' - ' + e.name
-                //    }
-                //}
             },
             {
                 dataField: 'itemGroupId',
                 caption: l('EntityFieldName:MDMService:VisitPlan:ItemGroup'),
-                editorType: 'dxSelectBox',
+                dataType: 'string',
+                calculateDisplayValue: (e) => {
+                    if (e?.itemGroup)
+                        return e.itemGroup.name
+                    return
+                },
                 lookup: {
-                    dataSource: getItemGroup,
+                    dataSource: {
+                        store: getItemGroup,
+                        paginate: true,
+                        pageSize
+                    },
                     valueExpr: 'id',
-                    displayExpr: function (e) {
-                        if (e)
-                            return e.code + ' - ' + e.name
-                        return
-                    }
+                    displayExpr: 'name'
                 },
                 allowEditing: false,
             },
