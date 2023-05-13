@@ -87,6 +87,7 @@ $(function () {
     //DataGrid - Employee Profile
     const dataGridContainer = $('#dataGridContainer').dxDataGrid({
         dataSource: employeeProfileStore,
+        remoteOperations: true,
         showRowLines: true,
         showBorders: true,
         cacheEnabled: true,
