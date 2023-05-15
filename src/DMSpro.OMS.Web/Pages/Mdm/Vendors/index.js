@@ -229,23 +229,6 @@ $(function () {
                 "addRowButton",
                 "columnChooserButton",
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
                 "searchPanel"
             ],
         },
@@ -256,16 +239,6 @@ $(function () {
                 width: 90,
                 buttons: ['edit', 'delete'],
                 fixedPosition: 'left'
-            },
-            {
-                dataField: 'id',
-                caption: l("Id"),
-                dataType: 'string',
-                allowEditing: false,
-                visible: false,
-                formItem: {
-                    visible: false
-                },
             },
             {
                 dataField: 'code',
@@ -521,5 +494,4 @@ $(function () {
             // },
         ],
     }).dxDataGrid("instance");
-    initImportPopup('api/mdm-service/vendors', 'Vendors_Template', 'dgVendors');
 });
