@@ -1,13 +1,14 @@
 ﻿
 $(function () {
-    var l = abp.localization.getResource("OMS");
-    var visitPlansService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
-    var mcpHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
-    var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
-    var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
-    var mcpDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
+    let l = abp.localization.getResource("OMS");
+    let visitPlansService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
+    let mcpHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
+    let itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
+    let customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
+    let mcpDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
+    let salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
 
-    const dayOfWeek = [
+    let dayOfWeek = [
         {
             id: 1,
             text: l('EntityFieldValue:MDMService:VisitPlan:DayOfWeek:MONDAY')
@@ -38,17 +39,44 @@ $(function () {
         }
     ]
 
+    let salesOrgHierarchyStore = new DevExpress.data.CustomStore({
+        key: 'id',
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            salesOrgHierarchyService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == undefined) return null;
+            var d = new $.Deferred();
+            salesOrgHierarchyService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                });
+            return d.promise();
+        }
+    });
 
     const visitPlansStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
-            if (loadOptions.filter == null) {
-                loadOptions.filter = ['dateVisit', '>', moment().format('YYYY-MM-DD')];
-            } else {
-                loadOptions.filter = [...loadOptions.filter, "and", ['dateVisit', '>', moment().format('YYYY-MM-DD')]];
-            }
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
@@ -153,12 +181,10 @@ $(function () {
         key: 'id',
         dataSource: {
             store: visitPlansStore,
-            paginate: true,
-            pageSize
+            filter: ['dateVisit', '>', moment().format('YYYY-MM-DD')],
         },
         editing: {
             mode: "row",
-            allowAdding: abp.auth.isGranted('MdmService.VisitPlans.Create'),
             allowUpdating: abp.auth.isGranted('MdmService.VisitPlans.Edit'),
             allowDeleting: abp.auth.isGranted('MdmService.VisitPlans.Delete'),
             useIcons: true,
@@ -220,19 +246,19 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'dgVisitPlans',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'dgVisitPlans',
+        // },
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -250,6 +276,7 @@ $(function () {
                         <span class="">Change Visit Plans</span>
                     </button>`
                 },
+                "addRowButton",
                 "columnChooserButton",
                 "exportButton",
                 // {
@@ -284,21 +311,43 @@ $(function () {
                 dataField: 'isCommando',
                 caption: l("EntityFieldName:MDMService:VisitPlan:IsCommando"),
                 dataType: 'boolean',
+                width: 110,
                 allowEditing: false,
-                width: 110
             },
             {
-                dataField: 'route.name',
+                dataField: 'routeId',
                 caption: l("EntityFieldName:MDMService:VisitPlan:RouteCode"),
                 dataType: 'string',
+                calculateDisplayValue: (e) => e?.route?.name,
+                lookup: {
+                    dataSource: {
+                        store: salesOrgHierarchyStore,
+                        // This filter for filterRow only
+                        filter: ["isRoute", "=", true],
+                        paginate: true,
+                        pageSize
+                    },
+                    displayExpr: 'name',
+                    valueExpr: 'id'
+                },
                 allowEditing: false,
             },
             {
-                dataField: 'customer.name',
+                dataField: 'customerId',
                 caption: l("EntityFieldName:MDMService:VisitPlan:CustomerCode"),
                 validationRules: [{ type: 'required' }],
                 editorType: 'dxSelectBox',
                 allowEditing: false,
+                calculateDisplayValue: (e) => e?.customer?.name,
+                lookup: {
+                    dataSource: {
+                        store: getCustomer,
+                        paginate: true,
+                        pageSize
+                    },
+                    displayExpr: 'name',
+                    valueExpr: 'id'
+                },
             },
             {
                 dataField: 'dateVisit',
@@ -327,6 +376,15 @@ $(function () {
                 dataType: 'string',
                 calculateDisplayValue: (e) => e?.itemGroup?.name,
                 allowEditing: false,
+                lookup: {
+                    dataSource: {
+                        store: getItemGroup,
+                        paginate: true,
+                        pageSize
+                    },
+                    valueExpr: 'id',
+                    displayExpr: 'name',
+                }
             },
             {
                 dataField: 'week',
@@ -367,7 +425,6 @@ $(function () {
             {
                 dataField: 'dayOfWeek',
                 caption: l('EntityFieldName:MDMService:VisitPlan:DayOfWeek'),
-                //editorType: 'dxSelectBox',
                 lookup: {
                     dataSource: dayOfWeek,
                     valueExpr: 'id',
@@ -378,7 +435,8 @@ $(function () {
             {
                 dataField: 'mcpDetailId',
                 caption: l('MCP Detail'),
-                //allowEditing: false,
+                allowEditing: false,
+                calculateDisplayValue: (e) => e?.mcpDetail?.code,
                 visible: false,
             }
         ],
@@ -460,7 +518,6 @@ $(function () {
                         selected.forEach(u => {
                             ids.push(u.id)
                         });
-                        console.log(val);
                         visitPlansService.updateMultiple(ids, moment(val).format('YYYY-MM-DD HH:mm:ss'), isCommando, { contentType: "application/json" }).done(result => {
                             abp.message.success(l('Congratulations'));
                             popupChangeVisitPlan.hide();
