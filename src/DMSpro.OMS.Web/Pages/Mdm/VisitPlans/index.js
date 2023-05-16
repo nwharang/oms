@@ -87,7 +87,6 @@ $(function () {
 
     const getItemGroup = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -120,7 +119,6 @@ $(function () {
 
     const getCustomer = new DevExpress.data.CustomStore({
         key: "id",
-        loadMode: 'processed',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -158,6 +156,18 @@ $(function () {
             paginate: true,
             pageSize
         },
+        editing: {
+            mode: "row",
+            allowAdding: abp.auth.isGranted('MdmService.VisitPlans.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.VisitPlans.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.VisitPlans.Delete'),
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            }
+        },
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
@@ -190,7 +200,6 @@ $(function () {
         },
         export: {
             enabled: true,
-            // formats: ['excel','pdf'],
             allowExportSelectedData: true,
         },
         onExporting(e) {
@@ -228,12 +237,8 @@ $(function () {
             showNavigationButtons: true
         },
         onRowUpdating: function (e) {
-            var objectRequire = ['code', 'name'];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+            let { dateVisit, distance, visitOrder, mcpDetailId, customerId, routeId, itemGroupId, isCommando } = Object.assign({}, e.oldData, e.newData);
+            e.newData = { dateVisit, distance, visitOrder, mcpDetailId, customerId, routeId, itemGroupId, isCommando }
         },
         toolbar: {
             items: [
@@ -268,7 +273,13 @@ $(function () {
             ],
         },
         columns: [
-
+            {
+                type: 'buttons',
+                caption: l('Actions'),
+                buttons: ['edit', 'delete'],
+                width: 110,
+                fixedPosition: 'left'
+            },
             {
                 dataField: 'isCommando',
                 caption: l("EntityFieldName:MDMService:VisitPlan:IsCommando"),
@@ -280,18 +291,12 @@ $(function () {
                 dataField: 'route.name',
                 caption: l("EntityFieldName:MDMService:VisitPlan:RouteCode"),
                 dataType: 'string',
-
                 allowEditing: false,
             },
             {
                 dataField: 'customer.name',
                 caption: l("EntityFieldName:MDMService:VisitPlan:CustomerCode"),
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: ''
-                    }
-                ],
+                validationRules: [{ type: 'required' }],
                 editorType: 'dxSelectBox',
                 allowEditing: false,
             },
@@ -302,47 +307,26 @@ $(function () {
                 format: 'dd/MM/yyyy',
             },
             {
-                dataField: 'itemGroupId',
-                caption: l('EntityFieldName:MDMService:VisitPlan:ItemGroup'),
-                dataType: 'string',
-                calculateDisplayValue: (e) => {
-                    if (e?.itemGroup)
-                        return e.itemGroup.name
-                    return
-                },
-                lookup: {
-                    dataSource: {
-                        store: getItemGroup,
-                        paginate: true,
-                        pageSize
-                    },
-                    valueExpr: 'id',
-                    displayExpr: 'name'
-                },
-                allowEditing: false,
-            },
-            {
                 dataField: 'distance',
                 caption: l('EntityFieldName:MDMService:VisitPlan:Distance'),
                 dataType: 'number',
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: ''
-                    }
-                ],
-                allowEditing: false,
+                validationRules: [{ type: 'required' }],
             },
             {
                 dataField: 'visitOrder',
                 caption: l('EntityFieldName:MDMService:VisitPlan:VisitOrder'),
                 dataType: 'number',
-                validationRules: [
-                    {
-                        type: 'required',
-                        message: ''
-                    }
-                ],
+                editorOptions: {
+                    format: '#'
+                },
+                validationRules: [{ type: 'required' }],
+            },
+            {
+                dataField: 'itemGroupId',
+                caption: l('EntityFieldName:MDMService:VisitPlan:ItemGroup'),
+                dataType: 'string',
+                calculateDisplayValue: (e) => e?.itemGroup?.name,
+                allowEditing: false,
             },
             {
                 dataField: 'week',
@@ -499,6 +483,4 @@ $(function () {
     }).dxPopup('instance');
 
     $('#ChangeVisitPlanButton').click(function () { $('#popupChangeVisitPlan').data('dxPopup').show(); });
-
-    // initImportPopup('api/mdm-service/visit-plans', 'VisitPlans_Template', 'dgVisitPlans');
 });
