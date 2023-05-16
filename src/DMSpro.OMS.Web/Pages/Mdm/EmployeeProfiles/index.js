@@ -2,15 +2,7 @@ $(function () {
     var l = abp.localization.getResource("OMS");
     var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
     var workingPositionService = window.dMSpro.oMS.mdmService.controllers.workingPositions.workingPosition;
-    var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
-    var employeeProfileImageService = window.dMSpro.oMS.mdmService.controllers.employeeImages.employeeImage;
 
-    var urlUploadFile = `${abp.appPath}api/mdm-service/employee-images/avatar`;
-    var urlGetFile = `${abp.appPath}api/mdm-service/employee-images/get-file`;
-    var files = [];
-    var rowEditing = -1;
-
-    /****custom store*****/
     var employeeProfileStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
@@ -33,13 +25,7 @@ $(function () {
             return deferred.promise();
         },
         insert(values) {
-            const deferred = $.Deferred();
-            employeeProfileService.create(values, { contentType: "application/json" }).done(result => {
-                //uploadAvatar(result.data.id);
-                deferred.resolve(result.data);
-            });;
-
-            return deferred.promise();
+            return employeeProfileService.create(values, { contentType: "application/json" })
         },
         update(key, values) {
             return employeeProfileService.update(key, values, { contentType: "application/json" });
@@ -83,9 +69,7 @@ $(function () {
         }
     });
 
-    /****control*****/
-    //DataGrid - Employee Profile
-    const dataGridContainer = $('#dataGridContainer').dxDataGrid({
+    let dataGridContainer = $('#dataGridContainer').dxDataGrid({
         dataSource: employeeProfileStore,
         remoteOperations: true,
         showRowLines: true,
@@ -150,14 +134,6 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
-        onInitNewRow(e) {
-            rowEditing = -1;
-            e.data.active = true;
-            e.data.effectiveDate = new Date()
-        },
-        onEditingStart(e) {
-            rowEditing = e.component.getRowIndexByKey(e.key);
-        },
         editing: {
             mode: 'popup',
             allowAdding: abp.auth.isGranted('MdmService.EmployeeProfiles.Create'),
@@ -171,8 +147,9 @@ $(function () {
             },
             popup: {
                 title: l("Page.Title.EmployeeProfiles"),
-                width: '99%',
-                height: 'fit-content'
+                height: 'fit-content',
+                hideOnOutsideClick: false,
+                dragEnabled: false,
             },
             form: {
                 items: [
@@ -180,21 +157,12 @@ $(function () {
                         itemType: 'group',
                         colCount: 1,
                         colSpan: 1,
-                        items: [
-                            {
-                                dataField: 'Avatar',
-                                template: function (data, itemElement) {
-                                    renderAvatarField(data, itemElement);
-                                }
-                            }
-                        ]
                     },
                     {
                         itemType: 'group',
                         colCount: 1,
                         colSpan: 2,
-                        items:
-                            ['erpCode', 'firstName', 'lastName', 'workingPositionId']
+                        items: ['erpCode', 'firstName', 'lastName', 'workingPositionId']
                     },
                     {
                         itemType: 'group',
@@ -213,22 +181,23 @@ $(function () {
                                 editorOptions: {
                                     format: 'dd/MM/yyyy',
                                 },
-                            }
-                            , 'active']
+                            }, 'active'
+                        ]
                     }
                 ],
             }
         },
+        onInitNewRow(e) {
+            e.data.active = true;
+            e.data.effectiveDate = new Date()
+        },
         onRowInserting: e => {
             if (!e.data.effectiveDate) e.data.effectiveDate = moment().format('yyyy-MM-DD')
         },
-        onRowUpdating: function (e) {
-            var objectRequire = ["erpCode", "firstName", "lastName", "dateOfBirth", "idCardNumber", "email", "phone", "address", "active", "effectiveDate", "endDate", "workingPositionId", "employeeTypeId"];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+        onRowUpdating: (e) => {
+            let { erpCode, firstName, lastName, dateOfBirth, idCardNumber, email, phone, address, active, effectiveDate, endDate, workingPositionId, employeeTypeId } = Object.assign({}, e.oldData, e.newData);
+            if (!email) email = null
+            e.newData = { erpCode, firstName, lastName, dateOfBirth, idCardNumber, email, phone, address, active, effectiveDate, endDate, workingPositionId, employeeTypeId }
         },
         onEditorPreparing: function (e) {
             if (e.dataField == "workingPositionId") {
@@ -373,15 +342,8 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:JobTittle"),
                 dataField: "workingPositionId",
-                //calculateDisplayValue: "workingPosition.name",
                 allowSearch: false,
-                calculateDisplayValue(rowData) {
-                    //console.log(rowData.geoLevel2);
-                    if (rowData.workingPosition) {
-                        return rowData.workingPosition.name;
-                    }
-                    return "";
-                },
+                calculateDisplayValue: (e) => e?.workingPosition?.name,
                 dataType: 'string',
                 lookup: {
                     dataSource(e) {
@@ -415,103 +377,9 @@ $(function () {
                 dataField: "active",
                 dataType: 'boolean',
                 alignment: 'center',
-                cellTemplate(container, options) {
-                    $('<div>').append($(options.value ? '<i class="fa fa-check"></i>' : '<i class= "fa fa-times"></i>')).appendTo(container);
-                }
             }
         ]
     }).dxDataGrid("instance");
-
-    function uploadAvatar(employeeProfileId) {
-        if (files.length === 0)
-            return;
-
-        var formData = new FormData();
-        formData.append("file", files[0]);
-
-        $.ajax({
-            type: "POST",
-            url: `${urlUploadFile}?EmployeeProfileId=${employeeProfileId}`,
-            async: true,
-            processData: false,
-            mimeType: 'multipart/form-data',
-            contentType: false,
-            data: formData,
-            success: function (data) {
-                files = [];
-            },
-            error: function (msg) {
-                console.log(msg.responseText.error);
-            },
-        });
-    }
-
-    function renderAvatarField(data, itemElement) {
-        itemElement.append($("<img>").attr({
-            id: "img-avatar",
-            src: "/images/default-avatar-image.jpg",
-            style: "border-radius: 50%",
-        }));
-        var selectedRowsData = dataGridContainer.getVisibleRows()[rowEditing];
-
-        if (selectedRowsData) {
-            getEmployeeImageAvatar(selectedRowsData.data.id).done(fileId => {
-                if (fileId !== "") {
-                    getFileAvatar(fileId, function (dataUrl) {
-                        $("#img-avatar").attr("src", dataUrl);
-                    });
-                }
-            });
-        }
-
-        itemElement.append($("<div>").attr("id", "file-uploader").dxFileUploader({
-            selectButtonText: 'Select photo',
-            labelText: '',
-            accept: 'image/*',
-            uploadMethod: 'POST',
-            uploadMode: selectedRowsData ? 'instantly' : 'useButtons',
-            onValueChanged(e) {
-                files = e.value;
-                $("#img-avatar").attr("src", URL.createObjectURL(files[0]));
-            },
-            uploadFile: function (file, progressCallback) {
-                if (!selectedRowsData)
-                    return;
-
-                uploadAvatar(selectedRowsData.data.id);
-            }
-        }));
-    }
-
-    function getFileAvatar(fileId, callback) {
-        toDataURL(`${urlGetFile}?id=${fileId}`, callback);
-    }
-
-    function toDataURL(url, callback) {
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-            var reader = new FileReader();
-            reader.onloadend = function () {
-                callback(reader.result);
-            }
-            reader.readAsDataURL(xhr.response);
-        };
-        xhr.open('GET', url);
-        xhr.responseType = 'blob';
-        xhr.send();
-    }
-
-    function getEmployeeImageAvatar(employeeProfileId) {
-        var d = new $.Deferred();
-        employeeProfileImageService.getList({ isAvatar: true, employeeProfileId: employeeProfileId }).done(result => {
-            if (result.items.length > 0) {
-                d.resolve(result.items[0].employeeImage.fileId);
-            }
-            d.resolve("");
-        });
-
-        return d.promise();
-    }
 
     initImportPopup('api/mdm-service/employee-profiles', 'EmployeeProfiles_Template', 'dataGridContainer');
 });
