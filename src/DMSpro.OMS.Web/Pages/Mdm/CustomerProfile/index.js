@@ -253,10 +253,6 @@
                     }],
             }
         },
-        // onEditingStart(e) {
-        //     e.data.url = "https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_960_720.jpg";
-        //     cusProfile = e.data;
-        // },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
@@ -428,13 +424,6 @@
                 caption: l("License"),
                 dataType: 'string',
                 visible: false,
-                validationRules: [
-                    {
-                        type: 'pattern',
-                        pattern: '^[a-zA-Z0-9]$',
-                        message: l('ValidateError:Code')
-                    }
-                ]
             },
             {
                 dataField: 'taxCode',
@@ -550,7 +539,6 @@
                 caption: l("PriceList"),
                 dataType: 'string',
                 visible: false,
-                //validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource: {
                         store: priceListStore,
