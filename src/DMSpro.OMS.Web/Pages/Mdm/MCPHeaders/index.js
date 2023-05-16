@@ -194,14 +194,13 @@
                     caption: l("Actions"),
                     width: 110,
                     buttons: [{
-                        text: "Edit",
-                        icon: "edit",
-                        hint: "Edit",
+                        text: l('Button.ViewDetail'),
+                        icon: "fieldchooser",
                         onClick: function (e) {
                             var w = window.open('/Mdm/MCPHeaders/Details', '_blank');
                             w.sessionStorage.setItem("MCPModel", JSON.stringify(e.row.data));
                         }
-                    }, 'delete'],
+                    }],
                     fixedPosition: "left",
                 },
                 {
