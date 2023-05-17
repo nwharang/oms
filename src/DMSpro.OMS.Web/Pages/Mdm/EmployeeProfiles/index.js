@@ -3,6 +3,25 @@ $(function () {
     var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
     var workingPositionService = window.dMSpro.oMS.mdmService.controllers.workingPositions.workingPosition;
 
+    var employeeTypeStore = [
+        {
+            id: 0,
+            displayName: l('EntityFieldValue:MDMService:EmployeeType:Salesman')
+        },
+        {
+            id: 1,
+            displayName: l('EntityFieldValue:MDMService:EmployeeType:Deliveryman')
+        },
+        {
+            id: 2,
+            displayName: l('EntityFieldValue:MDMService:EmployeeType:Supervisor')
+        },
+        {
+            id: 3,
+            displayName: l('EntityFieldValue:MDMService:EmployeeType:PromotionGirl')
+        },
+    ];
+
     var employeeProfileStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
@@ -162,7 +181,7 @@ $(function () {
                         itemType: 'group',
                         colCount: 1,
                         colSpan: 2,
-                        items: ['erpCode', 'firstName', 'lastName', 'workingPositionId']
+                        items: ['erpCode', 'firstName', 'lastName', 'workingPositionId', 'employeeType']
                     },
                     {
                         itemType: 'group',
@@ -195,9 +214,9 @@ $(function () {
             if (!e.data.effectiveDate) e.data.effectiveDate = moment().format('yyyy-MM-DD')
         },
         onRowUpdating: (e) => {
-            let { erpCode, firstName, lastName, dateOfBirth, idCardNumber, email, phone, address, active, effectiveDate, endDate, workingPositionId, employeeTypeId } = Object.assign({}, e.oldData, e.newData);
+            let { erpCode, firstName, lastName, dateOfBirth, idCardNumber, email, phone, address, active, effectiveDate, endDate, workingPositionId, employeeType } = Object.assign({}, e.oldData, e.newData);
             if (!email) email = null
-            e.newData = { erpCode, firstName, lastName, dateOfBirth, idCardNumber, email, phone, address, active, effectiveDate, endDate, workingPositionId, employeeTypeId }
+            e.newData = { erpCode, firstName, lastName, dateOfBirth, idCardNumber, email, phone, address, active, effectiveDate, endDate, workingPositionId, employeeType }
         },
         onEditorPreparing: function (e) {
             if (e.dataField == "workingPositionId") {
@@ -340,6 +359,17 @@ $(function () {
                 visible: false
             },
             {
+                caption: l("EntityFieldName:MDMService:EmployeeProfile:EmployeeTypeName"),
+                dataField: "employeeType",
+                lookup: {
+                    dataSource: employeeTypeStore,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName',
+                },
+                dataType: 'string',
+                visible: false
+            },
+            {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:JobTittle"),
                 dataField: "workingPositionId",
                 allowSearch: false,
@@ -358,6 +388,7 @@ $(function () {
                     valueExpr: 'id',
                 }
             },
+
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:EffectiveDate"),
                 dataField: "effectiveDate",
