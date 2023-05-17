@@ -8,6 +8,18 @@ $(function () {
             paginate: true,
             pageSize
         },
+        editing: {
+            mode: "row",
+            allowAdding: abp.auth.isGranted('MdmService.CustomerGroups.Create'),
+            allowUpdating: abp.auth.isGranted('MdmService.CustomerGroups.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.CustomerGroups.Delete'),
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            }
+        },
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
@@ -55,19 +67,19 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        // stateStoring: {
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'dgCustomerGroups',
-        // },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgCustomerGroups',
+        },
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -111,15 +123,25 @@ $(function () {
             {
                 caption: l("Actions"),
                 type: 'buttons',
-                width: 80,
-                buttons: [{
-                    text: l('Button.ViewDetail'),
-                    icon: "fieldchooser",
-                    onClick: function (e) {
-                        renderPopup(e.row.data)
+                alignment: 'left',
+                buttons: [
+                    {
+                        text: l('Button.ViewDetail'),
+                        icon: "fieldchooser",
+                        onClick: function (e) {
+                            renderPopup(e.row.data)
+                        },
+                        visible: abp.auth.isGranted('MdmService.CustomerGroups.Edit')
                     },
-                    visible: abp.auth.isGranted('MdmService.CustomerGroups.Edit')
-                }],
+                    {
+                        name: 'edit',
+                        visible: (e) => e.row.data.status < 1 && !e.row.isEditing,
+                    },
+                    {
+                        name: 'delete',
+                        visible: (e) => e.row.data.status < 1 && !e.row.isEditing,
+                    },
+                ],
                 fixedPosition: 'left'
             },
             {
@@ -159,7 +181,7 @@ $(function () {
                     valueExpr: "id",
                     displayExpr: "text",
                     paginate: true,
-                    pageSize: pageSizeForLookup
+                    pageSize
                 }
             },
             {
