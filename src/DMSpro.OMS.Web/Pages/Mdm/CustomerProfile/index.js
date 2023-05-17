@@ -217,9 +217,6 @@
                                         dataField: 'creditLimit'
                                     },
                                     {
-                                        dataField: 'paymentTermId'
-                                    },
-                                    {
                                         dataField: 'linkedCompanyId',
                                         editorOptions: {
                                             elementAttr: {
@@ -505,12 +502,6 @@
                     min: 0,
                     format: '#'
                 }
-            },
-            {
-                dataField: 'paymentTermId',
-                caption: l("PaymentTerm"),
-                dataType: 'string',
-                visible: false,
             },
             {
                 dataField: 'linkedCompanyId',
