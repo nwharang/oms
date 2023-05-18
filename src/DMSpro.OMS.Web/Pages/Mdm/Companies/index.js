@@ -436,13 +436,6 @@
                 caption: l("EntityFieldName:MDMService:CompanyProfile:License"),
                 dataType: 'string',
                 visible: false,
-                validationRules: [
-                    {
-                        type: 'pattern',
-                        pattern: '^[a-zA-Z0-9]$',
-                        message: l('ValidateError:Code')
-                    }
-                ]
             },
             {
                 dataField: 'taxCode',
@@ -521,12 +514,14 @@
                 dataField: 'effectiveDate',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:EffectiveDate"),
                 dataType: 'date',
+                format: 'dd/MM/yyyy',
                 visible: false,
             },
             {
                 dataField: 'endDate',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:EndDate"),
                 dataType: 'date',
+                format: 'dd/MM/yyyy',
                 visible: false,
             },
             {
