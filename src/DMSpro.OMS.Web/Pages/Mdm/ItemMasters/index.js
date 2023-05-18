@@ -765,7 +765,7 @@
                     dataSource: (options) => {
                         return {
                             store: store.getUOMsGroupDetailStore,
-                            filter: options?.data?.uomGroupId ? ["uomGroupId", "=", options.data.uomGroupId || 0] : null,
+                            filter: options?.data?.uomGroupId ? [["uomGroupId", "=", options.data.uomGroupId || 0], 'and', ['active', '=', true]] : null,
                         }
                     },
                     valueExpr: "altUOMId",
@@ -782,7 +782,7 @@
                     dataSource: (options) => {
                         return {
                             store: store.getUOMsGroupDetailStore,
-                            filter: options?.data?.uomGroupId ? ["uomGroupId", "=", options.data.uomGroupId || 0] : null,
+                            filter: options?.data?.uomGroupId ? [["uomGroupId", "=", options.data.uomGroupId || 0], 'and', ['active', '=', true]] : null,
                         }
                     },
                     valueExpr: "altUOMId",
@@ -800,7 +800,7 @@
                     dataSource: (options) => {
                         return {
                             store: store.getUOMsGroupDetailStore,
-                            filter: options?.data?.uomGroupId ? ["uomGroupId", "=", options.data.uomGroupId || 0] : null,
+                            filter: options?.data?.uomGroupId ? [["uomGroupId", "=", options.data.uomGroupId || 0], 'and', ['active', '=', true]] : null,
                         }
                     },
                     valueExpr: "altUOMId",
