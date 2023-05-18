@@ -154,11 +154,11 @@ $(function () {
             popup: {
                 height: "fit-content"
             },
-            form: {
-                items: [
-                    'name', 'shortname', 'phone1', 'phone2', 'erpCode', 'active', 'linkedCompanyId', 'priceListId', 'address'
-                ]
-            }
+            // form: {
+            //     items: [
+            //         'name', 'shortname', 'phone1', 'phone2', 'erpCode', 'active', 'linkedCompanyId', 'priceListId', 'address'
+            //     ]
+            // }
         },
         onInitNewRow: function (e) {
             e.data.active = true;
@@ -244,6 +244,7 @@ $(function () {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:Vendor:Code"),
                 dataType: 'string',
+                allowEditing: false,
             },
             {
                 dataField: 'name',
