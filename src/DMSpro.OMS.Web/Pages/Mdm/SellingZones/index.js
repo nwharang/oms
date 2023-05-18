@@ -332,9 +332,7 @@ $(function () {
     var companyAssginContainer = $('#companyAssgin').dxDataGrid({
         dataSource: {
             store: companyInZoneStore,
-            filter: ["endDate", '>', moment().format('YYYY-MM-DD')],
-            paginate: true,
-            pageSize
+            filter: [["endDate", '>', moment().format('YYYY-MM-DD')], 'or', ['endDate', '=', null]],
         },
         remoteOperations: true,
         showRowLines: true,
@@ -434,7 +432,7 @@ $(function () {
                 lookup: {
                     dataSource: {
                         store: companyStore,
-                        filter: [['active', '=', true], 'and', ['endDate', '>', moment().format('YYYY-MM-DD')]],
+                        filter: [['active', '=', true], 'and', [["endDate", '>', moment().format('YYYY-MM-DD')], 'or', ['endDate', '=', null]]],
                         paginate: true,
                         pageSize
                     },
@@ -479,7 +477,6 @@ $(function () {
     //DataGrid - Customer Assgin
     var customerAssginContainer = $('#customerAssgin').dxDataGrid({
         dataSource: customerInZoneStore,
-        //keyExpr: "id",
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
