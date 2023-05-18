@@ -345,6 +345,9 @@ $(function () {
                 dataType: 'string',
                 validationRules: [
                     {
+                        type: "required"
+                    },
+                    {
                         type: 'pattern',
                         pattern: '^[0-9]{10}$',
                         message: l('ValidateError:Phone')
