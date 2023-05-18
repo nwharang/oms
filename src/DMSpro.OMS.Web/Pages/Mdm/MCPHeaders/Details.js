@@ -1,6 +1,7 @@
-﻿var l = abp.localization.getResource("OMS");
-var MCPModel, mcpDetailData = [], sellingZoneId = null;
-$(function () {
+﻿$(function () {
+    let editingData;
+    let l = abp.localization.getResource("OMS");
+    let MCPModel, mcpDetailData = [], sellingZoneId = null;
     let rendingLoadingPopup = () => {
         let loadingPopup = $('<div />')
         loadingPopup.dxPopup({
@@ -21,20 +22,18 @@ $(function () {
     DevExpress.config({
         editorStylingMode: 'underlined',
     });
-    var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
-    var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
-    var companyInZoneService = window.dMSpro.oMS.mdmService.controllers.companyInZones.companyInZone;
-    var customerInZoneService = window.dMSpro.oMS.mdmService.controllers.customerInZones.customerInZone;
-    var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
-    var mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
-    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
-    var mCPDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
-    var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
-    var visitPlanService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
+    let salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
+    let itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
+    let companyInZoneService = window.dMSpro.oMS.mdmService.controllers.companyInZones.companyInZone;
+    let customerInZoneService = window.dMSpro.oMS.mdmService.controllers.customerInZones.customerInZone;
+    let customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
+    let mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
+    let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+    let mCPDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
+    let visitPlanService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
 
-    var customerStore = new DevExpress.data.CustomStore({
+    let customerStore = new DevExpress.data.CustomStore({
         key: 'customerId',
-        loadMode: 'raw',
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -44,7 +43,6 @@ $(function () {
                         args[i] = JSON.stringify(loadOptions[i]);
                     }
                 });
-
             customerInZoneService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -53,58 +51,20 @@ $(function () {
                         groupCount: result.groupCount,
                     });
                 });
-
-            return deferred.promise();
-        },
-    });
-    var mCPDetailsStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            if (!MCPModel || !MCPModel.id) {
-                deferred.resolve([], {
-                    totalCount: -1,
-                    summary: null,
-                    groupCount: -1,
-                });
-                return deferred.promise();
-            }
-            if (loadOptions.filter == null) {
-                loadOptions.filter = ['mcpHeaderId', '=', MCPModel.id];
-            } else {
-                loadOptions.filter = [loadOptions.filter, "and", ['mcpHeaderId', '=', MCPModel.id]];
-            }
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            mCPDetailsService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
             return deferred.promise();
         },
         byKey: function (key) {
-            if (key == 0) return null;
 
-            var d = new $.Deferred();
-            mCPDetailsService.get(key)
+            if (key == 0) return null;
+            let d = new $.Deferred();
+            customerService.get(key)
                 .done(data => {
                     d.resolve(data);
                 });
             return d.promise();
         },
     });
-    var companyInZoneStore = new DevExpress.data.CustomStore({
+    let companyInZoneStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
             const args = {};
@@ -116,7 +76,7 @@ $(function () {
             const deferred = $.Deferred();
             companyInZoneService.getListDevextremes(args)
                 .done(result => {
-                    var data = [];
+                    let data = [];
                     result.data.forEach(x => {
                         data.push({
                             id: x.company.id,
@@ -135,7 +95,7 @@ $(function () {
         byKey: function (key) {
             if (key == 0) return null;
 
-            var d = new $.Deferred();
+            let d = new $.Deferred();
             companyService.get(key)
                 .done(data => {
                     d.resolve(data);
@@ -144,7 +104,7 @@ $(function () {
         }
     });
 
-    var salesOrgHierarchyStore = new DevExpress.data.CustomStore({
+    let salesOrgHierarchyStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -234,12 +194,6 @@ $(function () {
                         dataField: 'Name',
                         validationRules: [{
                             type: 'required',
-                            message: '',
-                        },
-                        {
-                            type: "stringLength",
-                            max: 100,
-                            message: l('Message.MaximumLength').replace('{0}', 100)
                         }],
                     }
                 ]
@@ -255,14 +209,13 @@ $(function () {
                             message: '',
                         }],
                         editorOptions: {
-                            dataSource: new DevExpress.data.DataSource({
+                            dataSource: {
                                 store: salesOrgHierarchyStore,
                                 filter: [["isRoute", "=", true], 'and', ['salesOrgHeader.status', '=', 1]],
                                 paginate: true,
                                 pageSize
-                            }),
+                            },
                             showClearButton: true,
-                            placeholder: '',
                             valueExpr: "id",
                             displayExpr: "name"
                         }
@@ -277,7 +230,6 @@ $(function () {
                         editorOptions: {
                             readOnly: true,
                             showClearButton: true,
-                            placeholder: '',
                             valueExpr: "id",
                             displayExpr: "name",
                         }
@@ -324,13 +276,12 @@ $(function () {
                         dataField: 'ItemGroup',
                         editorType: 'dxSelectBox',
                         editorOptions: {
-                            dataSource: new DevExpress.data.DataSource({
+                            dataSource: {
                                 store: itemGroupStore,
                                 paginate: true,
                                 pageSize
-                            }),
+                            },
                             showClearButton: true,
-                            placeholder: '',
                             valueExpr: "id",
                             displayExpr: "name",
                         }
@@ -385,17 +336,16 @@ $(function () {
             export: {
                 enabled: true,
             },
-            onExporting(e) {
+            onExporting: function (e) {
                 const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('MCPDetails');
-
+                const worksheet = workbook.addWorksheet('Companies');
                 DevExpress.excelExporter.exportDataGrid({
                     component: e.component,
                     worksheet,
                     autoFilterEnabled: true,
                 }).then(() => {
                     workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'MCPDetails.xlsx');
+                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
                     });
                 });
                 e.cancel = true;
@@ -457,7 +407,7 @@ $(function () {
                             elementAttr: {
                                 class: "import-excel",
                             },
-                            onClick(e) {
+                            onClick: (e) => {
                                 var gridControl = e.element.closest('div.dx-datagrid').parent();
                                 var gridName = gridControl.attr('id');
                                 var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
@@ -468,19 +418,21 @@ $(function () {
                     "searchPanel",
                 ],
             },
-            onEditorPreparing: function (e) {
+            onSaving: (e) => {
+
+            },
+            onEditorPreparing: (e) => {
                 if (e.parentType === "dataRow" && e.dataField === "customerId") {
                     e.editorOptions.onValueChanged = function (ev) {
                         let selectedItem = ev.component.option('selectedItem');
                         e.setValue(selectedItem);
                     }
                 }
-
             },
-            onRowUpdating: function (e) {
+            onRowUpdating: (e) => {
                 e.newData = Object.assign({}, e.oldData, e.newData);
             },
-            onInitNewRow: function (e) {
+            onInitNewRow: (e) => {
                 $('#SaveButton').data('dxButton').option('disabled', true);
                 e.data.code = "1";
                 e.data.effectiveDate = new Date();
@@ -520,41 +472,33 @@ $(function () {
                 {
                     caption: l("EntityFieldName:MDMService:MCPDetail:Customer"),
                     dataField: "customerId",
-                    calculateDisplayValue(rowData) {
-                        if (rowData.customer) {
-                            return rowData.customer.name;
-                        } else {
-                            return "";
-                        }
-                    },
+                    calculateDisplayValue: (rowData) => rowData?.customer?.name,
                     editorOptions: {
                         dropDownOptions: {
                             width: 500,
                         },
                     },
-                    setCellValue: function (rowData, value) {
+                    setCellValue: (rowData, value) => {
                         rowData.customerId = value.customerId;
                         rowData.customer = value.customer;
                     },
                     validationRules: [{ type: "required" }],
                     lookup: {
-                        dataSource() {
-                            return {
-                                store: customerStore,
-                                paginate: true,
-                                pageSize
-                            };
+                        dataSource: {
+                            store: customerStore,
+                            filter: [['customer.active', '=', true], 'and', [['endDate', '>', moment().format('YYYY-MM-DD')], 'or', ['endDate', '=', null]]],
+                            paginate: true,
+                            pageSize
                         },
-                        displayExpr: 'customer.name',
-                        valueExpr: 'customerId',
-                    }
+                        displayExpr: (e) => e.customer?.name || e?.name,
+                        valueExpr: (e) => e?.customer?.id || e?.id
+                    },
                 },
                 {
                     caption: "Address",
                     dataField: "fullAddress",
-                    calculateDisplayValue(rowData) {
-                        if (rowData.customer) return rowData.customer.fullAddress;
-                    },
+                    dataType: 'string',
+                    calculateDisplayValue: (rowData) => rowData?.customer?.fullAddress,
                     width: 150,
                     allowEditing: false,
                 },
@@ -563,13 +507,34 @@ $(function () {
                     dataField: "effectiveDate",
                     dataType: "date",
                     format: 'dd/MM/yyyy',
-                    validationRules: [{ type: "required", message: '' }],
-                }, {
+                    validationRules: [
+                        {
+                            type: "required"
+                        },
+                        {
+                            type: 'async',
+                            validationCallback: (e) => {
+                                let effDate = new Date(e.data.effectiveDate)
+                                let endDate = new Date(e.data.endDate)
+                                return new Promise((resolve, reject) => {
+                                    if (endDate && effDate < endDate || !endDate)
+                                        resolve(effDate)
+                                    reject('Validation failed')
+                                })
+                            }
+                        }
+                    ],
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPDetail:EndDate"),
                     dataField: "endDate",
                     dataType: "date",
+                    editorOptions: {
+                        showClearButton: true,
+                    },
                     format: 'dd/MM/yyyy',
-                }, {
+                },
+                {
 
                     caption: l("EntityFieldName:MDMService:MCPDetail:Distance"),
                     dataField: "distance",
@@ -577,125 +542,74 @@ $(function () {
                     editorOptions: {
                         min: 0,
                     }
-                }, {
-
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPDetail:VisitOrder"),
                     dataField: "visitOrder",
                     dataType: "number",
                     editorOptions: {
                         format: '#'
                     }
-                }, {
-
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPDetail:Monday"),
                     dataField: "monday",
                     dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPDetail:Tuesday"),
                     dataField: "tuesday",
                     dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPDetail:Wednesday"),
                     dataField: "wednesday",
                     dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPDetail:Thursday"),
                     dataField: "thursday",
                     dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPDetail:Friday"),
                     dataField: "friday",
                     dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPDetail:Saturday"),
                     dataField: "saturday",
                     dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPDetail:Sunday"),
                     dataField: "sunday",
                     dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPDetail:Week1"),
                     dataField: "week1",
                     dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
+
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPDetail:Week2"),
                     dataField: "week2",
                     dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPDetail:Week3"),
                     dataField: "week3",
                     dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPDetail:Week4"),
                     dataField: "week4",
                     dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
                 }
             ],
         }).dxDataGrid("instance");
 
-
-    function getNormalDate(currentDate) {
-        if (!currentDate || (typeof currentDate == "string")) return currentDate;
-
-        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2) + "T00:00:00";
-        return date;
-    }
 
     $("#CloseButton").click(function (e) {
         e.preventDefault();
@@ -740,12 +654,12 @@ $(function () {
             mcpHeaderDto: mcpHeaderDto,
             mcpDetails: mcpDetails,
         }
-        params.mcpHeaderDto.effectiveDate = getNormalDate(params.mcpHeaderDto.effectiveDate);
-        params.mcpHeaderDto.endDate = getNormalDate(params.mcpHeaderDto.endDate);
+        params.mcpHeaderDto.effectiveDate = moment(params.mcpHeaderDto.effectiveDate).format('YYYY-MM-DDT12:00:00');
+        params.mcpHeaderDto.endDate = moment(params.mcpHeaderDto.endDate).format('YYYY-MM-DDT12:00:00');
 
         params.mcpDetails.forEach(u => {
-            u.effectiveDate = getNormalDate(u.effectiveDate);
-            u.endDate = getNormalDate(u.endDate);
+            u.effectiveDate = moment(u.effectiveDate).format('YYYY-MM-DDT12:00:00');
+            u.endDate = moment(u.endDate).format('YYYY-MM-DDT12:00:00');
         })
 
         if (!MCPModel)
@@ -844,44 +758,35 @@ $(function () {
             popupEnddateMCP.show();
     });
 
-    function LoadData() {
-        let jsonData = sessionStorage.getItem("MCPModel");
-        //console.log(jsonData);
-        if (jsonData) {
-            MCPModel = JSON.parse(jsonData);
-            let form = $("#top-section").data('dxForm');
-            form.getEditor('Route').option('value', MCPModel.routeId);
-            form.getEditor('Company').option('value', MCPModel.companyId);
-            form.getEditor('ItemGroup').option('value', MCPModel.itemGroupId);
-            form.getEditor('Code').option('value', MCPModel.code);
-            form.getEditor('Name').option('value', MCPModel.name);
-            form.getEditor('EffectiveDate').option('value', MCPModel.effectiveDate);
-            form.getEditor('EndDate').option('value', MCPModel.endDate);
 
-            $('#GenerateButton').data('dxButton').option('disabled', false);
-            $('#EnddateButton').data('dxButton').option('disabled', false);
+    let jsonData = sessionStorage.getItem("MCPModel");
+    if (jsonData) {
+        MCPModel = JSON.parse(jsonData);
+        let form = $("#top-section").data('dxForm');
+        form.getEditor('Route').option('value', MCPModel.routeId);
+        form.getEditor('Company').option('value', MCPModel.companyId);
+        form.getEditor('ItemGroup').option('value', MCPModel.itemGroupId);
+        form.getEditor('Code').option('value', MCPModel.code);
+        form.getEditor('Name').option('value', MCPModel.name);
+        form.getEditor('EffectiveDate').option('value', MCPModel.effectiveDate);
+        form.getEditor('EndDate').option('value', MCPModel.endDate);
 
-            salesOrgHierarchyService.get(MCPModel.routeId).done(u => {
-                sellingZoneId = u.parentId;
+        $('#GenerateButton').data('dxButton').option('disabled', false);
+        $('#EnddateButton').data('dxButton').option('disabled', false);
 
-                let dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
-                dxCompany.option('readOnly', false);
-                dxCompany.option('dataSource', new DevExpress.data.DataSource({
-                    store: companyInZoneStore,
-                    filter: ["salesOrgHierarchyId", "=", u.parentId],
-                    paginate: true,
-                    pageSize: pageSize
-                }));
-                dxCompany.option('value', MCPModel.companyId);
-            });
+        salesOrgHierarchyService.get(MCPModel.routeId).done(u => {
+            sellingZoneId = u.parentId;
 
-            LoadDataGrid();
-        }
-
-        //sessionStorage.removeItem('MCPModel');
-    }
-    function LoadDataGrid() {
-
+            let dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
+            dxCompany.option('readOnly', false);
+            dxCompany.option('dataSource', new DevExpress.data.DataSource({
+                store: companyInZoneStore,
+                filter: [["salesOrgHierarchyId", "=", u.parentId], 'and', ['company.active', '=', true], 'and', [['company.endDate', '>', moment().format('YYYY-MM-DD')], 'or', ['company.endDate', '=', null]]],
+                paginate: true,
+                pageSize: pageSize
+            }));
+            dxCompany.option('value', MCPModel.companyId);
+        });
         let loadOptions = {
             filter: ['mcpHeaderId', '=', MCPModel.id]
         };
@@ -892,7 +797,6 @@ $(function () {
                 args[i] = JSON.stringify(loadOptions[i]);
             }
         });
-
         mCPDetailsService.getListDevextremes(args)
             .done(result => {
                 let data = result.data;
@@ -901,10 +805,7 @@ $(function () {
 
                 dgMCPDetails.option('dataSource', mcpDetailData);
             });
-
     }
-
-    LoadData();
 
     function routeChangedHandler(data) {
         if (data.value !== null) {
@@ -912,12 +813,12 @@ $(function () {
 
             var dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
             dxCompany.option('readOnly', false);
-            dxCompany.option('dataSource', new DevExpress.data.DataSource({
+            dxCompany.option('dataSource', {
                 store: companyInZoneStore,
-                filter: ["salesOrgHierarchyId", "=", selectedItem.parentId],
+                filter: [["salesOrgHierarchyId", "=", selectedItem.parentId], 'and', ['company.active', '=', true], 'and', [['company.endDate', '>', moment().format('YYYY-MM-DD')], 'or', ['company.endDate', '=', null]]],
                 paginate: true,
                 pageSize
-            }));
+            });
 
         } else {
             var dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
@@ -933,11 +834,10 @@ $(function () {
     $('#StartDate').dxDateBox({
         type: 'date',
         showClearButton: true,
-        min: new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) > new Date() ? new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) : new Date(),
+        min: new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) > new Date() ? new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) : moment().add(1, 'days')._d,
         max: $("#top-section").dxForm('instance').getEditor('EndDate').option('value') ? new Date($("#top-section").dxForm('instance').getEditor('EndDate').option('value')) : undefined,
         displayFormat: 'dd/MM/yyyy',
         onValueChanged: (e) => {
-            console.log('StartDate');
             $('#EndDate').dxDateBox('instance').option('min', e.value);
         }
     });
@@ -948,7 +848,6 @@ $(function () {
         max: $("#top-section").dxForm('instance').getEditor('EndDate').option('value') ? new Date($("#top-section").dxForm('instance').getEditor('EndDate').option('value')) : undefined,
         displayFormat: 'dd/MM/yyyy',
         onValueChanged: (e) => {
-            console.log('EndDate');
             $('#StartDate').dxDateBox('instance').option('max', e.value);
         }
     });
@@ -957,11 +856,8 @@ $(function () {
         showClearButton: true,
         min: new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) > new Date() ? new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) : new Date(),
         displayFormat: 'dd/MM/yyyy',
-        onValueChanged: (e) => {
-
-        }
     });
-    const popupGenMCP = $('#popupGenMCP').dxPopup({
+    let popupGenMCP = $('#popupGenMCP').dxPopup({
         width: 400,
         height: 280,
         container: '.panel-container',
@@ -1011,7 +907,7 @@ $(function () {
         }],
     }).dxPopup('instance');
 
-    const popupEnddateMCP = $('#popupEnddateMCP').dxPopup({
+    let popupEnddateMCP = $('#popupEnddateMCP').dxPopup({
         width: 400,
         height: 280,
         container: '.panel-container',
@@ -1037,7 +933,7 @@ $(function () {
                 onClick() {
                     let dxEndDate = $('#EndDateMCP').data('dxDateBox');
                     let endDate = dxEndDate.option('value');
-                    mCPHeaderService.setEndDate(MCPModel.id, moment(endDate).format('YYYY-MM-DD 12:00:00'), { contentType: "application/json" })
+                    mCPHeaderService.setEndDate(MCPModel.id, moment(endDate).format('YYYY-MM-DDT12:00:00'), { contentType: "application/json" })
                         .done(result => {
                             abp.message.success(l('Congratulations'));
                             popupEnddateMCP.hide();
