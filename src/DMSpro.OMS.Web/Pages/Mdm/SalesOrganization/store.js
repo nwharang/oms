@@ -141,7 +141,10 @@ let store = {
             });
             salesOrgHierarchyService.getListDevextremes(args)
                 .done(result => {
-                    currentTreeTotalCount = result.totalCount
+                    result.data.forEach((item) => {
+                        if (item.isRoute) routeCount += 1;
+                        if (item.isSellingZone) zoneCount += 1;
+                    })
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,

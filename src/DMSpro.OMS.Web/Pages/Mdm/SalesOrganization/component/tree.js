@@ -180,11 +180,10 @@ let renderTree = (e, headerData) => {
                 caption: 'Name',
                 dataField: "name",
                 cellTemplate: function (element, info) {
+
                     if (info.data.isRoute) {
-                        routeCount += 1
                         element.append("<div class='isRoute'><span class='px-1'>" + info.data.code + " - " + info.data.name + "</span></div>");
                     } else if (info.data.isSellingZone) {
-                        zoneCount += 1
                         element.append("<div class='isSellingZone'><span class='px-1'>" + info.data.code + " - " + info.data.name + "</span></div>");
                     } else {
                         element.append("<div>" + info.data.code + " - " + info.data.name + "</div>");
