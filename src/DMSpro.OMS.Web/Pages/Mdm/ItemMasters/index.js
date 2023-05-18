@@ -1,16 +1,15 @@
 ﻿$(async function () {
     let l = abp.localization.getResource("OMS");
-    let l1 = abp.localization.getResource("MdmService");
     let rpcService = {
         itemMasterService: window.dMSpro.oMS.mdmService.controllers.items.item,
         itemAttrValueService: window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue,
         itemAttrService: window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute,
+        itemImageService: window.dMSpro.oMS.mdmService.controllers.itemImages.itemImage,
         itemTypeService: window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData,
         uomService: window.dMSpro.oMS.mdmService.controllers.uOMs.uOM,
         uomGroupService: window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGroup,
         uomGroupDetailService: window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail,
         vatService: window.dMSpro.oMS.mdmService.controllers.vATs.vAT,
-        itemImageService: window.dMSpro.oMS.mdmService.controllers.itemImages.itemImage,
     }
     let enumValue = {
         manageItem: [
@@ -64,23 +63,51 @@
         itemTypes: [
             {
                 id: 0,
-                text: l1('EntityFieldValue:MDMService:Item:ItemTypes:Item'),
+                text: l('EntityFieldValue:MDMService:Item:ItemTypes:Item'),
             },
             {
                 id: 1,
-                text: l1('EntityFieldValue:MDMService:Item:ItemTypes:POSM'),
+                text: l('EntityFieldValue:MDMService:Item:ItemTypes:POSM'),
             },
             {
                 id: 2,
-                text: l1('EntityFieldValue:MDMService:Item:ItemTypes:Discount'),
+                text: l('EntityFieldValue:MDMService:Item:ItemTypes:Discount'),
             },
             {
                 id: 3,
-                text: l1('EntityFieldValue:MDMService:Item:ItemTypes:Voucher'),
+                text: l('EntityFieldValue:MDMService:Item:ItemTypes:Voucher'),
             }
         ]
     }
     let store = {
+        itemImageStore: new DevExpress.data.CustomStore({
+            key: 'id',
+            load: (loadOptions) => {
+                const args = {};
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+                return rpcService.itemImageService.getListDevextremes(args)
+                    .then(({ data }) => Promise.all(data.map(async imageInfo => {
+                        return {
+                            ...imageInfo,
+                            url: await fetch("/api/mdm-service/item-images/get-file?id=" + imageInfo.fileId)
+                                .then(res => res.blob())
+                                .then(data => URL.createObjectURL(data))
+                        }
+                    })))
+                    .then(data => data.sort((a, b) => a.displayOrder - b.displayOrder));
+            },
+            byKey: (key) => key ? new Promise((resolve, reject) => rpcService.itemImageService.get(key)
+                .done(data => resolve(data))
+                .fail(err => reject(err))
+            ) : null,
+            insert: (values) => rpcService.itemImageService.create(values, { contentType: "application/json" }),
+            update: (key, values) => rpcService.itemImageService.update(key, values, { contentType: "application/json" }),
+            remove: (key) => rpcService.itemImageService.deleteMany(key)
+        }),
         getVATs: new DevExpress.data.CustomStore({
             key: 'id',
             loadMode: 'raw',
@@ -171,7 +198,6 @@
                 });
                 rpcService.uomGroupDetailService.getListDevextremes(args)
                     .done(result => {
-                        getUOMsGroupDetaiArr = result.data
                         deferred.resolve(result.data, {
                             totalCount: result.totalCount,
                             summary: result.summary,
@@ -183,6 +209,7 @@
         }),
         itemStore: new DevExpress.data.CustomStore({
             key: 'id',
+            useDefaultSearch: true,
             load(loadOptions) {
                 const deferred = $.Deferred();
                 const args = {};
@@ -203,7 +230,7 @@
                 return deferred.promise();
             },
             byKey: function (key) {
-                if (key == 0) return null;
+                if (!key) return null;
 
                 let d = new $.Deferred();
                 rpcService.itemMasterService.get(key)
@@ -248,12 +275,11 @@
             },
         })
     }
-    /****custom store*****/
-    let defaultItemType, getUOMsGroupDetaiArr;
-    let disableColumn = ["inventoryUOMId", "purUOMId", "salesUOMId"], gridInfo = {}
+    let getUOMsGroupDetaiArr, disableColumn = ["inventoryUOMId", "purUOMId", "salesUOMId"], gridInfo = {}
 
-
-    // get item attribute value
+    store.getUOMsGroupDetailStore.load({}).then(data => {
+        getUOMsGroupDetaiArr = data
+    })
     await rpcService.itemAttrService.getListDevextremes({ filter: JSON.stringify(['active', '=', true]) }).then(({ data }) => {
         gridInfo.itemAttr = {
             hierarchy: data.filter(e => e.hierarchyLevel != null).sort((a, b) => a.attrNo - b.attrNo),
@@ -276,84 +302,85 @@
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             },
             popup: {
-                title: 'Item Info',
-                showTitle: true,
-                height: '99%',
-                width: '99%',
+                height: '95%',
+                width: '95%',
                 hideOnOutsideClick: false,
                 dragEnabled: false,
+                onHiding: (e) => {
+                    gridInfo.editingItem = null;
+                    gridInfo.currentData = null;
+                    gridInfo.description = null;
+                    gridInfo.imageContent = null;
+                    gridInfo.generalContent = null;
+                    gridInfo.imageDataSource = null;
+                },
+                onContentReady: (e) => {
+                    let toolbarPopup = [...e.component.option('toolbarItems'),
+                    {
+                        widget: 'dxButton',
+                        toolbar: 'bottom',
+                        location: 'before',
+                        options: {
+                            text: 'Genarel Information',
+                            disabled: !Boolean(gridInfo.editingItem),
+                            onClick: () => {
+                                gridInfo.generalContent.show()
+                                gridInfo.imageContent.container.hide()
+                            },
+                        },
+                    },
+                    {
+                        widget: 'dxButton',
+                        toolbar: 'bottom',
+                        location: 'before',
+                        options: {
+                            text: 'Item Image',
+                            disabled: !Boolean(gridInfo.editingItem),
+                            onClick: (e) => {
+                                gridInfo.imageContent.container.show()
+                                gridInfo.generalContent.hide()
+                                if (!gridInfo.imageContent.isRender)
+                                    renderImageContent()
+                            },
+                        },
+                    }]
+                    e.component.option('toolbarItems', toolbarPopup)
+                    $('#formGridAddItemMaster').parent().addClass('d-flex flex-column')
+                    gridInfo.generalContent = $('#formGridAddItemMaster');
+                    gridInfo.imageContent = {
+                        container: $('<div style="display:flex;" class="flex-grow-1"/>').insertAfter($('#formGridAddItemMaster')),
+                        list: $('<div class="d-flex"/>').css({ 'flex': '1 0 65%' }),
+                        controller: $('<div class="border-start p-2"/>').css('flex-basis', "35%"),
+                    };
+                    gridInfo.imageContent.list.appendTo(gridInfo.imageContent.container)
+                    gridInfo.imageContent.controller.appendTo(gridInfo.imageContent.container)
+                    gridInfo.imageContent.container.hide()
+                }
             },
             form: {
-                labelMode: "outside",
-                colCount: 6,
+                labelMode: "static",
+                colCount: 3,
                 elementAttr: {
                     id: 'formGridAddItemMaster',
-                    class: "p-3 mx-auto"
+                    class: "flex-grow-1 px-3"
                 },
                 items: [
-                    // Image Placeholder
                     {
+                        caption: '',
                         itemType: "group",
-                        caption: 'IMAGE',
-                        colSpan: 1,
                         template: renderItemImage // Fix for future versions
                     },
-                    // Genaral Info
                     {
+                        caption: '',
                         itemType: 'group',
-                        caption: "GENERAL",
-                        colSpan: 2,
-                        items: [
-                            {
-                                dataField: 'code',
-                                dataType: 'string',
-                                validationRules: [{ type: 'required' }]
-                            },
-                            {
-                                dataField: 'name',
-                                dataType: 'string',
-                                validationRules: [{ type: 'required' }]
-                            },
-                            {
-                                dataField: 'shortName',
-                                dataType: 'string'
-                            },
-                            {
-                                dataField: 'itemType',
-                                editorType: 'dxSelectBox',
-                                editorOptions: {
-                                    dataSource: {
-                                        store: enumValue.itemTypes,
-                                    },
-                                    valueExpr: 'id',
-                                    displayExpr: 'text'
-                                }
-                            },
-                            {
-                                dataField: 'barcode',
-                                dataType: 'string'
-                            },
-                            {
-                                dataField: 'erpCode',
-                                dataType: 'string'
-                            },
-                            {
-                                dataField: 'active',
-                                dataType: 'boolean',
-                                editorType: 'dxCheckBox'
-                            }
-                        ]
+                        items: ['code', 'name', 'shortName', 'itemType', 'barcode', 'erpCode', 'active']
                     },
-                    // System properties
                     {
-                        caption: "MANAGEMENT",
+                        caption: '',
                         itemType: 'group',
-                        colSpan: 2,
                         items: [
                             {
                                 dataField: 'manageItemBy',
-                                validationRules: [{ type: 'required' }],
-                                editorType: 'dxSelectBox',
                                 editorOptions: {
                                     onSelectionChanged: (e) => {
                                         let formInstance = $("#formGridAddItemMaster").dxForm('instance')
@@ -406,7 +433,6 @@
                                 }
                             },
                             {
-                                name: 'expiredValue',
                                 dataField: 'expiredValue',
                                 editorType: 'dxNumberBox',
                                 editorOptions: {
@@ -418,7 +444,6 @@
                                 }
                             },
                             {
-                                name: 'issueMethod',
                                 dataField: 'issueMethod',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
@@ -433,92 +458,36 @@
                                     value: 0
                                 }
                             },
+                            {
+                                itemType: 'empty',
+                            },
+                            {
+                                itemType: 'group',
+                                colCountByScreen: {
+                                    xs: 3,
+                                    sm: 2,
+                                    md: 2,
+                                    lg: 2,
+                                },
+                                items: ['isInventoriable', 'isPurchasable', 'isSaleable']
+                            }
                         ]
 
                     },
-                    // Options
                     {
+                        caption: '',
                         itemType: 'group',
-                        caption: 'OPTIONS',
-                        colSpan: 1,
-                        items: [
-                            {
-                                dataField: 'isInventoriable',
-                                dataType: 'boolean',
-                                editorType: 'dxCheckBox'
-                            },
-                            {
-                                dataField: 'isPurchasable',
-                                dataType: 'boolean',
-                                editorType: 'dxCheckBox'
-                            },
-                            {
-                                dataField: 'isSaleable',
-                                dataType: 'boolean',
-                                editorType: 'dxCheckBox'
-                            },
-                        ]
-
+                        items: ['uomGroupId', 'inventoryUOMId', 'purUOMId', 'salesUOMId', 'vatId', 'basePrice',],
                     },
-                    // Sys settings
                     {
-                        caption: 'SYSTEM SETTINGS',
+                        caption: '',
                         itemType: 'group',
+                        colCount: 2,
                         colSpan: 2,
                         items: [
                             {
-                                dataField: 'uomGroupId',
-                                editorType: 'dxSelectBox',
-                            },
-                            {
-                                dataField: 'inventoryUOMId',
-                                validationRules: [{ type: 'required' }],
-                                editorType: 'dxSelectBox',
-                            },
-                            {
-                                dataField: 'purUOMId',
-                                validationRules: [{ type: 'required' }],
-                                editorType: 'dxSelectBox',
-                            },
-                            {
-                                dataField: 'salesUOMId',
-                                validationRules: [{ type: 'required' }],
-                                editorType: 'dxSelectBox',
-                            },
-                            {
-                                dataField: 'vatId',
-                                validationRules: [{ type: 'required' }],
-                                editorType: 'dxSelectBox',
-                                editorOptions: {
-                                    dataSource: {
-                                        store: store.getVATs,
-                                        paginate: true,
-                                    },
-                                    valueExpr: 'id',
-                                    displayExpr: 'code'
-                                }
-                            },
-                            {
-                                dataField: 'basePrice',
-                                dataType: 'number',
-                                editorOptions: {
-                                    format: '#,##0',
-                                    min: 0
-                                },
-                                validationRules: [{ type: 'required' }]
-                            },
-                        ],
-                    },
-                    // ATTRIBUTE
-                    {
-                        caption: 'ATTRIBUTE',
-                        itemType: 'group',
-                        colCount: 2,
-                        colSpan: 4,
-                        items: [
-                            {
                                 itemType: 'group',
-                                items: getAttrField('hierarchy')
+                                items: getAttrField('hierarchy'),
                             },
                             {
                                 itemType: 'group',
@@ -527,14 +496,12 @@
                         ]
                     },
                 ],
-                onContentReady: (e) => {
-                }
             },
         },
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
-        // cacheEnabled: true,
+        cacheEnabled: true,
         allowColumnReordering: true,
         rowAlternationEnabled: true,
         allowColumnResizing: true,
@@ -575,7 +542,7 @@
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `Exports.xlsx`);
                 });
             });
             e.cancel = true;
@@ -642,7 +609,18 @@
             {
                 type: 'buttons',
                 caption: l("Actions"),
-                buttons: ['edit'],
+                buttons: [
+                    {
+                        name: 'edit',
+                        onClick: (e) => {
+                            gridInfo.editingItem = e.row.data.id;
+                            gridItemMasters.editRow(e.row.rowIndex);
+                        }
+                    },
+                    {
+                        name: 'delete',
+                    }
+                ],
                 fixed: true,
                 fixedPosition: "left",
             },
@@ -652,8 +630,6 @@
                 dataType: 'string',
                 allowEditing: false,
                 visible: false,
-                fixed: true,
-                fixedPosition: "left",
                 formItem: {
                     visible: false
                 },
@@ -662,16 +638,7 @@
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:Item:Code"),
                 dataType: 'string',
-                validationRules: [
-                    {
-                        type: "required"
-                    },
-                    {
-                        type: 'pattern',
-                        pattern: '^[a-zA-Z0-9]{1,20}$',
-                        message: l('ValidateError:Code')
-                    }
-                ]
+                allowEditing: false,
             },
             {
                 dataField: 'name',
@@ -692,7 +659,7 @@
             {
                 dataField: 'itemType',
                 caption: l("EntityFieldName:MDMService:Item:ItemTypeName"),
-                editorType: 'dxSelectBox',
+                dataType: 'string',
                 validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource: enumValue.itemTypes,
@@ -729,11 +696,6 @@
                 editorType: 'dxCheckBox',
                 alignment: 'center',
                 dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                },
                 visible: false
             },
             {
@@ -742,11 +704,6 @@
                 editorType: 'dxCheckBox',
                 alignment: 'center',
                 dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                },
                 visible: false
             },
             {
@@ -755,11 +712,6 @@
                 editorType: 'dxCheckBox',
                 alignment: 'center',
                 dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                },
                 visible: false
             },
             {
@@ -790,13 +742,11 @@
                 caption: l('EntityFieldName:MDMService:Item:ExpiredValue'),
                 dataType: 'number',
                 visible: false,
-                editorOptions: {
-                    // disabled: true
-                }
             },
             {
                 dataField: 'issueMethod',
                 caption: l('EntityFieldName:MDMService:Item:IssueMethod'),
+                dataType: 'string',
                 lookup: {
                     dataSource: enumValue.issueMethod,
                     valueExpr: "id",
@@ -808,18 +758,15 @@
                 dataField: 'inventoryUOMId',
                 caption: l('EntityFieldName:MDMService:Item:InventoryUnitName'),
                 validationRules: [{ type: "required" }],
+                dataType: 'string',
                 visible: false,
-                editorOptions: {
-                    readOnly: true
-                },
+                calculateDisplayValue: (e) => e?.inventoryUOM?.name,
                 lookup: {
-                    dataSource(options) {
-                        if (options?.data)
-                            return {
-                                store: store.getUOMsGroupDetailStore,
-                                filter: ["uomGroupId", "=", options.data.uomGroupId || 0],
-                            }
-                        return store.getUOMsGroupDetailStore
+                    dataSource: (options) => {
+                        return {
+                            store: store.getUOMsGroupDetailStore,
+                            filter: options?.data?.uomGroupId ? ["uomGroupId", "=", options.data.uomGroupId || 0] : null,
+                        }
                     },
                     valueExpr: "altUOMId",
                     displayExpr: "altUOM.name",
@@ -829,16 +776,14 @@
                 dataField: 'purUOMId',
                 caption: l('EntityFieldName:MDMService:Item:PurUnitName'),
                 validationRules: [{ type: "required" }],
-                // visible: false,
+                dataType: 'string',
+                calculateDisplayValue: (e) => e?.purUOM?.name,
                 lookup: {
-                    dataSource(options) {
-                        if (options?.data?.uomGroupId) {
-                            return {
-                                store: store.getUOMsGroupDetailStore,
-                                filter: ["uomGroupId", "=", options.data.uomGroupId]
-                            }
+                    dataSource: (options) => {
+                        return {
+                            store: store.getUOMsGroupDetailStore,
+                            filter: options?.data?.uomGroupId ? ["uomGroupId", "=", options.data.uomGroupId || 0] : null,
                         }
-                        return store.getUOMsGroupDetailStore
                     },
                     valueExpr: "altUOMId",
                     displayExpr: "altUOM.name",
@@ -848,16 +793,15 @@
                 dataField: 'salesUOMId',
                 caption: l('EntityFieldName:MDMService:Item:SalesUnitName'),
                 validationRules: [{ type: "required" }],
+                dataType: 'string',
                 visible: false,
+                calculateDisplayValue: (e) => e?.salesUOM?.name,
                 lookup: {
-                    dataSource(options) {
-                        if (options?.data)
-                            return {
-                                store: store.getUOMsGroupDetailStore,
-                                filter: ["uomGroupId", "=", options.data.uomGroupId || 0],
-                                paginate: true,
-                            }
-                        return store.getUOMsGroupDetailStore
+                    dataSource: (options) => {
+                        return {
+                            store: store.getUOMsGroupDetailStore,
+                            filter: options?.data?.uomGroupId ? ["uomGroupId", "=", options.data.uomGroupId || 0] : null,
+                        }
                     },
                     valueExpr: "altUOMId",
                     displayExpr: "altUOM.name",
@@ -868,13 +812,10 @@
                 dataField: 'vatId',
                 caption: l('EntityFieldName:MDMService:Item:VATName'),
                 calculateDisplayValue: 'vat.name',
-                editorOptions: {
-                    searchEnabled: true
-                },
+                dataType: 'string',
                 lookup: {
                     dataSource: {
                         store: store.getVATs,
-                        paginate: true,
                     },
                     valueExpr: 'id',
                     displayExpr: 'code'
@@ -884,28 +825,22 @@
             },
             {
                 dataField: 'basePrice',
-                caption: 'Base Price',
+                caption: l("EntityFieldName:MDMService:Item:BasePrice"),
                 validationRules: [{ type: "required" }],
-                visible: false
+                dataType: 'number',
+                visible: false,
             },
             {
                 dataField: 'active',
                 caption: l('EntityFieldName:MDMService:Item:Active'),
-                editorType: 'dxCheckBox',
                 alignment: 'center',
                 dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                }
             },
             ...getAttrColumn("hierarchy"),
             ...getAttrColumn("flat"),
         ]
     }).dxDataGrid('instance');
 
-    /****function*****/
     initImportPopup('api/mdm-service/items', 'Items_Template', 'dataGridItemMasters');
 
     let disableCell = (e, arg) => {
@@ -919,28 +854,6 @@
         return gridInfo.itemAttr[type].map(({ attrNo, attrName, hierarchyLevel, id }, index) => {
             return {
                 dataField: 'attr' + attrNo + 'Id',
-                label: { text: l(`${attrName}`) },
-                editorOptions: {
-                    valueExpr: "id",
-                    // readOnly: type === "hierarchy" && hierarchyLevel != 0,
-                    displayExpr: "attrValName",
-                    dataSource: {
-                        store: store.getItemAttrValue,
-                        filter: ['itemAttributeId', '=', id],
-                    },
-                    onContentReady: (e) => {
-                        let selectboxInstance = e.component
-                        if (selectboxInstance.option('value')) {
-                            selectboxInstance.option('readOnly', false);
-                        }
-                    },
-                    setCellValue: (newData, value, currentRowData) => {
-                        newData[`attr${attrNo}Id`] = value;
-                        referenceArrayNo.forEach(value => {
-                            newData['attr' + value + 'Id'] = null
-                        })
-                    }
-                },
             }
         })
     }
@@ -951,6 +864,7 @@
             return {
                 dataField: 'attr' + attrNo + 'Id',
                 caption: attrName,
+                dataType: 'string',
                 lookup: {
                     valueExpr: "id",
                     displayExpr: "attrValName",
@@ -962,49 +876,141 @@
             }
         })
     }
-
-    function renderItemImage(data, itemElement) {
-        // change in future versions
-        function getImage(id) {
-            // Sample id : 8998d7c8-bbb6-97c0-bc54-3a09f05f64f5
-            let d = new $.Deferred();
-            /// Get item src attribute value here 
-            Promise.resolve(d.resolve(null))
-            // rpcService.itemImageService.getList('')
-            return d.promise();
-        }
-
-        getImage("Customer Id Go Here").done(dataUrl => {
-            itemElement.addClass("d-flex flex-column justify-content-center align-items-center");
-            itemElement.append($("<img>").attr({
-                // https://source.unsplash.com/random/ for testing image size
-                // /images/default-avatar-image.jpg for default image size
-                src: dataUrl || "https://source.unsplash.com/random/",
-                style: "object-fit:cover;object-position:center center;max-height:150px;max-width:150px;cursor:pointer;border-radius:1rem;",
-            }))
-            itemElement.append($("<div/>").addClass('mt-3').dxFileUploader({
-                accept: 'image/*',
-                labelText: "",
-                uploadMode: 'instantly',
-                uploadUrl: 'API_URL_POST', // Upload Image Endpoint Go Here
-                selectButtonText: "Choose Image",
-                onValueChanged(e) {
-                    const files = e.value;
-                    if (files.length > 0) {
-                        $('#selected-files .selected-item').remove();
-                        $.each(files, (i, file) => {
-                            const $selectedItem = $('<div class="selected-item" />')
-                            $selectedItem.append(
-                                $('<span />').html(`Name: ${file.name}<br/>`),
-                            );
-                            $selectedItem.appendTo($('#selected-files'));
-                        });
-                        $('#selected-files').show();
-                    } else {
-                        $('#selected-files').hide();
-                    }
+    function renderImageContent() {
+        gridInfo.ContextMenu = $('<div/>').dxContextMenu({
+            dataSource: [
+                {
+                    text: "Delete",
+                    action: (e) => store.itemImageStore.remove(e.id).then(() => gridInfo.imageDataSource.reload())
                 },
-            }))
+            ],
+            target: '.dx-item.dx-tile',
+            onItemClick: (e) => e.itemData.action(gridInfo.imageContent.selectedItem)
+        }).appendTo('body').dxContextMenu('instance')
+        gridInfo.imageContent.list.dxTileView({
+            dataSource: gridInfo.imageDataSource,
+            direction: 'vertical',
+            width: '100%',
+            showScrollbar: "always",
+            itemTemplate(itemData, itemIndex, itemElement) {
+                let image = $('<div>')
+                    .addClass('image')
+                    .css('background-image', `url(${itemData.url})`);
+                $('<span />').addClass('position-absolute badge rounded-pill text-bg-primary').css({ 'top': '0.25rem', 'left': '0.25rem' }).text(itemData.displayOrder).appendTo(image)
+                itemElement.append(image);
+            },
+            onItemContextMenu: (e) => {
+                gridInfo.imageContent.selectedItem = e.itemData
+            },
+            onItemClick(e) {
+                console.log(e);
+                if (!gridInfo?.imageContent?.popupView) gridInfo.imageContent.popupView = $('<div/>').dxPopup({
+                    hideOnOutsideClick: true,
+                    onContentReady(e) {
+                        const $contentElement = e.component.content();
+                        $contentElement.addClass('photo-popup-content');
+                    },
+                }).appendTo('body').dxPopup('instance');
+                gridInfo.imageContent.popupView.option({
+                    title: l('EntityFieldName:MDMService:ItemImage:DisplayOrder') + ': ' + e.itemData.displayOrder,
+                    maxHeight: '600px',
+                    width: 500,
+                    contentTemplate: () => {
+                        let container = $('<div />').css('height', 'auto')
+
+                        $(`<img src="${e.itemData.url}" class="photo-popup-image" />`).css({ 'height': '400px', 'width': '400px' }).appendTo(container)
+                        $($('<div/>').dxTextArea({
+                            value: e.itemData.description,
+                            readOnly: true,
+                            height: '100px',
+                            label: l("EntityFieldName:MDMService:ItemImage:Description")
+                        })).appendTo(container)
+                        return container
+                    }
+                });
+                gridInfo.imageContent.popupView.show()
+            }
+        }).dxTileView('instance');
+        gridInfo.imageContent.controller
+        let form = $('<div/>')
+            .appendTo(gridInfo.imageContent.controller)
+
+        let description = $('<div class="dx-field-value"/>').dxTextBox({
+            name: 'description',
+            valueChangeEvent: 'keyup',
+            onValueChanged: () => uploadUrl()
+        }).dxTextBox('instance')
+        $('<div class="dx-field"/>')
+            .append($('<div class="dx-field-label"/>').text(l('EntityFieldName:MDMService:ItemImage:Description')))
+            .append(description.element())
+            .appendTo(form)
+
+        let displayOrder = $('<div class="dx-field-value"/>').dxNumberBox({
+            name: 'displayOrder',
+            valueChangeEvent: 'keyup',
+            format: '#',
+            min: 0,
+            onValueChanged: () => uploadUrl()
+        }).dxNumberBox('instance')
+        $('<div class="dx-field"/>')
+            .append($('<div class="dx-field-label"/>').text(l('EntityFieldName:MDMService:ItemImage:DisplayOrder')))
+            .append(displayOrder.element())
+            .appendTo(form)
+
+        let fileUploader = $('<div/>').dxFileUploader({
+            accept: 'image/*',
+            labelText: "",
+            uploadMode: 'useButtons',
+            uploadUrl: `/api/mdm-service/item-images?itemId=${gridInfo.editingItem}`,
+            selectButtonText: l('Button.New.ItemImage'),
+            name: 'inputFile',
+            onBeforeSend: (e) => {
+                e.request.setRequestHeader('RequestVerificationToken', abp.utils.getCookieValue('XSRF-TOKEN'))
+            },
+            onUploaded: () => {
+                gridInfo.imageDataSource.reload()
+            }
         })
+            .appendTo(form)
+            .dxFileUploader('instance')
+        gridInfo.imageContent.isRender = true;
+
+
+        function uploadUrl() {
+            fileUploader.option('uploadUrl', `/api/mdm-service/item-images?itemId=${gridInfo.editingItem}&description=${description.option('value')}&displayOrder=${displayOrder.option('value')}`)
+        }
+    }
+
+
+    function renderItemImage(e, itemElement) {
+        itemElement.addClass('d-flex justify-content-center align-items-center').css('height', '300px');
+        let loadingState = $("<div style='w-100 h-100'/>").dxLoadIndicator({
+            height: 75,
+            width: 75,
+        }).appendTo(itemElement)
+        gridInfo.imageDataSource = new DevExpress.data.DataSource({
+            store: store.itemImageStore,
+            filter: ['itemId', '=', gridInfo.editingItem],
+        })
+        gridInfo.imageGallery = $("<div>").hide().dxGallery({
+            dataSource: gridInfo.imageDataSource,
+            height: 'auto',
+            itemTemplate: (item) => {
+                let result = $('<div>');
+                $('<img>/').attr('src', item.url).css({ 'object-fit': 'contain', 'object-position': 'top', 'height': '300px', 'width': '100%' }).appendTo(result);
+                $('<div class="mb-4"/>').dxTextArea({
+                    value: item.description,
+                    readOnly: true,
+                    label: l("EntityFieldName:MDMService:ItemImage:Description")
+
+                }).appendTo(result);
+                return result;
+            },
+            onContentReady: (e) => {
+                loadingState.remove()
+                itemElement.height('auto')
+                e.element.show()
+            }
+        }).appendTo(itemElement).dxGallery('instance')
     }
 });
