@@ -376,6 +376,12 @@ $(function () {
             }
             e.newData["salesOrgHierarchyId"] = salesOrgHierarchyId;
         },
+        onEditorPreparing: (e) => {
+            if (e.row?.rowType != 'data') return
+            if (e.row.isEditing && !e.row.isNewRow && e.dataField == 'effectiveDate') {
+                e.editorOptions.min = e.row.data.creationTime ? new Date(e.row.data.creationTime) : new Date()
+            }
+        },
         toolbar: {
             items: [
                 //"groupPanel",
@@ -402,16 +408,6 @@ $(function () {
                 //"searchPanel",
             ],
         },
-        // onContentReady: function (e) {
-
-        //     if (salesOrgHierarchyId) { 
-        //         initImportPopup('api/mdm-service/customer-group-by-atts', 'CustomerGroupByAtts_Template', 'dgCustomerAttribute');
-        //         e.component.option('toolbar.items[4].visible', true);
-        //     }
-        //     else {
-        //         e.component.option('toolbar.items[4].visible', false);
-        //     }
-        // },
         columns: [
             {
                 caption: l("Actions"),
@@ -447,6 +443,7 @@ $(function () {
                 validationRules: [{ type: "required" }],
                 editorOptions: {
                     format: 'dd/MM/yyyy',
+                    min: new Date()
                 },
                 format: 'dd/MM/yyyy',
             },
@@ -564,8 +561,13 @@ $(function () {
                     e.newData[property] = e.oldData[property];
                 }
             }
-
             e.newData["salesOrgHierarchyId"] = salesOrgHierarchyId;
+        },
+        onEditorPreparing: (e) => {
+            if (e.row?.rowType != 'data') return
+            if (e.row.isEditing && !e.row.isNewRow && e.dataField == 'effectiveDate') {
+                e.editorOptions.min = new Date(e.row.data.creationTime)
+            }
         },
         toolbar: {
             items: [
@@ -621,6 +623,10 @@ $(function () {
                 dataField: "effectiveDate",
                 dataType: "date",
                 format: 'dd/MM/yyyy',
+                editorOptions: {
+                    format: 'dd/MM/yyyy',
+                    min: new Date()
+                },
                 validationRules: [{ type: "required" }],
             },
             {
