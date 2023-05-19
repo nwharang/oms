@@ -1,16 +1,15 @@
 ﻿$(async function () {
-    var l = abp.localization.getResource("OMS");
-    var l1 = abp.localization.getResource("OMS");
-    var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
-    var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
-    var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.customerAttributeValues.customerAttributeValue;
-    var cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
-    var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
-    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+    let l = abp.localization.getResource("OMS");
+    let customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
+    let geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
+    let cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.customerAttributeValues.customerAttributeValue;
+    let cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
+    let priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
+    let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
 
     let cusAttrStore = cusAttrService.getListDevextremes({ filter: JSON.stringify(['active', "=", true]) })
 
-    var companiesLookup = new DevExpress.data.CustomStore({
+    let companiesLookup = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -184,13 +183,13 @@
                 items: [
                     {
                         itemType: "group",
-                        caption: 'IMAGE',
+                        caption: '',
                         colSpan: 1,
                         template: renderUserImage // Fix for future versions
                     },
                     {
                         itemType: "group",
-                        caption: 'GENERAL',
+                        caption: '',
                         colSpan: 2,
                         items: ["code", 'name', 'phone1', 'phone2', 'erpCode', 'priceListId', 'active'],
                     },
@@ -215,6 +214,9 @@
                                     },
                                     {
                                         dataField: 'creditLimit'
+                                    },
+                                    {
+                                        dataField: 'paymentTermId'
                                     },
                                     {
                                         dataField: 'linkedCompanyId',
@@ -312,7 +314,7 @@
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes, // ?? 
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -361,13 +363,10 @@
                 },
             },
             {
-                //allowEditing: false,
                 dataField: 'code',
                 caption: l("Code"),
-                //allowEditing: false,
                 dataType: 'string',
                 allowEditing: false,
-                //validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'name',
@@ -504,6 +503,13 @@
                 }
             },
             {
+                dataField: 'paymentTermId',
+                caption: l("PaymentTerm"),
+                dataType: 'string',
+                visible: false,
+                allowEditing: false,
+            },
+            {
                 dataField: 'linkedCompanyId',
                 caption: l("LinkedCompany"),
                 lookup: {
@@ -541,7 +547,7 @@
             },
             {
                 dataField: "geoMaster0Id",
-                caption: l1("GeoLevel0Name"),
+                caption: l("GeoLevel0Name"),
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster0 || rowData.geoMaster0 === null) return "";
@@ -570,7 +576,7 @@
             },
             {
                 dataField: "geoMaster1Id",
-                caption: l1("GeoLevel1Name"),
+                caption: l("GeoLevel1Name"),
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster1 || rowData.geoMaster1 === null) return "";
@@ -598,7 +604,7 @@
             },
             {
                 dataField: "geoMaster2Id",
-                caption: l1("GeoLevel2Name"),
+                caption: l("GeoLevel2Name"),
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster2 || rowData.geoMaster2 === null) return "";
@@ -625,7 +631,7 @@
             },
             {
                 dataField: "geoMaster3Id",
-                caption: l1("GeoLevel3Name"),
+                caption: l("GeoLevel3Name"),
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster3 || rowData.geoMaster3 === null) return "";
@@ -651,7 +657,7 @@
             },
             {
                 dataField: "geoMaster4Id",
-                caption: l1("GeoLevel4Name"),
+                caption: l("GeoLevel4Name"),
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster4 || rowData.geoMaster4 === null) return "";
