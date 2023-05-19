@@ -154,11 +154,6 @@ $(function () {
             popup: {
                 height: "fit-content"
             },
-            // form: {
-            //     items: [
-            //         'name', 'shortname', 'phone1', 'phone2', 'erpCode', 'active', 'linkedCompanyId', 'priceListId', 'address'
-            //     ]
-            // }
         },
         onInitNewRow: function (e) {
             e.data.active = true;
@@ -256,7 +251,7 @@ $(function () {
                 dataField: 'shortName',
                 caption: l("EntityFieldName:MDMService:Vendor:ShortName"),
                 dataType: 'string',
-                //validationRules: [{ type: "required" }]
+                validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'phone1',
@@ -303,7 +298,6 @@ $(function () {
                 width: 70,
                 alignment: 'center',
                 dataType: 'boolean',
-                //validationRules: [{ type: "required" }],
                 cellTemplate(container, options) {
                     $('<div>')
                         .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
@@ -313,14 +307,7 @@ $(function () {
             {
                 dataField: 'linkedCompanyId',
                 caption: l("EntityFieldName:MDMService:Vendor:LinkedCompany"),
-                //validationRules: [{ type: "required" }],
                 dataType: 'string',
-                // calculateDisplayValue: function (rowData) {
-                //     // if(rowData.geoLevel0){
-                //     //     return rowData.geoLevel0.name;
-                //     // }
-                //     // return "";
-                // },
                 lookup: {
                     dataSource: {
                         store: companiesLookup,
@@ -332,19 +319,9 @@ $(function () {
                 },
                 editorOptions: {
                     showClearButton: true
-                }
+                },
+                validationRules: [{ type: "required" }]
             },
-            //{
-            //    dataField: 'warehouseId',
-            //    caption: l("EntityFieldName:MDMService:Vendor:Warehouse"),
-            //    dataType: 'string',
-            //    validationRules: [{ type: "required" }],
-            //    lookup: {
-            //        dataSource: companiesLookup,
-            //        valueExpr: "id",
-            //        displayExpr: "displayName"
-            //    }
-            //},
             {
                 dataField: 'priceListId',
                 caption: l("PriceListName"),
