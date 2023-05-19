@@ -272,24 +272,15 @@ $(function () {
                 });
                 e.cancel = true;
             }
-            else if (e.format === 'pdf') {
-                const doc = new jsPDF();
-                DevExpress.pdfExporter.exportDataGrid({
-                    jsPDFDocument: doc,
-                    component: e.component,
-                }).then(() => {
-                    doc.save('PriceLists.pdf');
-                });
-            }
         },
         headerFilter: {
             visible: true,
         },
-        // stateStoring: {
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'gridPriceLists',
-        // },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'gridPriceLists',
+        },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -354,7 +345,7 @@ $(function () {
                 //"groupPanel",
                 "addRowButton",
                 "columnChooserButton",
-                //"exportButton",
+                "exportButton",
                 //{
                 //    location: 'after',
                 //    widget: 'dxButton',
