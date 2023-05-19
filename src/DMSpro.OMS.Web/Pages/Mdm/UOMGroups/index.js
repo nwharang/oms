@@ -141,7 +141,23 @@ $(function () {
         columnFixing: {
             enabled: true,
         },
-        ...genaralConfig('UOMGroupsHeader'),
+        export: {
+            enabled: true,
+        },
+        onExporting: function (e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Companies');
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
+                });
+            });
+            e.cancel = true;
+        },
         headerFilter: {
             visible: true,
         },
@@ -212,6 +228,9 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:UOM:Code"),
                 dataField: "code",
+                editorOptions: {
+                    maxLength: 20,
+                },
                 validationRules: [
                     {
                         type: "required"
@@ -254,7 +273,23 @@ $(function () {
                         allowColumnResizing: true,
                         columnResizingMode: 'widget',
                         columnAutoWidth: true,
-                        ...genaralConfig('UOMGroupsDetails'),
+                        export: {
+                            enabled: true,
+                        },
+                        onExporting: function (e) {
+                            const workbook = new ExcelJS.Workbook();
+                            const worksheet = workbook.addWorksheet('Companies');
+                            DevExpress.excelExporter.exportDataGrid({
+                                component: e.component,
+                                worksheet,
+                                autoFilterEnabled: true,
+                            }).then(() => {
+                                workbook.xlsx.writeBuffer().then((buffer) => {
+                                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
+                                });
+                            });
+                            e.cancel = true;
+                        },
                         searchPanel: {
                             visible: true
                         },

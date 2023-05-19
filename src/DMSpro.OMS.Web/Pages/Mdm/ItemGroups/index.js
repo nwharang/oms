@@ -24,10 +24,23 @@ $(function () {
             enabled: true,
             mode: "select"
         },
-        // columnFixing: {
-        //     enabled: true,
-        // },
-        ...genaralConfig('ItemGroups'),
+        export: {
+            enabled: true,
+        },
+        onExporting: function (e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Companies');
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
+                });
+            });
+            e.cancel = true;
+        },
         headerFilter: {
             visible: true,
         },
@@ -38,12 +51,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -111,23 +124,36 @@ $(function () {
                 width: 100,
                 type: 'buttons',
                 caption: l("Actions"),
+                alignment: 'left',
                 buttons: [
                     {
                         text: "View Details",
                         icon: "fieldchooser",
                         hint: "View Details",
                         visible: function (e) {
-                            return !e.row.isNewRow;
+                            return !e.row.isNewRow && !e.row.isEditing;
                         },
                         onClick: function (e) {
                             renderPopup(e.row.data)
                         },
+                    },
+                    {
+                        name: 'edit',
+                        visible: (e) => e.row.data.status < 1 && !e.row.isEditing,
+                    },
+                    {
+                        name: 'delete',
+                        visible: (e) => e.row.data.status < 1 && !e.row.isEditing,
                     },
                 ],
             },
             {
                 caption: l("EntityFieldName:MDMService:ItemGroup:Code"),
                 dataField: "code",
+                editorOptions: {
+                    maxLength: 20,
+                },
+                allowEditing: false,
                 validationRules: [
                     {
                         type: "required"
@@ -142,7 +168,8 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:ItemGroup:Name"),
                 dataField: "name",
-                validationRules: [{ type: "required" }]
+                validationRules: [{ type: "required" }],
+                width: '500',
             },
             {
                 caption: l("EntityFieldName:MDMService:ItemGroup:Type"),
@@ -153,8 +180,9 @@ $(function () {
                     displayExpr: 'text',
                     valueExpr: 'id',
                     paginate: true,
-                    pageSize: pageSizeForLookup
-                }
+                    pageSize
+                },
+                allowEditing: false,
             },
             {
                 caption: l("EntityFieldName:MDMService:ItemGroup:Status"),
@@ -165,7 +193,7 @@ $(function () {
                     displayExpr: 'text',
                     valueExpr: 'id',
                     paginate: true,
-                    pageSize: pageSizeForLookup
+                    pageSize
                 }
             }
         ]

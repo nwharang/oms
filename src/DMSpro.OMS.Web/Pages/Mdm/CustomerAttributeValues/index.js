@@ -192,6 +192,9 @@ $(function () {
                 dataField: 'code',
                 caption: l1("EntityFieldName:MDMService:CustomerAttributeValue:Code"),
                 dataType: 'string',
+                editorOptions: {
+                    maxLength: 20,
+                },
                 validationRules: [
                     {
                         type: "required"

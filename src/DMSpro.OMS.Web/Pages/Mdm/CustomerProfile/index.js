@@ -217,9 +217,6 @@
                                         dataField: 'creditLimit'
                                     },
                                     {
-                                        dataField: 'paymentTermId'
-                                    },
-                                    {
                                         dataField: 'linkedCompanyId',
                                         editorOptions: {
                                             elementAttr: {
@@ -253,10 +250,6 @@
                     }],
             }
         },
-        // onEditingStart(e) {
-        //     e.data.url = "https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_960_720.jpg";
-        //     cusProfile = e.data;
-        // },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
@@ -362,8 +355,6 @@
                 dataType: 'string',
                 allowEditing: false,
                 visible: false,
-                fixed: true,
-                fixedPosition: "left",
                 formItem: {
                     visible: false
                 },
@@ -387,10 +378,6 @@
                 dataField: 'phone1',
                 caption: l("Phone1"),
                 dataType: 'string',
-                editorOptions: {
-                    mask: '000-000-0000',
-                    maskRules: { h: /^[0-9]{10}$/ },
-                },
                 validationRules: [
                     {
                         type: 'pattern',
@@ -403,10 +390,6 @@
                 dataField: 'phone2',
                 caption: l("Phone2"),
                 dataType: 'string',
-                editorOptions: {
-                    mask: '000-000-0000',
-                    maskRules: { h: /^[0-9]{10}$/ },
-                },
                 validationRules: [
                     {
                         type: 'pattern',
@@ -420,20 +403,23 @@
                 dataField: 'erpCode',
                 caption: l("ERPCode"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                editorOptions: {
+                    maxLength: 20,
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ],
             },
             {
                 dataField: 'license',
                 caption: l("License"),
                 dataType: 'string',
                 visible: false,
-                validationRules: [
-                    {
-                        type: 'pattern',
-                        pattern: '^[a-zA-Z0-9]$',
-                        message: l('ValidateError:Code')
-                    }
-                ]
             },
             {
                 dataField: 'taxCode',
@@ -517,12 +503,6 @@
                 }
             },
             {
-                dataField: 'paymentTermId',
-                caption: l("PaymentTerm"),
-                dataType: 'string',
-                visible: false,
-            },
-            {
                 dataField: 'linkedCompanyId',
                 caption: l("LinkedCompany"),
                 lookup: {
@@ -549,7 +529,6 @@
                 caption: l("PriceList"),
                 dataType: 'string',
                 visible: false,
-                //validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource: {
                         store: priceListStore,

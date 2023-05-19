@@ -30,6 +30,7 @@ let renderPopup = async (headerData) => {
                     text: "Exit",
                     icon: "return",
                     onClick: function () {
+                        zoneCount = 0, routeCount = 0
                         popupInstance.hide()
                     }
                 },

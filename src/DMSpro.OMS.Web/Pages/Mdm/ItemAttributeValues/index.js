@@ -349,8 +349,6 @@ $(function () {
                 dataType: 'string',
                 allowEditing: false,
                 visible: false,
-                fixed: true,
-                fixedPosition: "left",
                 formItem: {
                     visible: false
                 },
@@ -369,6 +367,9 @@ $(function () {
             {
                 dataField: 'code',
                 caption: l1("EntityFieldName:MDMService:ItemAttributeValue:Code"),
+                editorOptions: {
+                    maxLength: 20,
+                },
                 validationRules: [
                     {
                         type: "required"

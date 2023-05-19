@@ -84,20 +84,19 @@ function renderItemList(headerId, status) {
                     return "";
                 },
                 lookup: {
-                    //dataSource: getItemList,
                     dataSource: {
                         store: store.getItemList,
+                        filter: ['active', '=', 'true'],
                         paginate: true,
-                        pageSize: pageSizeForLookup
+                        pageSize
                     },
                     valueExpr: 'id',
-                    displayExpr: function (e) {
+                    displayExpr: (e) => {
                         return e.code + ' - ' + e.name
                     }
                 },
                 setCellValue: (newData, value, currentRowData) => {
                     newData.itemId = value
-                    console.log(currentRowData);
                 },
             },
         ]

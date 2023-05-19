@@ -154,6 +154,11 @@ $(function () {
             popup: {
                 height: "fit-content"
             },
+            form: {
+                items: [
+                    'name', 'shortname', 'phone1', 'phone2', 'erpCode', 'active', 'linkedCompanyId', 'priceListId', 'address'
+                ]
+            }
         },
         onInitNewRow: function (e) {
             e.data.active = true;
@@ -179,6 +184,23 @@ $(function () {
         searchPanel: {
             visible: true
         },
+        export: {
+            enabled: true,
+        },
+        onExporting: function (e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Companies');
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
+                });
+            });
+            e.cancel = true;
+        },
         columnMinWidth: 50,
         columnChooser: {
             enabled: true,
@@ -187,35 +209,17 @@ $(function () {
         columnFixing: {
             enabled: true,
         },
-        export: {
-            enabled: true,
-        },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
         headerFilter: {
             visible: true,
         },
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -225,23 +229,6 @@ $(function () {
                 "addRowButton",
                 "columnChooserButton",
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
                 "searchPanel"
             ],
         },
@@ -257,16 +244,6 @@ $(function () {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:Vendor:Code"),
                 dataType: 'string',
-                validationRules: [
-                    {
-                        type: "required"
-                    },
-                    {
-                        type: 'pattern',
-                        pattern: '^[a-zA-Z0-9]{1,20}$',
-                        message: l('ValidateError:Code')
-                    }
-                ]
             },
             {
                 dataField: 'name',
@@ -284,10 +261,6 @@ $(function () {
                 dataField: 'phone1',
                 caption: l("EntityFieldName:MDMService:Vendor:Phone1"),
                 dataType: 'string',
-                editorOptions: {
-                    mask: '000-000-0000',
-                    maskRules: { h: /^[0-9]{10}$/ },
-                },
                 validationRules: [
                     {
                         type: 'pattern',
@@ -300,10 +273,6 @@ $(function () {
                 dataField: 'phone2',
                 caption: l("EntityFieldName:MDMService:Vendor:Phone2"),
                 dataType: 'string',
-                editorOptions: {
-                    mask: '000-000-0000',
-                    maskRules: { h: /^[0-9]{10}$/ },
-                },
                 validationRules: [
                     {
                         type: 'pattern',
@@ -316,6 +285,16 @@ $(function () {
                 dataField: 'erpCode',
                 caption: l("EntityFieldName:MDMService:Vendor:ERPCode"),
                 dataType: 'string',
+                editorOptions: {
+                    maxLength: 20,
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 dataField: 'active',
@@ -515,5 +494,4 @@ $(function () {
             // },
         ],
     }).dxDataGrid("instance");
-    initImportPopup('api/mdm-service/vendors', 'Vendors_Template', 'dgVendors');
 });

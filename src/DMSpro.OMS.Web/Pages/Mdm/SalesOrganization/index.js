@@ -121,6 +121,9 @@ $(function () {
             {
                 caption: l('EntityFieldName:MDMService:SalesOrgHeader:Code'),
                 dataField: "code",
+                editorOptions: {
+                    maxLength: 20,
+                },
                 validationRules: [
                     {
                         type: "required"

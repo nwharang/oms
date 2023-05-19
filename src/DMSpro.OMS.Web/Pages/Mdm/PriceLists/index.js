@@ -460,14 +460,6 @@ $(function () {
                         valueExpr: 'id',
                         displayExpr: 'code'
                     },
-                    //editorOptions: {
-                    //     //dataSource: {
-                    //     //    store: getPriceList,
-                    //     //    filter: ["isFirstPriceList", "=", true],
-                    //     //},
-                    //     //valueExpr: 'id',
-                    //     //displayExpr: 'code'
-                    // },
                     width: 200
                 },
                 {
@@ -502,17 +494,6 @@ $(function () {
                     },
                     width: 200
                 },
-                // {
-                //     dataField: 'isBase',
-                //     caption: l("EntityFieldName:MDMService:PriceList:IsBase"),
-                //     alignment: 'center',
-                //     cellTemplate(container, options) {
-                //         $('<div>')
-                //             .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                //             .appendTo(container);
-                //     },
-                //     width: 120,
-                // },
                 {
                     dataField: 'isDefaultForCustomer',
                     caption: l("EntityFieldName:MDMService:PriceList:IsDefaultForCustomer"),
@@ -605,19 +586,19 @@ $(function () {
                         headerFilter: {
                             visible: true,
                         },
-                        // stateStoring: {
-                        //     enabled: true,
-                        //     type: 'localStorage',
-                        //     storageKey: 'dgPriceListDetails' + options.key,
-                        // },
+                        stateStoring: {
+                            enabled: true,
+                            type: 'localStorage',
+                            storageKey: 'dgPriceListDetails' + options.key,
+                        },
                         paging: {
                             enabled: true,
-                            pageSize: pageSize
+                            pageSize
                         },
                         pager: {
                             visible: true,
                             showPageSizeSelector: true,
-                            allowedPageSizes: allowedPageSizes,
+                            allowedPageSizes,
                             showInfo: true,
                             showNavigationButtons: true
                         },
@@ -648,7 +629,8 @@ $(function () {
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Item"),
                                 dataField: "item.name",
-                                sortIndex: 0, sortOrder: "asc",
+                                sortIndex: 0,
+                                sortOrder: "asc",
                                 calculateDisplayValue: (e) => {
                                     if (e)
                                         return e.item.code + " - " + e.item.name
@@ -669,21 +651,13 @@ $(function () {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Price"),
                                 dataField: "price",
                                 dataType: 'number',
-
                                 validationRules: [{ type: "required" }]
                             },
-                            {
-                                caption: l("EntityFieldName:MDMService:PriceListDetail:Description"),
-                                dataField: "description",
-                                dataType: "string",
-                                validationRules: [{ type: "required" }]
-                            }
                         ],
                         onRowUpdating: (e) => {
-                            // console.log(e.newData?.description);
-                            let { uomId, itemId, concurrencyStamp, description, basedOnPrice } = e.oldData
+                            let { uomId, itemId, concurrencyStamp, basedOnPrice } = e.oldData
                             let newData = {
-                                uomId, itemId, concurrencyStamp, description, basedOnPrice,
+                                uomId, itemId, concurrencyStamp, basedOnPrice,
                                 ...e.newData,
                             }
                             e.newData = newData;

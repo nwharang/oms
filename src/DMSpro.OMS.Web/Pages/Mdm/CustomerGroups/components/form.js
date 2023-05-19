@@ -20,6 +20,9 @@ function renderForm(e, headerData) {
                 dataField: 'code',
                 editorType: 'dxTextBox',
                 colSpan: 2,
+                editorOptions: {
+                    maxLength: 20,
+                },
                 validationRules: [
                     {
                         type: "required"
