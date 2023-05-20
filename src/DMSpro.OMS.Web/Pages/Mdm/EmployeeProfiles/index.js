@@ -504,7 +504,24 @@ $(function () {
             selectButtonText: l('Button.New.EmployeeImage'),
             name: 'inputFile',
             showFileList: false,
+            disabled: !gridInfo.editingRowId,
             onBeforeSend: (e) => {
+                if (e.file.size > 1.5e7) {
+                    e.component.abortUpload()
+                    return abp.message.error(l('ValidateError:UploadFileSize'), '500')
+                }
+                var fr = new FileReader;
+                fr.onload = function () {
+                    var img = new Image;
+                    img.onload = () => {
+                        if (img.width > 1024 || img.height > 1024) {
+                            e.component.abortUpload()
+                            return abp.message.error(l('ValidateError:UploadImageSize'), '500')
+                        }
+                    };
+                    img.src = fr.result;
+                };
+                fr.readAsDataURL(e.file)
                 e.request.setRequestHeader('RequestVerificationToken', abp.utils.getCookieValue('XSRF-TOKEN'))
             },
             onUploaded: () => {
@@ -545,7 +562,6 @@ $(function () {
             },
         }).appendTo(itemElement).dxGallery('instance')
 
-        if (!gridInfo.editingRowId) return;
         gridInfo.form.appendTo(itemElement)
     }
     initImportPopup('api/mdm-service/employee-profiles', 'EmployeeProfiles_Template', 'dataGridContainer');
