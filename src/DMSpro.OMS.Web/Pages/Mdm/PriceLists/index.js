@@ -383,6 +383,7 @@ $(function () {
                         }
                     ],
                     caption: l('Actions'),
+                    name: "Actions",
                     width: 100,
                     fixedPosition: 'left'
                 },
@@ -483,29 +484,37 @@ $(function () {
                         valueExpr: 'id',
                         displayExpr: 'text'
                     },
-                    width: 200
+                    width: 200,
                 },
                 {
                     dataField: 'isDefaultForCustomer',
                     caption: l("EntityFieldName:MDMService:PriceList:IsDefaultForCustomer"),
                     alignment: 'center',
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                            .appendTo(container);
-                    },
-                    width: 120,
+                    allowEditing: false,
+                    cellTemplate: (container, options) => $('<div>')
+                        .append($(options.value ?
+                            '<i class="fa fa-check" style="color:#34b233"></i>' :
+                            $('<div/>').dxButton({
+                                text: l('Button:MDMService:PriceList:SetDefault'),
+                                hint: l("EntityFieldName:MDMService:PriceList:IsDefaultForCustomer"),
+                                type: 'default',
+                                onClick: () => priceListService.setDefaultForCustomer(options.data.id).then(() => dataGrid.getDataSource().reload())
+                            }))),
                 },
                 {
                     dataField: 'isDefaultForVendor',
                     caption: l("EntityFieldName:MDMService:PriceList:IsDefaultForVendor"),
                     alignment: 'center',
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                            .appendTo(container);
-                    },
-                    width: 120
+                    allowEditing: false,
+                    cellTemplate: (container, options) => $('<div>')
+                        .append($(options.value ?
+                            '<i class="fa fa-check" style="color:#34b233"></i>' :
+                            $('<div/>').dxButton({
+                                text: l('Button:MDMService:PriceList:SetDefault'),
+                                hint: l("EntityFieldName:MDMService:PriceList:IsDefaultForCustomer"),
+                                type: 'default',
+                                onClick: () => priceListService.setDefaultForVendor(options.data.id).then(() => dataGrid.getDataSource().reload())
+                            }))),
                 },
             ],
 
