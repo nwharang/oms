@@ -1,9 +1,11 @@
 $(function () {
-    var l = abp.localization.getResource("OMS");
-    var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
-    var workingPositionService = window.dMSpro.oMS.mdmService.controllers.workingPositions.workingPosition;
+    let l = abp.localization.getResource("OMS"), gridInfo = {}
 
-    var employeeTypeStore = [
+    let employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
+    let employeeImageService = window.dMSpro.oMS.mdmService.controllers.employeeImages.employeeImage;
+    let workingPositionService = window.dMSpro.oMS.mdmService.controllers.workingPositions.workingPosition;
+
+    let employeeTypeStore = [
         {
             id: 0,
             displayName: l('EntityFieldValue:MDMService:EmployeeType:Salesman')
@@ -22,7 +24,38 @@ $(function () {
         },
     ];
 
-    var employeeProfileStore = new DevExpress.data.CustomStore({
+    let store = {
+        imageStore: new DevExpress.data.CustomStore({
+            key: 'id',
+            load: (loadOptions) => {
+                const args = {};
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+                return employeeImageService.getListDevextremes(args)
+                    .then(({ data }) => Promise.all(data.map(async imageInfo => {
+                        return {
+                            ...imageInfo,
+                            url: await fetch("/api/mdm-service/employee-images/get-file?id=" + imageInfo.fileId)
+                                .then(res => res.blob())
+                                .then(data => URL.createObjectURL(data))
+                        }
+                    })))
+                    .then(data => data.sort((a, b) => a.displayOrder - b.displayOrder));
+            },
+            byKey: (key) => key ? new Promise((resolve, reject) => employeeImageService.get(key)
+                .done(data => resolve(data))
+                .fail(err => reject(err))
+            ) : null,
+            insert: (values) => employeeImageService.create(values, { contentType: "application/json" }),
+            update: (key, values) => employeeImageService.update(key, values, { contentType: "application/json" }),
+            remove: (key) => employeeImageService.deleteMany(key)
+        }),
+    }
+
+    let employeeProfileStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -43,6 +76,10 @@ $(function () {
 
             return deferred.promise();
         },
+        byKey: (key) => key ? new Promise((resolve, reject) => employeeProfileService.getEmployeeProfile(key)
+            .done(data => resolve(data))
+            .fail(err => reject(err))
+        ) : null,
         insert(values) {
             return employeeProfileService.create(values, { contentType: "application/json" })
         },
@@ -54,7 +91,7 @@ $(function () {
         }
     });
 
-    var workingPositionStore = new DevExpress.data.CustomStore({
+    let workingPositionStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -79,7 +116,7 @@ $(function () {
         byKey: function (key) {
             if (key == 0) return null;
 
-            var d = new $.Deferred();
+            let d = new $.Deferred();
             workingPositionService.get(key)
                 .done(data => {
                     d.resolve(data);
@@ -144,12 +181,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -169,17 +206,28 @@ $(function () {
                 height: 'fit-content',
                 hideOnOutsideClick: false,
                 dragEnabled: false,
+                onHiding: (e) => {
+                    gridInfo.editingRowId = null;
+                    gridInfo.currentData = null;
+                    gridInfo.description = null;
+                    gridInfo.imageContent = null;
+                    gridInfo.generalContent = null;
+                    gridInfo.imageDataSource = null;
+                },
             },
             form: {
+                labelMode: "static",
+                elementAttr: {
+                    id: 'formGridAddItemMaster',
+                    class: "flex-grow-1 px-3"
+                },
                 items: [
                     {
                         itemType: 'group',
-                        colCount: 1,
-                        colSpan: 1,
+                        template: renderItemImage // Fix for future versions
                     },
                     {
                         itemType: 'group',
-                        colCount: 1,
                         colSpan: 2,
                         items: ['erpCode', 'firstName', 'lastName', 'workingPositionId', 'employeeType']
                     },
@@ -239,9 +287,9 @@ $(function () {
                             class: "import-excel",
                         },
                         onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            let gridControl = e.element.closest('div.dx-datagrid').parent();
+                            let gridName = gridControl.attr('id');
+                            let popup = $(`div.${gridName}.popupImport`).data('dxPopup');
                             if (popup) popup.show();
                         }
                     }
@@ -254,7 +302,15 @@ $(function () {
                 caption: l("Actions"),
                 type: 'buttons',
                 width: 120,
-                buttons: ['edit', 'delete'],
+                buttons: [
+                    {
+                        name: 'edit',
+                        onClick: (e) => {
+                            gridInfo.editingRowId = e.row.data.id;
+                            dataGridContainer.editRow(e.row.rowIndex);
+                        }
+                    },
+                    , 'delete'],
                 fixedPosition: 'left'
             },
             {
@@ -415,5 +471,82 @@ $(function () {
         ]
     }).dxDataGrid("instance");
 
+    async function renderItemImage(e, itemElement) {
+
+        itemElement.addClass('d-flex justify-content-center align-items-center').css('height', '200px');
+
+
+        let loadingImage = $('<div class="justify-content-center align-items-center w-100 h-100 rounded"/>').css({ 'display': 'flex' })
+            .append($('<div/>').dxLoadIndicator({
+                height: 75,
+                width: 75,
+            }))
+            .appendTo(itemElement);
+
+
+        gridInfo.form = $('<div class="w-50 flex-column"/>').css({ 'height': '200px', 'display': 'flex' })
+
+
+        let description = $('<div class="flex-grow-1"/>').dxTextArea({
+            value: "",
+            width: '100%',
+            height: '100%',
+            label: l("EntityFieldName:MDMService:EmployeeImage:Description"),
+            valueChangeEvent: 'keyup',
+            onValueChanged: () => uploadUrl()
+        }).appendTo(gridInfo.form).dxTextArea('instance')
+
+        let fileUploader = $('<div/>').dxFileUploader({
+            accept: 'image/*',
+            labelText: "",
+            uploadMode: 'instantly',
+            uploadUrl: `/api/mdm-service/employee-images/avatar?employeeId=${gridInfo.editingRowId}&description=${description.option('value')}`,
+            selectButtonText: l('Button.New.EmployeeImage'),
+            name: 'inputFile',
+            showFileList: false,
+            onBeforeSend: (e) => {
+                e.request.setRequestHeader('RequestVerificationToken', abp.utils.getCookieValue('XSRF-TOKEN'))
+            },
+            onUploaded: () => {
+                gridInfo.imageDataSource.reload()
+            },
+        })
+            .appendTo(gridInfo.form)
+            .dxFileUploader('instance')
+
+        function uploadUrl() {
+            fileUploader.option('uploadUrl', `/api/mdm-service/employee-images/avatar?employeeId=${gridInfo.editingRowId}&description=${description.option('value') || ""}`)
+        }
+
+        gridInfo.imageDataSource = new DevExpress.data.DataSource({
+            store: store.imageStore,
+            filter: ['employeeProfileId', '=', gridInfo.editingRowId],
+            onLoadingChanged: () => {
+                loadingImage?.show()
+                gridInfo.form?.hide()
+                gridInfo.imageGallery?.element()?.hide()
+            },
+            onChanged: () => {
+                loadingImage.hide()
+                gridInfo.form?.show()
+                gridInfo.imageGallery?.element()?.show()
+                fileUploader?.option('uploadMethod', gridInfo.imageDataSource.items().length > 0 ? "PUT" : "POST")
+            }
+        })
+        await gridInfo.imageDataSource.load({})
+
+        gridInfo.imageGallery = $("<div class='w-50 '>").dxGallery({
+            dataSource: gridInfo.imageDataSource,
+            height: 200,
+            showIndicator: false,
+            itemTemplate: (item) => {
+                description.option('value', item.description)
+                return $('<div class="d-flex p-2">').append($('<img class="rounded"/>').attr('src', item.url).css({ 'object-fit': 'contain', 'object-position': 'top', 'height': '100%', 'width': "100%" }));
+            },
+        }).appendTo(itemElement).dxGallery('instance')
+
+        if (!gridInfo.editingRowId) return;
+        gridInfo.form.appendTo(itemElement)
+    }
     initImportPopup('api/mdm-service/employee-profiles', 'EmployeeProfiles_Template', 'dataGridContainer');
 });
