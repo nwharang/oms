@@ -171,6 +171,9 @@
 
     $("#top-section").dxForm({
         labelMode: 'floating',
+        formData: {
+            ...await MCPModel,
+        },
         colCount: 4,
         items: [
             {
@@ -242,35 +245,17 @@
                     {
                         dataField: 'EffectiveDate',
                         editorType: 'dxDateBox',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        },
-                        {
-                            type: 'async',
-                            validationCallback: (e) => {
-                                console.log(e, MCPModel);
-                                let createDate = new Date(MCPModel?.creationTime)
-                                let effDate = new Date(MCPModel?.effectiveDate)
-                                let endDate = MCPModel?.endDate ? new Date(MCPModel.endDate) : null
-                                return new Promise((resolve, reject) => {
-                                    if (!endDate || (endDate && effDate < endDate))
-                                        resolve(effDate)
-                                    reject(l('ValidateError:EffectiveDate'))
-                                })
-                            }
-                        }
-                        ],
                         editorOptions: {
                             displayFormat: 'dd/MM/yyyy',
                             showClearButton: true,
-                            min: MCPModel?.creationTime || new Date(),
+                            min: MCPModel?.creationTime ? new Date(MCPModel.creationTime) : new Date(),
                             onValueChanged: (e) => {
                                 try {
                                     $("#top-section").data('dxForm').getEditor('EndDate').option('min', e.value ? moment(e.value).add(1, 'days') : moment().add(1, 'days'))
                                 } catch (err) { }
-                            }
-                        }
+                            },
+                        },
+                        validationRules: [{ type: 'required', message: '' }],
                     },
                     {
                         dataField: 'EndDate',
