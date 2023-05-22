@@ -2,14 +2,14 @@
     let l = abp.localization.getResource("OMS");
     (() => {
         DevExpress.ui.forceIsoDateParsing = false;
-        DevExpress.ui.dxTextBox.defaultOptions({
-            options: {
-                maxLength: 255,
-            }
-        });
         DevExpress.ui.dxDataGrid.defaultOptions({
             options: {
                 dateSerializationFormat: 'yyyy-MM-dd',
+                customizeColumns: (e) => {
+                    e.filter(v => v.dataType === 'number').forEach(e => {
+                        e.validationRules?.push({ type: 'range', min: 0, })
+                    })
+                },
             }
         })
         DevExpress.ui.dxDateBox.defaultOptions({
@@ -27,12 +27,6 @@
                 placeholder: l('DefaultOption:SelectBox:PlaceHolder'),
             }
         })
-        DevExpress.ui.dxNumberBox.defaultOptions({
-            options: {
-                min: 0
-            }
-        })
-        console.log("DefaultOptions Loaded");
     })()
     if (!abp.currentTenant?.id) {
         return
