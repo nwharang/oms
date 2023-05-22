@@ -105,13 +105,21 @@ let store = {
 
             salesOrgHeaderService.getListDevextremes(args)
                 .done(result => {
+                    let zoneDictionary = result.summary[0]?.zoneDictionary
+                    let routeDictionary = result.summary[0]?.routeDictionary
+                    result.data = result.data.map((e) => {
+                        return {
+                            ...e,
+                            zoneCount: zoneDictionary[e.id]?.length || 0,
+                            routeCount: routeDictionary[e.id]?.length || 0
+                        }
+                    })
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
                         groupCount: result.groupCount,
                     });
                 });
-
             return deferred.promise();
         },
         byKey: function (key) {

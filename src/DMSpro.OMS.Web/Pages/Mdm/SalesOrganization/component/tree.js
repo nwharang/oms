@@ -70,10 +70,6 @@ let renderTree = (e, headerData) => {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        onContentReady: (e) => {
-            $('#routeCount').text(routeCount);
-            $('#zoneCount').text(zoneCount);
-        },
         onRowInserting: (e) => {
             // for create first data - if parentId = 0, update parentId = null
             if (e.data && e.data.parentId == 0) {
@@ -140,15 +136,12 @@ let renderTree = (e, headerData) => {
             items: [
                 {
                     location: 'before',
-                    template() {
-                        return $('<div class="dx-fieldset-header">').append('Organization Tree');
-                    },
+                    template: () => $('<div class="dx-fieldset-header">').append('Organization Tree'),
+
                 },
                 {
                     location: 'center',
-                    template() {
-                        return $("<div class='d-flex gap-2'><div class='isRoute' id='routeCount'></div><div class='isSellingZone' id='zoneCount'></div></div>")
-                    },
+                    template: () => $(`<div class='d-flex gap-2'><div class='isRoute' >${headerData.routeCount}</div><div class='isSellingZone'>${headerData.zoneCount}</div></div>`)
                 },
                 {
                     widget: 'dxButton',
