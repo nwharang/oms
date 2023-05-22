@@ -732,7 +732,14 @@
                 dataField: 'address',
                 caption: l("Address"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: "stringLength",
+                        max: 50,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 50)
+                    }
+                ]
             },
             {
                 dataField: 'latitude',
