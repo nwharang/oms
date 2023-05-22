@@ -152,7 +152,7 @@ $(function () {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             },
             popup: {
-                height: "fit-content"
+                height: 400
             },
         },
         onInitNewRow: function (e) {
@@ -454,9 +454,16 @@ $(function () {
             // },
             {
                 dataField: 'address',
+                dataType: 'string',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Address"),
                 width: 150,
-                dataType: 'string',
+                validationRules: [
+                    {
+                        type: "stringLength",
+                        max: 255,
+                        message: l('WarnMessage.FieldLength').replace('{0}', 255),
+                    }
+                ]
             },
             // {
             //     dataField: 'latitude',
