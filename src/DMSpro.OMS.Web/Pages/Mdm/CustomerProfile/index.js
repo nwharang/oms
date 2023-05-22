@@ -719,7 +719,14 @@
                 dataField: 'street',
                 caption: l("Street"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: "stringLength",
+                        max: 200,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 200)
+                    }
+                ]
             },
             {
                 dataField: 'address',
