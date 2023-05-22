@@ -472,7 +472,14 @@
                 dataField: 'vatAddress',
                 caption: l("VatAddress"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: "stringLength",
+                        max: 200,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 200)
+                    }
+                ]
             },
             // {
             //     dataField: 'sfaCustomerCode',
@@ -736,8 +743,8 @@
                 validationRules: [
                     {
                         type: "stringLength",
-                        max: 50,
-                        message: l('WarnMessage.FieldLength').replace("{0}", 50)
+                        max: 200,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 200)
                     }
                 ]
             },
