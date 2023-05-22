@@ -361,12 +361,28 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:FirstName"),
                 dataField: "firstName",
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: "stringLength",
+                        max: 100,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 100)
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:LastName"),
                 dataField: "lastName",
-                dataType: 'string'
+                dataType: 'string',
+                validationRules: [
+                    {
+                        type: "stringLength",
+                        max: 100,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 100)
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:DateOfBirth"),
