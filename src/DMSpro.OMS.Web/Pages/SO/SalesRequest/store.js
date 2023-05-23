@@ -153,7 +153,7 @@ let getInfoSO = async () => {
 
         return {
             companyId,
-            salesOrderStore: {
+            mainStore: {
                 customerList: Object.keys(data.customerDictionary).map((key) => data.customerDictionary[key]),
                 priceList: Object.keys(data.priceDictionary).map(function (key) {
                     return { id: key, value: data.priceDictionary[key] };
@@ -172,9 +172,15 @@ let getInfoSO = async () => {
                                 altQty: 1,
                                 baseQty: 1,
                                 altUOMId: data.uomGroupWithDetailsDictionary[key].baseUOMId,
+                                baseUOMId: data.uomGroupWithDetailsDictionary[key].baseUOMId,
                                 isBase: true
                             },
-                            ...Object.keys(data.uomGroupWithDetailsDictionary[key].detailsDictionary).map(key1 => data.uomGroupWithDetailsDictionary[key].detailsDictionary[key1])
+                            ...Object.keys(data.uomGroupWithDetailsDictionary[key].detailsDictionary).map(key1 => {
+                                return {
+                                    ...data.uomGroupWithDetailsDictionary[key].detailsDictionary[key1],
+                                    baseUOMId: data.uomGroupWithDetailsDictionary[key].baseUOMId,
+                                }
+                            })
                         ]
                     }
 

@@ -96,11 +96,11 @@ function initChooseItemsPopup(items) {
         selection: {
             mode: 'multiple',
             showCheckBoxesMode: 'always',
-            selectAllMode : 'page'
+            selectAllMode: 'page'
         },
         paging: {
             enabled: true,
-            pageSize : 10,
+            pageSize: 10,
         },
         pager: {
             visible: true,
@@ -117,7 +117,7 @@ function initChooseItemsPopup(items) {
                         return $('<div>')
                             .addClass('informer')
                             .append(
-                                $('<h4 id="numSelectedItems" style="margin:0">')
+                                $('<div id="numSelectedItems" style="margin:0">')
                                     .addClass('count')
                             );
                     },
@@ -126,24 +126,17 @@ function initChooseItemsPopup(items) {
                 "searchPanel",
             ],
         },
-        onCellClick: function (e) {
-            e.event.preventDefault();
-            e.event.stopPropagation();
-        },
-        // onSelectionChanged: function (e) {
-        //     var selectedRowsData = e.component.getSelectedRowsData();
-        // },
         columns: [
             {
                 caption: l('EntityFieldName:OrderService:SalesRequestDetails:Qty'),
                 dataField: 'qty',
                 width: 100,
-                cellTemplate(container, options) {
-                    $('<div>').dxNumberBox({
+                cellTemplate: (container, options) => {
+                    return $('<div>').dxNumberBox({
                         value: options.value,
                         min: 1,
                         height: '23px',
-                        onValueChanged: function (e) {
+                        onValueChanged: (e) => {
                             options.data.qty = e.value;
                         },
                         onKeyDown(e) {
@@ -154,7 +147,6 @@ function initChooseItemsPopup(items) {
                             }
                         },
                     })
-                        .appendTo(container);
                 }
             },
             {
@@ -175,20 +167,10 @@ function initChooseItemsPopup(items) {
                 dataType: 'boolean',
                 width: 100,
             },
-            {
-                dataField: 'inventory',
-                caption: l("Inventory"),
-                dataType: 'number',
-                width: 100,
-                allowEditing: false
-            }
         ],
-
     })).dxDataGrid("instance");
 
     const popupItems = $('#popupItems').dxPopup({
-        width: "fit-content",
-        height: 'fit-content',
         container: '.panel-container',
         showTitle: true,
         title: l('Popup:Title:Chooseitems'),
@@ -197,19 +179,9 @@ function initChooseItemsPopup(items) {
         hideOnOutsideClick: false,
         showCloseButton: true,
         resizeEnabled: false,
-        position: {
-            at: 'center',
-            my: 'center',
-            collision: 'fit',
-        },
-        onShowing: function (e) {
-            var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
-            $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
+        onShowing: () => {
+            dgItems.repaint();
             dgItems.deselectAll()
-        },
-        onResize: function (e) {
-            var heightGridContent = $('div.dx-overlay-content.dx-popup-normal.dx-popup-draggable.dx-resizable').innerHeight() - 310;
-            $('#dgItems div.dx-datagrid-rowsview').css('height', heightGridContent + 'px');
         },
         toolbarItems: [{
             widget: 'dxButton',
@@ -220,10 +192,8 @@ function initChooseItemsPopup(items) {
                 text: 'Submit',
                 elementAttr: {
                     id: "submitItemsButton",
-                    //disabled: true,
                 },
                 onClick() {
-                    //todo
                     var selectedItems = dgItems.getSelectedRowsData();
                     if (selectedItems.length > 0) {
                         appendSelectedItems(selectedItems);

@@ -407,8 +407,7 @@
             })
         },
     }).dxDataGrid("instance");
-    preLoad.then((data) => {
-        initChooseItemsPopup([...data.mainStore.itemList].map(e => { e.isFree = false; return e }))
-    })
+    preLoad.then((data) => initChooseItemsPopup([...data.mainStore.itemList].map(e => { e.isFree = false; return e })))
+
     // initImportPopup('', 'SalesRequest_Template', 'dgSalesOrderHeader');
 })
