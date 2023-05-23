@@ -520,6 +520,7 @@
                     displayFormat: 'dd/MM/yyyy',
                 },
                 format: 'dd/MM/yyyy',
+
             },
             {
                 dataField: 'isCompany',
@@ -766,6 +767,12 @@
             e.data.effectiveDate = new Date().toISOString();
             e.data.active = true;
         },
+        onEditorPreparing: (e) => {
+            if (e.row?.rowType != 'data') return
+            // ReadOnly when editing , allow when creating a new row
+            if (e.dataField == 'endDate' && !e.row.isNewRow)
+                e.editorOptions.readOnly = true
+        }
     }).dxDataGrid("instance");
 
     initImportPopup('api/mdm-service/customers', 'Customers_Template', 'dgCustomers');
