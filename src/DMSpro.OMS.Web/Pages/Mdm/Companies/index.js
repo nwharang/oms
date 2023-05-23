@@ -192,6 +192,12 @@
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             },
         },
+        onEditorPreparing: (e) => {
+            if (e.row?.rowType != 'data') return
+            // ReadOnly when editing , allow when creating a new row
+            if (e.dataField == 'endDate' && !e.row.isNewRow)
+                e.editorOptions.readOnly = true
+        },
         toolbar: {
             items: [
                 "groupPanel",
