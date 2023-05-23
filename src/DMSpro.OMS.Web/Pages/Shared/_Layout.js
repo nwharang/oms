@@ -9,6 +9,11 @@
                     e.filter(v => v.dataType === 'number').forEach(e => {
                         e.validationRules?.push({ type: 'range', min: 0, })
                     })
+                    e.forEach(column => column.headerFilter = {
+                        dataSource(options) {
+                            options.dataSource.postProcess = (result) => result.filter(x => x.value !== '')
+                        }
+                    })
                 },
             }
         })
