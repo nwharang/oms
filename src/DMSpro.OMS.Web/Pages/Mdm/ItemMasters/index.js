@@ -5,6 +5,7 @@
         itemAttrValueService: window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue,
         itemAttrService: window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute,
         itemImageService: window.dMSpro.oMS.mdmService.controllers.itemImages.itemImage,
+        itemAttachmentService: window.dMSpro.oMS.mdmService.controllers.itemAttachments.itemAttachment,
         itemTypeService: window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData,
         uomService: window.dMSpro.oMS.mdmService.controllers.uOMs.uOM,
         uomGroupService: window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGroup,
@@ -80,7 +81,7 @@
         ]
     }
     let store = {
-        itemImageStore: new DevExpress.data.CustomStore({
+        imageStore: new DevExpress.data.CustomStore({
             key: 'id',
             load: (loadOptions) => {
                 const args = {};
@@ -107,6 +108,58 @@
             insert: (values) => rpcService.itemImageService.create(values, { contentType: "application/json" }),
             update: (key, values) => rpcService.itemImageService.update(key, values, { contentType: "application/json" }),
             remove: (key) => rpcService.itemImageService.deleteMany(key)
+        }),
+        attachmentStore: new DevExpress.fileManagement.CustomFileSystemProvider({
+            keyExpr: 'id',
+            getItems: () => rpcService.itemAttachmentService.getListDevextremes({
+                filter: JSON.stringify(['itemId', '=', gridInfo.editingItem]),
+            }).then(({ data }) => {
+                gridInfo.attachment.fileSource = data?.map(e => {
+                    return {
+                        id: e.id,
+                        fileId: e.fileId,
+                        isDirectory: false,
+                        ...JSON.parse(e.description)
+                    };
+                })
+                return gridInfo.attachment.fileSource
+            }),
+            uploadFileChunk: (file, uploadInfo, destinationDirectory) => {
+                let form = new FormData();
+                form.append('inputFile', file, file.name);
+                let description = JSON.stringify({ name: file.name, size: file.size, type: file.type })
+                return rpcService.itemAttachmentService.create(gridInfo.editingItem, file, description, true,
+                    {
+                        contentType: false,
+                        processData: false,
+                        data: form,
+                        async: true,
+                    })
+            },
+            deleteItem: ({ dataItem }) => {
+                return rpcService.itemAttachmentService.deleteMany(dataItem.id)
+            },
+            // Don't change arguments
+            downloadItems: ([{ dataItem }]) => {
+                return rpcService.itemAttachmentService.getFile(dataItem.fileId, {
+                    dataType: 'binary',
+                    xhrFields: {
+                        'responseType': 'blob'
+                    },
+                    success: (result) => {
+                        console.log(result);
+                        let blob = new Blob([result]);
+                        let a = document.createElement('a');
+                        a.href = window.URL.createObjectURL(blob);
+                        a.download = dataItem.name;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(a.href);
+                    }
+                })
+            }
+
         }),
         getVATs: new DevExpress.data.CustomStore({
             key: 'id',
@@ -311,6 +364,7 @@
                     gridInfo.currentData = null;
                     gridInfo.description = null;
                     gridInfo.imageContent = null;
+                    gridInfo.attachment = null;
                     gridInfo.generalContent = null;
                     gridInfo.imageDataSource = null;
                 },
@@ -326,6 +380,7 @@
                             onClick: () => {
                                 gridInfo.generalContent.show()
                                 gridInfo.imageContent.container.hide()
+                                gridInfo.attachment.container.hide()
                             },
                         },
                     },
@@ -339,11 +394,29 @@
                             onClick: (e) => {
                                 gridInfo.imageContent.container.show()
                                 gridInfo.generalContent.hide()
+                                gridInfo.attachment.container.hide()
                                 if (!gridInfo.imageContent.isRender)
                                     renderImageContent()
                             },
                         },
-                    }]
+                    },
+                    {
+                        widget: 'dxButton',
+                        toolbar: 'bottom',
+                        location: 'before',
+                        options: {
+                            text: 'Item Attachment',
+                            disabled: !Boolean(gridInfo.editingItem),
+                            onClick: (e) => {
+                                gridInfo.attachment.container.show()
+                                gridInfo.generalContent.hide()
+                                gridInfo.imageContent.container.hide()
+                                if (!gridInfo.attachment.isRender)
+                                    renderAttachmentContent()
+                            },
+                        },
+                    },
+                    ]
                     e.component.option('toolbarItems', toolbarPopup)
                     $('#formGridAddItemMaster').parent().addClass('d-flex flex-column')
                     gridInfo.generalContent = $('#formGridAddItemMaster');
@@ -355,6 +428,9 @@
                     gridInfo.imageContent.list.appendTo(gridInfo.imageContent.container)
                     gridInfo.imageContent.controller.appendTo(gridInfo.imageContent.container)
                     gridInfo.imageContent.container.hide()
+                    gridInfo.attachment = {
+                        container: $('<div style="display:flex;" class="flex-grow-1"/>').insertAfter($('#formGridAddItemMaster')),
+                    };
                 }
             },
             form: {
@@ -876,12 +952,39 @@
             }
         })
     }
+
+    function renderAttachmentContent() {
+        $('<div class="flex-grow-1"/>').css('height', 'auto')
+            .appendTo(gridInfo.attachment.container)
+            .dxFileManager({
+                rootFolderName: "Item Attachment",
+                fileSystemProvider: store.attachmentStore,
+                permissions: {
+                    delete: true,
+                    upload: true,
+                    download: true,
+                },
+                upload: {
+                    chunkSize: 5e6,
+                    maxFileSize: 5e6,
+                },
+                selectionMode: "single",
+                onFileUploading: (e) => {
+                    if (gridInfo.attachment.fileSource.find(v => v.name === e.fileData.name)) {
+                        e.errorCode = 1
+                        e.cancel = true
+                    }
+                }
+            })
+        gridInfo.attachment.isRender = true;
+    }
+
     function renderImageContent() {
         gridInfo.ContextMenu = $('<div/>').dxContextMenu({
             dataSource: [
                 {
                     text: "Delete",
-                    action: (e) => store.itemImageStore.remove(e.id).then(() => gridInfo.imageDataSource.reload())
+                    action: (e) => store.imageStore.remove(e.id).then(() => gridInfo.imageDataSource.reload())
                 },
             ],
             target: '.dx-item.dx-tile',
@@ -989,7 +1092,7 @@
             width: 75,
         }).appendTo(itemElement)
         gridInfo.imageDataSource = new DevExpress.data.DataSource({
-            store: store.itemImageStore,
+            store: store.imageStore,
             filter: ['itemId', '=', gridInfo.editingItem],
         })
         gridInfo.imageGallery = $("<div>").hide().dxGallery({
