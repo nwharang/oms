@@ -148,6 +148,16 @@ $(function () {
                 ],
             },
             {
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                formItem: {
+                    visible: false
+                },
+            },
+            {
                 caption: l("EntityFieldName:MDMService:ItemGroup:Code"),
                 dataField: "code",
                 editorOptions: {
