@@ -792,6 +792,8 @@
         let img = $('<img class="w-100 h-100"/>').attr('src', imgURL || '/images/default-avatar-image.jpg').css({ 'object-fit': 'contain', 'object-position': 'center' }).appendTo(imgContainer)
         let fileinput = $('<input class="form-control mt-2" type="file" id="avatar" name="avatar" accept="image/*">').appendTo(gridInfo.form)
         fileinput.on('change', () => {
+            if (fileinput.prop('files')[0].size > 1.5e7) return abp.message.error(l('ValidateError:UploadFileSize'), 500)
+            img.attr('src', URL.createObjectURL(fileinput.prop('files')[0]))
             gridInfo.fileinput = (e) => {
                 let file = fileinput.prop('files')[0]
                 let form = new FormData();
@@ -806,7 +808,6 @@
                     })
                 gridInfo.fileinput = null
             }
-            img.attr('src', URL.createObjectURL(fileinput.prop('files')[0]))
         })
         gridInfo.form.appendTo(itemElement)
     }

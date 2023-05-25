@@ -172,7 +172,8 @@ $(function () {
             },
             popup: {
                 title: l("Page.Title.EmployeeProfiles"),
-                height: 'fit-content',
+                height: '95%',
+                width: '95%',
                 hideOnOutsideClick: false,
                 dragEnabled: false,
                 onHiding: (e) => {
@@ -197,7 +198,7 @@ $(function () {
                     {
                         itemType: 'group',
                         colSpan: 2,
-                        items: ['erpCode', 'firstName', 'lastName', 'workingPositionId', 'employeeType']
+                        items: ['code', 'erpCode', 'firstName', 'lastName', 'workingPositionId', 'employeeType']
                     },
                     {
                         itemType: 'group',
@@ -317,16 +318,7 @@ $(function () {
                 editorOptions: {
                     maxLength: 20,
                 },
-                validationRules: [
-                    {
-                        type: "required"
-                    },
-                    {
-                        type: 'pattern',
-                        pattern: '^[a-zA-Z0-9]{1,20}$',
-                        message: l('ValidateError:Code')
-                    }
-                ]
+                allowEditing: false,
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:FirstName"),
@@ -472,7 +464,9 @@ $(function () {
         let imgContainer = $('<div/>').css({ 'min-height': '250px', 'min-width': "250px" }).appendTo(itemElement);
         let img = $('<img class="w-100 h-100"/>').attr('src', imgURL || '/images/default-avatar-image.jpg').css({ 'object-fit': 'contain', 'object-position': 'center' }).appendTo(imgContainer)
         let fileinput = $('<input class="form-control mt-2" type="file" id="avatar" name="avatar" accept="image/*">').appendTo(gridInfo.form)
-        fileinput.on('change', () => {
+        fileinput.on('change', (e) => {
+            if (fileinput.prop('files')[0].size > 1.5e7) return abp.message.error(l('ValidateError:UploadFileSize'), 500)
+            img.attr('src', URL.createObjectURL(fileinput.prop('files')[0]))
             gridInfo.fileinput = (e) => {
                 let file = fileinput.prop('files')[0]
                 let form = new FormData();
@@ -487,7 +481,6 @@ $(function () {
                     })
                 gridInfo.fileinput = null
             }
-            img.attr('src', URL.createObjectURL(fileinput.prop('files')[0]))
         })
         gridInfo.form.appendTo(itemElement)
     }
