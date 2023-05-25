@@ -193,8 +193,15 @@ let store = {
     salesOrgEmpAssignmentStore: new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
+            loadOptions.filter = [...(loadOptions?.filter || []), ["salesOrgHierarchyId", "=", salesOrgHierarchyIdFilter]]
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
             const deferred = $.Deferred();
-            salesOrgEmpAssignmentService.getListDevextremes({ filter: JSON.stringify((["salesOrgHierarchyId", "=", salesOrgHierarchyIdFilter])) })
+            salesOrgEmpAssignmentService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
