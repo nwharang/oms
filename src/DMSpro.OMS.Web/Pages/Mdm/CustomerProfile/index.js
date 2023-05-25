@@ -3,37 +3,13 @@
     let customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
     let cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.customerAttributeValues.customerAttributeValue;
     let cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
-    let employeeImageService = window.dMSpro.oMS.mdmService.controllers.customerImages.customerImage;
+    let customerImageService = window.dMSpro.oMS.mdmService.controllers.customerImages.customerImage;
     let geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
     let priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
     let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
 
     let gridInfo = {}
     let cusAttrStore = cusAttrService.getListDevextremes({ filter: JSON.stringify(['active', "=", true]) })
-
-    let store = {
-        imageStore: new DevExpress.data.CustomStore({
-            key: 'id',
-            load: (loadOptions) => {
-                const args = {};
-                requestOptions.forEach((i) => {
-                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                        args[i] = JSON.stringify(loadOptions[i]);
-                    }
-                });
-                return employeeImageService.getListDevextremes(args)
-                    .then(({ data }) => Promise.all(data.map(async imageInfo => {
-                        return {
-                            ...imageInfo,
-                            url: await fetch("/api/mdm-service/customer-images/get-file?id=" + imageInfo.fileId)
-                                .then(res => res.blob())
-                                .then(data => URL.createObjectURL(data))
-                        }
-                    })))
-                    .then(data => data.sort((a, b) => a.displayOrder - b.displayOrder));
-            },
-        }),
-    }
 
     let companiesLookup = new DevExpress.data.CustomStore({
         key: "id",
@@ -199,10 +175,9 @@
                 onHiding: (e) => {
                     gridInfo.editingRowId = null;
                     gridInfo.currentData = null;
-                    gridInfo.description = null;
                     gridInfo.imageContent = null;
                     gridInfo.generalContent = null;
-                    gridInfo.imageDataSource = null;
+                    gridInfo.form = null
                 },
             },
             form: {
@@ -772,6 +747,9 @@
             // ReadOnly when editing , allow when creating a new row
             if (e.dataField == 'endDate' && !e.row.isNewRow)
                 e.editorOptions.readOnly = true
+        },
+        onSaved: (e) => {
+            if (gridInfo.fileinput) gridInfo.fileinput(e);
         }
     }).dxDataGrid("instance");
 
@@ -800,97 +778,36 @@
     }
 
     async function renderItemImage(e, itemElement) {
-
-        itemElement.addClass('d-flex justify-content-center align-items-center').css('height', '300px');
-
-
-        let loadingImage = $('<div class="justify-content-center align-items-center w-100 h-100 rounded"/>').css({ 'display': 'flex' })
-            .append($('<div/>').dxLoadIndicator({
-                height: 75,
-                width: 75,
-            }))
-            .appendTo(itemElement);
-
-
-        gridInfo.form = $('<div class="w-50 flex-column"/>').css({ 'height': '300px', 'display': 'flex' })
-
-
-        let description = $('<div class="flex-grow-1"/>').dxTextArea({
-            value: "",
-            width: '100%',
-            height: '100%',
-            label: l("EntityFieldName:MDMService:EmployeeImage:Description"),
-            valueChangeEvent: 'keyup',
-            onValueChanged: () => uploadUrl()
-        }).appendTo(gridInfo.form).dxTextArea('instance')
-
-        let fileUploader = $('<div/>').dxFileUploader({
-            accept: 'image/*',
-            labelText: "",
-            uploadMode: 'instantly',
-            uploadUrl: `/api/mdm-service/customer-images/avatar?customerId=${gridInfo.editingRowId}&description=${description.option('value')}`,
-            selectButtonText: l('Button.New.EmployeeImage'),
-            name: 'inputFile',
-            showFileList: false,
-            disabled: !gridInfo.editingRowId,
-            onBeforeSend: (e) => {
-                if (e.file.size > 1.5e7) {
-                    e.component.abortUpload()
-                    return abp.message.error(l('ValidateError:UploadFileSize'), '500')
-                }
-                var fr = new FileReader;
-                fr.onload = function () {
-                    var img = new Image;
-                    img.onload = () => {
-                        if (img.width > 1024 || img.height > 1024) {
-                            e.component.abortUpload()
-                            return abp.message.error(l('ValidateError:UploadImageSize'), '500')
-                        }
-                    };
-                    img.src = fr.result;
-                };
-                fr.readAsDataURL(e.file)
-                e.request.setRequestHeader('RequestVerificationToken', abp.utils.getCookieValue('XSRF-TOKEN'))
+        let fileId = await customerImageService.getListDevextremes({ filter: JSON.stringify([['customerId', '=', gridInfo.editingRowId], 'and', ['isAvatar', '=', true]]) }).then(({ data }) => data[0]?.fileId)
+        editingRowId = gridInfo.editingRowId
+        if (fileId) var imgURL = await customerImageService.getFile(fileId, {
+            dataType: 'binary',
+            xhrFields: {
+                'responseType': 'blob'
             },
-            onUploaded: () => {
-                gridInfo.imageDataSource.reload()
-            },
-        })
-            .appendTo(gridInfo.form)
-            .dxFileUploader('instance')
-
-        function uploadUrl() {
-            fileUploader.option('uploadUrl', `/api/mdm-service/customer-images/avatar?customerId=${gridInfo.editingRowId}&description=${description.option('value') || ""}`)
-        }
-
-        gridInfo.imageDataSource = new DevExpress.data.DataSource({
-            store: store.imageStore,
-            filter: ['customerId', '=', gridInfo.editingRowId],
-            onLoadingChanged: () => {
-                loadingImage?.show()
-                gridInfo.form?.hide()
-                gridInfo.imageGallery?.element()?.hide()
-            },
-            onChanged: () => {
-                loadingImage.hide()
-                gridInfo.form?.show()
-                gridInfo.imageGallery?.element()?.show()
-                fileUploader?.option('uploadMethod', gridInfo.imageDataSource.items().length > 0 ? "PUT" : "POST")
+        }).then((blob) => URL.createObjectURL(blob))
+        itemElement.addClass('d-flex flex-column justify-content-center align-items-center').css('height', '300px');
+        gridInfo.form = $('<div class="flex-column"/>').css({ 'height': '250px', 'display': 'flex' })
+        let imgContainer = $('<div/>').css({ 'min-height': '250px', 'min-width': "250px" }).appendTo(itemElement);
+        let img = $('<img class="w-100 h-100"/>').attr('src', imgURL || '/images/default-avatar-image.jpg').css({ 'object-fit': 'contain', 'object-position': 'center' }).appendTo(imgContainer)
+        let fileinput = $('<input class="form-control mt-2" type="file" id="avatar" name="avatar" accept="image/*">').appendTo(gridInfo.form)
+        fileinput.on('change', () => {
+            gridInfo.fileinput = (e) => {
+                let file = fileinput.prop('files')[0]
+                let form = new FormData();
+                form.append('inputFile', file, file.name);
+                let description = JSON.stringify({ name: file.name, size: file.size, type: file.type })
+                customerImageService[fileId ? 'updateAvatar' : 'createAvatar'](editingRowId || e.changes[0]?.data?.id, file, description,
+                    {
+                        contentType: false,
+                        processData: false,
+                        data: form,
+                        async: true,
+                    })
+                gridInfo.fileinput = null
             }
+            img.attr('src', URL.createObjectURL(fileinput.prop('files')[0]))
         })
-        await gridInfo.imageDataSource.load({})
-
-        gridInfo.imageGallery = $("<div class='w-50 '>").dxGallery({
-            dataSource: gridInfo.imageDataSource,
-            height: 300,
-            showIndicator: false,
-            itemTemplate: (item) => {
-                description.option('value', item.description)
-                return $('<div class="d-flex p-2">').append($('<img class="rounded"/>').attr('src', item.url).css({ 'object-fit': 'contain', 'object-position': 'top', 'height': '100%', 'width': "100%" }));
-            },
-        }).appendTo(itemElement).dxGallery('instance')
-
         gridInfo.form.appendTo(itemElement)
     }
-
 });
