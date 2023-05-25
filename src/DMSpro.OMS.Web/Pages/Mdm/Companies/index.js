@@ -442,6 +442,13 @@
                 caption: l("EntityFieldName:MDMService:CompanyProfile:License"),
                 dataType: 'string',
                 visible: false,
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]$',
+                        message: l('ValidateError:License')
+                    }
+                ],
             },
             {
                 dataField: 'taxCode',
@@ -449,6 +456,13 @@
                 //width: 90,
                 dataType: 'string',
                 visible: false,
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]$',
+                        message: l('ValidateError:TaxCode')
+                    }
+                ],
             },
             {
                 dataField: 'erpCode',

@@ -430,12 +430,26 @@
                 caption: l("License"),
                 dataType: 'string',
                 visible: false,
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]$',
+                        message: l('ValidateError:License')
+                    }
+                ],
             },
             {
                 dataField: 'taxCode',
                 caption: l("TaxCode"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]$',
+                        message: l('ValidateError:TaxCode')
+                    }
+                ],
             },
             {
                 dataField: 'vatName',
