@@ -375,22 +375,16 @@ $(function () {
                                 width: 100,
                                 fixedPosition: 'left'
                             },
-                            // {
-                            //     caption: l('Actions'),
-                            //     width: 150,
-                            //     cellTemplate: (cellElement, cellInfo) => {
-                            //         if (!cellInfo.row.isNewRow && !cellInfo.data.isReleased)
-                            //             return $('<div>').dxButton({
-                            //                 text: l('Button:MDMService:PriceListAssignment:Release'),
-                            //                 onClick: () => {
-                            //                     pricelistAssignmentService.release(cellInfo.data.id, { contentType: "application/json" }).then(() => {
-                            //                         dataGridDetail.dxDataGrid('instance').refresh()
-                            //                     })
-                            //                 }
-                            //             })
-                            //         else return $('<div>').css('height', '2em')
-                            //     },
-                            // },
+                            {
+                                dataField: 'id',
+                                caption: l("Id"),
+                                dataType: 'string',
+                                allowEditing: false,
+                                visible: false,
+                                formItem: {
+                                    visible: false
+                                },
+                            },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListAssignment:Customer"),
                                 dataField: "customerGroupId",
