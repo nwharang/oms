@@ -354,7 +354,6 @@
                 dataField: 'docDiscountPerc',
                 dataType: 'number',
                 validationRules: [{ type: 'required' }],
-                format: '#0.00 %',
                 calculateDisplayValue: (e) => {
                     if (e)
                         return e.docDiscountPerc + " %"
@@ -407,8 +406,7 @@
             })
         },
     }).dxDataGrid("instance");
-    preLoad.then((data) => {
-        initChooseItemsPopup([...data.mainStore.itemList].map(e => { e.isFree = false; return e }))
-    })
+    preLoad.then((data) => initChooseItemsPopup([...data.mainStore.itemList].map(e => { e.isFree = false; return e })))
+
     // initImportPopup('', 'SalesRequest_Template', 'dgSalesOrderHeader');
 })

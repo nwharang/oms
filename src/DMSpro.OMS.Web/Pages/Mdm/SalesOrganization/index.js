@@ -148,7 +148,19 @@ $(function () {
                     displayExpr: "text",
                 },
                 width: 100
-            }
+            },
+            {
+                caption: l('EntityFieldName:MDMService:SalesOrgHeader:ZoneCount'),
+                dataField: 'zoneCount',
+                allowEditing: false,
+                width: 100
+            },
+            {
+                caption: l('EntityFieldName:MDMService:SalesOrgHeader:RouteCount'),
+                dataField: 'routeCount',
+                allowEditing: false,
+                width: 100
+            },
         ]
     }).dxDataGrid("instance");
     // initImportPopup('api/mdm-service/sales-org-headers', 'SalesOrgHeader_Template', 'dataGridContainer');

@@ -362,18 +362,17 @@
                 dataField: 'docDiscountPerc',
                 dataType: 'number',
                 validationRules: [{ type: 'required' }],
-                format: '#0.00 %',
                 width: 100,
+                calculateDisplayValue: (e) => {
+                    if (e)
+                        return e.docDiscountPerc + " %"
+                },
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt'),
                 dataField: 'docDiscountAmt',
                 dataType: 'number',
                 format: '#,##0.##',
-                calculateDisplayValue: (e) => {
-                    if (e)
-                        return e.docDiscountPerc + " %"
-                },
                 validationRules: [{ type: 'required' }],
                 width: 100,
             },

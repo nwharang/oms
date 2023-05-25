@@ -43,10 +43,12 @@ const popupImportContentTemplate = function (e) {
         $(`<div class="${controlName}" name="excelUploader">`).dxFileUploader({
             selectButtonText: l('Select a file'),
             icon: 'import',
-            //labelText: '',
             multiple: false,
             uploadMode: 'useForm',
             allowedFileExtensions: ['.xlsx', '.xls'],
+            onBeforeSend: (e) => {
+
+            }
         }));
     return content;
 };
@@ -58,12 +60,10 @@ function initImportPopup(url, templateName, controlName) {
 
     if ($(`div.${controlName}.importPanel`).length > 0) {
         $(`div.${controlName}.importPanel`).dxLoadPanel({
-            //shadingColor: 'rgba(0,0,0,0.4)',
             position: { of: `#${controlName} div.dx-datagrid-rowsview.dx-datagrid-nowrap` },
             visible: false,
             showIndicator: true,
             showPane: true,
-            //shading: true,
             hideOnOutsideClick: false
         });
     }
@@ -72,7 +72,6 @@ function initImportPopup(url, templateName, controlName) {
         var popupImport = $(`div.${controlName}.popupImport`).dxPopup({
             width: 400,
             height: 300,
-            //container: '#import-excel',
             showTitle: true,
             title: ('Import Excel'),
             visible: false,
@@ -96,9 +95,7 @@ function initImportPopup(url, templateName, controlName) {
                         fetch(`/${url}/get-excel-template`)
                             // Retrieve its body as ReadableStream
                             .then((response) => {
-                                console.log(response);
                                 const reader = response.body.getReader();
-                                console.log(reader);
                                 return new ReadableStream({
                                     start(controller) {
                                         return pump();
@@ -145,54 +142,56 @@ function initImportPopup(url, templateName, controlName) {
                         if (files.length > 0) {
                             var extension = `.${files[0].name.split('.').pop()}`;
                             if (uploader.option('allowedFileExtensions').indexOf(extension) == -1) return;
+                            let wb = new ExcelJS.Workbook();
+                            // OMS-6144
+                            wb.xlsx.load(files[0]).then(workBook => {
+                                var importType = $(`div.${controlName}[name=sbImportTypes]`).data('dxSelectBox').option('value');
+                                abp.message.confirm(abp.localization.getResource("OMS")(importType == 'I' ? 'ConfirmationMessage.InsertExcelFile' : 'ConfirmationMessage.UpdateExcelFile').replace('{0}', workBook.getWorksheet('Data').actualRowCount - 1)).then(function (answer) {
+                                    if (answer) {
+                                        var requestUrl = '';
+                                        if (importType == 'I') {
+                                            requestUrl = `${abp.appPath + url}/insert-from-excel`;
+                                        } else requestUrl = `${abp.appPath + url}/update-from-excel`;
 
-                            abp.message.confirm(abp.localization.getResource("OMS")('ConfirmationMessage.UploadExcelFile').replace('{0}', `"${files[0].name}"`), ' ').then(function (answer) {
-                                if (answer) {
-                                    var requestUrl = '';
+                                        var formData = new FormData();
+                                        formData.append("file", files[0]);
 
-                                    var importType = $(`div.${controlName}[name=sbImportTypes]`).data('dxSelectBox').option('value');
-                                    if (importType == 'I') {
-                                        requestUrl = `${abp.appPath + url}/insert-from-excel`;
-                                    } else requestUrl = `${abp.appPath + url}/update-from-excel`;
+                                        var panel = $(`div.${controlName}.importPanel`).data('dxLoadPanel');
+                                        panel.show();
 
-                                    var formData = new FormData();
-                                    formData.append("file", files[0]);
+                                        $.ajax({
+                                            type: "POST",
+                                            url: requestUrl,
+                                            async: true,
+                                            data: formData,
+                                            cache: false,
+                                            contentType: false,
+                                            processData: false,
+                                            success: function (data) {
+                                                uploader.reset();
+                                                popupImport.hide();
+                                                panel.hide();
 
-                                    var panel = $(`div.${controlName}.importPanel`).data('dxLoadPanel');
-                                    panel.show();
-
-                                    $.ajax({
-                                        type: "POST",
-                                        url: requestUrl,
-                                        async: true,
-                                        data: formData,
-                                        cache: false,
-                                        contentType: false,
-                                        processData: false,
-                                        success: function (data) {
-                                            uploader.reset();
-                                            popupImport.hide();
-                                            panel.hide();
-
-                                            if ($(`#${controlName}`).data('dxDataGrid'))
-                                                $(`#${controlName}`).data('dxDataGrid').refresh();
-                                            else if ($(`#${controlName}`).data('dxTreeList'))
-                                                $(`#${controlName}`).data('dxTreeList').refresh();
-                                        },
-                                        error: function (msg) {
-                                            uploader.reset();
-                                            panel.hide();
-                                            console.log(msg.responseText);
-                                            if (msg.responseText) {
-                                                var parsedResult = JSON.parse(msg.responseText);
-                                                if (parsedResult && parsedResult.error) {
-                                                    abp.message.error(parsedResult.error.message);
+                                                if ($(`#${controlName}`).data('dxDataGrid'))
+                                                    $(`#${controlName}`).data('dxDataGrid').refresh();
+                                                else if ($(`#${controlName}`).data('dxTreeList'))
+                                                    $(`#${controlName}`).data('dxTreeList').refresh();
+                                            },
+                                            error: function (msg) {
+                                                uploader.reset();
+                                                panel.hide();
+                                                console.log(msg.responseText);
+                                                if (msg.responseText) {
+                                                    var parsedResult = JSON.parse(msg.responseText);
+                                                    if (parsedResult && parsedResult.error) {
+                                                        abp.message.error(parsedResult.error.message);
+                                                    }
                                                 }
-                                            }
-                                        },
-                                    });
-                                }
-                            });
+                                            },
+                                        });
+                                    }
+                                });
+                            })
                         }
                     },
                 },

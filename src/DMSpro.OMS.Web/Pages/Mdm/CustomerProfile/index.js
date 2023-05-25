@@ -1,16 +1,41 @@
 ﻿$(async function () {
-    var l = abp.localization.getResource("OMS");
-    var l1 = abp.localization.getResource("OMS");
-    var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
-    var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
-    var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.customerAttributeValues.customerAttributeValue;
-    var cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
-    var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
-    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+    let l = abp.localization.getResource("OMS");
+    let customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
+    let cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.customerAttributeValues.customerAttributeValue;
+    let cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
+    let employeeImageService = window.dMSpro.oMS.mdmService.controllers.customerImages.customerImage;
+    let geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
+    let priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
+    let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
 
+    let gridInfo = {}
     let cusAttrStore = cusAttrService.getListDevextremes({ filter: JSON.stringify(['active', "=", true]) })
 
-    var companiesLookup = new DevExpress.data.CustomStore({
+    let store = {
+        imageStore: new DevExpress.data.CustomStore({
+            key: 'id',
+            load: (loadOptions) => {
+                const args = {};
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+                return employeeImageService.getListDevextremes(args)
+                    .then(({ data }) => Promise.all(data.map(async imageInfo => {
+                        return {
+                            ...imageInfo,
+                            url: await fetch("/api/mdm-service/customer-images/get-file?id=" + imageInfo.fileId)
+                                .then(res => res.blob())
+                                .then(data => URL.createObjectURL(data))
+                        }
+                    })))
+                    .then(data => data.sort((a, b) => a.displayOrder - b.displayOrder));
+            },
+        }),
+    }
+
+    let companiesLookup = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -150,9 +175,6 @@
         }
     });
 
-
-    var cusProfile = {};
-
     var gridCustomers = $('#dgCustomers').dxDataGrid({
         dataSource: customStore,
         repaintChangesOnly: true,
@@ -174,29 +196,33 @@
                 height: "95%",
                 hideOnOutsideClick: false,
                 dragEnabled: false,
+                onHiding: (e) => {
+                    gridInfo.editingRowId = null;
+                    gridInfo.currentData = null;
+                    gridInfo.description = null;
+                    gridInfo.imageContent = null;
+                    gridInfo.generalContent = null;
+                    gridInfo.imageDataSource = null;
+                },
             },
             form: {
                 labelMode: "outside",
-                colCount: 3,
+                colCount: 2,
                 elementAttr: {
                     id: "customerForm",
                 },
                 items: [
                     {
                         itemType: "group",
-                        caption: 'IMAGE',
-                        colSpan: 1,
-                        template: renderUserImage // Fix for future versions
+                        template: renderItemImage
                     },
                     {
                         itemType: "group",
-                        caption: 'GENERAL',
-                        colSpan: 2,
                         items: ["code", 'name', 'phone1', 'phone2', 'erpCode', 'priceListId', 'active'],
                     },
                     {
                         itemType: "tabbed",
-                        colSpan: 3,
+                        colSpan: 2,
                         tabs: [
                             {
                                 title: 'DATA',
@@ -215,6 +241,9 @@
                                     },
                                     {
                                         dataField: 'creditLimit'
+                                    },
+                                    {
+                                        dataField: 'paymentTermId'
                                     },
                                     {
                                         dataField: 'linkedCompanyId',
@@ -244,7 +273,7 @@
                             {
                                 title: 'ATTRIBUTE',
                                 colCount: 2,
-                                items: getAttrOptions(),
+                                items: await getAttrOptions(),
                             }
                         ]
                     }],
@@ -312,7 +341,7 @@
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes, // ?? 
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -345,7 +374,15 @@
             {
                 type: 'buttons',
                 caption: l("Actions"),
-                buttons: ['edit'],
+                buttons: [
+                    {
+                        name: 'edit',
+                        onClick: (e) => {
+                            gridInfo.editingRowId = e.row.data.id;
+                            gridCustomers.editRow(e.row.rowIndex);
+                        }
+                    },
+                    , 'delete'],
                 fixed: true,
                 fixedPosition: "left",
             },
@@ -360,13 +397,10 @@
                 },
             },
             {
-                //allowEditing: false,
                 dataField: 'code',
                 caption: l("Code"),
-                //allowEditing: false,
                 dataType: 'string',
                 allowEditing: false,
-                //validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'name',
@@ -437,7 +471,14 @@
                 dataField: 'vatAddress',
                 caption: l("VatAddress"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: "stringLength",
+                        max: 200,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 200)
+                    }
+                ]
             },
             // {
             //     dataField: 'sfaCustomerCode',
@@ -478,6 +519,7 @@
                     displayFormat: 'dd/MM/yyyy',
                 },
                 format: 'dd/MM/yyyy',
+
             },
             {
                 dataField: 'isCompany',
@@ -501,6 +543,13 @@
                     min: 0,
                     format: '#'
                 }
+            },
+            {
+                dataField: 'paymentTermId',
+                caption: l("PaymentTerm"),
+                dataType: 'string',
+                visible: false,
+                allowEditing: false,
             },
             {
                 dataField: 'linkedCompanyId',
@@ -540,7 +589,7 @@
             },
             {
                 dataField: "geoMaster0Id",
-                caption: l1("GeoLevel0Name"),
+                caption: l("GeoLevel0Name"),
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster0 || rowData.geoMaster0 === null) return "";
@@ -569,7 +618,7 @@
             },
             {
                 dataField: "geoMaster1Id",
-                caption: l1("GeoLevel1Name"),
+                caption: l("GeoLevel1Name"),
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster1 || rowData.geoMaster1 === null) return "";
@@ -597,7 +646,7 @@
             },
             {
                 dataField: "geoMaster2Id",
-                caption: l1("GeoLevel2Name"),
+                caption: l("GeoLevel2Name"),
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster2 || rowData.geoMaster2 === null) return "";
@@ -624,7 +673,7 @@
             },
             {
                 dataField: "geoMaster3Id",
-                caption: l1("GeoLevel3Name"),
+                caption: l("GeoLevel3Name"),
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster3 || rowData.geoMaster3 === null) return "";
@@ -650,7 +699,7 @@
             },
             {
                 dataField: "geoMaster4Id",
-                caption: l1("GeoLevel4Name"),
+                caption: l("GeoLevel4Name"),
                 allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster4 || rowData.geoMaster4 === null) return "";
@@ -677,13 +726,27 @@
                 dataField: 'street',
                 caption: l("Street"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: "stringLength",
+                        max: 200,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 200)
+                    }
+                ]
             },
             {
                 dataField: 'address',
                 caption: l("Address"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: "stringLength",
+                        max: 200,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 200)
+                    }
+                ]
             },
             {
                 dataField: 'latitude',
@@ -703,63 +766,16 @@
             e.data.effectiveDate = new Date().toISOString();
             e.data.active = true;
         },
+        onEditorPreparing: (e) => {
+            if (e.row?.rowType != 'data') return
+            // ReadOnly when editing , allow when creating a new row
+            if (e.dataField == 'endDate' && !e.row.isNewRow)
+                e.editorOptions.readOnly = true
+        }
     }).dxDataGrid("instance");
 
     initImportPopup('api/mdm-service/customers', 'Customers_Template', 'dgCustomers');
 
-    function dsAttrValue(n) {
-        return {
-            store: getCusAttrValue,
-            filter: ['customerAttribute.attrNo', '=', n],
-        };
-    }
-
-    //var listAttrValue = [];
-    function renderUserImage(data, itemElement) {
-        // change in future versions
-        function getuserImage(userId) {
-            var d = new $.Deferred();
-            /// Get avatar src attribute value here 
-            Promise.resolve(d.resolve(null))
-            return d.promise();
-        }
-
-        getuserImage("Customer Id Go Here").done(dataUrl => {
-            itemElement.addClass("d-flex flex-column justify-content-center align-items-center");
-            itemElement.append($("<img>").attr({
-                id: "img-avatar",
-                // https://source.unsplash.com/random/ for testing image size
-                // /images/default-avatar-image.jpg for default image size
-                src: dataUrl || "/images/default-avatar-image.jpg",
-                style: "object-fit:contain;object-position:center center;max-height:200px;max-width:200px;cursor:pointer;border-radius:50%",
-            }))
-            itemElement.append($("<div>").addClass('mt-3 w-100').attr("id", "file-uploader").dxFileUploader({
-                accept: 'image/*',
-                uploadMode: 'instantly',
-                uploadUrl: 'API_URL_POST', // Upload Image Endpoint Go Here
-                selectButtonText: "Choose Image",
-                onValueChanged(e) {
-                    const files = e.value;
-                    if (files.length > 0) {
-                        $('#selected-files .selected-item').remove();
-                        $.each(files, (i, file) => {
-                            const $selectedItem = $('<div />').addClass('selected-item');
-                            $selectedItem.append(
-                                $('<span />').html(`Name: ${file.name}<br/>`),
-                                $('<span />').html(`Size ${file.size} bytes<br/>`),
-                                $('<span />').html(`Type ${file.type}<br/>`),
-                                $('<span />').html(`Last Modified Date: ${file.lastModifiedDate}`),
-                            );
-                            $selectedItem.appendTo($('#selected-files'));
-                        });
-                        $('#selected-files').show();
-                    } else {
-                        $('#selected-files').hide();
-                    }
-                },
-            }))
-        })
-    }
     function genCustomerAttrColumn() {
         return cusAttrStore.then(({ data }) =>
             data.map(({ attrNo, attrName }) => {
@@ -779,23 +795,101 @@
         )
     }
     function getAttrOptions() {
-        let res = []
-        cusAttrStore.then(({ data }) => {
-            data.forEach(e => { res.push(generateAttrOptions(e)) })
-        })
-        return res
+        return cusAttrStore.then(({ data }) => data.map(({ attrNo }) => 'attr' + attrNo + 'Id'))
     }
-    function generateAttrOptions(attr) {
-        return {
-            dataField: 'attr' + attr.attrNo + 'Id',
-            label: {
-                text: attr.attrName
+
+    async function renderItemImage(e, itemElement) {
+
+        itemElement.addClass('d-flex justify-content-center align-items-center').css('height', '300px');
+
+
+        let loadingImage = $('<div class="justify-content-center align-items-center w-100 h-100 rounded"/>').css({ 'display': 'flex' })
+            .append($('<div/>').dxLoadIndicator({
+                height: 75,
+                width: 75,
+            }))
+            .appendTo(itemElement);
+
+
+        gridInfo.form = $('<div class="w-50 flex-column"/>').css({ 'height': '300px', 'display': 'flex' })
+
+
+        let description = $('<div class="flex-grow-1"/>').dxTextArea({
+            value: "",
+            width: '100%',
+            height: '100%',
+            label: l("EntityFieldName:MDMService:EmployeeImage:Description"),
+            valueChangeEvent: 'keyup',
+            onValueChanged: () => uploadUrl()
+        }).appendTo(gridInfo.form).dxTextArea('instance')
+
+        let fileUploader = $('<div/>').dxFileUploader({
+            accept: 'image/*',
+            labelText: "",
+            uploadMode: 'instantly',
+            uploadUrl: `/api/mdm-service/customer-images/avatar?customerId=${gridInfo.editingRowId}&description=${description.option('value')}`,
+            selectButtonText: l('Button.New.EmployeeImage'),
+            name: 'inputFile',
+            showFileList: false,
+            disabled: !gridInfo.editingRowId,
+            onBeforeSend: (e) => {
+                if (e.file.size > 1.5e7) {
+                    e.component.abortUpload()
+                    return abp.message.error(l('ValidateError:UploadFileSize'), '500')
+                }
+                var fr = new FileReader;
+                fr.onload = function () {
+                    var img = new Image;
+                    img.onload = () => {
+                        if (img.width > 1024 || img.height > 1024) {
+                            e.component.abortUpload()
+                            return abp.message.error(l('ValidateError:UploadImageSize'), '500')
+                        }
+                    };
+                    img.src = fr.result;
+                };
+                fr.readAsDataURL(e.file)
+                e.request.setRequestHeader('RequestVerificationToken', abp.utils.getCookieValue('XSRF-TOKEN'))
             },
-            editorOptions: {
-                dataSource: dsAttrValue(attr.attrNo), //listAttrValue.filter(x => x.itemAttributeId == attr.id),
-                valueExpr: 'id',
-                displayExpr: 'attrValName'
-            }
+            onUploaded: () => {
+                gridInfo.imageDataSource.reload()
+            },
+        })
+            .appendTo(gridInfo.form)
+            .dxFileUploader('instance')
+
+        function uploadUrl() {
+            fileUploader.option('uploadUrl', `/api/mdm-service/customer-images/avatar?customerId=${gridInfo.editingRowId}&description=${description.option('value') || ""}`)
         }
+
+        gridInfo.imageDataSource = new DevExpress.data.DataSource({
+            store: store.imageStore,
+            filter: ['customerId', '=', gridInfo.editingRowId],
+            onLoadingChanged: () => {
+                loadingImage?.show()
+                gridInfo.form?.hide()
+                gridInfo.imageGallery?.element()?.hide()
+            },
+            onChanged: () => {
+                loadingImage.hide()
+                gridInfo.form?.show()
+                gridInfo.imageGallery?.element()?.show()
+                fileUploader?.option('uploadMethod', gridInfo.imageDataSource.items().length > 0 ? "PUT" : "POST")
+            }
+        })
+        await gridInfo.imageDataSource.load({})
+
+        gridInfo.imageGallery = $("<div class='w-50 '>").dxGallery({
+            dataSource: gridInfo.imageDataSource,
+            height: 300,
+            showIndicator: false,
+            itemTemplate: (item) => {
+                description.option('value', item.description)
+                return $('<div class="d-flex p-2">').append($('<img class="rounded"/>').attr('src', item.url).css({ 'object-fit': 'contain', 'object-position': 'top', 'height': '100%', 'width': "100%" }));
+            },
+        }).appendTo(itemElement).dxGallery('instance')
+
+        gridInfo.form.appendTo(itemElement)
     }
+
 });

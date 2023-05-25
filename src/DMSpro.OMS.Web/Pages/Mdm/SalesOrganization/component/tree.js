@@ -70,10 +70,6 @@ let renderTree = (e, headerData) => {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        onContentReady: (e) => {
-            $('#routeCount').text(routeCount);
-            $('#zoneCount').text(zoneCount);
-        },
         onRowInserting: (e) => {
             // for create first data - if parentId = 0, update parentId = null
             if (e.data && e.data.parentId == 0) {
@@ -140,15 +136,12 @@ let renderTree = (e, headerData) => {
             items: [
                 {
                     location: 'before',
-                    template() {
-                        return $('<div class="dx-fieldset-header">').append('Organization Tree');
-                    },
+                    template: () => $('<div class="dx-fieldset-header">').append('Organization Tree'),
+
                 },
                 {
                     location: 'center',
-                    template() {
-                        return $("<div class='d-flex gap-2'><div class='isRoute' id='routeCount'></div><div class='isSellingZone' id='zoneCount'></div></div>")
-                    },
+                    template: () => $(`<div class='d-flex gap-2'><div class='isRoute' >${headerData.routeCount}</div><div class='isSellingZone'>${headerData.zoneCount}</div></div>`)
                 },
                 {
                     widget: 'dxButton',
@@ -180,11 +173,10 @@ let renderTree = (e, headerData) => {
                 caption: 'Name',
                 dataField: "name",
                 cellTemplate: function (element, info) {
+
                     if (info.data.isRoute) {
-                        routeCount += 1
                         element.append("<div class='isRoute'><span class='px-1'>" + info.data.code + " - " + info.data.name + "</span></div>");
                     } else if (info.data.isSellingZone) {
-                        zoneCount += 1
                         element.append("<div class='isSellingZone'><span class='px-1'>" + info.data.code + " - " + info.data.name + "</span></div>");
                     } else {
                         element.append("<div>" + info.data.code + " - " + info.data.name + "</div>");

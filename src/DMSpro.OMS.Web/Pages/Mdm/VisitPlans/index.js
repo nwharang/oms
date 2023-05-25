@@ -263,8 +263,8 @@ $(function () {
             showNavigationButtons: true
         },
         onRowUpdating: function (e) {
-            let { dateVisit, distance, visitOrder, mcpDetailId, customerId, routeId, itemGroupId, isCommando } = Object.assign({}, e.oldData, e.newData);
-            e.newData = { dateVisit, distance, visitOrder, mcpDetailId, customerId, routeId, itemGroupId, isCommando }
+            let { dateVisit, distance, visitOrder, mcpDetailId, customerId, routeId, itemGroupId } = Object.assign({}, e.oldData, e.newData);
+            e.newData = { dateVisit, distance, visitOrder, mcpDetailId, customerId, routeId, itemGroupId }
         },
         toolbar: {
             items: [

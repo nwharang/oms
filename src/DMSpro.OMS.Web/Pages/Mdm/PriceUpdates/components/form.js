@@ -30,12 +30,14 @@ function renderForm(e, headerData) {
                 editorType: 'dxSelectBox',
                 colSpan: 3,
                 editorOptions: {
-                    dataSource: store.priceListStore,
-                    displayExpr(e) {
-                        if (e) {
+                    dataSource: {
+                        store: store.priceListStore,
+                        filter: ['isReleased', '=', true]
+                    },
+                    displayExpr: (e) => {
+                        if (e)
                             return `${e.code} - ${e.name}`;
-                        }
-                        return "";
+                        return
                     },
                     valueExpr: "id",
                     readOnly: headerData.status >= 0
@@ -52,9 +54,9 @@ function renderForm(e, headerData) {
                     text: headerData.status >= 0 ? "Release" : "Create",
                     disabled: headerData.status >= 1,
                     width: '100%',
-                    onClick(event) {
+                    onClick: (event) => {
                         popupInstance.beginUpdate()
-                        if (!formInstance.validate().inValid) return
+                        if (formInstance.validate().inValid) return
                         switch (headerData.status) {
                             default:
                                 dataSend = {

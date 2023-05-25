@@ -105,13 +105,21 @@ let store = {
 
             salesOrgHeaderService.getListDevextremes(args)
                 .done(result => {
+                    let zoneDictionary = result.summary[0]?.zoneDictionary
+                    let routeDictionary = result.summary[0]?.routeDictionary
+                    result.data = result.data.map((e) => {
+                        return {
+                            ...e,
+                            zoneCount: zoneDictionary[e.id]?.length || 0,
+                            routeCount: routeDictionary[e.id]?.length || 0
+                        }
+                    })
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
                         groupCount: result.groupCount,
                     });
                 });
-
             return deferred.promise();
         },
         byKey: function (key) {
@@ -141,7 +149,10 @@ let store = {
             });
             salesOrgHierarchyService.getListDevextremes(args)
                 .done(result => {
-                    currentTreeTotalCount = result.totalCount
+                    result.data.forEach((item) => {
+                        if (item.isRoute) routeCount += 1;
+                        if (item.isSellingZone) zoneCount += 1;
+                    })
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -182,8 +193,15 @@ let store = {
     salesOrgEmpAssignmentStore: new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
+            loadOptions.filter = [...(loadOptions?.filter || []), ["salesOrgHierarchyId", "=", salesOrgHierarchyIdFilter]]
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
             const deferred = $.Deferred();
-            salesOrgEmpAssignmentService.getListDevextremes({ filter: JSON.stringify((["salesOrgHierarchyId", "=", salesOrgHierarchyIdFilter])) })
+            salesOrgEmpAssignmentService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,

@@ -297,23 +297,6 @@
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
             },
-            // {
-            //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
-            //     dataField: 'docTotalLineAmt',
-            //     dataType: 'number',
-            //     visible: true,
-            //     validationRules: [{ type: 'required' }],
-            //     allowEditing: false,
-            // },
-            // {
-            //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
-            //     dataField: 'docTotalLineAmtAfterTax',
-            //     dataType: 'number',
-            //     width: 100,
-            //     visible: true,
-            //     validationRules: [{ type: 'required' }],
-            //     allowEditing: false,
-            // },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
                 dataField: 'docTotalAmt',
@@ -400,8 +383,5 @@
             })
         },
     }).dxDataGrid("instance");
-    preLoad.then((data) => {
-        initChooseItemsPopup([...data.salesOrderStore.itemList].map(e => { e.isFree = false; return e }))
-    })
-    // initImportPopup('', 'SalesRequest_Template', 'dgSalesRequestHeader');
+    preLoad.then((data) => initChooseItemsPopup([...data.mainStore.itemList].map(e => { e.isFree = false; return e })))
 })

@@ -193,7 +193,7 @@ $(function () {
                     {
                         type: "stringLength",
                         max: 50,
-                        message: l('WarnMessage.FieldLength')
+                        message: l('WarnMessage.FieldLength').replace("{0}", 50)
                     }
                 ]
             }

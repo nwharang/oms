@@ -1,7 +1,7 @@
 let preLoad = getInfoSO()
 
 let currentData = {}, isDocOpen
-let helper = ({ companyId, salesOrderStore, vatList }) => {
+let helper = ({ companyId, mainStore, vatList }) => {
     let salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
     let { discountTypeStore, transactionTypeStore, docStatusStore } = store()
     let gridInitialized = false, popup, form, grid;
@@ -99,7 +99,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                             editorType: 'dxSelectBox',
                             editorOptions: {
                                 dataSource: {
-                                    store: salesOrderStore.customerList,
+                                    store: mainStore.customerList,
                                     paginate: true,
                                     pageSize
                                 },
@@ -323,7 +323,7 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                             id: 'addNewDetailButton'
                         }
                     },
-                    onClick(e) {
+                    onClick: (e) => {
                         $("#popupItems").dxPopup('instance').show()
                     }
 
@@ -345,118 +345,59 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     fixed: true,
                     fixedPosition: 'left',
                     lookup: {
-                        dataSource: salesOrderStore.itemList,
+                        dataSource: mainStore.itemList,
                         displayExpr(e) { return e.code + ' - ' + e.name },
                         valueExpr: "id",
                     },
-                    editCellTemplate: (cellElement, cellInfo) => {
-                        return $('<div>').dxDropDownBox({
-                            dataSource: salesOrderStore.itemList,
-                            value: cellInfo.value,
-                            valueExpr: "id",
-                            displayExpr(e) { return e.code + ' - ' + e.name },
-                            width: 500,
-                            placeholder: 'Select a value...',
-                            contentTemplate: (e) => {
-                                let content = $('<div>').dxDataGrid({
-                                    dataSource: genStoreForDropDownBox(salesOrderStore.itemList),
-                                    hoverStateEnabled: true,
-                                    scrolling: { mode: 'virtual' },
-                                    height: 250,
-                                    selection: { mode: 'single' },
-                                    selectedRowKeys: [cellInfo.value],
-                                    focusedRowEnabled: true,
-                                    focusedRowKey: cellInfo.value,
-                                    filterRow: {
-                                        visible: true,
-                                        applyFilter: 'auto',
-                                    },
-                                    columns: [
-                                        {
-                                            dataField: 'code'
-                                        },
-                                        {
-                                            dataField: 'name'
-                                        },
-                                    ],
-                                    onSelectionChanged(selectionChangedArgs) {
-                                        e.component.option('value', selectionChangedArgs.selectedRowKeys[0]);
-                                        cellInfo.setValue(selectionChangedArgs.selectedRowKeys[0]);
-                                        if (selectionChangedArgs.selectedRowKeys.length > 0) {
-                                            e.component.close();
-                                        }
-                                    },
-                                })
-                                e.component.on('valueChanged', (args) => {
-                                    content.dxDataGrid('instance').selectRows(args.value, false);
-                                    e.component.close();
-                                    setTimeout(() => {
-                                        recalulateDocTotal()
-                                    }, 200)
-
-                                });
-                                return content
-                            }
-                        })
-                    },
-                    setCellValue: function (newData, value, currentRowData) {
-                        let selectedItem = salesOrderStore.itemList.find(i => i.id == value);
-                        let vat = vatList.find(i => i.id == selectedItem?.vatId);
-                        if (selectedItem) {
-                            newData.itemId = value;
-                            newData.uomGroupId = selectedItem.uomGroupId;
-                            newData.vatId = selectedItem.vatId;
-                            newData.taxRate = vat.rate;
-                            newData.uomId = selectedItem.salesUomId;
-                            newData.price = selectedItem.basePrice;
-                            newData.priceAfterTax = newData.price + (newData.price * newData.taxRate) / 100;
-                            newData.lineAmtAfterTax = newData.priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0);
-                            newData.lineAmt = newData.price * currentRowData.qty - (currentRowData.discountAmt || 0);
-                        }
-                    },
+                    allowEditing: false,
                 },
                 {
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:UOM'),
                     dataField: 'uomId',
+                    calculateDisplayValue: "uomDisplay",
                     lookup: {
                         dataSource: (e) => {
-                            if (e?.data?.uomGroupId) {
-                                // find Valid UomGroup 
-                                let validUom = salesOrderStore.uomGroupWithDetailsDictionary.find(v => v.id === e.data.uomGroupId)?.data
-                                if (!validUom)
-                                    return salesOrderStore.uOMList
-                                let data = salesOrderStore.uOMList.map(e => {
-                                    return {
-                                        ...e,
-                                        ...validUom.find(v => v.altUOMId === e.id)
-                                    }
-                                })
-                                console.log(data);
-                                return data
+                            if (e?.data?.id) {
+                                let uomGroupId = mainStore.itemList.find(v => v.id === e.data.itemId).uomGroupId
+                                let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === uomGroupId)?.data
+                                if (!validUom) return mainStore.uOMList
+                                let dataSource = mainStore.uOMList.filter(e => validUom.find(v => e.id === v.altUOMId))
+                                return dataSource
                             }
-                            return salesOrderStore.uOMList
+                            return mainStore.uOMList
                         },
                         displayExpr: (e) => {
-                            if (e)
-                                return `${e.code} - ${e.name}`
+                            if (e) return `(${e.code}) - ${e.name}`
                         },
                         valueExpr: "id"
                     },
-                    // calculateDisplayValue: (e) => {
-                    //     return salesOrderStore.uOMList.find(v => v.id === e.uomId)?.name || "None"
-                    // },
                     setCellValue: function (newData, value, currentRowData) {
-                        let customerId = form.dxForm('instance').getEditor('businessPartnerId').option('value');
-                        let customer = salesOrderStore.customerList.find(x => x.id == customerId);
-                        let price = salesOrderStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + value)?.value || 0;
-                        let priceAfterTax = price + (price * currentRowData.taxRate) / 100;
-                        let lineAmtAfterTax = priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0);
-                        let lineAmt = price * currentRowData.qty - (currentRowData.discountAmt || 0);
                         newData.uomId = value;
-                        newData.price = price;
-                        newData.priceAfterTax = priceAfterTax;
-                        newData.lineAmtAfterTax = lineAmtAfterTax;
-                        newData.lineAmt = lineAmt;
+                        if (currentRowData.isFree) {
+                            newData.price = 0;
+                            newData.priceAfterTax = 0;
+                            newData.lineAmtAfterTax = 0;
+                            newData.lineAmt = 0;
+                            newData.discountType = null
+                            newData.discountPerc = null
+                            newData.discountAmt = null
+                        } else {
+                            let customerId = form.dxForm('instance').getEditor('businessPartnerId').option('value');
+                            let customer = mainStore.customerList.find(x => x.id == customerId);
+                            let price = mainStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + value)?.value;
+                            if (!price) {
+                                let uomGroupId = mainStore.itemList.find(v => v.id === currentRowData.itemId).uomGroupId
+                                let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === uomGroupId)?.data?.find(v => v.altUOMId === value)
+                                price = mainStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + validUom.baseUOMId)?.value * validUom?.baseQty || 0
+                            }
+                            let priceAfterTax = price + (price * currentRowData.taxRate) / 100;
+                            let lineAmtAfterTax = priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0);
+                            let lineAmt = price * currentRowData.qty - (currentRowData.discountAmt || 0);
+                            newData.price = price;
+                            newData.priceAfterTax = priceAfterTax;
+                            newData.lineAmtAfterTax = lineAmtAfterTax;
+                            newData.lineAmt = lineAmt;
+                        }
                     },
                 },
                 {
@@ -465,16 +406,38 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                     dataType: 'boolean',
                     width: "75",
                     setCellValue: (newData, value, currentRowData) => {
-                        let lineAmtAfterTax = currentRowData.priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0);
-                        let lineAmt = currentRowData.price * currentRowData.qty - (currentRowData.discountAmt || 0);
                         newData.isFree = value;
-                        if (Boolean(value)) {
+                        if (value) {
                             newData.lineAmt = 0
                             newData.lineAmtAfterTax = 0
+                            newData.lineDiscountAmt = 0
+                            newData.discountType = null
+                            newData.discountPerc = null
+                            newData.discountAmt = null
+                            newData.price = 0
+                            newData.priceAfterTax = 0
                         }
                         else {
-                            newData.lineAmt = lineAmt
-                            newData.lineAmtAfterTax = lineAmtAfterTax
+                            let customerId = form.dxForm('instance').getEditor('businessPartnerId').option('value');
+                            let customer = mainStore.customerList.find(x => x.id == customerId);
+                            let price = mainStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + currentRowData.uomId)?.value || 0;
+                            let priceAfterTax = price + (price * currentRowData.taxRate) / 100;
+                            switch (currentRowData.discountType) {
+                                case 0:
+                                    var discountAmtCal = currentRowData.discountAmt
+                                    break;
+                                case 1: // 
+                                    var discountAmtCal = currentRowData.discountPerc * currentRowData.qty * currentRowData.price / 100
+                                    break;
+                                case 2:
+                                    var discountAmtCal = currentRowData.discountPerc * currentRowData.qty * currentRowData.priceAfterTax / 100
+                                    break;
+                            }
+                            newData.price = price;
+                            newData.priceAfterTax = priceAfterTax;
+                            newData.lineAmt = price * currentRowData.qty - (discountAmtCal || 0);
+                            newData.lineAmtAfterTax = priceAfterTax * currentRowData.qty - (discountAmtCal || 0)
+                            newData.lineDiscountAmt = (discountAmtCal || 0)
                         }
                     }
                 },
@@ -756,20 +719,15 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
                 if (e.row?.rowType != 'data') return
                 let discountType = e.row.data.discountType
                 if (e.dataField == "discountType") {
+                    e.editorOptions.readOnly = e.row.data.isFree
                     e.cancel = e.row.data.isFree
                 }
                 if (e.dataField == "discountAmt")
-                    e.cancel = discountType == 0 && !e.row.data.isFree ? false : true
+                    e.editorOptions.readOnly = discountType == 0 && !e.row.data.isFree ? false : true
                 if (e.dataField == "discountPerc")
-                    e.cancel = discountType > 0 && !e.row.data.isFree ? false : true
-
-                // e.editorOptions.onValueChanged = (v) => {
-                //     e.setValue(v.value)
-                //     setTimeout(() => {
-                //         recalulateDocTotal()
-                //     }, 200)
-                // }
-
+                    e.editorOptions.readOnly = discountType > 0 && !e.row.data.isFree ? false : true
+                if (e.dataField == "price")
+                    e.editorOptions.readOnly = e.row.data.isFree
             }
         })
         gridInstance = grid.dxDataGrid('instance')
@@ -1017,15 +975,15 @@ let helper = ({ companyId, salesOrderStore, vatList }) => {
 }
 function appendSelectedItems(selectedItems) {
     let gridInstance = $("#detailsDataGrids").dxDataGrid('instance')
-    // let items = [...gridInstance.getDataSource().items()]
-    // let items = currentData.details || [] // Array[] || []
     if (!currentData.details) currentData.details = []
-    preLoad.then((data) => {
+    preLoad.then(({ mainStore, vatList }) => {
         selectedItems.forEach((u) => {
-            let priceAfterTax = u.basePrice + (u.basePrice * data.vatList.find(x => x.id == u.vatId).rate) / 100;
+            let customerId = $('#form-container').dxForm('instance').getEditor('businessPartnerId').option('value');
+            let customer = mainStore.customerList.find(x => x.id == customerId);
+            let price = mainStore.priceList.find(x => x.id == customer.priceListId + '|' + u.id + '|' + u.salesUomId)?.value || 0;
+            let priceAfterTax = price + (price * vatList.find(x => x.id == u.vatId).rate) / 100;
             let lineAmtAfterTax = (priceAfterTax * parseInt(u.qty));
-            let lineAmt = u.basePrice * u.qty
-            // let store = $("#detailsDataGrids").dxDataGrid('instance').getDataSource().store()
+            let lineAmt = price * u.qty
             let foundItem = currentData.details.find(item => item?.itemId === u.id && item.isFree === u.isFree)
             if (foundItem) {
                 foundItem.qty += u.qty
@@ -1037,13 +995,13 @@ function appendSelectedItems(selectedItems) {
                     id: u.id,
                     itemId: u.id,
                     vatId: u.vatId,
-                    taxRate: data.vatList.find(x => x.id == u.vatId).rate,
-                    uomId: u.invUomId,
-                    price: u.basePrice,
+                    taxRate: vatList.find(x => x.id == u.vatId).rate,
+                    uomId: u.salesUomId,
+                    price,
+                    priceAfterTax,
                     qty: parseInt(u.qty),
-                    priceAfterTax: priceAfterTax,
                     lineAmtAfterTax: !u.isFree ? lineAmtAfterTax : 0,
-                    lineAmt: !u.isFree ? u.basePrice * parseInt(u.qty) : 0,
+                    lineAmt: !u.isFree ? price * parseInt(u.qty) : 0,
                     transactionType: 0,
                     uomGroupId: u.uomGroupId
                 })
@@ -1078,6 +1036,8 @@ function recalulateDocTotal() {
         debounce(gridInstance.saveEditData(), 250)
     }
     let { docDiscountType, docDiscountPerc, docDiscountAmt } = formInstance.option('formData')
+    if (!docDiscountPerc) docDiscountPerc = 0
+    if (!docDiscountAmt) docDiscountAmt = 0
     let docTotalLineDiscountAmt = gridInstance.getTotalSummaryValue('docTotalLineDiscountAmt') || 0
     let docTotalLineAmt = gridInstance.getTotalSummaryValue('docTotalLineAmt') || 0
     let docTotalLineAmtAfterTax = gridInstance.getTotalSummaryValue('docTotalLineAmtAfterTax') || 0
