@@ -141,7 +141,7 @@ let renderTree = (e, headerData) => {
                 },
                 {
                     location: 'center',
-                    template: () => $(`<div class='d-flex gap-2'><div class='isRoute' >${headerData.routeCount}</div><div class='isSellingZone'>${headerData.zoneCount}</div></div>`)
+                    template: () => $(`<div class='d-flex gap-2'><div class='isRoute' >${headerData.routeCount || 0}</div><div class='isSellingZone'>${headerData.zoneCount || 0}</div></div>`)
                 },
                 {
                     widget: 'dxButton',
