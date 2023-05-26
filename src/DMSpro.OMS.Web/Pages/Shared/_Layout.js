@@ -4,6 +4,7 @@
         DevExpress.ui.forceIsoDateParsing = false;
         DevExpress.ui.dxDataGrid.defaultOptions({
             options: {
+                errorRowEnabled: false,
                 dateSerializationFormat: 'yyyy-MM-dd',
                 customizeColumns: (e) => {
                     e.filter(v => v.dataType === 'number').forEach(e => {
