@@ -59,6 +59,7 @@ let renderForm = (e, headerData) => {
                     onClick: function (e) {
                         if (formInstance.validate().status == 'invalid') return
                         e.component.option('text', 'Loading...')
+                        e.component.option('disabled', true)
                         let code = formInstance.getEditor('salesOrgHeaderCode').option('value')
                         let name = formInstance.getEditor('salesOrgHeaderName').option('value')
                         let orgHeaderValue = { code, name, status: headerData.status + 1 }
@@ -71,10 +72,12 @@ let renderForm = (e, headerData) => {
                                         headerData = result;
                                         reloadPopupBodyComponent(result)
                                         $('#NewRootButton').dxButton('instance').option('disabled', false)
+                                        e.component.option('disabled', false)
                                         e.component.option('text', 'Release')
                                     })
                                     .fail(() => {
                                         notify({ type: "error", message: "Create Sale Organization Error" })
+                                        e.component.option('disabled', false)
                                         e.component.option('text', 'Save')
                                     });
                                 break;
@@ -87,10 +90,12 @@ let renderForm = (e, headerData) => {
                                                 headerData = result;
                                                 reloadPopupBodyComponent(result)
                                                 $('#NewRootButton').dxButton('instance').option('disabled', true)
+                                                e.component.option('disabled', false)
                                                 e.component.option('text', 'Inactive')
                                             })
                                             .fail(() => {
                                                 notify({ type: "error", message: "Release Sale Organization Error" })
+                                                e.component.option('disabled', false)
                                                 e.component.option('text', 'Release')
                                             });
                                     },
@@ -112,10 +117,12 @@ let renderForm = (e, headerData) => {
                                             })
                                             .fail(() => {
                                                 notify({ type: "error", message: "Inactived Sale Organization Error" })
+                                                e.component.option('disabled', false)
                                                 e.component.option('text', 'Inactive')
                                             });
                                     },
                                     () => {
+                                        e.component.option('disabled', false)
                                         e.component.option('text', 'Inactive')
                                     })
                                 break;

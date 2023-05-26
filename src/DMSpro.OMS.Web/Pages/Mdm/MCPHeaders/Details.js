@@ -1,7 +1,7 @@
-﻿$(function () {
+﻿$(async () => {
     let l = abp.localization.getResource("OMS");
     let MCPModel = JSON.parse(sessionStorage.getItem("MCPModel")), mcpDetailData = [], sellingZoneId = null;
-
+    console.log(MCPModel);
     let rendingLoadingPopup = () => {
         let loadingPopup = $('<div />')
         loadingPopup.dxPopup({
@@ -171,9 +171,7 @@
 
     $("#top-section").dxForm({
         labelMode: 'floating',
-        formData: {
-            ...await MCPModel,
-        },
+        formData: await MCPModel,
         colCount: 4,
         items: [
             {
@@ -488,7 +486,17 @@
                     lookup: {
                         dataSource: {
                             store: customerStore,
-                            filter: [['customer.active', '=', true], 'and', [['endDate', '>', moment().format('YYYY-MM-DD')], 'or', ['endDate', '=', null]]],
+                            filter: [
+                                ['customer.active', '=', true],
+                                'and',
+                                [
+                                    ['endDate', '>', moment().format('YYYY-MM-DD')],
+                                    'or',
+                                    ['endDate', '=', null]
+                                ],
+                                // 'and',
+                                // ['salesOrgHierarchyId', '=', sellingZoneId || MCPModel.]
+                            ],
                             paginate: true,
                             pageSize
                         },
@@ -808,6 +816,7 @@
     }
 
     function routeChangedHandler(data) {
+        console.log('a');
         if (data.value !== null) {
             const selectedItem = data.component.option('selectedItem');
 
@@ -834,7 +843,12 @@
     $('#StartDate').dxDateBox({
         type: 'date',
         showClearButton: true,
-        min: new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) > new Date() ? new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) : moment().add(1, 'days')._d,
+        min: new Date($("#top-section")
+            .dxForm('instance')
+            .getEditor('EffectiveDate')
+            .option('value')) > new Date() ?
+            new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value'))
+            : moment().add(1, 'days')._d,
         max: $("#top-section").dxForm('instance').getEditor('EndDate').option('value') ? new Date($("#top-section").dxForm('instance').getEditor('EndDate').option('value')) : undefined,
         displayFormat: 'dd/MM/yyyy',
         onValueChanged: (e) => {
