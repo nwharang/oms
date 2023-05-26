@@ -214,6 +214,21 @@ function initChooseItemsPopup(items) {
         }],
     }).dxPopup('instance');
 }
+let loadingPanel = $('<div class"fixed"/>').dxPopup({
+    height: 100,
+    width: 100,
+    showTitle: false,
+    animation: {
+        show: { type: 'pop', duration: 100 },
+        hide: { type: 'pop', duration: 100 }
+    },
+    contentTemplate: (e) => $('<div/>').dxLoadIndicator({
+        height: 60,
+        width: 60,
+    })
+})
+    .appendTo('body')
+    .dxPopup('instance')
 
 $(function () {
     initImportPopup('api/mdm-service/items', 'Items_Template', 'dgItems');

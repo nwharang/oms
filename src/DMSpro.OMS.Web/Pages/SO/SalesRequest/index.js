@@ -97,11 +97,10 @@
                     options: {
                         icon: 'add',
                     },
-                    onClick(e) {
-                        preLoad.then((data) => {
-                            helper(data).renderPopup()
-                        })
-                    },
+                    onClick: (e) => {
+                        loadingPanel.show()
+                        preLoad.then((data) => helper(data, () => loadingPanel.hide()).renderPopup())
+                    }
                 },
                 {
                     widget: "dxDropDownButton",
@@ -201,10 +200,9 @@
                     {
                         text: l('Button.ViewDetail'),
                         icon: "fieldchooser",
-                        onClick: function (e) {
-                            preLoad.then((data) => {
-                                helper(data).renderPopup(e.row.data.id)
-                            })
+                        onClick: (e) => {
+                            loadingPanel.show()
+                            preLoad.then((data) => helper(data, () => loadingPanel.hide()).renderPopup(e.row.data.id))
 
                         }
                     }
