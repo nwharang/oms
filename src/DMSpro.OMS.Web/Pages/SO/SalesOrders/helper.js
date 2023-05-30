@@ -1,6 +1,6 @@
 let preLoad = getInfoSO()
 
-let helper = ({ companyId, mainStore, vatList }) => {
+let helper = ({ companyId, mainStore, vatList }, loadingCallback) => {
     let { discountTypeStore, transactionTypeStore, docStatusStore } = store()
     let gridInitialized = false, popup, form, grid;
     // Local Store
@@ -739,6 +739,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 ],
             },
             onContentReady: async (e) => {
+                loadingCallback()
                 if (!Boolean(currentData.header.docStatus)) {
                     if (form.dxForm('instance').getEditor('businessPartnerId').option('value'))
                         $('#addNewDetailButton').dxButton('instance').option('visible', true)

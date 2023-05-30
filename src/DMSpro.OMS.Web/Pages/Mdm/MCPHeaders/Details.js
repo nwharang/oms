@@ -1,7 +1,6 @@
 ﻿$(async () => {
     let l = abp.localization.getResource("OMS");
     let MCPModel = JSON.parse(sessionStorage.getItem("MCPModel")), mcpDetailData = [], sellingZoneId = null;
-    console.log(MCPModel);
     let rendingLoadingPopup = () => {
         let loadingPopup = $('<div />')
         loadingPopup.dxPopup({
@@ -36,13 +35,13 @@
         key: 'customerId',
         load(loadOptions) {
             const deferred = $.Deferred();
+            loadOptions.filter = [...(loadOptions.filter && loadOptions.filter.length > 0 ? [loadOptions.filter, "and"] : []), [["endDate", ">", new Date()], 'or', ['endDate', '=', null]], 'and', ["salesOrgHierarchyId", "=", sellingZoneId]]
             const args = {};
-            args.filter = JSON.stringify([[["endDate", ">", moment()], 'or', ['endDate', '=', null]], 'and', ["salesOrgHierarchyId", "=", sellingZoneId]]),
-                requestOptions.forEach((i) => {
-                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                        args[i] = JSON.stringify(loadOptions[i]);
-                    }
-                });
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
             customerInZoneService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -308,317 +307,303 @@
         handles: "bottom"
     }).dxResizable('instance');
 
-    var dgMCPDetails = $('#dgMCPDetails')
-        .dxDataGrid({
-            dataSource: mcpDetailData,
-            onEditingStart: function (e) {
-                $('#SaveButton').data('dxButton').option('disabled', true);
-            },
-            onSaved: function (e) {
-                $('#SaveButton').data('dxButton').option('disabled', false);
-            },
-            onEditCanceled: function (e) {
-                $('#SaveButton').data('dxButton').option('disabled', false);
-            },
-            editing: {
-                mode: "row",
-                allowAdding: abp.auth.isGranted('MdmService.MCPs.Create'),
-                allowUpdating: abp.auth.isGranted('MdmService.MCPs.Edit'),
-                allowDeleting: abp.auth.isGranted('MdmService.MCPs.Delete'),
-                useIcons: true,
-                texts: {
-                    editRow: l("Edit"),
-                    deleteRow: l("Delete"),
-                    confirmDeleteMessage: l("DeleteConfirmationMessage")
-                }
-            },
-            remoteOperations: true,
-            export: {
-                enabled: true,
-            },
-            onExporting: function (e) {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Companies');
-                DevExpress.excelExporter.exportDataGrid({
-                    component: e.component,
-                    worksheet,
-                    autoFilterEnabled: true,
-                }).then(() => {
-                    workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
-                    });
+    var dgMCPDetails = $('#dgMCPDetails').dxDataGrid({
+        dataSource: mcpDetailData,
+        onEditingStart: function (e) {
+            $('#SaveButton').data('dxButton').option('disabled', true);
+        },
+        onSaved: function (e) {
+            $('#SaveButton').data('dxButton').option('disabled', false);
+        },
+        onEditCanceled: function (e) {
+            $('#SaveButton').data('dxButton').option('disabled', false);
+        },
+        editing: {
+            mode: "row",
+            allowAdding: abp.auth.isGranted('MdmService.MCPs.Create') && Boolean(MCPModel?.id),
+            allowUpdating: abp.auth.isGranted('MdmService.MCPs.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.MCPs.Delete'),
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            }
+        },
+        remoteOperations: true,
+        export: {
+            enabled: true,
+        },
+        onExporting: function (e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Companies');
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
                 });
-                e.cancel = true;
-            },
-            showRowLines: true,
-            showBorders: true,
-            allowColumnReordering: true,
-            allowColumnResizing: true,
-            columnResizingMode: 'widget',
-            columnMinWidth: 50,
-            columnAutoWidth: true,
-            columnChooser: {
-                enabled: true,
-                mode: "select"
-            },
-            columnFixing: {
-                enabled: true,
-            },
-            filterRow: {
-                visible: true,
-            },
-            groupPanel: {
-                visible: true,
-            },
-            headerFilter: {
-                visible: true,
-            },
-            rowAlternationEnabled: true,
-            searchPanel: {
-                visible: true
-            },
-            stateStoring: { //save state in localStorage
-                enabled: true,
-                type: 'localStorage',
-                storageKey: 'dgMCPDetails',
-            },
-            paging: {
-                enabled: true,
-                pageSize
-            },
-            pager: {
-                visible: true,
-                showPageSizeSelector: true,
-                allowedPageSizes,
-                showInfo: true,
-                showNavigationButtons: true
-            },
-            toolbar: {
-                items: [
-                    "groupPanel",
-                    "addRowButton",
-                    "columnChooserButton",
-                    "exportButton",
-                    {
-                        location: 'after',
-                        widget: 'dxButton',
-                        options: {
-                            icon: "import",
-                            elementAttr: {
-                                class: "import-excel",
-                            },
-                            onClick: (e) => {
-                                var gridControl = e.element.closest('div.dx-datagrid').parent();
-                                var gridName = gridControl.attr('id');
-                                var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                                if (popup) popup.show();
-                            },
+            });
+            e.cancel = true;
+        },
+        showRowLines: true,
+        showBorders: true,
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
+        columnMinWidth: 50,
+        columnAutoWidth: true,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        filterRow: {
+            visible: true,
+        },
+        groupPanel: {
+            visible: true,
+        },
+        headerFilter: {
+            visible: true,
+        },
+        rowAlternationEnabled: true,
+        searchPanel: {
+            visible: true
+        },
+        stateStoring: { //save state in localStorage
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgMCPDetails',
+        },
+        paging: {
+            enabled: true,
+            pageSize
+        },
+        pager: {
+            visible: true,
+            showPageSizeSelector: true,
+            allowedPageSizes,
+            showInfo: true,
+            showNavigationButtons: true
+        },
+        toolbar: {
+            items: [
+                "groupPanel",
+                "addRowButton",
+                "columnChooserButton",
+                "exportButton",
+                {
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            class: "import-excel",
+                        },
+                        onClick: (e) => {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
                         },
                     },
-                    "searchPanel",
+                },
+                "searchPanel",
+            ],
+        },
+        onEditorPreparing: (e) => {
+            if (e.parentType === "dataRow" && e.dataField === "customerId") {
+                e.editorOptions.onValueChanged = function (ev) {
+                    let selectedItem = ev.component.option('selectedItem');
+                    e.setValue(selectedItem);
+                }
+            }
+        },
+        onRowUpdating: (e) => {
+            e.newData = Object.assign({}, e.oldData, e.newData);
+        },
+        onInitNewRow: (e) => {
+            $('#SaveButton').data('dxButton').option('disabled', true);
+            e.data.code = "1";
+            e.data.effectiveDate = new Date();
+            e.data.distance = 0;
+            e.data.visitOrder = 0;
+            e.data.monday = false;
+            e.data.tuesday = false;
+            e.data.wednesday = false;
+            e.data.thursday = false;
+            e.data.friday = false;
+            e.data.saturday = false;
+            e.data.sunday = false;
+            e.data.week1 = true;
+            e.data.week2 = true;
+            e.data.week3 = true;
+            e.data.week4 = true;
+        },
+        dateSerializationFormat: "yyyy-MM-dd",
+        columns: [
+            {
+                type: 'buttons',
+                caption: l("Actions"),
+                width: 110,
+                buttons: ['edit', 'delete'],
+                fixedPosition: "left",
+            },
+            {
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                formItem: {
+                    visible: false
+                },
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Customer"),
+                dataField: "customerId",
+                calculateDisplayValue: (rowData) => rowData?.customer?.name,
+                editorOptions: {
+                    dropDownOptions: {
+                        width: 500,
+                    },
+                },
+                setCellValue: (rowData, value) => {
+                    rowData.customerId = value.customerId;
+                    rowData.customer = value.customer;
+                },
+                validationRules: [{ type: "required" }],
+                lookup: {
+                    dataSource: {
+                        store: customerStore,
+                        filter: [...(MCPModel?.effectiveDate ? ['effectiveDate', '<', MCPModel.effectiveDate] : []), ...(MCPModel?.endDate ? ['and', [['endDate', '=', null], 'or', ['endDate', '=', MCPModel.endDate]]] : [])],
+                        paginate: true,
+                        pageSize
+                    },
+                    displayExpr: (e) => e.customer?.name || e?.name,
+                    valueExpr: (e) => e?.customer?.id || e?.id
+                },
+            },
+            {
+                caption: "Address",
+                dataField: "fullAddress",
+                dataType: 'string',
+                calculateDisplayValue: (rowData) => rowData?.customer?.fullAddress,
+                width: 150,
+                allowEditing: false,
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:EffectiveDate"),
+                dataField: "effectiveDate",
+                dataType: "date",
+                format: 'dd/MM/yyyy',
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'async',
+                        validationCallback: (e) => {
+                            let effDate = new Date(e.data.effectiveDate)
+                            let endDate = e?.data?.endDate ? new Date(e?.data?.endDate) : null
+                            return new Promise((resolve, reject) => {
+                                if (!endDate || (endDate && effDate < endDate))
+                                    resolve(effDate)
+                                reject(l('ValidateError:EffectiveDate'))
+                            })
+                        }
+                    }
                 ],
             },
-            onSaving: (e) => {
-
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:EndDate"),
+                dataField: "endDate",
+                dataType: "date",
+                editorOptions: {
+                    showClearButton: true,
+                },
+                format: 'dd/MM/yyyy',
             },
-            onEditorPreparing: (e) => {
-                if (e.parentType === "dataRow" && e.dataField === "customerId") {
-                    e.editorOptions.onValueChanged = function (ev) {
-                        let selectedItem = ev.component.option('selectedItem');
-                        e.setValue(selectedItem);
-                    }
+            {
+
+                caption: l("EntityFieldName:MDMService:MCPDetail:Distance"),
+                dataField: "distance",
+                dataType: "number",
+                editorOptions: {
+                    min: 0,
                 }
             },
-            onRowUpdating: (e) => {
-                e.newData = Object.assign({}, e.oldData, e.newData);
-            },
-            onInitNewRow: (e) => {
-                $('#SaveButton').data('dxButton').option('disabled', true);
-                e.data.code = "1";
-                e.data.effectiveDate = new Date();
-                e.data.distance = 0;
-                e.data.visitOrder = 0;
-                e.data.monday = false;
-                e.data.tuesday = false;
-                e.data.wednesday = false;
-                e.data.thursday = false;
-                e.data.friday = false;
-                e.data.saturday = false;
-                e.data.sunday = false;
-                e.data.week1 = true;
-                e.data.week2 = true;
-                e.data.week3 = true;
-                e.data.week4 = true;
-            },
-            dateSerializationFormat: "yyyy-MM-dd",
-            columns: [
-                {
-                    type: 'buttons',
-                    caption: l("Actions"),
-                    width: 110,
-                    buttons: ['edit', 'delete'],
-                    fixedPosition: "left",
-                },
-                {
-                    dataField: 'id',
-                    caption: l("Id"),
-                    dataType: 'string',
-                    allowEditing: false,
-                    visible: false,
-                    formItem: {
-                        visible: false
-                    },
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Customer"),
-                    dataField: "customerId",
-                    calculateDisplayValue: (rowData) => rowData?.customer?.name,
-                    editorOptions: {
-                        dropDownOptions: {
-                            width: 500,
-                        },
-                    },
-                    setCellValue: (rowData, value) => {
-                        rowData.customerId = value.customerId;
-                        rowData.customer = value.customer;
-                    },
-                    validationRules: [{ type: "required" }],
-                    lookup: {
-                        dataSource: {
-                            store: customerStore,
-                            filter: [
-                                ['customer.active', '=', true],
-                                'and',
-                                [
-                                    ['endDate', '>', moment().format('YYYY-MM-DD')],
-                                    'or',
-                                    ['endDate', '=', null]
-                                ],
-                                // 'and',
-                                // ['salesOrgHierarchyId', '=', sellingZoneId || MCPModel.]
-                            ],
-                            paginate: true,
-                            pageSize
-                        },
-                        displayExpr: (e) => e.customer?.name || e?.name,
-                        valueExpr: (e) => e?.customer?.id || e?.id
-                    },
-                },
-                {
-                    caption: "Address",
-                    dataField: "fullAddress",
-                    dataType: 'string',
-                    calculateDisplayValue: (rowData) => rowData?.customer?.fullAddress,
-                    width: 150,
-                    allowEditing: false,
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:EffectiveDate"),
-                    dataField: "effectiveDate",
-                    dataType: "date",
-                    format: 'dd/MM/yyyy',
-                    validationRules: [
-                        {
-                            type: "required"
-                        },
-                        {
-                            type: 'async',
-                            validationCallback: (e) => {
-                                let effDate = new Date(e.data.effectiveDate)
-                                let endDate = e?.data?.endDate ? new Date(e?.data?.endDate) : null
-                                return new Promise((resolve, reject) => {
-                                    if (!endDate || (endDate && effDate < endDate))
-                                        resolve(effDate)
-                                    reject(l('ValidateError:EffectiveDate'))
-                                })
-                            }
-                        }
-                    ],
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:EndDate"),
-                    dataField: "endDate",
-                    dataType: "date",
-                    editorOptions: {
-                        showClearButton: true,
-                    },
-                    format: 'dd/MM/yyyy',
-                },
-                {
-
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Distance"),
-                    dataField: "distance",
-                    dataType: "number",
-                    editorOptions: {
-                        min: 0,
-                    }
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:VisitOrder"),
-                    dataField: "visitOrder",
-                    dataType: "number",
-                    editorOptions: {
-                        format: '#'
-                    }
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Monday"),
-                    dataField: "monday",
-                    dataType: "boolean",
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Tuesday"),
-                    dataField: "tuesday",
-                    dataType: "boolean",
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Wednesday"),
-                    dataField: "wednesday",
-                    dataType: "boolean",
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Thursday"),
-                    dataField: "thursday",
-                    dataType: "boolean",
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Friday"),
-                    dataField: "friday",
-                    dataType: "boolean",
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Saturday"),
-                    dataField: "saturday",
-                    dataType: "boolean",
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Sunday"),
-                    dataField: "sunday",
-                    dataType: "boolean",
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Week1"),
-                    dataField: "week1",
-                    dataType: "boolean",
-
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Week2"),
-                    dataField: "week2",
-                    dataType: "boolean",
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Week3"),
-                    dataField: "week3",
-                    dataType: "boolean",
-                },
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Week4"),
-                    dataField: "week4",
-                    dataType: "boolean",
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:VisitOrder"),
+                dataField: "visitOrder",
+                dataType: "number",
+                editorOptions: {
+                    format: '#'
                 }
-            ],
-        }).dxDataGrid("instance");
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Monday"),
+                dataField: "monday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Tuesday"),
+                dataField: "tuesday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Wednesday"),
+                dataField: "wednesday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Thursday"),
+                dataField: "thursday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Friday"),
+                dataField: "friday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Saturday"),
+                dataField: "saturday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Sunday"),
+                dataField: "sunday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Week1"),
+                dataField: "week1",
+                dataType: "boolean",
+
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Week2"),
+                dataField: "week2",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Week3"),
+                dataField: "week3",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Week4"),
+                dataField: "week4",
+                dataType: "boolean",
+            }
+        ],
+    }).dxDataGrid("instance");
 
 
     $("#CloseButton").click(function (e) {
@@ -682,6 +667,7 @@
                     $('#GenerateButton').data('dxButton').option('disabled', false);
                     $('#EnddateButton').data('dxButton').option('disabled', false);
                     $('#SaveButton').dxButton('instance').option('disabled', false)
+                    dgMCPDetails.option('editing.allowAdding', abp.auth.isGranted('MdmService.MCPs.Create') && Boolean(MCPModel?.id))
                     salesOrgHierarchyService.get(MCPModel.routeId).done(u => {
                         sellingZoneId = u.parentId;
                     })

@@ -1,7 +1,7 @@
 let preLoad = getInfoSO()
 
 let currentData = {}, isDocOpen
-let helper = ({ companyId, mainStore, vatList }) => {
+let helper = ({ companyId, mainStore, vatList }, loadingCallback) => {
     let { discountTypeStore, transactionTypeStore, docStatusStore } = store()
     let popup, form, grid;
     // Local Store
@@ -255,6 +255,9 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 enabled: true,
                 type: 'localStorage',
                 storageKey: 'dgDODetails',
+            },
+            onContentReady: () => {
+                loadingCallback()
             },
             toolbar: {
                 items: ["columnChooserButton",]

@@ -8,8 +8,73 @@
     let priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
     let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
 
-    let gridInfo = {}
+    let gridInfo = {}, endDateRowData;
     let cusAttrStore = cusAttrService.getListDevextremes({ filter: JSON.stringify(['active', "=", true]) })
+
+    let dialog = ({ header, body }, callBackIfTrue, callBackIfFalse) => {
+        DevExpress.ui.dialog.confirm(`<i>${body}</i>`, header)
+            .done((e) => {
+                if (e) {
+                    callBackIfTrue()
+                }
+                else {
+                    callBackIfFalse()
+                }
+            })
+    }
+
+
+    let endDatePopup = $('<div/>').dxPopup({
+        showTitle: false,
+        width: 400,
+        height: 150,
+        onShowing: () => {
+            $('#inactive-dateBox').dxDateBox('instance').option('value', moment().add(1, 'd').format('YYYY-MM-DD[T00:00:00Z]'))
+            // Reset Date Box Data Value to today + 1 
+        },
+        toolbarItems: [
+            {
+                widget: "dxButton",
+                location: "after",
+                toolbar: "bottom",
+                options: {
+                    text: l('Button.Inactive.Customer'),
+                    onClick: () => {
+                        // Localize This
+                        dialog({ header: 'Inactive Customer', body: `Do you want to inactive customer ${endDateRowData.name}` },
+                            () => {
+                                customerService.inactive(endDateRowData.id, moment($('#inactive-dateBox').dxDateBox('instance').option('value')).format('YYYY-MM-DD[T00:00:00Z]')).then(() => {
+                                    gridCustomers.refresh()
+                                    endDatePopup.hide()
+                                })
+                            },
+                            () => {
+                                endDateRowData = undefined
+                                endDatePopup.hide()
+                            }
+                        )
+                    }
+                },
+            },
+            {
+                widget: "dxButton",
+                location: "after",
+                toolbar: "bottom",
+                options: {
+                    text: l("Button.Cancel"),
+                    onClick: () => endDatePopup.hide()
+                },
+            },
+        ],
+        contentTemplate: () => {
+            return $('<div id="inactive-dateBox">').dxDateBox({
+                value: moment().add(1, 'd').format('YYYY-MM-DD[T00:00:00Z]'),
+                min: moment().add(1, 'd').format('YYYY-MM-DD[T00:00:00Z]'),
+                format: 'dd-MM-yyyy',
+            })
+        }
+    }).appendTo('body').dxPopup('instance')
+
 
     let companiesLookup = new DevExpress.data.CustomStore({
         key: "id",
@@ -193,7 +258,7 @@
                     },
                     {
                         itemType: "group",
-                        items: ["code", 'name', 'phone1', 'phone2', 'erpCode', 'priceListId', 'active'],
+                        items: ["code", 'name', 'phone1', 'phone2', 'erpCode', 'priceListId'],
                     },
                     {
                         itemType: "tabbed",
@@ -349,6 +414,7 @@
             {
                 type: 'buttons',
                 caption: l("Actions"),
+                alignment: 'left',
                 buttons: [
                     {
                         name: 'edit',
@@ -357,7 +423,16 @@
                             gridCustomers.editRow(e.row.rowIndex);
                         }
                     },
-                    , 'delete'],
+                    , 'delete', {
+                        name: 'inactive',
+                        text: l("EntityFieldValue:MDMService:Customer:Active:False"),
+                        icon: 'close',
+                        visible: (e) => e.row.data.active,
+                        onClick: (e) => {
+                            endDateRowData = e.row.data
+                            endDatePopup.show()
+                        },
+                    }],
                 fixed: true,
                 fixedPosition: "left",
             },
@@ -381,7 +456,7 @@
                 dataField: 'name',
                 caption: l("Name"),
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                validationRules: [{ type: "required" }],
             },
             {
                 dataField: 'phone1',
@@ -478,7 +553,6 @@
             {
                 dataField: 'active',
                 caption: l("Active"),
-                //allowEditing: false,
                 width: 110,
                 alignment: 'center',
                 dataType: 'boolean',
@@ -760,6 +834,9 @@
             // ReadOnly when editing , allow when creating a new row
             if (e.dataField == 'endDate' && !e.row.isNewRow)
                 e.editorOptions.readOnly = true
+            if (!e.row.data.active) {
+                e.editorOptions.readOnly = true
+            }
         },
         onSaved: (e) => {
             if (gridInfo.fileinput) gridInfo.fileinput(e);

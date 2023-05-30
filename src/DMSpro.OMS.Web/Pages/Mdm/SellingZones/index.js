@@ -50,7 +50,13 @@ $(function () {
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
-            itemGroupService.getListDevextremes({})
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            itemGroupService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -305,7 +311,7 @@ $(function () {
     const salesOrgHierarchy = $('#salesOrgHierarchy').css({ 'max-width': "20em", 'width': "20em" }).dxSelectBox({
         dataSource: salesOrgHierarchyStore,
         valueExpr: 'id',
-        displayExpr(e) {
+        displayExpr: (e) => {
             if (e)
                 return `${e.code} - ${e.name}`
             return ''
@@ -419,16 +425,12 @@ $(function () {
                 caption: l("CompanyInZone.Company"),
                 dataField: "companyId",
                 allowSearch: false,
-                calculateDisplayValue: (rowData) => {
-                    if (rowData?.company)
-                        return rowData.company.name;
-                    return
-                },
+                calculateDisplayValue: (rowData) => rowData?.company?.name,
                 validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource: {
                         store: companyStore,
-                        filter: [['active', '=', true], 'and', [["endDate", '>', moment().format('YYYY-MM-DD')], 'or', ['endDate', '=', null]]],
+                        filter: [["endDate", '>', moment().format('YYYY-MM-DD')], 'or', ['endDate', '=', null]],
                         paginate: true,
                         pageSize
                     },
@@ -453,12 +455,14 @@ $(function () {
                 dataType: "date",
                 editorOptions: {
                     format: 'dd/MM/yyyy',
+                    min: new Date()
                 },
                 format: 'dd/MM/yyyy',
             },
             {
                 caption: l("Page.Title.ItemGroups"),
                 dataField: "itemGroupId",
+                calculateDisplayValue: (e) => e?.itemGroup?.name,
                 lookup: {
                     dataSource: itemGroupStore,
                     valueExpr: "id",
@@ -566,7 +570,7 @@ $(function () {
         onEditorPreparing: (e) => {
             if (e.row?.rowType != 'data') return
             if (e.row.isEditing && !e.row.isNewRow && e.dataField == 'effectiveDate') {
-                e.editorOptions.min = new Date(e.row.data.creationTime)
+                e.editorOptions.min = e.row.data.creationTime ? new Date(e.row.data.creationTime) : new Date()
             }
         },
         toolbar: {
@@ -634,12 +638,10 @@ $(function () {
                 dataField: "endDate",
                 format: 'dd/MM/yyyy',
                 dataType: "date",
+                editorOptions: {
+                    min: new Date()
+                }
             },
-            //{
-            //    caption: l("Active"),
-            //    dataField: "active",
-            //    dataType: "boolean"
-            //}
         ]
     }).dxDataGrid("instance");
 
@@ -702,7 +704,7 @@ $(function () {
                 grid = $("<div id='grid'>").dxDataGrid({
                     dataSource: {
                         store,
-                        filter: ["active", "=", "true"],
+                        filter: [["endDate", '>', moment().format('YYYY-MM-DD')], 'or', ['endDate', '=', null]],
                         paginate: true,
                         pageSize
                     },
@@ -755,8 +757,9 @@ $(function () {
                                     displayFormat: "dd/MM/yyyy",
                                     type: 'date',
                                     value: new Date(),
+                                    min: new Date(),
                                     elementAttr: {
-                                        id: 'cusBatchInputEffectiveDate'
+                                        id: 'cusBatchInputEffectiveDate',
                                     }
                                 }
                             },
@@ -768,11 +771,12 @@ $(function () {
                                     label: 'endDate',
                                     labelMode: 'floating',
                                     displayFormat: "dd/MM/yyyy",
+                                    min: new Date(),
                                     type: 'date',
                                     value: null,
                                     elementAttr: {
                                         id: 'cusBatchInputEndDate'
-                                    }
+                                    },
                                 }
                             },
                             'columnChooserButton'

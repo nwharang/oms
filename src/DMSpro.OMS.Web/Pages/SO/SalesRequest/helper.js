@@ -1,19 +1,12 @@
 let preLoad = getInfoSO()
 
 let currentData = {}, isDocOpen
-let helper = ({ companyId, mainStore, vatList }) => {
+let helper = ({ companyId, mainStore, vatList }, loadingCallback) => {
     let salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
     let { discountTypeStore, transactionTypeStore, docStatusStore } = store()
     let gridInitialized = false, popup, form, grid;
     // Local Store
     let comingData = { next: {}, previous: {} }
-    let genStoreForDropDownBox = (data) => new DevExpress.data.CustomStore({
-        labelMode: 'raw',
-        key: 'id',
-        load() {
-            return data
-        }
-    })
     let loadNavigationButton = (docId) => {
         if (docId) {
             salesRequestsHeaderService.getPrevDoc(docId).done(data => {
@@ -43,10 +36,8 @@ let helper = ({ companyId, mainStore, vatList }) => {
             type: obj.type,
             displayTime: 5000,
             animation: {
-                show: {
-                    type: 'fade', duration: 400, from: 0, to: 1,
-                },
-                hide: { type: 'fade', duration: 40, to: 0 },
+                show: { type: 'fade', duration: 1 },
+                hide: { type: 'fade', duration: 1 },
             },
         }, {
             position: obj.position,
@@ -680,6 +671,7 @@ let helper = ({ companyId, mainStore, vatList }) => {
                 ],
             },
             onContentReady: async (e) => {
+                loadingCallback();
                 if (!Boolean(currentData.header.docStatus)) {
                     if (form.dxForm('instance').getEditor('businessPartnerId').option('value'))
                         $('#addNewDetailButton').dxButton('instance').option('visible', true)
