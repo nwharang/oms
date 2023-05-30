@@ -50,7 +50,13 @@ $(function () {
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
-            itemGroupService.getListDevextremes({})
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            itemGroupService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -424,7 +430,7 @@ $(function () {
                 lookup: {
                     dataSource: {
                         store: companyStore,
-                        filter: [['active', '=', true], 'and', [["endDate", '>', moment().format('YYYY-MM-DD')], 'or', ['endDate', '=', null]]],
+                        filter: [["endDate", '>', moment().format('YYYY-MM-DD')], 'or', ['endDate', '=', null]],
                         paginate: true,
                         pageSize
                     },
@@ -564,7 +570,7 @@ $(function () {
         onEditorPreparing: (e) => {
             if (e.row?.rowType != 'data') return
             if (e.row.isEditing && !e.row.isNewRow && e.dataField == 'effectiveDate') {
-                e.editorOptions.min = new Date(e.row.data.creationTime)
+                e.editorOptions.min = e.row.data.creationTime ? new Date(e.row.data.creationTime) : new Date()
             }
         },
         toolbar: {
@@ -632,12 +638,10 @@ $(function () {
                 dataField: "endDate",
                 format: 'dd/MM/yyyy',
                 dataType: "date",
+                editorOptions: {
+                    min: new Date()
+                }
             },
-            //{
-            //    caption: l("Active"),
-            //    dataField: "active",
-            //    dataType: "boolean"
-            //}
         ]
     }).dxDataGrid("instance");
 
@@ -700,7 +704,7 @@ $(function () {
                 grid = $("<div id='grid'>").dxDataGrid({
                     dataSource: {
                         store,
-                        filter: ["active", "=", true],
+                        filter: [["endDate", '>', moment().format('YYYY-MM-DD')], 'or', ['endDate', '=', null]],
                         paginate: true,
                         pageSize
                     },
@@ -772,7 +776,7 @@ $(function () {
                                     value: null,
                                     elementAttr: {
                                         id: 'cusBatchInputEndDate'
-                                    }
+                                    },
                                 }
                             },
                             'columnChooserButton'
