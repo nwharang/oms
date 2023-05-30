@@ -502,6 +502,10 @@
                 dataField: "effectiveDate",
                 dataType: "date",
                 format: 'dd/MM/yyyy',
+                editorOptions: {
+                    min: MCPModel.effectiveDate,
+                    max: MCPModel.endDate || null
+                },
                 validationRules: [
                     {
                         type: "required"
@@ -526,6 +530,8 @@
                 dataType: "date",
                 editorOptions: {
                     showClearButton: true,
+                    min: MCPModel.effectiveDate,
+                    max: MCPModel.endDate || null
                 },
                 format: 'dd/MM/yyyy',
             },
