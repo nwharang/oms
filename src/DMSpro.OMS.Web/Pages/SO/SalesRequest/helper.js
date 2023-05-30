@@ -315,6 +315,7 @@ let helper = ({ companyId, mainStore, vatList }, loadingCallback) => {
                         }
                     },
                     onClick: (e) => {
+                        loadingPanel.show()
                         $("#popupItems").dxPopup('instance').show()
                     }
 

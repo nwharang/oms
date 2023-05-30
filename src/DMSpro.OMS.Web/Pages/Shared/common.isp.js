@@ -171,7 +171,7 @@ function initChooseItemsPopup(items) {
         container: '.panel-container',
         showTitle: true,
         title: l('Popup:Title:Chooseitems'),
-        minHeight : 700,
+        minHeight: 700,
         dragEnabled: false,
         hideOnOutsideClick: false,
         showCloseButton: true,
@@ -194,6 +194,7 @@ function initChooseItemsPopup(items) {
                     var selectedItems = dgItems.getSelectedRowsData();
                     if (selectedItems.length > 0) {
                         appendSelectedItems(selectedItems);
+                        loadingPanel.hide()
                         popupItems.hide();
                     }
                 },
@@ -205,6 +206,7 @@ function initChooseItemsPopup(items) {
             options: {
                 text: 'Cancel',
                 onClick() {
+                    loadingPanel.hide()
                     popupItems.hide();
                 },
             },
