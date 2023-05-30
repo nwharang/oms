@@ -75,9 +75,7 @@ var dxDataGridConfiguration = {
 };
 
 function initChooseItemsPopup(items) {
-    $('div.panel-container.show').append(`<div id="popupItems" style="display:none">
-                <div id="dgItems" ></div> 
-            </div>`);
+    $('div.panel-container.show').append(`<div id="popupItems" style="display:none"><div id="dgItems" ></div></div>`);
 
     var dgItems = $('#dgItems').dxDataGrid(jQuery.extend(dxDataGridConfiguration, {
         dataSource: items,
@@ -169,12 +167,11 @@ function initChooseItemsPopup(items) {
             },
         ],
     })).dxDataGrid("instance");
-
     const popupItems = $('#popupItems').dxPopup({
         container: '.panel-container',
         showTitle: true,
         title: l('Popup:Title:Chooseitems'),
-        visible: false,
+        minHeight : 700,
         dragEnabled: false,
         hideOnOutsideClick: false,
         showCloseButton: true,
