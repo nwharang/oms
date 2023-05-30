@@ -180,6 +180,9 @@ function initChooseItemsPopup(items) {
             dgItems.repaint();
             dgItems.deselectAll()
         },
+        onHidden: () => {
+            loadingPanel.hide()
+        },
         toolbarItems: [{
             widget: 'dxButton',
             toolbar: 'bottom',
@@ -194,7 +197,6 @@ function initChooseItemsPopup(items) {
                     var selectedItems = dgItems.getSelectedRowsData();
                     if (selectedItems.length > 0) {
                         appendSelectedItems(selectedItems);
-                        loadingPanel.hide()
                         popupItems.hide();
                     }
                 },
@@ -206,7 +208,6 @@ function initChooseItemsPopup(items) {
             options: {
                 text: 'Cancel',
                 onClick() {
-                    loadingPanel.hide()
                     popupItems.hide();
                 },
             },
