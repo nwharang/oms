@@ -277,6 +277,7 @@
                         editorOptions: {
                             dataSource: {
                                 store: itemGroupStore,
+                                filter: [],
                                 paginate: true,
                                 pageSize
                             },
@@ -481,7 +482,7 @@
                 lookup: {
                     dataSource: {
                         store: customerStore,
-                        filter: [...(MCPModel?.effectiveDate ? ['effectiveDate', '<', MCPModel.effectiveDate] : []), ...(MCPModel?.endDate ? ['and', [['endDate', '=', null], 'or', ['endDate', '=', MCPModel.endDate]]] : [])],
+                        filter: [...(MCPModel?.endDate ? [['effectiveDate', '<', MCPModel.endDate], 'and'] : []), [['endDate', '>=', MCPModel?.effectiveDate], 'or', ['endDate', '=', null]]],
                         paginate: true,
                         pageSize
                     },
@@ -503,8 +504,8 @@
                 dataType: "date",
                 format: 'dd/MM/yyyy',
                 editorOptions: {
-                    min: MCPModel.effectiveDate,
-                    max: MCPModel.endDate || null
+                    min: MCPModel?.effectiveDate || new Date(),
+                    max: MCPModel?.endDate || new Date()
                 },
                 validationRules: [
                     {
@@ -530,8 +531,8 @@
                 dataType: "date",
                 editorOptions: {
                     showClearButton: true,
-                    min: MCPModel.effectiveDate,
-                    max: MCPModel.endDate || null
+                    min: MCPModel?.effectiveDate || new Date(),
+                    max: MCPModel?.endDate || new Date()
                 },
                 format: 'dd/MM/yyyy',
             },
@@ -549,7 +550,8 @@
                 dataField: "visitOrder",
                 dataType: "number",
                 editorOptions: {
-                    format: '#'
+                    format: '#',
+                    min: 0
                 }
             },
             {
