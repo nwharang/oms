@@ -160,11 +160,15 @@
                 items: [
                     "groupPanel",
                     {
-                        name: 'addRowButton',
-                        onClick: () => {
-                            var w = window.open('/Mdm/MCPHeaders/Details', '_blank');
-                            w.sessionStorage.setItem("MCPModel", null);
-                        },
+                        widget: 'dxButton',
+                        options: {
+                            hint: l('Button.New.MCPHeader'),
+                            icon: 'add',
+                            onClick: () => {
+                                var w = window.open('/Mdm/MCPHeaders/Details', '_blank');
+                                return w.sessionStorage.setItem("MCPModel", null);
+                            },
+                        }
                     },
                     "columnChooserButton",
                     "exportButton",
