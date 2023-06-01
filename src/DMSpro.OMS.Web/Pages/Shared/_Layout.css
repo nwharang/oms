@@ -334,3 +334,6 @@ table.companies > tbody > tr{
     border-left-width: 2px;
     border-right-width: 2px;
 }
+.dx-freespace-row {  
+    height: 0px !important;  
+ }  
