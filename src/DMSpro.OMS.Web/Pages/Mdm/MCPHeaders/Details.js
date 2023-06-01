@@ -35,7 +35,7 @@
         key: 'customerId',
         load(loadOptions) {
             const deferred = $.Deferred();
-            loadOptions.filter = [...(loadOptions.filter && loadOptions.filter.length > 0 ? [loadOptions.filter, "and"] : []), [["endDate", ">", new Date()], 'or', ['endDate', '=', null]], 'and', ["salesOrgHierarchyId", "=", sellingZoneId]]
+            loadOptions.filter = [...(loadOptions.filter && loadOptions.filter.length > 0 ? [loadOptions.filter, "and"] : []), [["endDate", ">=", moment().format('YYYY-MM-DD')], 'or', ['endDate', '=', null]], 'and', ["salesOrgHierarchyId", "=", sellingZoneId]]
             const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
@@ -482,7 +482,6 @@
                 lookup: {
                     dataSource: {
                         store: customerStore,
-                        filter: [...(MCPModel?.endDate ? [['effectiveDate', '<', MCPModel.endDate], 'and'] : []), [['endDate', '>=', MCPModel?.effectiveDate], 'or', ['endDate', '=', null]]],
                         paginate: true,
                         pageSize
                     },
