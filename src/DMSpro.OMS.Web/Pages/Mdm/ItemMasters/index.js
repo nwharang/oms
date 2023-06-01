@@ -1070,8 +1070,10 @@
             onBeforeSend: (e) => {
                 e.request.setRequestHeader('RequestVerificationToken', abp.utils.getCookieValue('XSRF-TOKEN'))
             },
-            onUploaded: () => {
-                gridInfo.imageDataSource.reload()
+            onUploaded: () => gridInfo.imageDataSource.reload(),
+            onUploadError: (e) => {
+                let { code, message } = JSON.parse(e.error.response).error
+                return abp.message.error(message, code)
             }
         })
             .appendTo(form)
