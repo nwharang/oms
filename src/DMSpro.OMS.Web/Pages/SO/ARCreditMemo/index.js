@@ -1,8 +1,8 @@
 ﻿$(async function () {
     var l = abp.localization.getResource("OMS");
-    let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
+    let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore, render } = store()
     let currentSelectedDoc = new Map();
-    let mainGrid = $('#dgArCreditMemoHeaders').dxDataGrid({
+    let mainGrid = $('#dgSOHeader').dxDataGrid({
         dataSource: { store: mainStore },
         showRowLines: true,
         showBorders: true,
@@ -55,7 +55,7 @@
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgArCreditMemoHeaders',
+            storageKey: `dg${render.permissionGroup}Header`,
         },
         paging: {
             enabled: true,
@@ -78,7 +78,7 @@
                     },
                     onClick: (e) => {
                         loadingPanel.show()
-                        preLoad.then((data) => helper(data, () => loadingPanel.hide()).renderPopup())
+                        preLoad.then((data) => helper(data, () => loadingPanel.hide()))
                     }
                 },
                 // {
@@ -100,7 +100,7 @@
                 //                     mainService.createListDODoc(array)
                 //                         .done(() => {
                 //                             notify({ type: 'success', message: `${array.length} SRs Approved` })
-                //                             $('#dgArCreditMemoHeaders').dxDataGrid('instance').getDataSource().reload()
+                //                             $('#dgSOHeader').dxDataGrid('instance').getDataSource().reload()
                 //                         }
                 //                         ).fail(() => {
                 //                             notify({ type: 'error', message: "SRs Approve Failed" })
@@ -162,7 +162,7 @@
                         icon: "fieldchooser",
                         onClick: (e) => {
                             loadingPanel.show()
-                            preLoad.then((data) => helper(data, () => loadingPanel.hide()).renderPopup(e.row.data.id))
+                            preLoad.then((data) => helper(data, () => loadingPanel.hide(), { docId: e.row.data.id }))
                         }
                     }
                 ],
@@ -324,4 +324,5 @@
         },
     }).dxDataGrid("instance");
     preLoad.then((data) => initChooseItemsPopup([...data.mainStore.itemList].map(e => { e.isFree = false; return e })))
+    $('body').append('<div id=popup>')
 })

@@ -113,6 +113,21 @@ let store = () => {
                 text: l('EntityFieldName:OrderService:SalesRequest:Incentive')
             }
         ],
+        render: {
+            isRenderEmployeeRoute: true,
+            isRenderDiscount: true,
+            permissionGroup: 'ArInvoices',
+            title: l('Page.Title.ARInvoice'),
+            action: [
+                {
+                    text: l('Button.Action.ARToARCMDoc'),
+                    icon: "check",
+                    onClick: () => mainService.createListARCrMemoDoc([docData.docId]).then(() => {
+                        docData.popupInstance.hide()
+                    })
+                },
+            ]
+        }
     }
 }
 

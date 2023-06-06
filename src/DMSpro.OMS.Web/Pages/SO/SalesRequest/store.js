@@ -1,10 +1,10 @@
-let salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
+let mainService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
 let salesOrderService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
 let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
 
 let store = () => {
     return {
-        salesRequestsHeaderStore: new DevExpress.data.CustomStore({
+        mainStore: new DevExpress.data.CustomStore({
             key: 'id',
             sort: [
                 { selector: "requestDate", desc: false }
@@ -19,7 +19,7 @@ let store = () => {
                     }
                 });
 
-                salesRequestsHeaderService.getHeaderListDevextremes(args)
+                mainService.getHeaderListDevextremes(args)
                     .done(result => {
                         result.data.sort((a, b) => Date.parse(a.requestDate) - Date.parse(b.requestDate))
                         deferred.resolve(result.data.sort((a, b) => Date.parse(a.requestDate) - Date.parse(b.requestDate)), {
@@ -110,6 +110,30 @@ let store = () => {
                 text: l('EntityFieldName:OrderService:SalesRequest:Incentive')
             }
         ],
+        render: {
+            isRenderEmployeeRoute: false,
+            isRenderDiscount: true,
+            permissionGroup: 'SalesRequests',
+            title: l('Page.Title.SalesRequest'),
+            action: [
+                {
+                    text: l('Button.Action.SRToSODoc'),
+                    icon: "check",
+                    onClick: () => mainService.createListSODoc([docData.docId]).then(() => {
+                        docData.popupInstance.hide()
+                    })
+                },
+                {
+                    text: l('Button.Action.Cancel'),
+                    icon: "close",
+                    onClick: () => DevExpress.ui.dialog.confirm(l('ConfirmationMessage:OrderService:SalesRequest:Cancel'), "").done(e => {
+                        if (e) mainService.cancelDoc([docData.docId]).then(() => {
+                            docData.popupInstance.hide()
+                        })
+                    })
+                }
+            ]
+        }
     }
 }
 

@@ -109,6 +109,30 @@ let store = () => {
                 text: l('EntityFieldName:OrderService:SalesRequest:Incentive')
             }
         ],
+        render: {
+            isRenderEmployeeRoute: true,
+            isRenderDiscount: true,
+            permissionGroup: 'SalesOrders',
+            title: l('Page.Title.SalesOrders'),
+            action: [
+                {
+                    text: l('Button.Action.SOToDODoc'),
+                    icon: "check",
+                    onClick: () => mainService.createListDODoc([docData.docId]).then(() => {
+                        docData.popupInstance.hide()
+                    })
+                },
+                {
+                    text: l('Button.Action.Cancel'),
+                    icon: "close",
+                    onClick: () => DevExpress.ui.dialog.confirm(l('ConfirmationMessage:OrderService:SalesRequest:Cancel'), "").done(e => {
+                        if (e) mainService.cancelDoc([docData.docId]).then(() => {
+                            docData.popupInstance.hide()
+                        })
+                    })
+                }
+            ]
+        }
     }
 }
 

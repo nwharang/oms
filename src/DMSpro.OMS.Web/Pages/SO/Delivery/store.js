@@ -113,6 +113,28 @@ let store = () => {
                 text: l('EntityFieldName:OrderService:SalesRequest:Incentive')
             }
         ],
+        render: {
+            isRenderEmployeeRoute: true,
+            isRenderDiscount: true,
+            permissionGroup: 'Deliveries',
+            title: l('Page.Title.Delivery'),
+            action: [
+                {
+                    text: l('Button.Action.DOToARDoc'),
+                    icon: "check",
+                    onClick: () => mainService.createListARInvoiceDoc([docData.docId]).then(() => {
+                        docData.popupInstance.hide()
+                    })
+                },
+                {
+                    text: l('Button.Action.DOToRODoc'),
+                    icon: "check",
+                    onClick: () => mainService.createListRODoc([docData.docId]).then(() => {
+                        docData.popupInstance.hide()
+                    })
+                },
+            ]
+        }
     }
 }
 

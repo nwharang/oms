@@ -113,6 +113,30 @@ let store = () => {
                 text: l('EntityFieldName:OrderService:SalesRequest:Incentive')
             }
         ],
+        render: {
+            isRenderEmployeeRoute: true,
+            isRenderDiscount: false,
+            permissionGroup: 'ArCreditMemos',
+            title: l('Page.Title.ARCreditMemo'),
+            action: [
+                {
+                    text: l('Button.Action.CloseARCM'),
+                    icon: "check",
+                    onClick: () => mainService.closeDoc([docData.docId]).then(() => {
+                        docData.popupInstance.hide()
+                    })
+                },
+                {
+                    text: l('Button.Action.Cancel'),
+                    icon: "close",
+                    onClick: () => DevExpress.ui.dialog.confirm(l('ConfirmationMessage:OrderService:SalesRequest:Cancel'), "").done(e => {
+                        if (e) mainService.cancelDoc([docData.docId]).then(() => {
+                            docData.popupInstance.hide()
+                        })
+                    })
+                }
+            ]
+        }
     }
 }
 
