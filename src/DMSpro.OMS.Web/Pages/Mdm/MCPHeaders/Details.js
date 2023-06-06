@@ -531,12 +531,11 @@
                 editorOptions: {
                     showClearButton: true,
                     min: MCPModel?.effectiveDate || new Date(),
-                    max: MCPModel?.endDate || new Date()
+                    max: MCPModel?.endDate || null
                 },
                 format: 'dd/MM/yyyy',
             },
             {
-
                 caption: l("EntityFieldName:MDMService:MCPDetail:Distance"),
                 dataField: "distance",
                 dataType: "number",
@@ -639,29 +638,50 @@
         var effectiveDate = form.getEditor('EffectiveDate').option('value');
         var endDate = form.getEditor('EndDate').option('value');
         var mcpHeaderDto = {
-            routeId,
-            companyId,
-            itemGroupId,
             code,
             name,
             effectiveDate,
-            endDate
+            endDate,
+            routeId,
+            companyId,
+            itemGroupId,
         };
         var mcpDetails = [];
 
         dgMCPDetails.getDataSource().items().forEach(u => {
-            mcpDetails.push(u);
+            mcpDetails.push({
+                code: u.code,
+                effectiveDate: u.effectiveDate,
+                endDate: u.endDate,
+                distance: u.distance,
+                visitOrder: u.visitOrder,
+                monday: u.monday,
+                tuesday: u.tuesday,
+                wednesday: u.wednesday,
+                thursday: u.thursday,
+                friday: u.friday,
+                saturday: u.saturday,
+                sunday: u.sunday,
+                week1: u.week1,
+                week2: u.week2,
+                week3: u.week3,
+                week4: u.week4,
+                customerId: u.customerId,
+                mcpHeaderId: u.mcpHeaderId,
+                concurrencyStamp: u.concurrencyStamp,
+                id: u.id
+            });
         });
         var params = {
             mcpHeaderDto: mcpHeaderDto,
             mcpDetails: mcpDetails,
         }
-        params.mcpHeaderDto.effectiveDate = moment(params.mcpHeaderDto.effectiveDate).format('YYYY-MM-DDT12:00:00');
-        params.mcpHeaderDto.endDate = moment(params.mcpHeaderDto.endDate).format('YYYY-MM-DDT12:00:00');
+        params.mcpHeaderDto.effectiveDate = moment(params.mcpHeaderDto.effectiveDate).format('YYYY-MM-DDT12:00:00Z');
+        params.mcpHeaderDto.endDate = moment(params.mcpHeaderDto.endDate).format('YYYY-MM-DDT12:00:00Z');
 
         params.mcpDetails.forEach(u => {
-            u.effectiveDate = moment(u.effectiveDate).format('YYYY-MM-DDT12:00:00');
-            u.endDate = moment(u.endDate).format('YYYY-MM-DDT12:00:00');
+            u.effectiveDate = moment(u.effectiveDate).format('YYYY-MM-DDT12:00:00Z');
+            u.endDate = moment(u.endDate).format('YYYY-MM-DDT12:00:00Z');
         })
 
         if (!MCPModel)
