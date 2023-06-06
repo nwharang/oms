@@ -922,9 +922,9 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                 isSaveable()
                 // Should some field in form section should be disabled
                 if (!docData.isOpen || state().isError || !docData.permission.edit) return
-                docData.formInstance.getEditor('businessPartnerId').option('readOnly', isBusinessPartner)
-                docData.formInstance.getEditor('employeeId').option('readOnly', isEmployeeRoute)
-                docData.formInstance.getEditor('routeId').option('readOnly', isEmployeeRoute)
+                docData.formInstance.getEditor('businessPartnerId')?.option('readOnly', isBusinessPartner)
+                docData.formInstance.getEditor('employeeId')?.option('readOnly', isEmployeeRoute)
+                docData.formInstance.getEditor('routeId')?.option('readOnly', isEmployeeRoute)
 
             },
             onEditorPreparing: (e) => {
