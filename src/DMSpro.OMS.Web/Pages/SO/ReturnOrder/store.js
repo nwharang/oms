@@ -122,7 +122,7 @@ let store = () => {
                 {
                     text: l('Button.Action.CloseRO'),
                     icon: "check",
-                    onClick: () => mainService.closeDoc([docData.docId]).then(() => {
+                    onClick: () => mainService.closeDoc(docData.docId).then(() => {
                         docData.popupInstance.hide()
                     })
                 },

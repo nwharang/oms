@@ -29,16 +29,17 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
         },
         calculateDocTotal: _.debounce(() => {
             // Calculate Doc total
+            if (state().isError || !docData.isOpen || !docData.permission.edit || render.isBaseDoc) return
             try {
                 let { gridInstance, formInstance } = docData, formData = docData.formInstance.option('formData')
                 formInstance.beginUpdate()
+                let { docDiscountType, docDiscountPerc, docDiscountAmt } = formData
                 if (render.isRenderDiscount) {
-                    var { docDiscountType, docDiscountPerc, docDiscountAmt } = formData
-                    formInstance.getEditor('docDiscountAmt').option('readOnly', docDiscountType != 0)
-                    formInstance.getEditor('docDiscountPerc').option('readOnly', docDiscountType != 1)
+                    formInstance.getEditor('docDiscountAmt')?.option('readOnly', docDiscountType != 0)
+                    formInstance.getEditor('docDiscountPerc')?.option('readOnly', docDiscountType != 1)
                 }
-                if (!docDiscountPerc) var docDiscountPerc = 0
-                if (!docDiscountAmt) var docDiscountAmt = 0
+                if (!docDiscountPerc) docDiscountPerc = 0
+                if (!docDiscountAmt) docDiscountAmt = 0
                 let docTotalLineDiscountAmt = gridInstance.getTotalSummaryValue('docTotalLineDiscountAmt') || 0
                 let docTotalLineAmt = gridInstance.getTotalSummaryValue('docTotalLineAmt') || 0
                 let docTotalLineAmtAfterTax = gridInstance.getTotalSummaryValue('docTotalLineAmtAfterTax') || 0
@@ -243,7 +244,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                 companyId,
                 ...docData.currentData.header
             },
-            readOnly: state().isError || !docData.isOpen || !docData.permission.edit,
+            readOnly: state().isError || !docData.isOpen || !docData.permission.edit || render.isBaseDoc,
             items: [
                 {
                     itemType: "group",
@@ -490,9 +491,9 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
             repaintChangesOnly: true,
             editing: {
                 mode: 'batch',
-                allowAdding: docData.isOpen && !state().isError && docData.permission.edit,
-                allowUpdating: docData.isOpen && !state().isError && docData.permission.edit,
-                allowDeleting: docData.isOpen && !state().isError && docData.permission.edit,
+                allowAdding: docData.isOpen && !state().isError && docData.permission.edit && !render.isBaseDoc,
+                allowUpdating: docData.isOpen && !state().isError && docData.permission.edit && !render.isBaseDoc,
+                allowDeleting: docData.isOpen && !state().isError && docData.permission.edit && !render.isBaseDoc,
                 useIcons: true,
                 texts: {
                     editRow: l("Edit"),
@@ -538,7 +539,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                     widget: 'dxButton',
                     options: {
                         icon: 'add',
-                        visible: docData.isOpen && !state().isError && docData.permission.edit,
+                        visible: docData.isOpen && !state().isError && docData.permission.edit && !render.isBaseDoc,
                     },
                     onClick(e) {
                         if (!state().isError && docData.formInstance.validate().isValid) {
@@ -558,7 +559,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                         {
                             text: l("Delete"),
                             icon: 'trash',
-                            visible: (e) => docData.isOpen && !state().isError && docData.permission.edit,
+                            visible: (e) => docData.isOpen && !state().isError && docData.permission.edit && !render.isBaseDoc,
                             onClick: (e) => {
                                 e.component.deleteRow(e.row.rowIndex)
                                 e.component.saveEditData().then(() => state().isSaveable())

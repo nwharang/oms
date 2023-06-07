@@ -118,11 +118,12 @@ let store = () => {
             isRenderDiscount: false,
             permissionGroup: 'ArCreditMemos',
             title: l('Page.Title.ARCreditMemo'),
+            isBaseDoc: true,
             action: (docData) => [
                 {
                     text: l('Button.Action.CloseARCM'),
                     icon: "check",
-                    onClick: () => mainService.closeDoc([docData.docId]).then(() => {
+                    onClick: () => mainService.closeDoc(docData.docId).then(() => {
                         docData.popupInstance.hide()
                     })
                 },
