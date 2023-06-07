@@ -174,118 +174,104 @@
         colCount: 4,
         items: [
             {
-                itemType: "group",
-                items: [
+                dataField: 'Code',
+                editorType: 'dxTextBox',
+                validationRules: [
                     {
-                        dataField: 'Code',
-                        editorType: 'dxTextBox',
-                        validationRules: [
-                            {
-                                type: "required"
-                            },
-                            {
-                                type: 'pattern',
-                                pattern: '^[a-zA-Z0-9]{1,20}$',
-                                message: l('ValidateError:Code')
-                            }
-                        ]
+                        type: "required"
                     },
                     {
-                        dataField: 'Name',
-                        validationRules: [{
-                            type: 'required',
-                        }],
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
                     }
                 ]
             },
             {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'Route',
-                        editorType: 'dxSelectBox',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        }],
-                        editorOptions: {
-                            dataSource: {
-                                store: salesOrgHierarchyStore,
-                                filter: [["isRoute", "=", true], 'and', ['salesOrgHeader.status', '=', 1]],
-                                paginate: true,
-                                pageSize
-                            },
-                            showClearButton: true,
-                            valueExpr: "id",
-                            displayExpr: "name"
-                        }
+                dataField: 'Name',
+                validationRules: [{
+                    type: 'required',
+                }],
+            },
+            {
+                dataField: 'Route',
+                editorType: 'dxSelectBox',
+                validationRules: [{
+                    type: 'required',
+                    message: '',
+                }],
+                editorOptions: {
+                    dataSource: {
+                        store: salesOrgHierarchyStore,
+                        filter: [["isRoute", "=", true], 'and', ['salesOrgHeader.status', '=', 1]],
+                        paginate: true,
+                        pageSize
                     },
-                    {
-                        dataField: 'Company',
-                        editorType: 'dxSelectBox',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        }],
-                        editorOptions: {
-                            readOnly: true,
-                            showClearButton: true,
-                            valueExpr: "id",
-                            displayExpr: "name",
-                        }
+                    showClearButton: true,
+                    valueExpr: "id",
+                    displayExpr: "name"
+                }
+            },
+            {
+                dataField: 'Company',
+                editorType: 'dxSelectBox',
+                validationRules: [{
+                    type: 'required',
+                    message: '',
+                }],
+                editorOptions: {
+                    readOnly: true,
+                    showClearButton: true,
+                    valueExpr: "id",
+                    displayExpr: "name",
+                }
+            },
+            {
+                dataField: 'EffectiveDate',
+                editorType: 'dxDateBox',
+                editorOptions: {
+                    displayFormat: 'dd/MM/yyyy',
+                    showClearButton: true,
+                    min: MCPModel?.creationTime ? new Date(MCPModel.creationTime) : new Date(),
+                    onValueChanged: (e) => {
+                        try {
+                            $("#top-section").data('dxForm').getEditor('EndDate').option('min', e.value ? moment(e.value).add(1, 'days') : moment().add(1, 'days'))
+                        } catch (err) { }
+                    },
+                },
+                validationRules: [{ type: 'required', message: '' }],
+            },
+            {
+                dataField: 'EndDate',
+                editorType: 'dxDateBox',
+                editorOptions: {
+                    displayFormat: 'dd/MM/yyyy',
+                    showClearButton: true,
+                    onValueChanged: (e) => {
+                        try {
+                            $("#top-section").data('dxForm').getEditor('EffectiveDate').option('max', moment(e.value).subtract(1, 'days'))
+                        } catch (err) { }
                     }
-                ]
+                }
             },
             {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'EffectiveDate',
-                        editorType: 'dxDateBox',
-                        editorOptions: {
-                            displayFormat: 'dd/MM/yyyy',
-                            showClearButton: true,
-                            min: MCPModel?.creationTime ? new Date(MCPModel.creationTime) : new Date(),
-                            onValueChanged: (e) => {
-                                try {
-                                    $("#top-section").data('dxForm').getEditor('EndDate').option('min', e.value ? moment(e.value).add(1, 'days') : moment().add(1, 'days'))
-                                } catch (err) { }
-                            },
-                        },
-                        validationRules: [{ type: 'required', message: '' }],
+                dataField: 'ItemGroup',
+                editorType: 'dxSelectBox',
+                editorOptions: {
+                    dataSource: {
+                        store: itemGroupStore,
+                        filter: [],
+                        paginate: true,
+                        pageSize
                     },
-                    {
-                        dataField: 'EndDate',
-                        editorType: 'dxDateBox',
-                        editorOptions: {
-                            displayFormat: 'dd/MM/yyyy',
-                            showClearButton: true,
-                            onValueChanged: (e) => {
-                                try {
-                                    $("#top-section").data('dxForm').getEditor('EffectiveDate').option('max', moment(e.value).subtract(1, 'days'))
-                                } catch (err) { }
-                            }
-                        }
-                    }]
+                    showClearButton: true,
+                    valueExpr: "id",
+                    displayExpr: "name",
+                }
             },
             {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'ItemGroup',
-                        editorType: 'dxSelectBox',
-                        editorOptions: {
-                            dataSource: {
-                                store: itemGroupStore,
-                                filter: [],
-                                paginate: true,
-                                pageSize
-                            },
-                            showClearButton: true,
-                            valueExpr: "id",
-                            displayExpr: "name",
-                        }
-                    }]
+                dataField: 'gpsLock',
+                editorType: 'dxCheckBox',
             }
         ]
     });
@@ -634,7 +620,7 @@
         var itemGroupId = form.getEditor('ItemGroup').option('value');
         var code = form.getEditor('Code').option('value');
         var name = form.getEditor('Name').option('value');
-        //var isGPSLocked = form.getEditor('IsGPSLocked').option('value');
+        var gpsLock = form.getEditor('gpsLock').option('value');
         var effectiveDate = form.getEditor('EffectiveDate').option('value');
         var endDate = form.getEditor('EndDate').option('value');
         var mcpHeaderDto = {
@@ -645,6 +631,7 @@
             routeId,
             companyId,
             itemGroupId,
+            gpsLock
         };
         var mcpDetails = [];
 
