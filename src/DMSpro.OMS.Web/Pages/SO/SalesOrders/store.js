@@ -114,7 +114,7 @@ let store = () => {
             isRenderDiscount: true,
             permissionGroup: 'SalesOrders',
             title: l('Page.Title.SalesOrders'),
-            action: [
+            action: (docData) => [
                 {
                     text: l('Button.Action.SOToDODoc'),
                     icon: "check",

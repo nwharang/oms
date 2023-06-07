@@ -81,78 +81,12 @@
                         preLoad.then((data) => helper(data, () => loadingPanel.hide()))
                     }
                 },
-                // {
-                //     widget: "dxDropDownButton",
-                //     location: 'after',
-                //     options: {
-                //         icon: 'preferences',
-                //         text: 'Actions',
-                //         width: 120,
-                //         items: [
-                //             {
-                //                 text: "Approve",
-                //                 icon: "check",
-                //                 onClick() {
-                //                     let array = []
-                //                     currentSelectedDoc.forEach((e, k) => {
-                //                         if (e) array.push(k)
-                //                     })
-                //                     mainService.createListDODoc(array)
-                //                         .done(() => {
-                //                             notify({ type: 'success', message: `${array.length} SRs Approved` })
-                //                             $('#dgSOHeader').dxDataGrid('instance').getDataSource().reload()
-                //                         }
-                //                         ).fail(() => {
-                //                             notify({ type: 'error', message: "SRs Approve Failed" })
-                //                         })
-                //                 }
-                //             },
-                //         ]
-                //     },
-
-                // },
                 'columnChooserButton',
                 "exportButton",
                 "searchPanel"
             ],
         },
         columns: [
-            // {
-            //     cssClass: "text-center",
-            //     headerCellTemplate(container) {
-            //         $('<div>').dxCheckBox({
-            //             onValueChanged: (e) => {
-            //                 $('.actionCheckboxFormControl').each(function () {
-            //                     let id = $(this).attr('id')
-            //                     if (e.value) {
-            //                         $(this).dxCheckBox('instance').option('value', e.value)
-            //                         currentSelectedDoc.set(id, true)
-            //                     }
-            //                     else {
-            //                         $(this).dxCheckBox('instance').option('value', e.value)
-
-            //                     }
-            //                 })
-            //             }
-            //         }).appendTo(container)
-            //     },
-            //     cellTemplate(container, option) {
-            //         let disabled = Boolean(option.data.docStatus)
-            //         $('<div>').dxCheckBox({
-            //             elementAttr: {
-            //                 class: Boolean(option.data.docStatus) ? 'disabledActionCheckboxFormControl' : "actionCheckboxFormControl",
-            //                 id: option.data.id
-            //             },
-            //             disabled,
-            //             onValueChanged: (e) => {
-            //                 currentSelectedDoc.set(e.element.attr('id'), e.value)
-            //             }
-            //         }).appendTo(container)
-            //     },
-            //     fixed: true,
-            //     fixedPosition: "left",
-            //     allowExporting: false,
-            // },
             {
                 caption: l("Actions"),
                 type: 'buttons',

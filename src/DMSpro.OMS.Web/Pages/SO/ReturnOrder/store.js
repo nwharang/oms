@@ -118,7 +118,7 @@ let store = () => {
             isRenderDiscount: false,
             permissionGroup: 'ReturnOrders',
             title: l('Page.Title.ReturnOrder'),
-            action: [
+            action: (docData) => [
                 {
                     text: l('Button.Action.CloseRO'),
                     icon: "check",

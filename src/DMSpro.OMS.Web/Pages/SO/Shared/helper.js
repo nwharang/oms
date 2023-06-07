@@ -177,8 +177,8 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                         text: 'Actions',
                         width: 120,
                         onContentReady: (e) => docData.actionButton = e.component,
-                        disabled: !docData.isOpen || !docData.docId || state().isError ,
-                        items: render.action
+                        disabled: !docData.isOpen || !docData.docId || state().isError,
+                        items: render.action(docData)
                     },
                 },
                 {

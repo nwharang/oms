@@ -118,7 +118,7 @@ let store = () => {
             isRenderDiscount: false,
             permissionGroup: 'ArCreditMemos',
             title: l('Page.Title.ARCreditMemo'),
-            action: [
+            action: (docData) => [
                 {
                     text: l('Button.Action.CloseARCM'),
                     icon: "check",

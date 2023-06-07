@@ -118,11 +118,11 @@ let store = () => {
             isRenderDiscount: true,
             permissionGroup: 'ArInvoices',
             title: l('Page.Title.ARInvoice'),
-            action: [
+            action: (docData) => [
                 {
                     text: l('Button.Action.ARToARCMDoc'),
                     icon: "check",
-                    onClick: () => mainService.createListARCrMemoDoc([docData.docId]).then(() => {
+                    onClick: (e) => mainService.createListARCrMemoDoc([docData.docId]).then(() => {
                         docData.popupInstance.hide()
                     })
                 },
