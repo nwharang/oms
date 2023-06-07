@@ -97,23 +97,19 @@ $(function () {
         onRowInserting: function (e) {
             e.data.status = 0;
         },
+        onRowInserted: (e) => renderPopup(e.data),
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
+        },
+        onEditorPreparing: (e) => {
+            if (e.row?.rowType != 'data') return
+            if (e.dataField === 'groupBy' || e.dataField === 'code')
+                e.editorOptions.readOnly = !e.row.isNewRow
         },
         toolbar: {
             items: [
                 "groupPanel",
-                {
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'add',
-                        onClick(e) {
-                            renderPopup({})
-                        },
-                        visible: abp.auth.isGranted('MdmService.CustomerGroups.Create')
-                    }
-
-                },
+                'addRowButton',
                 'columnChooserButton',
                 "exportButton",
                 "searchPanel"
@@ -192,7 +188,7 @@ $(function () {
                     dataSource: store.cusStatus,
                     valueExpr: "id",
                     displayExpr: "text",
-                }
+                },
             }
         ],
     }).dxDataGrid("instance");
