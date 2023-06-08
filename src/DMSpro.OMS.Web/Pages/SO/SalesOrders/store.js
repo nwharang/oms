@@ -176,8 +176,6 @@ let getInfoSO = async () => {
         let specialCustomer = Object.keys(data.customerIdsWithoutRoute).map((key) => data.customerIdsWithoutRoute[key])
         let employeesRoute = []
         let routesEmployee = []
-        // employeesInRoutesDictionary
-        // routesWithEmployeesDictionary
         Object.keys(data.employeesInRoutesDictionary).forEach((key) => {
             employeesRoute.push({ id: key, data: data.employeesInRoutesDictionary[key].map(empRoute => routesList.find(route => route.id == empRoute)) })
         });
