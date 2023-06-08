@@ -20,9 +20,9 @@
         return obj
     }
     var l = abp.localization.getResource("OMS");
-    let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
+    let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore, render } = store()
     let currentSelectedDoc = new Map();
-    let mainGrid = $('#dgDeliveryHeader').dxDataGrid({
+    let mainGrid = $('#dgSOHeader').dxDataGrid({
         dataSource: { store: mainStore },
         showRowLines: true,
         showBorders: true,
@@ -75,16 +75,16 @@
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgDeliveryHeader',
+            storageKey: `dg${render.permissionGroup}Header`,
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 50, 100],
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -113,7 +113,7 @@
                                     mainService.createListARInvoiceDoc(array)
                                         .done(() => {
                                             notify({ type: 'success', message: `Create ${array.length} Ar Invoice` })
-                                            $('#dgDeliveryHeader').dxDataGrid('instance').getDataSource().reload()
+                                            $('#dgSOHeader').dxDataGrid('instance').getDataSource().reload()
                                         }
                                         ).fail(() => {
                                             notify({ type: 'error', message: "Create Failed" })
@@ -131,7 +131,7 @@
                                     mainService.createListRODoc(array)
                                         .done(() => {
                                             notify({ type: 'success', message: `Create ${array.length} RO` })
-                                            $('#dgDeliveryHeader').dxDataGrid('instance').getDataSource().reload()
+                                            $('#dgSOHeader').dxDataGrid('instance').getDataSource().reload()
                                         }
                                         ).fail(() => {
                                             notify({ type: 'error', message: "Create Failed" })
@@ -193,7 +193,7 @@
                         icon: "fieldchooser",
                         onClick: (e) => {
                             loadingPanel.show()
-                            preLoad.then((data) => helper(data, () => loadingPanel.hide()).renderPopup(e.row.data.id))
+                            preLoad.then((data) => helper(data, () => loadingPanel.hide(), { docId: e.row.data.id }))
                         }
                     }
                 ],
@@ -412,4 +412,5 @@
             })
         },
     }).dxDataGrid("instance");
+    $('body').append('<div id=popup>')
 })

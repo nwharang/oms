@@ -1,10 +1,10 @@
-let salesRequestsHeaderService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
+let mainService = window.dMSpro.oMS.orderService.controllers.salesRequests.salesRequest;
 let salesOrderService = window.dMSpro.oMS.mdmService.controllers.salesOrders.salesOrder;
 let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
 
 let store = () => {
     return {
-        salesRequestsHeaderStore: new DevExpress.data.CustomStore({
+        mainStore: new DevExpress.data.CustomStore({
             key: 'id',
             sort: [
                 { selector: "requestDate", desc: false }
@@ -19,7 +19,7 @@ let store = () => {
                     }
                 });
 
-                salesRequestsHeaderService.getHeaderListDevextremes(args)
+                mainService.getHeaderListDevextremes(args)
                     .done(result => {
                         result.data.sort((a, b) => Date.parse(a.requestDate) - Date.parse(b.requestDate))
                         deferred.resolve(result.data.sort((a, b) => Date.parse(a.requestDate) - Date.parse(b.requestDate)), {
@@ -110,6 +110,30 @@ let store = () => {
                 text: l('EntityFieldName:OrderService:SalesRequest:Incentive')
             }
         ],
+        render: {
+            isRenderEmployeeRoute: false,
+            isRenderDiscount: true,
+            permissionGroup: 'SalesRequests',
+            title: l('Page.Title.SalesRequest'),
+            action: (docData) => [
+                {
+                    text: l('Button.Action.SRToSODoc'),
+                    icon: "check",
+                    onClick: () => mainService.createListSODoc([docData.docId]).then(() => {
+                        docData.popupInstance.hide()
+                    })
+                },
+                {
+                    text: l('Button.Action.Cancel'),
+                    icon: "close",
+                    onClick: () => DevExpress.ui.dialog.confirm(l('ConfirmationMessage:OrderService:SalesRequest:Cancel'), "").done(e => {
+                        if (e) mainService.cancelDoc([docData.docId]).then(() => {
+                            docData.popupInstance.hide()
+                        })
+                    })
+                }
+            ]
+        }
     }
 }
 
@@ -136,21 +160,29 @@ let getInfoSO = async () => {
         })
         let uOMList = []
         Object.keys(data.uom).forEach((key) => {
-            uOMList.push(data.uom[key]);
-        })
-        let uomGroupWithDetailsDictionary = []
-        Object.keys(data.uomGroupWithDetailsDictionary).forEach(key => {
-            uomGroupWithDetailsDictionary.push({
-                id: key,
-                detailsDictionary: Object.keys(data.uomGroupWithDetailsDictionary[key].detailsDictionary).map(key1 => {
-                    return {
-                        ...data.uomGroupWithDetailsDictionary[key].detailsDictionary[key1],
-                        ...data.uom[key1]
-                    }
-                })
-            })
+            if (validUOM.find(e => e.uomId === key))
+                uOMList.push(data.uom[key]);
         })
 
+        let employeesList = Object.keys(data.employeeDictionary).map((key) => data.employeeDictionary[key])
+        let routesList = Object.keys(data.routeDictionary).map((key) => data.routeDictionary[key])
+        let customerEmployeesList = [];
+        let customerRoutesList = [];
+        Object.keys(data.customersRoutesDictionary).forEach((key) => {
+            customerRoutesList.push({ id: key, data: data.customersRoutesDictionary[key].map(cusRoute => routesList.find(route => route.id == cusRoute)) })
+        });
+        Object.keys(data.customerEmployeesDictionary).forEach((key) => {
+            customerEmployeesList.push({ id: key, data: data.customerEmployeesDictionary[key].map(cusEmp => employeesList.find(emp => emp.id == cusEmp)) })
+        });
+        let specialCustomer = Object.keys(data.customerIdsWithoutRoute).map((key) => data.customerIdsWithoutRoute[key])
+        let employeesRoute = []
+        let routesEmployee = []
+        Object.keys(data.employeesInRoutesDictionary).forEach((key) => {
+            employeesRoute.push({ id: key, data: data.employeesInRoutesDictionary[key].map(empRoute => routesList.find(route => route.id == empRoute)) })
+        });
+        Object.keys(data.routesWithEmployeesDictionary).forEach((key) => {
+            routesEmployee.push({ id: key, data: data.routesWithEmployeesDictionary[key].map(routeEmp => employeesList.find(route => route.id == routeEmp)) })
+        });
         return {
             companyId,
             mainStore: {
@@ -172,19 +204,20 @@ let getInfoSO = async () => {
                                 altQty: 1,
                                 baseQty: 1,
                                 altUOMId: data.uomGroupWithDetailsDictionary[key].baseUOMId,
-                                baseUOMId: data.uomGroupWithDetailsDictionary[key].baseUOMId,
                                 isBase: true
                             },
-                            ...Object.keys(data.uomGroupWithDetailsDictionary[key].detailsDictionary).map(key1 => {
-                                return {
-                                    ...data.uomGroupWithDetailsDictionary[key].detailsDictionary[key1],
-                                    baseUOMId: data.uomGroupWithDetailsDictionary[key].baseUOMId,
-                                }
-                            })
+                            ...Object.keys(data.uomGroupWithDetailsDictionary[key].detailsDictionary).map(key1 => data.uomGroupWithDetailsDictionary[key].detailsDictionary[key1])
                         ]
                     }
 
                 }),
+                employeesList,
+                routesList,
+                customerEmployeesList,
+                customerRoutesList,
+                employeesRoute,
+                routesEmployee,
+                specialCustomer,
             },
             vatList: Object.keys(data.vat).map((key) => data.vat[key])
         }

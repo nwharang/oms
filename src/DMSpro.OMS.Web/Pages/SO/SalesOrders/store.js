@@ -109,6 +109,30 @@ let store = () => {
                 text: l('EntityFieldName:OrderService:SalesRequest:Incentive')
             }
         ],
+        render: {
+            isRenderEmployeeRoute: true,
+            isRenderDiscount: true,
+            permissionGroup: 'SalesOrders',
+            title: l('Page.Title.SalesOrders'),
+            action: (docData) => [
+                {
+                    text: l('Button.Action.SOToDODoc'),
+                    icon: "check",
+                    onClick: () => mainService.createListDODoc([docData.docId]).then(() => {
+                        docData.popupInstance.hide()
+                    })
+                },
+                {
+                    text: l('Button.Action.Cancel'),
+                    icon: "close",
+                    onClick: () => DevExpress.ui.dialog.confirm(l('ConfirmationMessage:OrderService:SalesRequest:Cancel'), "").done(e => {
+                        if (e) mainService.cancelDoc([docData.docId]).then(() => {
+                            docData.popupInstance.hide()
+                        })
+                    })
+                }
+            ]
+        }
     }
 }
 
@@ -152,8 +176,6 @@ let getInfoSO = async () => {
         let specialCustomer = Object.keys(data.customerIdsWithoutRoute).map((key) => data.customerIdsWithoutRoute[key])
         let employeesRoute = []
         let routesEmployee = []
-        // employeesInRoutesDictionary
-        // routesWithEmployeesDictionary
         Object.keys(data.employeesInRoutesDictionary).forEach((key) => {
             employeesRoute.push({ id: key, data: data.employeesInRoutesDictionary[key].map(empRoute => routesList.find(route => route.id == empRoute)) })
         });

@@ -75,11 +75,10 @@ var dxDataGridConfiguration = {
 };
 
 function initChooseItemsPopup(items) {
-    $('div.panel-container.show').append(`<div id="popupItems" style="display:none">
-                <div id="dgItems" ></div> 
-            </div>`);
 
-    var dgItems = $('#dgItems').dxDataGrid(jQuery.extend(dxDataGridConfiguration, {
+    $('<div id="popupItems"></div>').appendTo('body')
+
+    const dgItems = $('<div class="px-2"/>').dxDataGrid(jQuery.extend(dxDataGridConfiguration, {
         dataSource: items,
         stateStoring: {
             // enabled: true,
@@ -171,10 +170,15 @@ function initChooseItemsPopup(items) {
     })).dxDataGrid("instance");
 
     const popupItems = $('#popupItems').dxPopup({
-        container: '.panel-container',
         showTitle: true,
         title: l('Popup:Title:Chooseitems'),
-        visible: false,
+        contentTemplate: () => {
+            return $('<div />').append(dgItems.element()).dxScrollView({
+                scrollByContent: true,
+                scrollByThumb: true,
+                showScrollbar: 'onScroll'
+            })
+        },
         dragEnabled: false,
         hideOnOutsideClick: false,
         showCloseButton: true,
@@ -182,6 +186,9 @@ function initChooseItemsPopup(items) {
         onShowing: () => {
             dgItems.repaint();
             dgItems.deselectAll()
+        },
+        onHiding: () => {
+            loadingPanel.hide()
         },
         toolbarItems: [{
             widget: 'dxButton',
@@ -213,15 +220,16 @@ function initChooseItemsPopup(items) {
             },
         }],
     }).dxPopup('instance');
+
+
+
+
 }
 let loadingPanel = $('<div class"fixed"/>').dxPopup({
     height: 100,
     width: 100,
     showTitle: false,
-    animation: {
-        show: { type: 'pop', duration: 100 },
-        hide: { type: 'pop', duration: 100 }
-    },
+    animation: null,
     contentTemplate: (e) => $('<div/>').dxLoadIndicator({
         height: 60,
         width: 60,
@@ -229,7 +237,7 @@ let loadingPanel = $('<div class"fixed"/>').dxPopup({
 })
     .appendTo('body')
     .dxPopup('instance')
-
+loadingPanel.registerKeyHandler('escape', () => loadingPanel.hide())
 $(function () {
     initImportPopup('api/mdm-service/items', 'Items_Template', 'dgItems');
 });

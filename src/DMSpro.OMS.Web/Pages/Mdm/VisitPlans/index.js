@@ -113,6 +113,38 @@ $(function () {
         }
     });
 
+    const mcpHeaderStore = new DevExpress.data.CustomStore({
+        key: "id",
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            mcpHeaderService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+
+            var d = new $.Deferred();
+            mcpHeaderService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
+        }
+    })
+
     const getItemGroup = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
@@ -182,6 +214,14 @@ $(function () {
         dataSource: {
             store: visitPlansStore,
             filter: ['dateVisit', '>', moment().format('YYYY-MM-DD')],
+            // map: (e) => {
+            //     return {
+            //         ...e,
+            //         company: e.mcpDetail.mcpHeaderId,
+            //         employee: e.mcpDetail.mcpHeaderId,
+            //         sellingZone: e.route.salesOrgHeaderId
+            //     }
+            // }
         },
         editing: {
             mode: "row",
@@ -315,10 +355,33 @@ $(function () {
                 allowEditing: false,
             },
             {
+                dataField: 'dateVisit',
+                caption: l('EntityFieldName:MDMService:VisitPlan:DateVisit'),
+                dataType: 'date',
+                format: 'dd/MM/yyyy',
+            },
+            {
+                dataField: 'route.parentId',
+                caption: l("EntityFieldName:MDMService:VisitPlan:ZoneCode"),
+                dataType: 'string',
+                lookup: {
+                    dataSource: {
+                        store: salesOrgHierarchyStore,
+                        // This filter for filterRow only
+                        filter: ["isSellingZone", "=", true],
+                        paginate: true,
+                        pageSize
+                    },
+                    displayExpr: (e) => { if (e) return `${e.code} - ${e.name}` },
+                    valueExpr: 'id'
+                },
+                allowEditing: false,
+            },
+            {
                 dataField: 'routeId',
                 caption: l("EntityFieldName:MDMService:VisitPlan:RouteCode"),
                 dataType: 'string',
-                calculateDisplayValue: (e) => e?.route?.name,
+                calculateDisplayValue: (e) => { if (e?.route) return `${e.route.code} - ${e.route.name}` },
                 lookup: {
                     dataSource: {
                         store: salesOrgHierarchyStore,
@@ -327,7 +390,7 @@ $(function () {
                         paginate: true,
                         pageSize
                     },
-                    displayExpr: 'name',
+                    displayExpr: (e) => { if (e) return `${e.code} - ${e.name}` },
                     valueExpr: 'id'
                 },
                 allowEditing: false,
@@ -336,9 +399,10 @@ $(function () {
                 dataField: 'customerId',
                 caption: l("EntityFieldName:MDMService:VisitPlan:CustomerCode"),
                 validationRules: [{ type: 'required' }],
-                editorType: 'dxSelectBox',
                 allowEditing: false,
-                calculateDisplayValue: (e) => e?.customer?.name,
+                calculateDisplayValue: (e) => {
+                    if (e?.customer?.code && e?.customer?.name) return `${e.customer.code} - ${e.customer.name}`
+                },
                 lookup: {
                     dataSource: {
                         store: getCustomer,
@@ -350,10 +414,14 @@ $(function () {
                 },
             },
             {
-                dataField: 'dateVisit',
-                caption: l('EntityFieldName:MDMService:VisitPlan:DateVisit'),
-                dataType: 'date',
-                format: 'dd/MM/yyyy',
+                dataField: 'mcpDetail.mcpHeaderId',
+                caption: l("EntityFieldName:MDMService:VisitPlan:CompanyCode"),
+                allowEditing: false,
+                lookup: {
+                    dataSource: mcpHeaderStore,
+                    displayExpr: (e) => { if (e?.company) return `${e.company.code} - ${e.company.name}` },
+                    valueExpr: 'id'
+                },
             },
             {
                 dataField: 'distance',

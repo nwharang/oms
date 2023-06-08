@@ -75,13 +75,7 @@ $(function () {
         toolbar: {
             items: [
                 "groupPanel",
-                {
-                    location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick(e) {
-                        renderPopup({})
-                    },
-                },
+                'addRowButton',
                 'columnChooserButton',
                 "exportButton",
                 {
@@ -104,11 +98,9 @@ $(function () {
             ],
         },
         onEditorPreparing: function (e) {
-            if (e.dataField == "type" && e.parentType == "dataRow") {
-                if (e.row.data.status != 0)
-                    e.editorOptions.disabled = false;
-                //e.editorOptions.disabled = !e.row.inserted;
-            }
+            if (e.row?.rowType != 'data') return
+            if (e.dataField === 'type' || e.dataField === 'code')
+                e.editorOptions.readOnly = !e.row.isNewRow
         },
         onRowInserting: function (e) {
             e.data.status = 0;
@@ -116,6 +108,7 @@ $(function () {
                 e.data.id = null;
             }
         },
+        onRowInserted: (e) => renderPopup(e.data),
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
@@ -163,7 +156,6 @@ $(function () {
                 editorOptions: {
                     maxLength: 20,
                 },
-                allowEditing: false,
                 validationRules: [
                     {
                         type: "required"
@@ -189,10 +181,7 @@ $(function () {
                     dataSource: store.type,
                     displayExpr: 'text',
                     valueExpr: 'id',
-                    paginate: true,
-                    pageSize
                 },
-                allowEditing: false,
             },
             {
                 caption: l("EntityFieldName:MDMService:ItemGroup:Status"),

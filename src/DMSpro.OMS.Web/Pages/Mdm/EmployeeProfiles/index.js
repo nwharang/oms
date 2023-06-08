@@ -366,7 +366,14 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:IdCardNumber"),
                 dataField: "idCardNumber",
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{12}$',
+                        message: l('ValidateError:IdCardNumber')
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:Email"),

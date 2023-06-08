@@ -1,7 +1,7 @@
 ﻿$(async function () {
     var l = abp.localization.getResource("OMS");
-    let { mainStore, docTypeStore, docStatusStore, docSourceStore } = store()
-    let mainGrid = $('#dgReturnOrderHeader').dxDataGrid({
+    let { mainStore, docTypeStore, docStatusStore, docSourceStore, render } = store()
+    let mainGrid = $('#dgSOHeader').dxDataGrid({
         dataSource: { store: mainStore },
         showRowLines: true,
         showBorders: true,
@@ -54,7 +54,7 @@
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgReturnOrderHeader',
+            storageKey: `dg${render.permissionGroup}Header`,
         },
         paging: {
             enabled: true,
@@ -85,7 +85,7 @@
                         icon: "fieldchooser",
                         onClick: (e) => {
                             loadingPanel.show()
-                            preLoad.then((data) => helper(data, () => loadingPanel.hide()).renderPopup(e.row.data.id))
+                            preLoad.then((data) => helper(data, () => loadingPanel.hide(), { docId: e.row.data.id }))
                         }
                     }
                 ],
@@ -235,4 +235,5 @@
             ],
         },
     }).dxDataGrid("instance");
+    $('body').append('<div id=popup>')
 })

@@ -6,7 +6,7 @@ $(function () {
     let detailDataSrc // Local varible for condition check
     let editingComponent; // Local varible for close unfinish editor
     let isEditing = false // Editing but not adding
-    var groupStore = new DevExpress.data.CustomStore({
+    var uomGroupHeaderStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -47,7 +47,7 @@ $(function () {
         }
     });
 
-    var detailStore = new DevExpress.data.CustomStore({
+    var uomGroupDetailsStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -113,7 +113,7 @@ $(function () {
     });
 
     const dataGrid = $('#gridUOMGroups').dxDataGrid({
-        dataSource: groupStore,
+        dataSource: uomGroupHeaderStore,
         //keyExpr: 'id',
         remoteOperations: true,
         showRowLines: true,
@@ -190,7 +190,8 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            e.newData = Object.assign({}, e.oldData, e.newData);
+            let { name, concurrencyStamp } = { ...e.oldData, ...e.newData }
+            e.newData = { name, concurrencyStamp }
         },
 
         toolbar: {
@@ -261,7 +262,7 @@ $(function () {
                 const dataGridDetail = $('<div>')
                     .dxDataGrid({
                         dataSource: {
-                            store: detailStore,
+                            store: uomGroupDetailsStore,
                             filter: ['uomGroupId', '=', options.key]
                         },
                         remoteOperations: true,
