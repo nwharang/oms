@@ -174,7 +174,7 @@ $(() => {
                 dataType: 'number',
                 caption: l("EntityFieldName:MDMService:Holiday:Year"),
                 width: 100,
-                validationRules: [{ type: "required" }, { type: "stringLength", max: 4 }],
+                validationRules: [{ type: "required" }, { type: "stringLength", max: 4, message: l('WarnMessage.FieldLength').replace("{0}", 4) }],
             },
             {
                 dataField: 'description',
@@ -421,7 +421,7 @@ $(() => {
                             {
                                 dataField: 'description',
                                 caption: l("EntityFieldName:MDMService:HolidayDetail:Description"),
-                                validationRules: [{ type: "required" }, { type: "stringLength", max: 255 }],
+                                validationRules: [{ type: "required" }, { type: "stringLength", max: 255, message: l('WarnMessage.FieldLength').replace("{0}", 255) }],
                             }],
                     }).appendTo(container);
             },
