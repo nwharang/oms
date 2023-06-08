@@ -508,7 +508,7 @@
                 validationRules: [
                     {
                         type: 'pattern',
-                        pattern: '^[a-zA-Z0-9]$',
+                        pattern: '^[0-9]{10,}$',
                         message: l('ValidateError:License')
                     }
                 ],
@@ -521,7 +521,7 @@
                 validationRules: [
                     {
                         type: 'pattern',
-                        pattern: '^[a-zA-Z0-9]$',
+                        pattern: '^[0-9]{1,13}$',
                         message: l('ValidateError:TaxCode')
                     }
                 ],
