@@ -3,7 +3,7 @@ $(function () {
     // language
     var l = abp.localization.getResource("OMS");
 
-    var customStore = new DevExpress.data.CustomStore({
+    var uomStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -46,7 +46,7 @@ $(function () {
     });
 
     var gridUOMs = $('#gridUOMs').dxDataGrid({
-        dataSource: customStore,
+        dataSource: uomStore,
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
@@ -122,7 +122,8 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            e.newData = Object.assign({}, e.oldData, e.newData);
+            let { name, concurrencyStamp } = { ...e.oldData, ...e.newData }
+            e.newData = { name, concurrencyStamp }
         },
         onEditorPreparing: function (e) {
             if (e.dataField == 'code' && e.value != null) {
