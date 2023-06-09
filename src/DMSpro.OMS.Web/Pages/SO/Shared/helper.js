@@ -244,7 +244,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                 companyId,
                 ...docData.currentData.header
             },
-            readOnly: state().isError || !docData.isOpen || !docData.permission.edit || render.isBaseDoc,
+            readOnly: state().isError || !docData.isOpen || !docData.permission.edit,
             items: [
                 {
                     itemType: "group",
@@ -271,6 +271,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                             dataField: "businessPartnerId",
                             editorType: 'dxSelectBox',
                             editorOptions: {
+                                readOnly: render.isBaseDoc,
                                 dataSource: {
                                     store: mainStore.customerList,
                                     paginate: true,
@@ -303,6 +304,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                             editorOptions: {
                                 displayFormat: "dd-MM-yyyy",
                                 dateOutOfRangeMessage: "Date is out of range",
+                                readOnly: render.isBaseDoc,
                             },
                             validationRules: [{ type: 'required' }],
                         },
@@ -323,6 +325,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                             dataField: "employeeId",
                             editorType: 'dxSelectBox',
                             editorOptions: {
+                                readOnly: render.isBaseDoc,
                                 dataSource: ({
                                     store: mainStore.employeesList,
                                     postProcess: () => mainStore.customerEmployeesList.find(e => e.id == docData.currentData.header.businessPartnerId)?.data || []
@@ -351,6 +354,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                             dataField: "routeId",
                             editorType: 'dxSelectBox',
                             editorOptions: {
+                                readOnly: render.isBaseDoc,
                                 dataSource: ({
                                     store: mainStore.routesList,
                                     postProcess: () => mainStore.customerRoutesList.find(e => e.id == docData.currentData.header.businessPartnerId)?.data || []
@@ -405,6 +409,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                                         valueExpr: 'id',
                                         searchEnabled: true,
                                         showClearButton: true,
+                                        readOnly: render.isBaseDoc,
                                     },
                                 },
                                 render.isRenderDiscount && {
@@ -414,6 +419,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                                     dataField: "docDiscountPerc",
                                     editorType: 'dxNumberBox',
                                     editorOptions: {
+                                        readOnly: render.isBaseDoc,
                                         format: '#0.00',
                                         min: 0,
                                         max: 100,
@@ -432,6 +438,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                                     dataField: "docDiscountAmt",
                                     editorType: 'dxNumberBox',
                                     editorOptions: {
+                                        readOnly: render.isBaseDoc,
                                         format: '#,##0.##',
                                         min: 0,
                                     }
