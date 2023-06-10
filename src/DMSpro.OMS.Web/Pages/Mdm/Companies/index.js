@@ -33,7 +33,7 @@
                     text: l('Button.Inactive.Customer'),
                     onClick: () => {
                         // Localize This
-                        dialog({ header: 'Inactive Customer', body: `Do you want to inactive customer ${endDateRowData.name}` },
+                        dialog({ header: l("Dialog:MDMService:CompanyProfile:Inactive.Header"), body: l("Dialog:MDMService:CompanyProfile:Inactive.Body").replace('{0}', endDateRowData.name) },
                             () => {
                                 companyService.inactive(endDateRowData.id, moment($('#inactive-dateBox').dxDateBox('instance').option('value')).format('YYYY-MM-DD[T00:00:00Z]')).then(() => {
                                     gridCompanies.refresh()
