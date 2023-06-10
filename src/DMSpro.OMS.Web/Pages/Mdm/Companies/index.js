@@ -3,6 +3,71 @@
     let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
     let geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
 
+
+    let dialog = ({ header, body }, callBackIfTrue, callBackIfFalse) => {
+        DevExpress.ui.dialog.confirm(`<i>${body}</i>`, header)
+            .done((e) => {
+                if (e) {
+                    callBackIfTrue()
+                }
+                else {
+                    callBackIfFalse()
+                }
+            })
+    }
+
+    let endDateRowData, endDatePopup = $('<div/>').dxPopup({
+        showTitle: false,
+        width: 400,
+        height: 150,
+        onShowing: () => {
+            $('#inactive-dateBox').dxDateBox('instance').option('value', moment().add(1, 'd').format('YYYY-MM-DD[T00:00:00Z]'))
+            // Reset Date Box Data Value to today + 1 
+        },
+        toolbarItems: [
+            {
+                widget: "dxButton",
+                location: "after",
+                toolbar: "bottom",
+                options: {
+                    text: l('Button.Inactive.Customer'),
+                    onClick: () => {
+                        // Localize This
+                        dialog({ header: 'Inactive Customer', body: `Do you want to inactive customer ${endDateRowData.name}` },
+                            () => {
+                                companyService.inactive(endDateRowData.id, moment($('#inactive-dateBox').dxDateBox('instance').option('value')).format('YYYY-MM-DD[T00:00:00Z]')).then(() => {
+                                    gridCompanies.refresh()
+                                    endDatePopup.hide()
+                                })
+                            },
+                            () => {
+                                endDateRowData = undefined
+                                endDatePopup.hide()
+                            }
+                        )
+                    }
+                },
+            },
+            {
+                widget: "dxButton",
+                location: "after",
+                toolbar: "bottom",
+                options: {
+                    text: l("Button.Cancel"),
+                    onClick: () => endDatePopup.hide()
+                },
+            },
+        ],
+        contentTemplate: () => {
+            return $('<div id="inactive-dateBox">').dxDateBox({
+                value: moment().add(1, 'd').format('YYYY-MM-DD[T00:00:00Z]'),
+                min: moment().add(1, 'd').format('YYYY-MM-DD[T00:00:00Z]'),
+                format: 'dd-MM-yyyy',
+            })
+        }
+    }).appendTo('body').dxPopup('instance')
+
+
     let geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
@@ -227,7 +292,21 @@
             {
                 type: 'buttons',
                 caption: l("Actions"),
-                buttons: ['edit', 'delete'],
+                alignment: 'left',
+                buttons: [
+                    'edit',
+                    'delete',
+                    {
+                        name: 'inactive',
+                        text: l("EntityFieldValue:MDMService:Customer:Active:False"),
+                        icon: 'close',
+                        visible: (e) => e.row.data.active && !e.row.data.isHO,
+                        onClick: (e) => {
+                            endDateRowData = e.row.data
+                            endDatePopup.show()
+                        },
+                    }
+                ],
                 fixed: true,
                 fixedPosition: "left",
             },
