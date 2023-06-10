@@ -663,12 +663,12 @@
             mcpHeaderDto: mcpHeaderDto,
             mcpDetails: mcpDetails,
         }
-        params.mcpHeaderDto.effectiveDate = moment(params.mcpHeaderDto.effectiveDate).format('YYYY-MM-DDT12:00:00Z');
-        params.mcpHeaderDto.endDate = moment(params.mcpHeaderDto.endDate).format('YYYY-MM-DDT12:00:00Z');
+        params.mcpHeaderDto.effectiveDate = moment(params.mcpHeaderDto.effectiveDate).format('YYYY-MM-DD[T12:00:00Z]');
+        params.mcpHeaderDto.endDate = moment(params.mcpHeaderDto.endDate).format('YYYY-MM-DD[T12:00:00Z]');
 
         params.mcpDetails.forEach(u => {
-            u.effectiveDate = moment(u.effectiveDate).format('YYYY-MM-DDT12:00:00Z');
-            u.endDate = moment(u.endDate).format('YYYY-MM-DDT12:00:00Z');
+            u.effectiveDate = moment(u.effectiveDate).format('YYYY-MM-DD[T12:00:00Z]');
+            u.endDate = moment(u.endDate).format('YYYY-MM-DD[T12:00:00Z]');
         })
 
         if (!MCPModel)
@@ -947,7 +947,7 @@
                 onClick() {
                     let dxEndDate = $('#EndDateMCP').data('dxDateBox');
                     let endDate = dxEndDate.option('value');
-                    mCPHeaderService.setEndDate(MCPModel.id, moment(endDate).format('YYYY-MM-DDT12:00:00'), { contentType: "application/json" })
+                    mCPHeaderService.setEndDate(MCPModel.id, moment(endDate).format('YYYY-MM-DD[T12:00:00Z]'), { contentType: "application/json" })
                         .done(result => {
                             abp.message.success(l('Congratulations'));
                             popupEnddateMCP.hide();

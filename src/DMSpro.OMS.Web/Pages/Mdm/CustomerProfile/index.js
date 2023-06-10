@@ -41,7 +41,7 @@
                     text: l('Button.Inactive.Customer'),
                     onClick: () => {
                         // Localize This
-                        dialog({ header: 'Inactive Customer', body: `Do you want to inactive customer ${endDateRowData.name}` },
+                        dialog({ header: 'Inactive Company', body: `Do you want to inactive company ${endDateRowData.name}` },
                             () => {
                                 customerService.inactive(endDateRowData.id, moment($('#inactive-dateBox').dxDateBox('instance').option('value')).format('YYYY-MM-DD[T00:00:00Z]')).then(() => {
                                     gridCustomers.refresh()
@@ -304,16 +304,16 @@
                             },
                             {
                                 title: "SYSTEM",
-                                items: ['license', 'taxCode', 'vatName', 'vatAddress']
+                                items: ['license', 'taxCode', 'vatName', 'vatAddress', { itemType: 'empty' }]
                             },
                             {
                                 title: "ADDRESS",
-                                items: ['geoMaster0Id', 'geoMaster1Id', 'geoMaster2Id', 'geoMaster3Id', 'geoMaster4Id', 'street', 'address', 'latitude', 'longitude']
+                                items: ['geoMaster0Id', 'geoMaster1Id', 'geoMaster2Id', 'geoMaster3Id', 'geoMaster4Id', 'street', 'address', 'latitude', 'longitude', { itemType: 'empty' }]
                             },
                             {
                                 title: 'ATTRIBUTE',
                                 colCount: 2,
-                                items: await getAttrOptions(),
+                                items: [...await getAttrOptions(), { itemType: 'empty' }, { itemType: 'empty' }],
                             }
                         ]
                     }],
@@ -507,7 +507,7 @@
                 validationRules: [
                     {
                         type: 'pattern',
-                        pattern: '^[a-zA-Z0-9]$',
+                        pattern: '^[0-9]{10,}$',
                         message: l('ValidateError:License')
                     }
                 ],
@@ -520,7 +520,7 @@
                 validationRules: [
                     {
                         type: 'pattern',
-                        pattern: '^[a-zA-Z0-9]$',
+                        pattern: '^[0-9]{1,13}$',
                         message: l('ValidateError:TaxCode')
                     }
                 ],
