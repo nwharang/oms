@@ -8,6 +8,7 @@ $(function () {
     let mcpDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
     let salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
 
+
     let dayOfWeek = [
         {
             id: 1,
@@ -83,7 +84,29 @@ $(function () {
                 }
             });
             visitPlansService.getListDevextremes(args)
-                .done(result => {
+                .done(async (result) => {
+                    let arr = result.data.map(e => e.id)
+                    if (!args.group) {
+                        let summary = await visitPlansService.getSummaryInfo(arr.shift(), {
+                            data: { ids: arr },
+                            traditional: true
+                        }).then(data => JSON.parse(data))
+                        let { geoDictionary, assignmentDictionary, employeeDictionary, routeDictionary } = summary.summaryInfo
+                        result.data.forEach(e => {
+                            e.customer.geoMaster0 = e.customer.geoMaster0Id ? geoDictionary[e.customer.geoMaster0Id] : null
+                            e.customer.geoMaster1 = e.customer.geoMaster1Id ? geoDictionary[e.customer.geoMaster1Id] : null
+                            e.customer.geoMaster2 = e.customer.geoMaster2Id ? geoDictionary[e.customer.geoMaster2Id] : null
+                            e.customer.geoMaster3 = e.customer.geoMaster3Id ? geoDictionary[e.customer.geoMaster3Id] : null
+                            e.customer.geoMaster4 = e.customer.geoMaster4Id ? geoDictionary[e.customer.geoMaster4Id] : null
+                            let zoneId = e.routeId ? routeDictionary[e.routeId]?.zoneId : null
+                            if (zoneId) {
+                                var [assignmentId] = assignmentDictionary[zoneId] ? assignmentDictionary[zoneId] : [null]
+                            }
+                            if (assignmentId)
+                                e.employee = employeeDictionary[assignmentId]
+                        })
+                        console.log(employeeDictionary);
+                    }
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -213,15 +236,7 @@ $(function () {
         key: 'id',
         dataSource: {
             store: visitPlansStore,
-            filter: ['dateVisit', '>', moment().format('YYYY-MM-DD')],
-            // map: (e) => {
-            //     return {
-            //         ...e,
-            //         company: e.mcpDetail.mcpHeaderId,
-            //         employee: e.mcpDetail.mcpHeaderId,
-            //         sellingZone: e.route.salesOrgHeaderId
-            //     }
-            // }
+            filter: ['dateVisit', '>', new Date],
         },
         editing: {
             mode: "row",
@@ -286,11 +301,11 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        // stateStoring: {
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'dgVisitPlans',
-        // },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgVisitPlans',
+        },
         paging: {
             enabled: true,
             pageSize
@@ -298,7 +313,8 @@ $(function () {
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes,
+            // Do not change this
+            allowedPageSizes: [10, 20, 40],
             showInfo: true,
             showNavigationButtons: true
         },
@@ -419,9 +435,23 @@ $(function () {
                 allowEditing: false,
                 lookup: {
                     dataSource: mcpHeaderStore,
-                    displayExpr: (e) => { if (e?.company) return `${e.company.code} - ${e.company.name}` },
+                    displayExpr: (e) => {
+                        if (e) return `${e.code} - ${e.name}`
+                        return
+                    },
                     valueExpr: 'id'
                 },
+            },
+            {
+                dataField: 'employee.id',
+                caption: l("EntityFieldName:MDMService:VisitPlan:EmployeeCode"),
+                calculateDisplayValue: e => {
+                    if (e?.employee) return `${e.employee.code} - ${e.employee.name}`
+                },
+                allowEditing: false,
+                allowFiltering: false,
+                allowSorting: false,
+                visible: false
             },
             {
                 dataField: 'distance',
@@ -437,6 +467,62 @@ $(function () {
                     format: '#'
                 },
                 validationRules: [{ type: 'required' }],
+            },
+            {
+                dataField: 'customer.geoMaster0Id',
+                caption: l("EntityFieldName:MDMService:GeoMaster:GeoMaster0Name"),
+                dataType: 'string',
+                calculateDisplayValue: (e) => {
+                    if (e?.customer?.geoMaster0) return `${e.customer.geoMaster0.code} - ${e.customer.geoMaster0.name}`
+                },
+                allowEditing: false,
+                allowFiltering: false,
+                allowSorting: false,
+            },
+            {
+                dataField: 'customer.geoMaster1Id',
+                caption: l("EntityFieldName:MDMService:GeoMaster:GeoMaster1Name"),
+                dataType: 'string',
+                calculateDisplayValue: (e) => {
+                    if (e?.customer?.geoMaster1) return `${e.customer.geoMaster1.code} - ${e.customer.geoMaster1.name}`
+                },
+                allowEditing: false,
+                allowFiltering: false,
+                allowSorting: false,
+            },
+            {
+                dataField: 'customer.geoMaster2Id',
+                caption: l("EntityFieldName:MDMService:GeoMaster:GeoMaster2Name"),
+                dataType: 'string',
+                calculateDisplayValue: (e) => {
+                    if (e?.customer?.geoMaster2) return `${e.customer.geoMaster2.code} - ${e.customer.geoMaster2.name}`
+                },
+                allowEditing: false,
+                allowFiltering: false,
+                allowSorting: false,
+            },
+            {
+                dataField: 'customer.geoMaster3Id',
+                caption: l("EntityFieldName:MDMService:GeoMaster:GeoMaster3Name"),
+                dataType: 'string',
+                calculateDisplayValue: (e) => {
+                    if (e?.customer?.geoMaster3) return `${e.customer.geoMaster3.code} - ${e.customer.geoMaster3.name}`
+                },
+                allowEditing: false,
+                allowFiltering: false,
+                allowSorting: false,
+            },
+            {
+                dataField: 'customer.geoMaster4Id',
+                caption: l("EntityFieldName:MDMService:GeoMaster:GeoMaster4Name"),
+                dataType: 'string',
+                calculateDisplayValue: (e) => {
+                    if (e?.customer?.geoMaster4) return `${e.customer.geoMaster4.code} - ${e.customer.geoMaster4.name}`
+                },
+                allowEditing: false,
+                allowFiltering: false,
+                allowSorting: false,
+                visible: false
             },
             {
                 dataField: 'itemGroupId',
