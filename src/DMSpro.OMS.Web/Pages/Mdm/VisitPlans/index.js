@@ -436,7 +436,7 @@ $(function () {
                 lookup: {
                     dataSource: mcpHeaderStore,
                     displayExpr: (e) => {
-                        if (e) return `${e.code} - ${e.name}`
+                        if (e?.company) return `${e.company.code} - ${e.company.name}`
                         return
                     },
                     valueExpr: 'id'
