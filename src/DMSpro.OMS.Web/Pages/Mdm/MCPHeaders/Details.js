@@ -522,7 +522,7 @@
                     {
                         type: 'async',
                         validationCallback: (e) => {
-                            let customerEnddate = e.data.customer.endDate ? new Date(e.data.customer.endDate) : null
+                            let customerEnddate = e.data?.customer?.endDate ? new Date(e.data.customer.endDate) : null
                             let endDate = e?.data?.endDate ? new Date(e?.data?.endDate) : null
 
                             return new Promise((resolve, reject) => {
