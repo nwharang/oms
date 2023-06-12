@@ -105,7 +105,6 @@ $(function () {
                             if (assignmentId)
                                 e.employee = employeeDictionary[assignmentId]
                         })
-                        console.log(employeeDictionary);
                     }
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,

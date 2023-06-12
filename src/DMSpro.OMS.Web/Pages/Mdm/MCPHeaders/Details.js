@@ -490,7 +490,6 @@
                 format: 'dd/MM/yyyy',
                 editorOptions: {
                     min: MCPModel?.effectiveDate || new Date(),
-                    max: MCPModel?.endDate || new Date()
                 },
                 validationRules: [
                     {
