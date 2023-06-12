@@ -152,14 +152,18 @@ $(function () {
             {
                 caption: l('EntityFieldName:MDMService:SalesOrgHeader:ZoneCount'),
                 dataField: 'zoneCount',
+                width: 100,
                 allowEditing: false,
-                width: 100
+                allowFiltering: false,
+                allowSorting: false,
             },
             {
                 caption: l('EntityFieldName:MDMService:SalesOrgHeader:RouteCount'),
                 dataField: 'routeCount',
+                width: 100,
                 allowEditing: false,
-                width: 100
+                allowFiltering: false,
+                allowSorting: false,
             },
         ]
     }).dxDataGrid("instance");

@@ -519,6 +519,21 @@
                     min: MCPModel?.effectiveDate || new Date(),
                     max: MCPModel?.endDate || null
                 },
+                validationRules: [
+                    {
+                        type: 'async',
+                        validationCallback: (e) => {
+                            let customerEnddate = e.data.customer.endDate ? new Date(e.data.customer.endDate) : null
+                            let endDate = e?.data?.endDate ? new Date(e?.data?.endDate) : null
+
+                            return new Promise((resolve, reject) => {
+                                if (!endDate || endDate <= customerEnddate)
+                                    resolve(endDate)
+                                reject(l('ValidateError:MCPDetails:EffectiveDate'))
+                            })
+                        }
+                    }
+                ],
                 format: 'dd/MM/yyyy',
             },
             {
@@ -623,23 +638,26 @@
         var gpsLock = form.getEditor('gpsLock').option('value');
         var effectiveDate = form.getEditor('EffectiveDate').option('value');
         var endDate = form.getEditor('EndDate').option('value');
+
         var mcpHeaderDto = {
             code,
             name,
-            effectiveDate,
-            endDate,
+            effectiveDate: effectiveDate ? moment(effectiveDate).format('YYYY-MM-DD[T12:00:00Z]') : null,
+            endDate: endDate ? moment(endDate).format('YYYY-MM-DD[T12:00:00Z]') : null,
             routeId,
             companyId,
             itemGroupId,
             gpsLock
         };
+        if (endDate)
+            console.log(endDate);
         var mcpDetails = [];
 
         dgMCPDetails.getDataSource().items().forEach(u => {
             mcpDetails.push({
                 code: u.code,
-                effectiveDate: u.effectiveDate,
-                endDate: u.endDate,
+                effectiveDate: u.effectiveDate ? moment(u.effectiveDate).format('YYYY-MM-DD[T12:00:00Z]') : null,
+                endDate: u.endDate ? moment(u.endDate).format('YYYY-MM-DD[T12:00:00Z]') : null,
                 distance: u.distance,
                 visitOrder: u.visitOrder,
                 monday: u.monday,
@@ -663,13 +681,6 @@
             mcpHeaderDto: mcpHeaderDto,
             mcpDetails: mcpDetails,
         }
-        params.mcpHeaderDto.effectiveDate = moment(params.mcpHeaderDto.effectiveDate).format('YYYY-MM-DD[T12:00:00Z]');
-        params.mcpHeaderDto.endDate = moment(params.mcpHeaderDto.endDate).format('YYYY-MM-DD[T12:00:00Z]');
-
-        params.mcpDetails.forEach(u => {
-            u.effectiveDate = moment(u.effectiveDate).format('YYYY-MM-DD[T12:00:00Z]');
-            u.endDate = moment(u.endDate).format('YYYY-MM-DD[T12:00:00Z]');
-        })
 
         if (!MCPModel)
             mCPHeaderService.createMCP(params, { contentType: "application/json" })

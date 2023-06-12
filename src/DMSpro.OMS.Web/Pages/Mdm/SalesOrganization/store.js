@@ -104,16 +104,18 @@ let store = {
             });
 
             salesOrgHeaderService.getListDevextremes(args)
-                .done(result => {
-                    let zoneDictionary = result.summary[0]?.zoneDictionary
-                    let routeDictionary = result.summary[0]?.routeDictionary
-                    result.data = result.data.map((e) => {
-                        return {
-                            ...e,
-                            zoneCount: zoneDictionary[e.id]?.length || 0,
-                            routeCount: routeDictionary[e.id]?.length || 0
-                        }
-                    })
+                .done(async (result) => {
+                    let arr = result.data.map(e => e.id)
+                    if (!args.group) {
+                        let { routeDictionary, zoneDictionary } = (await salesOrgHeaderService.getSummaryInfo(arr.shift(), {
+                            data: { ids: arr },
+                            traditional: true
+                        }).then(data => JSON.parse(data)))?.summaryInfo
+                        result.data.forEach((e) => {
+                            e.zoneCount = zoneDictionary[e.id]?.length || 0
+                            e.routeCount = routeDictionary[e.id]?.length || 0
+                        })
+                    }
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
