@@ -11,6 +11,20 @@
     let gridInfo = {}, endDateRowData;
     let cusAttrStore = cusAttrService.getListDevextremes({ filter: JSON.stringify(['active', "=", true]) })
 
+    let loadingPanel = $('<div class"fixed"/>').dxPopup({
+        height: 100,
+        width: 100,
+        showTitle: false,
+        animation: null,
+        contentTemplate: (e) => $('<div/>').dxLoadIndicator({
+            height: 60,
+            width: 60,
+        })
+    })
+        .appendTo('body')
+        .dxPopup('instance')
+    loadingPanel.registerKeyHandler('escape', () => loadingPanel.hide())
+
     let dialog = ({ header, body }, callBackIfTrue, callBackIfFalse) => {
         DevExpress.ui.dialog.confirm(`<i>${body}</i>`, header)
             .done((e) => {
@@ -890,12 +904,15 @@
                 let form = new FormData();
                 form.append('inputFile', file, file.name);
                 let description = JSON.stringify({ name: file.name, size: file.size, type: file.type })
+                loadingPanel.show()
                 customerImageService[fileId ? 'updateAvatar' : 'createAvatar'](editingRowId || e.changes[0]?.data?.id, file, description,
                     {
                         contentType: false,
                         processData: false,
                         data: form,
                         async: true,
+                    }).then(() => {
+                        loadingPanel.hide()
                     })
                 gridInfo.fileinput = null
             }

@@ -5,6 +5,20 @@ $(function () {
     let employeeImageService = window.dMSpro.oMS.mdmService.controllers.employeeImages.employeeImage;
     let workingPositionService = window.dMSpro.oMS.mdmService.controllers.workingPositions.workingPosition;
 
+    let loadingPanel = $('<div class"fixed"/>').dxPopup({
+        height: 100,
+        width: 100,
+        showTitle: false,
+        animation: null,
+        contentTemplate: (e) => $('<div/>').dxLoadIndicator({
+            height: 60,
+            width: 60,
+        })
+    })
+        .appendTo('body')
+        .dxPopup('instance')
+    loadingPanel.registerKeyHandler('escape', () => loadingPanel.hide())
+
     let employeeTypeStore = [
         {
             id: 0,
@@ -479,13 +493,16 @@ $(function () {
                 let form = new FormData();
                 form.append('inputFile', file, file.name);
                 let description = JSON.stringify({ name: file.name, size: file.size, type: file.type })
+                loadingPanel.show()
                 employeeImageService[fileId ? 'updateAvatar' : 'createAvatar'](editingRowId || e.changes[0]?.data?.id, file, description, true,
                     {
                         contentType: false,
                         processData: false,
                         data: form,
                         async: true,
-                    })
+                    }).then(() =>
+                        loadingPanel.hide()
+                    )
                 gridInfo.fileinput = null
             }
         })
