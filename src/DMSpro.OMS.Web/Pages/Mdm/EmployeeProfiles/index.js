@@ -239,7 +239,7 @@ $(function () {
         },
         onInitNewRow(e) {
             e.data.active = true;
-            e.data.effectiveDate = new Date()
+            e.data.effectiveDate = moment().format('YYYY-MM-DD')
         },
         onRowInserting: e => {
             if (!e.data.effectiveDate) e.data.effectiveDate = moment().format('yyyy-MM-DD')
