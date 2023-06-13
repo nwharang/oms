@@ -846,10 +846,11 @@
         },
         onEditorPreparing: (e) => {
             if (e.row?.rowType != 'data') return
+            console.log(new Date());
             // ReadOnly when editing , allow when creating a new row
             if (e.dataField == 'endDate' && !e.row.isNewRow)
                 e.editorOptions.readOnly = true
-            if (!e.row.data.active) {
+            if (e.row?.data?.endDate && moment(e.row.data.endDate).isBefore(moment())) {
                 e.editorOptions.readOnly = true
             }
         },
