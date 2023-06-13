@@ -699,7 +699,7 @@
                     salesOrgHierarchyService.get(MCPModel.routeId).done(u => {
                         sellingZoneId = u.parentId;
                     })
-                    $('top-section').data('dxForm').getEditor('Code').option('readOnly', true)
+                    $('top-section').data('dxForm')?.getEditor('Code')?.option('readOnly', true)
                     loadingPopup.hide()
                 })
                 .fail(() => {
