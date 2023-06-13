@@ -490,7 +490,6 @@
                 format: 'dd/MM/yyyy',
                 editorOptions: {
                     min: MCPModel?.effectiveDate || new Date(),
-                    max: MCPModel?.endDate || new Date()
                 },
                 validationRules: [
                     {
@@ -523,11 +522,11 @@
                     {
                         type: 'async',
                         validationCallback: (e) => {
-                            let customerEnddate = e.data.customer.endDate ? new Date(e.data.customer.endDate) : null
+                            let customerEnddate = e.data?.customer?.endDate ? new Date(e.data.customer.endDate) : null
                             let endDate = e?.data?.endDate ? new Date(e?.data?.endDate) : null
 
                             return new Promise((resolve, reject) => {
-                                if (!endDate || endDate <= customerEnddate)
+                                if (!e.value || !customerEnddate || e.value <= customerEnddate)
                                     resolve(endDate)
                                 reject(l('ValidateError:MCPDetails:EffectiveDate'))
                             })

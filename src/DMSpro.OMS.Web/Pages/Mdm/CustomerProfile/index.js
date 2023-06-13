@@ -507,7 +507,7 @@
                 validationRules: [
                     {
                         type: 'pattern',
-                        pattern: '^[0-9]{10,}$',
+                        pattern: '^[0-9]{10,50}$',
                         message: l('ValidateError:License')
                     }
                 ],
