@@ -2,11 +2,7 @@
 $(function () {
     let l = abp.localization.getResource("OMS");
     let visitPlansService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
-    let mcpHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
     let itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
-    let customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
-    let mcpDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
-    let salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
 
 
     let dayOfWeek = [
@@ -40,39 +36,6 @@ $(function () {
         }
     ]
 
-    let salesOrgHierarchyStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            salesOrgHierarchyService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == undefined) return null;
-            var d = new $.Deferred();
-            salesOrgHierarchyService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
-
     const visitPlansStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
@@ -85,27 +48,6 @@ $(function () {
             });
             visitPlansService.getListDevextremes(args)
                 .done(async (result) => {
-                    let arr = result.data.map(e => e.id)
-                    if (!args.group) {
-                        let summary = await visitPlansService.getSummaryInfo(arr.shift(), {
-                            data: { ids: arr },
-                            traditional: true
-                        }).then(data => JSON.parse(data))
-                        let { geoDictionary, assignmentDictionary, employeeDictionary, routeDictionary } = summary.summaryInfo
-                        result.data.forEach(e => {
-                            e.customer.geoMaster0 = e.customer.geoMaster0Id ? geoDictionary[e.customer.geoMaster0Id] : null
-                            e.customer.geoMaster1 = e.customer.geoMaster1Id ? geoDictionary[e.customer.geoMaster1Id] : null
-                            e.customer.geoMaster2 = e.customer.geoMaster2Id ? geoDictionary[e.customer.geoMaster2Id] : null
-                            e.customer.geoMaster3 = e.customer.geoMaster3Id ? geoDictionary[e.customer.geoMaster3Id] : null
-                            e.customer.geoMaster4 = e.customer.geoMaster4Id ? geoDictionary[e.customer.geoMaster4Id] : null
-                            let zoneId = e.routeId ? routeDictionary[e.routeId]?.zoneId : null
-                            if (zoneId) {
-                                var [assignmentId] = assignmentDictionary[zoneId] ? assignmentDictionary[zoneId] : [null]
-                            }
-                            if (assignmentId)
-                                e.employee = employeeDictionary[assignmentId]
-                        })
-                    }
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -135,38 +77,6 @@ $(function () {
         }
     });
 
-    const mcpHeaderStore = new DevExpress.data.CustomStore({
-        key: "id",
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            mcpHeaderService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            mcpHeaderService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                })
-            return d.promise();
-        }
-    })
-
     const getItemGroup = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
@@ -192,38 +102,6 @@ $(function () {
 
             var d = new $.Deferred();
             itemGroupService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                })
-            return d.promise();
-        }
-    });
-
-    const getCustomer = new DevExpress.data.CustomStore({
-        key: "id",
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            customerService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            customerService.get(key)
                 .done(data => {
                     d.resolve(data);
                 })
@@ -313,7 +191,7 @@ $(function () {
             visible: true,
             showPageSizeSelector: true,
             // Do not change this
-            allowedPageSizes: [10, 20, 40],
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -376,81 +254,47 @@ $(function () {
                 format: 'dd/MM/yyyy',
             },
             {
-                dataField: 'route.parentId',
+                dataField: 'zoneCode',
                 caption: l("EntityFieldName:MDMService:VisitPlan:ZoneCode"),
                 dataType: 'string',
-                lookup: {
-                    dataSource: {
-                        store: salesOrgHierarchyStore,
-                        // This filter for filterRow only
-                        filter: ["isSellingZone", "=", true],
-                        paginate: true,
-                        pageSize
-                    },
-                    displayExpr: (e) => { if (e) return `${e.code} - ${e.name}` },
-                    valueExpr: 'id'
+                calculateDisplayValue: (e) => {
+                    if (e) return `${e.zoneCode} - ${e.zoneName}`
                 },
                 allowEditing: false,
             },
             {
-                dataField: 'routeId',
+                dataField: 'routeCode',
                 caption: l("EntityFieldName:MDMService:VisitPlan:RouteCode"),
                 dataType: 'string',
-                calculateDisplayValue: (e) => { if (e?.route) return `${e.route.code} - ${e.route.name}` },
-                lookup: {
-                    dataSource: {
-                        store: salesOrgHierarchyStore,
-                        // This filter for filterRow only
-                        filter: ["isRoute", "=", true],
-                        paginate: true,
-                        pageSize
-                    },
-                    displayExpr: (e) => { if (e) return `${e.code} - ${e.name}` },
-                    valueExpr: 'id'
+                calculateDisplayValue: (e) => {
+                    if (e) return `${e.routeCode} - ${e.routeName}`
                 },
                 allowEditing: false,
             },
             {
-                dataField: 'customerId',
+                dataField: 'customerCode',
                 caption: l("EntityFieldName:MDMService:VisitPlan:CustomerCode"),
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
                 calculateDisplayValue: (e) => {
-                    if (e?.customer?.code && e?.customer?.name) return `${e.customer.code} - ${e.customer.name}`
-                },
-                lookup: {
-                    dataSource: {
-                        store: getCustomer,
-                        paginate: true,
-                        pageSize
-                    },
-                    displayExpr: 'name',
-                    valueExpr: 'id'
+                    if (e) return `${e.customerCode} - ${e.customerName}`
                 },
             },
             {
-                dataField: 'mcpDetail.mcpHeaderId',
+                dataField: 'companyCode',
                 caption: l("EntityFieldName:MDMService:VisitPlan:CompanyCode"),
                 allowEditing: false,
-                lookup: {
-                    dataSource: mcpHeaderStore,
-                    displayExpr: (e) => {
-                        if (e?.company) return `${e.company.code} - ${e.company.name}`
-                        return
-                    },
-                    valueExpr: 'id'
-                },
+                calculateDisplayValue: (e) => {
+                    if (e) return `${e.companyCode} - ${e.companyName}`
+                }
             },
             {
-                dataField: 'employee.id',
+                dataField: 'empCode',
                 caption: l("EntityFieldName:MDMService:VisitPlan:EmployeeCode"),
                 calculateDisplayValue: e => {
-                    if (e?.employee) return `${e.employee.code} - ${e.employee.firstName}`
+                    if (e) return `${e.empCode} - ${e.empName}`
                 },
                 allowEditing: false,
-                allowFiltering: false,
-                allowSorting: false,
-                visible: false
             },
             {
                 dataField: 'distance',
@@ -468,61 +312,37 @@ $(function () {
                 validationRules: [{ type: 'required' }],
             },
             {
-                dataField: 'customer.geoMaster0Id',
+                dataField: 'geo0Name',
                 caption: l("EntityFieldName:MDMService:GeoMaster:GeoMaster0Name"),
                 dataType: 'string',
-                calculateDisplayValue: (e) => {
-                    if (e?.customer?.geoMaster0) return `${e.customer.geoMaster0.code} - ${e.customer.geoMaster0.name}`
-                },
                 allowEditing: false,
-                allowFiltering: false,
-                allowSorting: false,
             },
             {
-                dataField: 'customer.geoMaster1Id',
+                dataField: 'geo1Name',
                 caption: l("EntityFieldName:MDMService:GeoMaster:GeoMaster1Name"),
                 dataType: 'string',
-                calculateDisplayValue: (e) => {
-                    if (e?.customer?.geoMaster1) return `${e.customer.geoMaster1.code} - ${e.customer.geoMaster1.name}`
-                },
                 allowEditing: false,
-                allowFiltering: false,
-                allowSorting: false,
             },
             {
-                dataField: 'customer.geoMaster2Id',
+                dataField: 'geo2Name',
                 caption: l("EntityFieldName:MDMService:GeoMaster:GeoMaster2Name"),
                 dataType: 'string',
-                calculateDisplayValue: (e) => {
-                    if (e?.customer?.geoMaster2) return `${e.customer.geoMaster2.code} - ${e.customer.geoMaster2.name}`
-                },
                 allowEditing: false,
-                allowFiltering: false,
-                allowSorting: false,
             },
             {
-                dataField: 'customer.geoMaster3Id',
+                dataField: 'geo3Name',
                 caption: l("EntityFieldName:MDMService:GeoMaster:GeoMaster3Name"),
                 dataType: 'string',
-                calculateDisplayValue: (e) => {
-                    if (e?.customer?.geoMaster3) return `${e.customer.geoMaster3.code} - ${e.customer.geoMaster3.name}`
-                },
                 allowEditing: false,
-                allowFiltering: false,
-                allowSorting: false,
             },
             {
-                dataField: 'customer.geoMaster4Id',
+                dataField: 'geo4Name',
                 caption: l("EntityFieldName:MDMService:GeoMaster:GeoMaster4Name"),
                 dataType: 'string',
-                calculateDisplayValue: (e) => {
-                    if (e?.customer?.geoMaster4) return `${e.customer.geoMaster4.code} - ${e.customer.geoMaster4.name}`
-                },
                 allowEditing: false,
-                allowFiltering: false,
-                allowSorting: false,
-                visible: false
             },
+
+
             {
                 dataField: 'itemGroupId',
                 caption: l('EntityFieldName:MDMService:VisitPlan:ItemGroup'),
