@@ -191,7 +191,7 @@ $(function () {
             visible: true,
             showPageSizeSelector: true,
             // Do not change this
-            allowedPageSizes: [10, 20, 40],
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
