@@ -847,6 +847,7 @@
                     valueExpr: "altUOMId",
                     displayExpr: "altUOM.name",
                 },
+                allowSearch: false
             },
             {
                 dataField: 'purUOMId',
@@ -864,6 +865,7 @@
                     valueExpr: "altUOMId",
                     displayExpr: "altUOM.name",
                 },
+                allowSearch: false
             },
             {
                 dataField: 'salesUOMId',
@@ -882,7 +884,7 @@
                     valueExpr: "altUOMId",
                     displayExpr: "altUOM.name",
                 },
-
+                allowSearch: false
             },
             {
                 dataField: 'vatId',

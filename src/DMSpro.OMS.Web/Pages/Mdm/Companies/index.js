@@ -355,6 +355,7 @@
                 dataField: "geoLevel0Id",
                 caption: l("GeoLevel0Name"),
                 dataType: 'string',
+                allowSearch: false,
                 calculateDisplayValue: (rowData) => {
                     if (rowData?.geoLevel0)
                         return rowData.geoLevel0.name;
@@ -384,6 +385,7 @@
                 dataField: "geoLevel1Id",
                 caption: l("GeoLevel1Name"),
                 dataType: 'string',
+                allowSearch: false,
                 calculateDisplayValue: (rowData) => {
                     if (rowData?.geoLevel1)
                         return rowData.geoLevel1.name;
@@ -414,6 +416,7 @@
                 dataField: "geoLevel2Id",
                 caption: l("GeoLevel2Name"),
                 dataType: 'string',
+                allowSearch: false,
                 calculateDisplayValue: (rowData) => {
                     if (rowData?.geoLevel2)
                         return rowData.geoLevel2.name;
@@ -443,6 +446,7 @@
                 dataField: "geoLevel3Id",
                 caption: l("GeoLevel3Name"),
                 dataType: 'string',
+                allowSearch: false,
                 calculateDisplayValue: (rowData) => {
                     if (rowData?.geoLevel3)
                         return rowData.geoLevel3.name;
@@ -471,6 +475,7 @@
                 dataField: "geoLevel4Id",
                 caption: l("GeoLevel4Name"),
                 dataType: 'string',
+                allowSearch: false,
                 calculateDisplayValue: (rowData) => {
                     if (rowData.geoLevel4)
                         return rowData.geoLevel4.name;
