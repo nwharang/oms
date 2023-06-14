@@ -445,7 +445,7 @@ $(function () {
                 dataField: 'employee.id',
                 caption: l("EntityFieldName:MDMService:VisitPlan:EmployeeCode"),
                 calculateDisplayValue: e => {
-                    if (e?.employee) return `${e.employee.code} - ${e.employee.name}`
+                    if (e?.employee) return `${e.employee.code} - ${e.employee.firstName}`
                 },
                 allowEditing: false,
                 allowFiltering: false,

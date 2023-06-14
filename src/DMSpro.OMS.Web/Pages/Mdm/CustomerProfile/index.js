@@ -11,6 +11,20 @@
     let gridInfo = {}, endDateRowData;
     let cusAttrStore = cusAttrService.getListDevextremes({ filter: JSON.stringify(['active', "=", true]) })
 
+    let loadingPanel = $('<div class"fixed"/>').dxPopup({
+        height: 100,
+        width: 100,
+        showTitle: false,
+        animation: null,
+        contentTemplate: (e) => $('<div/>').dxLoadIndicator({
+            height: 60,
+            width: 60,
+        })
+    })
+        .appendTo('body')
+        .dxPopup('instance')
+    loadingPanel.registerKeyHandler('escape', () => loadingPanel.hide())
+
     let dialog = ({ header, body }, callBackIfTrue, callBackIfFalse) => {
         DevExpress.ui.dialog.confirm(`<i>${body}</i>`, header)
             .done((e) => {
@@ -550,18 +564,18 @@
             //     dataType: 'string',
             //     //validationRules: [{ type: "required" }]
             // },
-            {
-                dataField: 'active',
-                caption: l("Active"),
-                width: 110,
-                alignment: 'center',
-                dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                },
-            },
+            // {
+            //     dataField: 'active',
+            //     caption: l("Active"),
+            //     width: 110,
+            //     alignment: 'center',
+            //     dataType: 'boolean',
+            //     cellTemplate(container, options) {
+            //         $('<div>')
+            //             .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+            //             .appendTo(container);
+            //     },
+            // },
             {
                 dataField: 'effectiveDate',
                 caption: l("EffectiveDate"),
@@ -831,10 +845,11 @@
         },
         onEditorPreparing: (e) => {
             if (e.row?.rowType != 'data') return
+            console.log(new Date());
             // ReadOnly when editing , allow when creating a new row
             if (e.dataField == 'endDate' && !e.row.isNewRow)
                 e.editorOptions.readOnly = true
-            if (!e.row.data.active) {
+            if (e.row?.data?.endDate && moment(e.row.data.endDate).isBefore(moment())) {
                 e.editorOptions.readOnly = true
             }
         },
@@ -889,12 +904,15 @@
                 let form = new FormData();
                 form.append('inputFile', file, file.name);
                 let description = JSON.stringify({ name: file.name, size: file.size, type: file.type })
+                loadingPanel.show()
                 customerImageService[fileId ? 'updateAvatar' : 'createAvatar'](editingRowId || e.changes[0]?.data?.id, file, description,
                     {
                         contentType: false,
                         processData: false,
                         data: form,
                         async: true,
+                    }).then(() => {
+                        loadingPanel.hide()
                     })
                 gridInfo.fileinput = null
             }

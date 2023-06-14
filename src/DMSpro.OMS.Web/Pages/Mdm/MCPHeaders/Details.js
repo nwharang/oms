@@ -174,8 +174,12 @@
         colCount: 4,
         items: [
             {
+                name: 'Code',
                 dataField: 'Code',
                 editorType: 'dxTextBox',
+                editorOptions: {
+                    readOnly: Boolean(await MCPModel?.id)
+                },
                 validationRules: [
                     {
                         type: "required"
@@ -695,6 +699,7 @@
                     salesOrgHierarchyService.get(MCPModel.routeId).done(u => {
                         sellingZoneId = u.parentId;
                     })
+                    $('top-section').data('dxForm')?.getEditor('Code')?.option('readOnly', true)
                     loadingPopup.hide()
                 })
                 .fail(() => {
