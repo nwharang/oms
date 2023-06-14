@@ -258,7 +258,7 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:VisitPlan:ZoneCode"),
                 dataType: 'string',
                 calculateDisplayValue: (e) => {
-                    if (e) return `${e.zoneCode} - ${e.zoneName}`
+                    if (e?.zoneCode && e?.zoneName) return `${e.zoneCode} - ${e.zoneName}`
                 },
                 allowEditing: false,
             },
@@ -267,7 +267,7 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:VisitPlan:RouteCode"),
                 dataType: 'string',
                 calculateDisplayValue: (e) => {
-                    if (e) return `${e.routeCode} - ${e.routeName}`
+                    if (e?.routeCode && e?.routeName) return `${e.routeCode} - ${e.routeName}`
                 },
                 allowEditing: false,
             },
@@ -277,7 +277,7 @@ $(function () {
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
                 calculateDisplayValue: (e) => {
-                    if (e) return `${e.customerCode} - ${e.customerName}`
+                    if (e?.customerCode && e.customerName) return `${e.customerCode} - ${e.customerName}`
                 },
             },
             {
@@ -285,14 +285,14 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:VisitPlan:CompanyCode"),
                 allowEditing: false,
                 calculateDisplayValue: (e) => {
-                    if (e) return `${e.companyCode} - ${e.companyName}`
+                    if (e?.companyCode && e?.companyName) return `${e.companyCode} - ${e.companyName}`
                 }
             },
             {
                 dataField: 'empCode',
                 caption: l("EntityFieldName:MDMService:VisitPlan:EmployeeCode"),
                 calculateDisplayValue: e => {
-                    if (e) return `${e.empCode} - ${e.empName}`
+                    if (e?.empCode && e?.empName) return `${e.empCode} - ${e.empName}`
                 },
                 allowEditing: false,
             },
