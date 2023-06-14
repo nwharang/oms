@@ -565,18 +565,18 @@
             //     dataType: 'string',
             //     //validationRules: [{ type: "required" }]
             // },
-            {
-                dataField: 'active',
-                caption: l("Active"),
-                width: 110,
-                alignment: 'center',
-                dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                },
-            },
+            // {
+            //     dataField: 'active',
+            //     caption: l("Active"),
+            //     width: 110,
+            //     alignment: 'center',
+            //     dataType: 'boolean',
+            //     cellTemplate(container, options) {
+            //         $('<div>')
+            //             .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+            //             .appendTo(container);
+            //     },
+            // },
             {
                 dataField: 'effectiveDate',
                 caption: l("EffectiveDate"),
