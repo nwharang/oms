@@ -1,7 +1,11 @@
 let preLoad = getInfoSO()
-let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) => {
+$(() => {
+    window.massInput = renderMassInput()
+})
+
+let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
     if (option) var { docId, navigateData } = option
-    let { discountTypeStore, transactionTypeStore, docStatusStore, render } = store()
+    let { discountTypeStore, transactionTypeStore, docStatusStore, render, customerStore } = store()
 
     // Obj for type definition
     const docData = {
@@ -70,7 +74,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                         break;
                 }
 
-            } catch (e) { }
+            } catch (e) { console.log(e); }
             finally { docData.formInstance.endUpdate() }
         }, 750),
         /**  @param {object} data - Current Header Data @param {boolean} isOpen - Is Doc Open * @returns {boolean} Doc have error ?*/
@@ -95,8 +99,6 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
     docData.readOnlyHeader = _.clone(docData.currentData.header)  // Copy header data for compare determine haveEditData
     docData.readOnlyDetails = _.clone(docData.currentData.details)  // Copy details data for compare determine haveEditData
 
-
-
     const state = () => {
         return {
             isBusinessPartner: Boolean(docData.currentData.details.length > 0 || docData.currentData.header.employeeId || docData.currentData.header.routeId),
@@ -104,7 +106,8 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
             Render: Boolean(docData.currentData.details.length > 0),
             docDiscountType: Number(docData.currentData.header.docDiscountType),
             isSaveable: _.debounce(() => docData.saveButton.option('disabled', (JSON.stringify(docData.readOnlyDetails.sort()) === JSON.stringify(docData.currentData.details.sort()) && _.isEqual(docData.readOnlyHeader, docData.currentData.header) || !docData.isOpen)), 200), // Have editingDate from DataGrid and Form that haven't save
-            isError: Boolean(docData.validateSOItem(docData.currentData.header, docData.isOpen)),
+            isError: false,
+            // isError: Boolean(docData.validateSOItem(docData.currentData.header, docData.isOpen)),
         }
     }
 
@@ -195,7 +198,8 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                             loadingPanel.show()
                             if (docData.docId) var res = mainService.updateDoc(docData.docId, docData.currentData)
                             else var res = mainService.createDoc(docData.currentData)
-                            preLoad.then(async (data) => helper(data, () => loadingPanel.hide(), { navigateData: await res, docId: (await res).header.id }))
+                            res.then(() => preLoad.then(async (data) => helper(data, () => loadingPanel.hide(), { navigateData: await res, docId: (await res).header.id })))
+                                .catch((err) => { if (err) loadingPanel.hide() })
                         },
                         onContentReady: (e) => docData.saveButton = e.component
                     }
@@ -221,7 +225,9 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                 docData.calculateDocTotal()
                 // Match header data to formData - Do not change
                 docData.currentData.header = e.component.option('formData')
-                e.component.repaint()
+                // Remake api so need to disable repaint , may change in future
+                // Repaint to check error
+                // e.component.repaint()
                 state().isSaveable()
             },
             labelMode: "floatting",
@@ -281,15 +287,17 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                                     if (e) return `${e.code} - ${e.name}`
                                     return
                                 },
-                                onValueChanged: (e) => {
-                                    let data = {
-                                        rouList: mainStore.customerRoutesList.find(arr => arr.id == e.value)?.data,
-                                        emList: mainStore.customerEmployeesList.find(arr => arr.id == e.value)?.data,
-                                        noEmCusCheck: mainStore.specialCustomer.find(arr => arr.id == e.value)
-                                    }
-                                    // Set first value of each to be default value
-                                    docData.formInstance.updateData('routeId', data.rouList ? data.rouList[0].id : null)
-                                    docData.formInstance.updateData('employeeId', data.emList ? data.emList[0]?.id : null)
+                                onValueChanged: async (e) => {
+                                    if (!render.isRenderEmployeeRoute) return
+                                    loadingPanel.show()
+                                    let { result } = await salesOrderService.getRouteAndEmployeeOfCustomer(e.value, companyId).then(data => JSON.parse(data))
+                                    let routesList = Object.keys(result.routeDictionary).map((key) => result.routeDictionary[key])
+                                    let employeesList = Object.keys(result.employeeDictionary).map((key) => result.employeeDictionary[key])
+                                    docData.formInstance.getEditor('routeId').option('dataSource', routesList)
+                                    docData.formInstance.getEditor('employeeId').option('dataSource', employeesList)
+                                    docData.formInstance.updateData('routeId', routesList.length > 0 ? routesList[0].id : null)
+                                    docData.formInstance.updateData('employeeId', employeesList.length > 0 ? employeesList[0].id : null)
+                                    loadingPanel.hide()
                                 },
                                 valueExpr: 'id',
                             },
@@ -326,10 +334,6 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                             editorType: 'dxSelectBox',
                             editorOptions: {
                                 readOnly: render.isBaseDoc,
-                                dataSource: ({
-                                    store: mainStore.employeesList,
-                                    postProcess: () => mainStore.customerEmployeesList.find(e => e.id == docData.currentData.header.businessPartnerId)?.data || []
-                                }),
                                 valueExpr: 'id',
                                 displayExpr: (e) => {
                                     if (e) return `${e.code} ${"- " + e.firstName || ""}`;
@@ -355,10 +359,6 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                             editorType: 'dxSelectBox',
                             editorOptions: {
                                 readOnly: render.isBaseDoc,
-                                dataSource: ({
-                                    store: mainStore.routesList,
-                                    postProcess: () => mainStore.customerRoutesList.find(e => e.id == docData.currentData.header.businessPartnerId)?.data || []
-                                }),
                                 valueExpr: 'id',
                                 displayExpr: (e) => {
                                     if (e) return `${e.code} ${"- " + e.name || ""}`;
@@ -551,8 +551,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                     onClick(e) {
                         if (!state().isError && docData.formInstance.validate().isValid) {
                             loadingPanel.show()
-                            $("#popupItems").dxPopup('instance').show()
-
+                            window.massInput.popup.show()
                         }
                     }
 
@@ -583,11 +582,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                     dataField: 'itemId',
                     fixed: true,
                     fixedPosition: 'left',
-                    lookup: {
-                        dataSource: mainStore.itemList,
-                        displayExpr(e) { return e.code + ' - ' + e.name },
-                        valueExpr: "id",
-                    },
+                    calculateDisplayValue: 'itemDisplay',
                     allowEditing: false,
                 },
                 {
@@ -595,8 +590,8 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                     dataField: 'uomId',
                     lookup: {
                         dataSource: (e) => {
-                            if (e?.data?.id) {
-                                let uomGroupId = mainStore.itemList.find(v => v.id === e.data.itemId).uomGroupId
+                            if (e?.data?.itemId) {
+                                let uomGroupId = e.data.uomGroupId
                                 let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === uomGroupId)?.data
                                 if (!validUom) return mainStore.uOMList
                                 let dataSource = mainStore.uOMList.filter(e => validUom.find(v => e.id === v.altUOMId))
@@ -609,7 +604,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                         },
                         valueExpr: "id"
                     },
-                    setCellValue: function (newData, value, currentRowData) {
+                    setCellValue: async (newData, value, currentRowData) => {
                         newData.uomId = value;
                         if (currentRowData.isFree) {
                             newData.price = 0;
@@ -621,12 +616,12 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                             newData.discountAmt = null
                         } else {
                             let customerId = docData.formInstance.getEditor('businessPartnerId').option('value');
-                            let customer = mainStore.customerList.find(x => x.id == customerId);
-                            let price = mainStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + value)?.value;
+                            let { priceListId } = mainStore.customerList.find(x => x.id == customerId);
+                            let priceList = await salesOrderService.getPriceOfItemsForSO(priceListId, currentRowData.itemId, { dataType: 'json' }).then(({ result }) => result)
+                            let price = priceList[currentRowData.itemId][value];
                             if (!price) {
-                                let uomGroupId = mainStore.itemList.find(v => v.id === currentRowData.itemId).uomGroupId
-                                let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === uomGroupId)?.data?.find(v => v.altUOMId === value)
-                                price = mainStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + validUom.baseUOMId)?.value * validUom?.baseQty || 0
+                                let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === currentRowData.uomGroupId)?.data?.find(v => v.altUOMId === value)
+                                price = priceList[currentRowData.itemId][validUom.baseUOMId] * validUom?.baseQty || 0
                             }
                             let priceAfterTax = price + (price * currentRowData.taxRate) / 100;
                             let lineAmtAfterTax = priceAfterTax * currentRowData.qty - (currentRowData.discountAmt || 0);
@@ -643,7 +638,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                     dataField: 'isFree',
                     dataType: 'boolean',
                     width: "75",
-                    setCellValue: (newData, value, currentRowData) => {
+                    setCellValue: async (newData, value, currentRowData) => {
                         newData.isFree = value;
                         if (value) {
                             newData.lineAmt = 0
@@ -657,8 +652,13 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                         }
                         else {
                             let customerId = docData.formInstance.getEditor('businessPartnerId').option('value');
-                            let customer = mainStore.customerList.find(x => x.id == customerId);
-                            let price = mainStore.priceList.find(x => x.id == customer.priceListId + '|' + currentRowData.itemId + '|' + currentRowData.uomId)?.value || 0;
+                            let { priceListId } = mainStore.customerList.find(x => x.id == customerId);
+                            let priceList = await salesOrderService.getPriceOfItemsForSO(priceListId, currentRowData.itemId, { dataType: 'json' }).then(({ result }) => result)
+                            let price = priceList[currentRowData.itemId][currentRowData.uomId];
+                            if (!price) {
+                                let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === currentRowData.uomGroupId)?.data?.find(v => v.altUOMId === currentRowData.uomId)
+                                price = priceList[currentRowData.itemId][validUom.baseUOMId] * validUom?.baseQty || 0
+                            }
                             let priceAfterTax = price + (price * currentRowData.taxRate) / 100;
                             switch (currentRowData.discountType) {
                                 case 0:
@@ -707,7 +707,7 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                     caption: l('EntityFieldName:OrderService:SalesRequestDetails:VAT'),
                     dataField: 'vatId',
                     lookup: {
-                        dataSource: vatList,
+                        dataSource: mainStore.vatList,
                         displayExpr: "name",
                         valueExpr: 'id'
                     },
@@ -933,7 +933,6 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
                 docData.formInstance.getEditor('businessPartnerId')?.option('readOnly', isBusinessPartner)
                 docData.formInstance.getEditor('employeeId')?.option('readOnly', isEmployeeRoute)
                 docData.formInstance.getEditor('routeId')?.option('readOnly', isEmployeeRoute)
-
             },
             onEditorPreparing: (e) => {
                 if (e.row?.rowType != 'data') return
@@ -969,40 +968,46 @@ let helper = async ({ companyId, mainStore, vatList }, loadingCallback, option) 
 }
 
 async function appendSelectedItems(selectedItems) {
+    loadingPanel.show()
     let gridInstance = $("#detailsDataGrid").dxDataGrid('instance')
     let dataGridDataSource = gridInstance.getDataSource()
     let itemList = await dataGridDataSource.load()
-    preLoad.then(({ mainStore, vatList }) => {
-        selectedItems.forEach(async (u, k) => {
-            let customerId = $('#formDataGrid').dxForm('instance').getEditor('businessPartnerId').option('value');
-            let customer = mainStore.customerList.find(x => x.id == customerId);
-            let price = mainStore.priceList.find(x => x.id == customer.priceListId + '|' + u.id + '|' + u.salesUomId)?.value || 0;
-            let priceAfterTax = price + (price * vatList.find(x => x.id == u.vatId).rate) / 100;
-            let lineAmtAfterTax = (priceAfterTax * parseInt(u.qty));
-            let lineAmt = price * u.qty
-            let foundItem = itemList.find(item => item.itemId === u.id && item.isFree === u.isFree)
-            if (foundItem)
-                await dataGridDataSource.store().update(foundItem, {
-                    qty: foundItem.qty + u.qty,
-                    lineAmtAfterTax: foundItem.lineAmtAfterTax + lineAmtAfterTax,
-                    lineAmt: foundItem.lineAmt + lineAmt
-                })
-            else
-                await dataGridDataSource.store().insert({
-                    isFree: u.isFree,
-                    itemId: u.id,
-                    vatId: u.vatId,
-                    taxRate: vatList.find(x => x.id == u.vatId).rate,
-                    uomId: u.salesUomId,
-                    price,
-                    priceAfterTax,
-                    qty: parseInt(u.qty),
-                    lineAmtAfterTax: !u.isFree ? lineAmtAfterTax : 0,
-                    lineAmt: !u.isFree ? price * parseInt(u.qty) : 0,
-                    transactionType: 0,
-                    uomGroupId: u.uomGroupId
-                })
-        })
+    let { mainStore } = await preLoad
+    let customerId = $('#formDataGrid').dxForm('instance').getEditor('businessPartnerId').option('value');
+    // Get priceListId            
+    let { priceListId } = mainStore.customerList.find(x => x.id == customerId);
+    // Call API to get price
+    let priceList = await salesOrderService.getPriceOfItemsForSO(priceListId, selectedItems.map(e => e.id), { dataType: 'json' }).then(({ result }) => result)
+    selectedItems.forEach(async (u, k) => {
+        let price = priceList[u.id][u.salesUOMId]
+        let priceAfterTax = price + (price * mainStore.vatList.find(x => x.id == u.vatId).rate) / 100;
+        let lineAmtAfterTax = (priceAfterTax * parseInt(u.qty));
+        let lineAmt = price * u.qty
+        let foundItem = itemList.find(item => item.itemId === u.id && item.isFree === u.isFree)
+        if (foundItem)
+            await dataGridDataSource.store().update(foundItem, {
+                qty: foundItem.qty + u.qty,
+                lineAmtAfterTax: foundItem.lineAmtAfterTax + lineAmtAfterTax,
+                lineAmt: foundItem.lineAmt + lineAmt
+            })
+        else
+            await dataGridDataSource.store().insert({
+                itemDisplay: `(${u.code} - ${u.name})`,
+                uomDisplay: `${u.salesUOM.code} - ${u.salesUOM.name}`,
+                isFree: u.isFree,
+                itemId: u.id,
+                vatId: u.vatId,
+                taxRate: mainStore.vatList.find(x => x.id == u.vatId).rate,
+                uomId: u.salesUOMId,
+                price,
+                priceAfterTax,
+                qty: parseInt(u.qty),
+                lineAmtAfterTax: !u.isFree ? lineAmtAfterTax : 0,
+                lineAmt: !u.isFree ? price * parseInt(u.qty) : 0,
+                transactionType: 0,
+                uomGroupId: u.uomGroupId,
+            })
     })
+    loadingPanel.hide()
     gridInstance.refresh(true)
 }
