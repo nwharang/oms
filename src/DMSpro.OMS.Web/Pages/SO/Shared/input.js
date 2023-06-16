@@ -97,6 +97,11 @@ function renderMassInput() {
                     showInfo: true,
                     showNavigationButtons: true
                 },
+                stateStoring: {
+                    enabled: true,
+                    type: 'localStorage',
+                    storageKey: `dgSOInputDetails`,
+                },
                 editing: {
                     mode: 'batch',
                     allowUpdating: true,
@@ -113,7 +118,9 @@ function renderMassInput() {
                         setCellValue: (newData, value, currentRowData) => {
                             newData.qty = value
                             grid.selectRows([currentRowData.id], true)
-                        }
+                        },
+                        allowFiltering: false,
+                        allowSorting: false,
                     },
                     {
                         dataField: 'code',

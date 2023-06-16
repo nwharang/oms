@@ -980,6 +980,10 @@ async function appendSelectedItems(selectedItems) {
     let priceList = await salesOrderService.getPriceOfItemsForSO(priceListId, selectedItems.map(e => e.id), { dataType: 'json' }).then(({ result }) => result)
     selectedItems.forEach(async (u, k) => {
         let price = priceList[u.id][u.salesUOMId]
+        if (!price) {
+            let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === u.uomGroupId)?.data?.find(v => v.altUOMId === u.salesUOMId)
+            price = priceList[u.id][validUom.baseUOMId] * validUom?.baseQty || 0
+        }
         let priceAfterTax = price + (price * mainStore.vatList.find(x => x.id == u.vatId).rate) / 100;
         let lineAmtAfterTax = (priceAfterTax * parseInt(u.qty));
         let lineAmt = price * u.qty
@@ -992,7 +996,7 @@ async function appendSelectedItems(selectedItems) {
             })
         else
             await dataGridDataSource.store().insert({
-                itemDisplay: `(${u.code} - ${u.name})`,
+                itemDisplay: `(${u.code}) - ${u.name}`,
                 uomDisplay: `${u.salesUOM.code} - ${u.salesUOM.name}`,
                 isFree: u.isFree,
                 itemId: u.id,
