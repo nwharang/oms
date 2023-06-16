@@ -257,6 +257,7 @@ $(function () {
                 dataField: 'zoneCode',
                 caption: l("EntityFieldName:MDMService:VisitPlan:ZoneCode"),
                 dataType: 'string',
+                allowSearch: false,
                 calculateDisplayValue: (e) => {
                     if (e?.zoneCode && e?.zoneName) return `${e.zoneCode} - ${e.zoneName}`
                 },
@@ -266,6 +267,7 @@ $(function () {
                 dataField: 'routeCode',
                 caption: l("EntityFieldName:MDMService:VisitPlan:RouteCode"),
                 dataType: 'string',
+                allowSearch: false,
                 calculateDisplayValue: (e) => {
                     if (e?.routeCode && e?.routeName) return `${e.routeCode} - ${e.routeName}`
                 },
@@ -276,6 +278,7 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:VisitPlan:CustomerCode"),
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
+                allowSearch: false,
                 calculateDisplayValue: (e) => {
                     if (e?.customerCode && e.customerName) return `${e.customerCode} - ${e.customerName}`
                 },
@@ -284,6 +287,7 @@ $(function () {
                 dataField: 'companyCode',
                 caption: l("EntityFieldName:MDMService:VisitPlan:CompanyCode"),
                 allowEditing: false,
+                allowSearch: false,
                 calculateDisplayValue: (e) => {
                     if (e?.companyCode && e?.companyName) return `${e.companyCode} - ${e.companyName}`
                 }
@@ -291,6 +295,7 @@ $(function () {
             {
                 dataField: 'empCode',
                 caption: l("EntityFieldName:MDMService:VisitPlan:EmployeeCode"),
+                allowSearch: false,
                 calculateDisplayValue: e => {
                     if (e?.empCode && e?.empName) return `${e.empCode} - ${e.empName}`
                 },
@@ -347,6 +352,7 @@ $(function () {
                 dataField: 'itemGroupId',
                 caption: l('EntityFieldName:MDMService:VisitPlan:ItemGroup'),
                 dataType: 'string',
+                allowSearch: false,
                 calculateDisplayValue: (e) => e?.itemGroup?.name,
                 allowEditing: false,
                 lookup: {
@@ -409,6 +415,7 @@ $(function () {
                 dataField: 'mcpDetailId',
                 caption: l('MCP Detail'),
                 allowEditing: false,
+                allowSearch: false,
                 calculateDisplayValue: (e) => e?.mcpDetail?.code,
                 visible: false,
             }

@@ -403,6 +403,5 @@
             })
         },
     }).dxDataGrid("instance");
-    preLoad.then((data) => initChooseItemsPopup([...data.mainStore.itemList].map(e => { e.isFree = false; return e })))
     $('body').append('<div id=popup>')
 })

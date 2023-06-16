@@ -1607,7 +1607,11 @@
             //<script src="/pages/shared/dxconvert.js"></script>
         }
         @RenderSection("scripts", false)
-
+        <script>
+            $(async () => {
+                $('div.dx-texteditor-input-container div.dx-icon.dx-icon-search+input.dx-texteditor-input').attr('maxLength', 50)
+            })
+        </script>
         @await Component.InvokeLayoutHookAsync(LayoutHooks.PageContent.Last, StandardLayouts.Application)
     </div>
 

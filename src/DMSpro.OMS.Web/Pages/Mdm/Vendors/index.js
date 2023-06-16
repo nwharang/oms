@@ -340,7 +340,8 @@ $(function () {
                     },
                     valueExpr: "id",
                     displayExpr: "code"
-                }
+                },
+                allowSearch: false
             },
             // {
             //     dataField: "geoMaster0Id",
