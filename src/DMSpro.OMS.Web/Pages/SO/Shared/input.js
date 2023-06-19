@@ -162,6 +162,8 @@ function renderMassInput() {
             grid.clearSelection()
         },
         onHiding: () => {
+            grid.cancelEditData()
+            grid.clearSelection()
             loadingPanel.hide()
         },
 
@@ -233,4 +235,25 @@ let getInfoSO = async () => {
             },
         }
     })
+}
+
+let notify = (option) => {
+    obj = { type: "success", position: "bottom left", message: "Message Placeholder", ...option };
+    DevExpress.ui.notify({
+        message: obj.message,
+        height: 45,
+        width: 250,
+        minWidth: 250,
+        type: obj.type,
+        displayTime: 5000,
+        animation: {
+            show: {
+                type: 'fade', duration: 400, from: 0, to: 1,
+            },
+            hide: { type: 'fade', duration: 40, to: 0 },
+        },
+    }, {
+        position: obj.position,
+    })
+    return obj
 }
