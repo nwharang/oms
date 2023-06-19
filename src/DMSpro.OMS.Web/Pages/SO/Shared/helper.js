@@ -7,7 +7,6 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
     if (option) var { docId, navigateData } = option
     let { discountTypeStore, transactionTypeStore, docStatusStore, render } = store()
 
-    // Obj for type definition
     const docData = {
         isOpen: false,
         docId,
@@ -74,7 +73,9 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                         break;
                 }
 
-            } catch (e) { console.log(e); }
+            } catch (e) {
+                // console.log(e);
+            }
             finally { docData.formInstance.endUpdate() }
         }, 750),
         /**  @param {object} data - Current Header Data @param {boolean} isOpen - Is Doc Open * @returns {Promise<boolean>} Doc have error ?*/
@@ -87,8 +88,6 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                 var employee = employeesList.find(e => e.id === data.employeeId)
             if (data.routeId)
                 var route = routesList.find(e => e.id === data.routeId)
-            console.log((data.employeeId && !employee));
-            console.log((data.routeId && !route));
             return Boolean(((data.employeeId && !employee) || (data.routeId && !route)) && isOpen)
         },
         permission: {
@@ -117,7 +116,6 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
             isBaseDoc: Boolean(render.isBaseDoc && docData.currentData.header.baseDocId)
         }
     }
-    state()
     function renderPopup() {
         docData.popupInstance = docData.element.popup.dxPopup({
             title: `${render.title} - #${docId ? docData.currentData.header.docNbr : "New"} - ${(() => {
@@ -1025,6 +1023,6 @@ async function appendSelectedItems(selectedItems) {
                 uomGroupId: u.uomGroupId,
             })
     })
-    loadingPanel.hide()
     gridInstance.refresh(true)
+    loadingPanel.hide()
 }
