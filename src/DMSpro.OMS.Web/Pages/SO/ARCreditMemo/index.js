@@ -32,7 +32,6 @@
         },
         export: {
             enabled: true,
-            // allowExportSelectedData: true,
         },
         onExporting(e) {
             const workbook = new ExcelJS.Workbook();
