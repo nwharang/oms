@@ -122,9 +122,12 @@ let store = () => {
                 {
                     text: l('Button.Action.ARToARCMDoc'),
                     icon: "check",
-                    onClick: (e) => mainService.createListARCrMemoDoc([docData.docId]).then(() => {
-                        docData.popupInstance.hide()
-                    })
+                    onClick: (e) => mainService.createListARCrMemoDoc([docData.docId])
+                        .then(() => {
+                            docData.popupInstance.hide()
+                            notify({ message: 'Success' })
+                        })
+                        .catch(e => notify({ type: 'error', message: 'Failed' }))
                 },
             ]
         }

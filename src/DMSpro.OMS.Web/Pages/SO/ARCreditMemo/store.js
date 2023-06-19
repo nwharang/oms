@@ -123,17 +123,23 @@ let store = () => {
                 {
                     text: l('Button.Action.CloseARCM'),
                     icon: "check",
-                    onClick: () => mainService.closeDoc(docData.docId).then(() => {
-                        docData.popupInstance.hide()
-                    })
+                    onClick: () => mainService.closeDoc(docData.docId)
+                        .then(() => {
+                            docData.popupInstance.hide()
+                            notify({ message: 'Success' })
+                        })
+                        .catch(e => notify({ type: 'error', message: 'Failed' }))
                 },
                 {
                     text: l('Button.Action.Cancel'),
                     icon: "close",
                     onClick: () => DevExpress.ui.dialog.confirm(l('ConfirmationMessage:OrderService:SalesRequest:Cancel'), "").done(e => {
-                        if (e) mainService.cancelDoc([docData.docId]).then(() => {
-                            docData.popupInstance.hide()
-                        })
+                        if (e) mainService.cancelDoc([docData.docId])
+                            .then(() => {
+                                docData.popupInstance.hide()
+                                notify({ message: 'Success' })
+                            })
+                            .catch(e => notify({ type: 'error', message: 'Failed' }))
                     })
                 }
             ]

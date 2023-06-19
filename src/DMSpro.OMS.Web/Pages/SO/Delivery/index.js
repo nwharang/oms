@@ -1,24 +1,4 @@
 ﻿$(async function () {
-    let notify = (option) => {
-        obj = { type: "success", position: "bottom right", message: "Message Placeholder", ...option };
-        DevExpress.ui.notify({
-            message: obj.message,
-            height: 45,
-            width: 250,
-            minWidth: 250,
-            type: obj.type,
-            displayTime: 5000,
-            animation: {
-                show: {
-                    type: 'fade', duration: 400, from: 0, to: 1,
-                },
-                hide: { type: 'fade', duration: 40, to: 0 },
-            },
-        }, {
-            position: obj.position,
-        })
-        return obj
-    }
     var l = abp.localization.getResource("OMS");
     let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore, render } = store()
     let currentSelectedDoc = new Map();
@@ -52,7 +32,6 @@
         },
         export: {
             enabled: true,
-            // allowExportSelectedData: true,
         },
         onExporting(e) {
             const workbook = new ExcelJS.Workbook();
@@ -309,23 +288,6 @@
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
             },
-            // {
-            //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
-            //     dataField: 'docTotalLineAmt',
-            //     dataType: 'number',
-            //     visible: true,
-            //     validationRules: [{ type: 'required' }],
-            //     allowEditing: false,
-            // },
-            // {
-            //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
-            //     dataField: 'docTotalLineAmtAfterTax',
-            //     dataType: 'number',
-            //     width: 100,
-            //     visible: true,
-            //     validationRules: [{ type: 'required' }],
-            //     allowEditing: false,
-            // },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
                 dataField: 'docTotalAmt',
