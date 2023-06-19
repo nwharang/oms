@@ -152,7 +152,7 @@ let store = () => {
                     icon: "close",
                     onClick: () => DevExpress.ui.dialog.confirm(l('ConfirmationMessage:OrderService:SalesRequest:Cancel'), "")
                         .done(e => {
-                            if (e) mainService.cancelDoc([docData.docId]).then(() => {
+                            if (e) mainService.cancelDoc(docData.docId).then(() => {
                                 docData.popupInstance.hide()
                                 notify({ message: 'Success' })
                             })

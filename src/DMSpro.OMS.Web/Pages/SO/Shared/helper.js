@@ -33,7 +33,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
         },
         calculateDocTotal: _.debounce(() => {
             // Calculate Doc total
-            if (state().isError || !docData.isOpen || !docData.permission.edit || render.isBaseDoc) return
+            if (state().isError || !docData.isOpen || !docData.permission.edit || state().isBaseDoc) return
             try {
                 let { gridInstance, formInstance } = docData, formData = docData.formInstance.option('formData')
                 formInstance.beginUpdate()
@@ -199,8 +199,10 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                         icon: 'save',
                         visible: docData.permission.edit,
                         disabled: true,
-                        onClick: () => {
+                        onClick: async () => {
                             loadingPanel.show()
+                            await docData.gridInstance.saveEditData()
+
                             if (docData.docId) var res = mainService.updateDoc(docData.docId, docData.currentData)
                             else var res = mainService.createDoc(docData.currentData)
                             res.then(() => preLoad.then(async (data) => helper(data, () => loadingPanel.hide(), { navigateData: await res, docId: (await res).header.id })))
@@ -282,7 +284,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                             dataField: "businessPartnerId",
                             editorType: 'dxSelectBox',
                             editorOptions: {
-                                readOnly: render.isBaseDoc,
+                                readOnly: state().isBaseDoc,
                                 dataSource: {
                                     store: mainStore.customerList,
                                     paginate: true,
@@ -317,7 +319,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                             editorOptions: {
                                 displayFormat: "dd-MM-yyyy",
                                 dateOutOfRangeMessage: "Date is out of range",
-                                readOnly: render.isBaseDoc,
+                                readOnly: state().isBaseDoc,
                             },
                             validationRules: [{ type: 'required' }],
                         },
@@ -338,7 +340,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                             dataField: "employeeId",
                             editorType: 'dxSelectBox',
                             editorOptions: {
-                                readOnly: render.isBaseDoc,
+                                readOnly: state().isBaseDoc,
                                 valueExpr: 'id',
                                 displayExpr: (e) => {
                                     if (e) return `${e.code} ${"- " + e.firstName || ""}`;
@@ -363,7 +365,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                             dataField: "routeId",
                             editorType: 'dxSelectBox',
                             editorOptions: {
-                                readOnly: render.isBaseDoc,
+                                readOnly: state().isBaseDoc,
                                 valueExpr: 'id',
                                 displayExpr: (e) => {
                                     if (e) return `${e.code} ${"- " + e.name || ""}`;
@@ -414,7 +416,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                                         valueExpr: 'id',
                                         searchEnabled: true,
                                         showClearButton: true,
-                                        readOnly: render.isBaseDoc,
+                                        readOnly: state().isBaseDoc,
                                     },
                                 },
                                 render.isRenderDiscount && {
@@ -424,7 +426,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                                     dataField: "docDiscountPerc",
                                     editorType: 'dxNumberBox',
                                     editorOptions: {
-                                        readOnly: render.isBaseDoc,
+                                        readOnly: state().isBaseDoc,
                                         format: '#0.00',
                                         min: 0,
                                         max: 100,
@@ -443,7 +445,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                                     dataField: "docDiscountAmt",
                                     editorType: 'dxNumberBox',
                                     editorOptions: {
-                                        readOnly: render.isBaseDoc,
+                                        readOnly: state().isBaseDoc,
                                         format: '#,##0.##',
                                         min: 0,
                                     }
@@ -503,9 +505,9 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
             repaintChangesOnly: true,
             editing: {
                 mode: 'batch',
-                allowAdding: docData.isOpen && !state().isError && docData.permission.edit && !render.isBaseDoc,
-                allowUpdating: docData.isOpen && !state().isError && docData.permission.edit && !render.isBaseDoc,
-                allowDeleting: docData.isOpen && !state().isError && docData.permission.edit && !render.isBaseDoc,
+                allowAdding: docData.isOpen && !state().isError && docData.permission.edit && !state().isBaseDoc,
+                allowUpdating: docData.isOpen && !state().isError && docData.permission.edit && !state().isBaseDoc,
+                allowDeleting: docData.isOpen && !state().isError && docData.permission.edit && !state().isBaseDoc,
                 useIcons: true,
                 texts: {
                     editRow: l("Edit"),
@@ -986,6 +988,7 @@ async function appendSelectedItems(selectedItems) {
     selectedItems.forEach(async (u, k) => {
         let price = priceList[u.id][u.salesUOMId]
         if (!price) {
+            console.log('test');
             let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === u.uomGroupId)?.data?.find(v => v.altUOMId === u.salesUOMId)
             price = priceList[u.id][validUom.baseUOMId] * validUom?.baseQty || 0
         }

@@ -238,7 +238,7 @@ let getInfoSO = async () => {
 }
 
 let notify = (option) => {
-    obj = { type: "success", position: "bottom left", message: "Message Placeholder", ...option };
+    obj = { type: "success", position: "bottom right", message: "Message Placeholder", ...option };
     DevExpress.ui.notify({
         message: obj.message,
         height: 45,
