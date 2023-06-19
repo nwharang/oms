@@ -140,18 +140,24 @@ let store = () => {
                 {
                     text: l('Button.Action.SOToDODoc'),
                     icon: "check",
-                    onClick: () => mainService.createListDODoc([docData.docId]).then(() => {
-                        docData.popupInstance.hide()
-                    })
+                    onClick: () => mainService.createListDODoc([docData.docId])
+                        .then(() => {
+                            docData.popupInstance.hide()
+                            notify({ message: 'Success' })
+                        })
+                        .catch(e => notify({ type: 'error', message: 'Failed' }))
                 },
                 {
                     text: l('Button.Action.Cancel'),
                     icon: "close",
-                    onClick: () => DevExpress.ui.dialog.confirm(l('ConfirmationMessage:OrderService:SalesRequest:Cancel'), "").done(e => {
-                        if (e) mainService.cancelDoc([docData.docId]).then(() => {
-                            docData.popupInstance.hide()
+                    onClick: () => DevExpress.ui.dialog.confirm(l('ConfirmationMessage:OrderService:SalesRequest:Cancel'), "")
+                        .done(e => {
+                            if (e) mainService.cancelDoc([docData.docId]).then(() => {
+                                docData.popupInstance.hide()
+                                notify({ message: 'Success' })
+                            })
+                                .catch(e => notify({ type: 'error', message: 'Failed' }))
                         })
-                    })
                 }
             ]
         }

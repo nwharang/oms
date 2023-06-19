@@ -122,16 +122,22 @@ let store = () => {
                 {
                     text: l('Button.Action.DOToARDoc'),
                     icon: "check",
-                    onClick: () => mainService.createListARInvoiceDoc([docData.docId]).then(() => {
-                        docData.popupInstance.hide()
-                    })
+                    onClick: () => mainService.createListARInvoiceDoc([docData.docId])
+                        .then(() => {
+                            docData.popupInstance.hide()
+                            notify({ message: 'Success' })
+                        })
+                        .catch(e => notify({ type: 'error', message: 'Failed' }))
                 },
                 {
                     text: l('Button.Action.DOToRODoc'),
                     icon: "check",
-                    onClick: () => mainService.createListRODoc([docData.docId]).then(() => {
-                        docData.popupInstance.hide()
-                    })
+                    onClick: () => mainService.createListRODoc([docData.docId])
+                        .then(() => {
+                            docData.popupInstance.hide()
+                            notify({ message: 'Success' })
+                        })
+                        .catch(e => notify({ type: 'error', message: 'Failed' }))
                 },
             ]
         }
