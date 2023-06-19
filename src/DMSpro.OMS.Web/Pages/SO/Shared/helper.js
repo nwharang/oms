@@ -87,6 +87,8 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                 var employee = employeesList.find(e => e.id === data.employeeId)
             if (data.routeId)
                 var route = routesList.find(e => e.id === data.routeId)
+            console.log((data.employeeId && !employee));
+            console.log((data.routeId && !route));
             return Boolean(((data.employeeId && !employee) || (data.routeId && !route)) && isOpen)
         },
         permission: {
@@ -98,9 +100,9 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
     }
 
     if (docId && !navigateData) docData.currentData = await mainService.getDoc(docId)
+    if (navigateData) docData.currentData = navigateData
     docData.isOpen = !Boolean(docData.currentData.header.docStatus)
     docData.isError = await docData.validateSOItem(docData.currentData.header, docData.isOpen)
-    if (navigateData) docData.currentData = navigateData
     docData.readOnlyHeader = _.clone(docData.currentData.header)  // Copy header data for compare determine haveEditData
     docData.readOnlyDetails = _.clone(docData.currentData.details)  // Copy details data for compare determine haveEditData
 
@@ -112,10 +114,10 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
             docDiscountType: Number(docData.currentData.header.docDiscountType),
             isSaveable: _.debounce(() => docData.saveButton.option('disabled', (JSON.stringify(docData.readOnlyDetails.sort()) === JSON.stringify(docData.currentData.details.sort()) && _.isEqual(docData.readOnlyHeader, docData.currentData.header) || !docData.isOpen)), 200),
             isError: docData.isError,
-            isBaseDoc: Boolean(render.isBaseDoc && docData.baseDocId)
+            isBaseDoc: Boolean(render.isBaseDoc && docData.currentData.header.baseDocId)
         }
     }
-
+    state()
     function renderPopup() {
         docData.popupInstance = docData.element.popup.dxPopup({
             title: `${render.title} - #${docId ? docData.currentData.header.docNbr : "New"} - ${(() => {
@@ -638,6 +640,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                             newData.lineAmtAfterTax = lineAmtAfterTax;
                             newData.lineAmt = lineAmt;
                         }
+                        docData.gridInstance.saveEditData()
                     },
                 },
                 {
@@ -986,16 +989,18 @@ async function appendSelectedItems(selectedItems) {
     // Call API to get price
     let priceList = await salesOrderService.getPriceOfItemsForSO(priceListId, selectedItems.map(e => e.id), { dataType: 'json' }).then(({ result }) => result)
     selectedItems.forEach(async (u, k) => {
-        let price = priceList[u.id][u.salesUOMId]
+        let foundItem = itemList.find(item => item.itemId === u.id && item.isFree === u.isFree)
+        if (foundItem)
+            var price = priceList[u.id][foundItem.uomId]
+        else
+            var price = priceList[u.id][u.salesUOMId]
         if (!price) {
-            console.log('test');
             let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === u.uomGroupId)?.data?.find(v => v.altUOMId === u.salesUOMId)
             price = priceList[u.id][validUom.baseUOMId] * validUom?.baseQty || 0
         }
         let priceAfterTax = price + (price * mainStore.vatList.find(x => x.id == u.vatId).rate) / 100;
         let lineAmtAfterTax = (priceAfterTax * parseInt(u.qty));
         let lineAmt = price * u.qty
-        let foundItem = itemList.find(item => item.itemId === u.id && item.isFree === u.isFree)
         if (foundItem)
             await dataGridDataSource.store().update(foundItem, {
                 qty: foundItem.qty + u.qty,
