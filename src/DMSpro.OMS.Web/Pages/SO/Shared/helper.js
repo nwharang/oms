@@ -79,11 +79,9 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
             finally { docData.formInstance.endUpdate() }
         }, 750),
         /**  @param {object} data - Current Header Data @param {boolean} isOpen - Is Doc Open * @returns {Promise<boolean>} Doc have error ?*/
-        validateSOItem: async (data, isOpen) => {
+        validateSOItem: async (data, isOpen, result) => {
             // have employeeId, routeId but not found in list, OpenMode Only
-            let { result } = await salesOrderService.getRouteAndEmployeeOfCustomer(data.businessPartnerId, companyId).then(data => JSON.parse(data))
-            let routesList = Object.keys(result.routeDictionary).map((key) => result.routeDictionary[key])
-            let employeesList = Object.keys(result.employeeDictionary).map((key) => result.employeeDictionary[key])
+            let { routesList, employeesList } = result
             if (data.employeeId)
                 var employee = employeesList.find(e => e.id === data.employeeId)
             if (data.routeId)
@@ -96,12 +94,19 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
             edit: Boolean(abp.auth.isGranted(`OrderService.${render.permissionGroup}.Edit`)),
         },
         isError: null,
+        EmRouteData: null
     }
 
     if (docId && !navigateData) docData.currentData = await mainService.getDoc(docId)
     if (navigateData) docData.currentData = navigateData
     docData.isOpen = !Boolean(docData.currentData.header.docStatus)
-    docData.isError = await docData.validateSOItem(docData.currentData.header, docData.isOpen)
+    if (docData.currentData.header.businessPartnerId) {
+        docData.EmRouteData = await salesOrderService.getRouteAndEmployeeOfCustomer(docData.currentData.header.businessPartnerId, companyId).then(data => JSON.parse(data)).then(({ result }) => ({
+            routesList: Object.keys(result.routeDictionary).map((key) => result.routeDictionary[key]),
+            employeesList: Object.keys(result.employeeDictionary).map((key) => result.employeeDictionary[key])
+        }))
+        docData.isError = await docData.validateSOItem(docData.currentData.header, docData.isOpen, docData.EmRouteData)
+    }
     docData.readOnlyHeader = _.clone(docData.currentData.header)  // Copy header data for compare determine haveEditData
     docData.readOnlyDetails = _.clone(docData.currentData.details)  // Copy details data for compare determine haveEditData
 
@@ -317,6 +322,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                             dataField: "requestDate",
                             editorType: 'dxDateBox',
                             editorOptions: {
+
                                 displayFormat: "dd-MM-yyyy",
                                 dateOutOfRangeMessage: "Date is out of range",
                                 readOnly: state().isBaseDoc,
@@ -340,6 +346,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                             dataField: "employeeId",
                             editorType: 'dxSelectBox',
                             editorOptions: {
+                                dataSource: docData.EmRouteData?.employeesList || [],
                                 readOnly: state().isBaseDoc,
                                 valueExpr: 'id',
                                 displayExpr: (e) => {
@@ -365,6 +372,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                             dataField: "routeId",
                             editorType: 'dxSelectBox',
                             editorOptions: {
+                                dataSource: docData.EmRouteData?.routesList || [],
                                 readOnly: state().isBaseDoc,
                                 valueExpr: 'id',
                                 displayExpr: (e) => {
