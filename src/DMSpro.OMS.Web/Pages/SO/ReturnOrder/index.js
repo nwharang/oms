@@ -2,7 +2,8 @@
     var l = abp.localization.getResource("OMS");
     let { mainStore, docTypeStore, docStatusStore, docSourceStore, render } = store()
     let mainGrid = $('#dgSOHeader').dxDataGrid({
-        dataSource: { store: mainStore },
+        dataSource: mainStore ,
+        remoteOperations: true,
         showRowLines: true,
         showBorders: true,
         cacheEnabled: true,
@@ -35,7 +36,7 @@
         },
         onExporting(e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('PurchaseRequests');
+            const worksheet = workbook.addWorksheet('Data');
 
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
@@ -43,7 +44,7 @@
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PurchaseRequests.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${render.permissionGroup}.xlsx`);
                 });
             });
             e.cancel = true;
@@ -106,25 +107,13 @@
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:Route'),
-                dataField: 'routeId',
-                calculateDisplayValue: "routeDisplay",
-                lookup: {
-                    store: "routeDisplay",
-                    displayExpr: "name",
-                    valueExpr: 'id'
-                },
+                dataField: 'routeDisplay',
                 dataType: 'string',
                 validationRules: [{ type: 'required' }],
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:Employee'),
-                dataField: 'employeeId',
-                calculateDisplayValue: "employeeDisplay",
-                lookup: {
-                    store: "employeeDisplay",
-                    displayExpr: "name",
-                    valueExpr: 'id'
-                },
+                dataField: 'employeeDisplay',
                 dataType: 'string',
                 validationRules: [{ type: 'required' }],
             },

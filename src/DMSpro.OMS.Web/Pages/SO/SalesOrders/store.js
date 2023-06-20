@@ -5,9 +5,6 @@ let store = () => {
     return {
         mainStore: new DevExpress.data.CustomStore({
             key: 'id',
-            sort: [
-                { selector: "requestDate", desc: false }
-            ],
             load(loadOptions) {
                 const deferred = $.Deferred();
                 const args = {};
@@ -27,30 +24,6 @@ let store = () => {
                     });
 
                 return deferred.promise();
-            }
-        }),
-        customerInZoneStore: new DevExpress.data.CustomStore({
-            key: 'id',
-            load(loadOptions) {
-                const deferred = $.Deferred();
-                const args = {};
-                requestOptions.forEach((i) => {
-                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                        args[i] = JSON.stringify(loadOptions[i]);
-                    }
-                });
-                customerInZoneService.getListDevextremes(args)
-                    .done(result => {
-                        deferred.resolve(result.data, {
-                            totalCount: result.totalCount,
-                            summary: result.summary,
-                            groupCount: result.groupCount,
-                        });
-                    });
-                return deferred.promise();
-            },
-            byKey: function (key) {
-                return key == 0 ? customerInZoneService.get(key) : null;
             },
         }),
         docTypeStore: [

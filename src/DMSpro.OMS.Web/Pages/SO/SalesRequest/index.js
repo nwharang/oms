@@ -3,7 +3,8 @@
     let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore, render } = store()
     let currentSelectedDoc = new Map();
     let gridSalesRequests = $('#dgSOHeader').dxDataGrid({
-        dataSource: { store: mainStore },
+        dataSource: mainStore ,
+        remoteOperations: true,
         showRowLines: true,
         showBorders: true,
         cacheEnabled: true,
@@ -36,7 +37,7 @@
         },
         onExporting(e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('PurchaseRequests');
+            const worksheet = workbook.addWorksheet('Data');
 
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
@@ -44,7 +45,7 @@
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PurchaseRequests.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${render.permissionGroup}.xlsx`);
                 });
             });
             e.cancel = true;
