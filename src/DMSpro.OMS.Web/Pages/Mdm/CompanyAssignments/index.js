@@ -221,7 +221,7 @@ $(function () {
                 type: 'buttons',
                 caption: l("Actions"),
                 width: 110,
-                buttons: ['delete'],
+                buttons: ['delete', 'edit'],
                 fixedPosition: "left",
             },
             {
