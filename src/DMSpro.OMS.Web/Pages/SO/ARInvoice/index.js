@@ -172,7 +172,8 @@
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:BaseDoc'),
-                dataField: 'baseDoc',
+                dataField: 'baseDocId',
+visible: false,
                 dataType: 'string',
             },
             {
