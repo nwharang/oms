@@ -79,7 +79,7 @@
                     },
                     onClick: (e) => {
                         loadingPanel.show()
-                        preLoad.then((data) => helper(data, () => loadingPanel.hide()))
+                        preLoad.then((data) => helper(data))
                     }
                 },
                 {
@@ -165,7 +165,7 @@
                         icon: "fieldchooser",
                         onClick: (e) => {
                             loadingPanel.show()
-                            preLoad.then((data) => helper(data, () => loadingPanel.hide(), { docId: e.row.data.id }))
+                            preLoad.then((data) => helper(data, { docId: e.row.data.id }))
                         }
                     }
                 ],

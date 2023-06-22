@@ -2,7 +2,7 @@
     var l = abp.localization.getResource("OMS");
     let { mainStore, docTypeStore, docStatusStore, docSourceStore, render } = store()
     let mainGrid = $('#dgSOHeader').dxDataGrid({
-        dataSource: mainStore ,
+        dataSource: mainStore,
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
@@ -86,7 +86,7 @@
                         icon: "fieldchooser",
                         onClick: (e) => {
                             loadingPanel.show()
-                            preLoad.then((data) => helper(data, () => loadingPanel.hide(), { docId: e.row.data.id }))
+                            preLoad.then((data) => helper(data, { docId: e.row.data.id }))
                         }
                     }
                 ],

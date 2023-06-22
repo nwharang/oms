@@ -3,7 +3,7 @@
     let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore, render } = store()
     let currentSelectedDoc = new Map();
     let gridSalesRequests = $('#dgSOHeader').dxDataGrid({
-        dataSource: mainStore ,
+        dataSource: mainStore,
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
@@ -79,7 +79,7 @@
                     },
                     onClick: (e) => {
                         loadingPanel.show()
-                        preLoad.then((data) => helper(data, () => loadingPanel.hide()))
+                        preLoad.then((data) => helper(data))
                     }
                 },
                 {
@@ -166,7 +166,7 @@
                         icon: "fieldchooser",
                         onClick: (e) => {
                             loadingPanel.show()
-                            preLoad.then((data) => helper(data, () => loadingPanel.hide(), { docId: e.row.data.id }))
+                            preLoad.then((data) => helper(data, { docId: e.row.data.id }))
                         }
                     }
                 ],
