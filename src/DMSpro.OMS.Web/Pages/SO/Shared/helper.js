@@ -1,10 +1,21 @@
-let preLoad = getInfoSO()
+window.preLoad = getInfoSO()
 $(() => {
     window.massInput = renderMassInput()
 })
 
-let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
+
+let helper = async ({ companyId, mainStore }, option) => {
+    let tabs = option?.tabs || []
+    /**
+     * example : 
+     * [{
+     *  title : "example",
+     *  icon : "add",
+     *  callback : () => {} // return element
+     * }]
+     */
     if (option) var { docId, navigateData } = option
+
     let { discountTypeStore, transactionTypeStore, docStatusStore, render } = store()
 
     const docData = {
@@ -14,21 +25,24 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
             header: {},
             details: [],
         },
-        readOnlyHeader: {},
-        readOnlyDetails: [],
         coimngData: {
             next: {},
             previous: {}
         },
         gridInstance: null,
+        tabsInstance: null,
         formInstance: null,
         popupInstance: null,
         actionButton: null,
         saveButton: null,
+        isError: null,
+        EmRouteData: null,
         element: {
             popup: $('#popup'),
             form: $('<div id="formDataGrid">'),
-            grid: $('<div id="detailsDataGrid" style="flex:1 0 auto;">')
+            tabs: $('<div>'),
+            grid: $('<div id="detailsDataGrid">')
+
         },
         calculateDocTotal: _.debounce(() => {
             // Calculate Doc total
@@ -93,8 +107,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
             read: Boolean(abp.auth.isGranted(`OrderService.${render.permissionGroup}`)),
             edit: Boolean(abp.auth.isGranted(`OrderService.${render.permissionGroup}.Edit`)),
         },
-        isError: null,
-        EmRouteData: null
+
     }
 
     if (docId && !navigateData) docData.currentData = await mainService.getDoc(docId)
@@ -107,8 +120,8 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
         }))
         docData.isError = await docData.validateSOItem(docData.currentData.header, docData.isOpen, docData.EmRouteData)
     }
-    docData.readOnlyHeader = _.clone(docData.currentData.header)  // Copy header data for compare determine haveEditData
-    docData.readOnlyDetails = _.clone(docData.currentData.details)  // Copy details data for compare determine haveEditData
+    const readOnlyHeader = _.cloneDeep(docData.currentData.header)  // Copy header data for compare determine haveEditData
+    const readOnlyDetails = _.cloneDeep(docData.currentData.details)  // Copy details data for compare determine haveEditData
 
     const state = () => {
         return {
@@ -116,7 +129,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
             isEmployeeRoute: Boolean(docData.currentData.details.length > 0),
             Render: Boolean(docData.currentData.details.length > 0),
             docDiscountType: Number(docData.currentData.header.docDiscountType),
-            isSaveable: _.debounce(() => docData.saveButton.option('disabled', (JSON.stringify(docData.readOnlyDetails.sort()) === JSON.stringify(docData.currentData.details.sort()) && _.isEqual(docData.readOnlyHeader, docData.currentData.header) || !docData.isOpen)), 200),
+            isSaveable: _.debounce(() => docData.saveButton.option('disabled', (_.isEqual(readOnlyDetails, docData.currentData.details) && _.isEqual(readOnlyHeader, docData.currentData.header) || !docData.isOpen)), 200),
             isError: docData.isError,
             isBaseDoc: Boolean(render.isBaseDoc && docData.currentData.header.baseDocId)
         }
@@ -136,8 +149,9 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
             dragEnabled: false,
             contentTemplate: (e) => {
                 renderForm()
-                renderGrid()
-                return $('<div class="w-100 h-100"/>').append($('<div class="w-100 h-100 px-2"/>').append(docData.element.form).append(docData.element.grid)).dxScrollView({
+                renderTabs()
+                renderDefaultGrid()
+                return $('<div class="w-100 h-100"/>').append($('<div class="w-100 h-100 px-2"/>').append(docData.element.form).append(docData.element.tabs)).dxScrollView({
                     scrollByContent: true,
                     scrollByThumb: true,
                     showScrollbar: 'onScroll'
@@ -158,7 +172,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                         disabled: true,
                         onClick: (e) => preLoad.then((data) => {
                             loadingPanel.show()
-                            helper(data, () => loadingPanel.hide(), { navigateData: docData.coimngData.previous, docId: docData.coimngData.previous.header.id })
+                            helper(data, { navigateData: docData.coimngData.previous, docId: docData.coimngData.previous.header.id })
                         })
                     }
                 },
@@ -175,7 +189,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                         disabled: true,
                         onClick: (e) => preLoad.then((data) => {
                             loadingPanel.show()
-                            helper(data, () => loadingPanel.hide(), { navigateData: docData.coimngData.next, docId: docData.coimngData.next.header.id })
+                            helper(data, { navigateData: docData.coimngData.next, docId: docData.coimngData.next.header.id })
                         })
                     }
                 },
@@ -207,10 +221,30 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                         onClick: async () => {
                             loadingPanel.show()
                             await docData.gridInstance.saveEditData()
-
-                            if (docData.docId) var res = mainService.updateDoc(docData.docId, docData.currentData)
-                            else var res = mainService.createDoc(docData.currentData)
-                            res.then(() => preLoad.then(async (data) => helper(data, () => loadingPanel.hide(), { navigateData: await res, docId: (await res).header.id })))
+                            delete docData.currentData.header.edited
+                            let data = {
+                                header: docData.currentData.header,
+                                details: docData.currentData.details.map(e => ({
+                                    id: e.id,
+                                    isFree: e.isFree,
+                                    itemId: e.itemId,
+                                    vatId: e.vatId,
+                                    uomId: e.uomId,
+                                    price: e.price,
+                                    priceAfterTax: e.priceAfterTax,
+                                    qty: e.qty,
+                                    discountType: e.discountType,
+                                    discountAmt: e.discountAmt,
+                                    discountPerc: e.discountPerc,
+                                    lineDiscountAmt: e.lineDiscountAmt,
+                                    lineAmt: e.lineAmt,
+                                    lineAmtAfterTax: e.lineAmtAfterTax,
+                                    transactionType: e.transactionType,
+                                }))
+                            }
+                            if (docData.docId) var res = mainService.updateDoc(docData.docId, data)
+                            else var res = mainService.createDoc(data)
+                            res.then(() => preLoad.then(async (data) => helper(data, { navigateData: await res, docId: (await res).header.id })))
                                 .catch((err) => { if (err) loadingPanel.hide() })
                         },
                         onContentReady: (e) => docData.saveButton = e.component
@@ -507,7 +541,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
 
         }).dxForm('instance')
     }
-    function renderGrid() {
+    function renderDefaultGrid() {
         docData.gridInstance = docData.element.grid.dxDataGrid({
             dataSource: docData.currentData.details,
             repaintChangesOnly: true,
@@ -785,6 +819,8 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                                 break;
 
                             default:
+                                newData.discountAmt = null
+                                newData.discountPerc = null
                                 break;
                         }
                     },
@@ -889,10 +925,14 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                     lookup: {
                         dataSource: transactionTypeStore,
                         displayExpr: 'text',
-                        valueExpr: 'id'
+                        valueExpr: 'id',
                     },
                     validationRules: [{ type: 'required', message: '' }],
                     width: 150,
+                    setCellValue: (e, value) => {
+                        e.transactionType = value
+                        docData.currentData.header.edited = true
+                    }
                 },
             ],
             summary: {
@@ -940,7 +980,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                     transactionType: 0,
                 }
             },
-            onContentReady: () => {
+            onContentReady: (e) => {
                 docData.calculateDocTotal()
                 let { isSaveable, isBusinessPartner, isEmployeeRoute } = state()
                 isSaveable()
@@ -949,6 +989,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
                 docData.formInstance.getEditor('businessPartnerId')?.option('readOnly', isBusinessPartner)
                 docData.formInstance.getEditor('employeeId')?.option('readOnly', isEmployeeRoute)
                 docData.formInstance.getEditor('routeId')?.option('readOnly', isEmployeeRoute)
+
             },
             onEditorPreparing: (e) => {
                 if (e.row?.rowType != 'data') return
@@ -966,9 +1007,25 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
             },
         }).dxDataGrid("instance")
     }
-
+    function renderTabs() {
+        docData.tabsInstance = docData.element.tabs.dxTabPanel({
+            swipeEnabled: true,
+            items: [
+                {
+                    title: "Details",
+                    icon: 'detailslayout',
+                    template: () => $('<div class="p-2"/>').append(docData.element.grid)
+                },
+                ...tabs.map(e => ({
+                    title: e.title,
+                    icon: e.icon || '',
+                    template: () => $('<div class="p-2"/>').append(e.callback())
+                }))
+            ]
+        })
+    }
     renderPopup()
-    loadingCallback()
+    loadingPanel.hide()
     docData.popupInstance.show()
     if (!docId) return
 
@@ -981,6 +1038,7 @@ let helper = async ({ companyId, mainStore }, loadingCallback, option) => {
         $('#nextDocButton').dxButton('instance').option('disabled', !Boolean(data))
         docData.coimngData.next = data
     })
+    return { data: docData, currentState: state() }
 }
 
 async function appendSelectedItems(selectedItems) {

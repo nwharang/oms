@@ -200,9 +200,11 @@ function renderMassInput() {
 }
 
 let getInfoSO = async () => {
-    let companyId = (await Common.getCurrentCompany()).id;
+    let companyIdentityUserAssignment = window.dMSpro.oMS.mdmService.controllers.companyIdentityUserAssignments.companyIdentityUserAssignment
+    let companyId = await Common.getCurrentCompany().then((e) => e.id);
+    await companyIdentityUserAssignment.setCurrentlySelectedCompany(companyId)
     return await salesOrderService.getInfoSO({ companyId }, new Date()).then(async result => {
-        let data = (await Common.parseJSON(result)).soInfo;
+        let data = await Common.parseJSON(result).then((data) => data.soInfo);
         return {
             companyId,
             mainStore: {

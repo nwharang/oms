@@ -6,9 +6,6 @@ let store = () => {
     return {
         mainStore: new DevExpress.data.CustomStore({
             key: 'id',
-            sort: [
-                { selector: "requestDate", desc: false }
-            ],
             load(loadOptions) {
                 const deferred = $.Deferred();
                 const args = {};
@@ -21,7 +18,6 @@ let store = () => {
 
                 mainService.getHeaderListDevextremes(args)
                     .done(result => {
-                        result.data.sort((a, b) => Date.parse(a.requestDate) - Date.parse(b.requestDate))
                         deferred.resolve(result.data.sort((a, b) => Date.parse(a.requestDate) - Date.parse(b.requestDate)), {
                             totalCount: result.totalCount,
                             summary: result.summary,
