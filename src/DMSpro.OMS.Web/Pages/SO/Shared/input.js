@@ -120,6 +120,9 @@ function renderMassInput() {
                             newData.qty = value
                             grid.selectRows([currentRowData.id], true)
                         },
+                        editorOptions: {
+                            format: "#"
+                        },
                         allowFiltering: false,
                         allowSorting: false,
                     },
@@ -149,7 +152,7 @@ function renderMassInput() {
                     let selectedItem = e.component.getSelectedRowsData().map(obj => {
                         return {
                             ...obj,
-                            qty: e.changes.find(v => v.key === obj.id)?.data.qty || 0,
+                            qty: e.changes.find(v => v.key === obj.id)?.data.qty || 1,
                             isFree: e.changes.find(v => v.key === obj.id)?.data.isFree || false
                         }
                     }).filter(e => e.qty > 0)
@@ -167,7 +170,9 @@ function renderMassInput() {
             grid.clearSelection()
             loadingPanel.hide()
         },
-
+        onFocusedRowChanging: (e) => {
+            // e.newRowIndex
+        },
 
         toolbarItems: [
             {
