@@ -59,7 +59,6 @@ function renderForm(e, headerData) {
                     width: '100%',
                     onClick(event) {
                         popupInstance.beginUpdate()
-                        console.log(headerData.status);
                         switch (headerData.status) {
                             default:
                                 itemGroupService.create({ ...headerData, selectable: true }, { contentType: "application/json" }).done(e => {

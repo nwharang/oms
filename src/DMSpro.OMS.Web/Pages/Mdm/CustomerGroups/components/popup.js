@@ -30,44 +30,6 @@ let renderPopup = async (args) => {
             }
         },
         toolbarItems: [
-            // {
-            //     widget: "dxDropDownButton",
-            //     location: "after",
-            //     toolbar: "bottom",
-            //     options: {
-            //         dropDownOptions: {
-            //             width: 230,
-            //         },
-            //         icon: 'preferences',
-            //         text: 'Actions',
-            //         width: 120,
-            //         elementAttr: {
-            //             id: "actionButtonDetailsPanel",
-            //         },
-            //         items: [
-            //             {
-            //                 text: "Release",
-            //                 icon: "check",
-            //                 onClick: () => {
-            //                     console.log('hello');
-            //                 }
-            //             },
-            //             {
-            //                 text: "Cancel",
-            //                 icon: "close",
-            //                 onClick: () => DevExpress.ui.dialog.confirm("<i> Do you wish to continue this action?</i>", "Rejecting Sale Request")
-            //                     .done((e) => {
-            //                         if (e) {
-            //                             console.log('hello');
-            //                         }
-            //                         else {
-            //                             console.log('nooooo');
-            //                         }
-            //                     })
-            //             }
-            //         ]
-            //     },
-            // },
             {
                 widget: "dxButton",
                 location: "after",
