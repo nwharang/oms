@@ -11,7 +11,7 @@ let helper = async ({ companyId, mainStore }, option) => {
      * [{
      *  title : "example",
      *  icon : "add",
-     *  callback : () => {} // return element
+     *  callback : (data) => {} // return element
      * }]
      */
     if (option) var { docId, navigateData } = option
@@ -1019,7 +1019,7 @@ let helper = async ({ companyId, mainStore }, option) => {
                 ...tabs.map(e => ({
                     title: e.title,
                     icon: e.icon || '',
-                    template: () => $('<div class="p-2"/>').append(e.callback())
+                    template: () => $('<div class="p-2"/>').append(e.callback(docData))
                 }))
             ]
         })

@@ -28,7 +28,7 @@ const itemStore = new DevExpress.data.CustomStore({
         });
         itemServices.getListDevextremes(args)
             .done(result => {
-                deferred.resolve(result.data.sort((a, b) => Date.parse(b.requestDate) - Date.parse(a.requestDate)), {
+                deferred.resolve(result.data, {
                     totalCount: result.totalCount,
                     summary: result.summary,
                     groupCount: result.groupCount,
@@ -57,6 +57,7 @@ function renderMassInput() {
                     store: itemStore,
                     filter: ['active', '=', true],
                     map: e => {
+                        e.qty = 1;
                         e.isFree = false
                         return e
                     }
