@@ -106,6 +106,8 @@ let helper = async ({ companyId, mainStore }, option) => {
             create: Boolean(abp.auth.isGranted(`OrderService.${render.permissionGroup}.Create`)),
             read: Boolean(abp.auth.isGranted(`OrderService.${render.permissionGroup}`)),
             edit: Boolean(abp.auth.isGranted(`OrderService.${render.permissionGroup}.Edit`)),
+            cancel: Boolean(abp.auth.isGranted(`OrderService.${render.permissionGroup}.Cancel`)),
+            release: Boolean(abp.auth.isGranted(`OrderService.${render.permissionGroup}.Release`)),
         },
 
     }
@@ -223,7 +225,11 @@ let helper = async ({ companyId, mainStore }, option) => {
                             await docData.gridInstance.saveEditData()
                             delete docData.currentData.header.edited
                             let data = {
-                                header: docData.currentData.header,
+                                // Any Date type send to server format here
+                                header: {
+                                    ...docData.currentData.header,
+                                    requestDate: moment(docData.currentData.requestDate).format('YYYY-MM-DD[T00:00:00Z]')
+                                },
                                 details: docData.currentData.details.map(e => ({
                                     id: e.id,
                                     isFree: e.isFree,
@@ -356,7 +362,7 @@ let helper = async ({ companyId, mainStore }, option) => {
                             dataField: "requestDate",
                             editorType: 'dxDateBox',
                             editorOptions: {
-
+                                min: docData.currentData.header?.docDate || new Date,
                                 displayFormat: "dd-MM-yyyy",
                                 dateOutOfRangeMessage: "Date is out of range",
                                 readOnly: state().isBaseDoc,
