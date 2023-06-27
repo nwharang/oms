@@ -823,6 +823,7 @@ let helper = async ({ companyId, mainStore }, option) => {
                                 newData.discountPerc = null
                                 newData.lineAmt = currentRowData.qty * currentRowData.price
                                 newData.lineAmtAfterTax = currentRowData.priceAfterTax * currentRowData.qty
+                                newData.lineDiscountAmt = 0;
                                 break;
                         }
                     },
