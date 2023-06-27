@@ -652,8 +652,6 @@
             itemGroupId,
             gpsLock
         };
-        if (endDate)
-            console.log(endDate);
         var mcpDetails = [];
 
         dgMCPDetails.getDataSource().items().forEach(u => {
@@ -831,7 +829,6 @@
     }
 
     function routeChangedHandler(data) {
-        console.log('a');
         if (data.value !== null) {
             const selectedItem = data.component.option('selectedItem');
 

@@ -434,6 +434,7 @@
                         name: 'edit',
                         onClick: (e) => {
                             gridInfo.editingRowId = e.row.data.id;
+                            gridInfo.currentData = e.row.data
                             gridCustomers.editRow(e.row.rowIndex);
                         }
                     },
@@ -845,7 +846,6 @@
         },
         onEditorPreparing: (e) => {
             if (e.row?.rowType != 'data') return
-            console.log(new Date());
             // ReadOnly when editing , allow when creating a new row
             if (e.dataField == 'endDate' && !e.row.isNewRow)
                 e.editorOptions.readOnly = true
@@ -895,8 +895,9 @@
         gridInfo.form = $('<div class="flex-column"/>').css({ 'height': '250px', 'display': 'flex' })
         let imgContainer = $('<div/>').css({ 'min-height': '250px', 'min-width': "250px" }).appendTo(itemElement);
         let img = $('<img class="w-100 h-100"/>').attr('src', imgURL || '/images/default-avatar-image.jpg').css({ 'object-fit': 'contain', 'object-position': 'center' }).appendTo(imgContainer)
-        let fileinput = $('<input class="form-control mt-2" type="file" id="avatar" name="avatar" accept="image/*">').appendTo(gridInfo.form)
-        fileinput.on('change', () => {
+        if (!gridInfo.currentData?.endDate || new Date(gridInfo?.currentData?.endDate) > new Date())
+            var fileinput = $('<input class="form-control mt-2" type="file" id="avatar" name="avatar" accept="image/*">').appendTo(gridInfo.form)
+        fileinput?.on('change', () => {
             if (fileinput.prop('files')[0].size > 1.5e7) return abp.message.error(l('ValidateError:UploadFileSize'), 500)
             img.attr('src', URL.createObjectURL(fileinput.prop('files')[0]))
             gridInfo.fileinput = (e) => {

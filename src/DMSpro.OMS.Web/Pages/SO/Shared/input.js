@@ -28,7 +28,7 @@ const itemStore = new DevExpress.data.CustomStore({
         });
         itemServices.getListDevextremes(args)
             .done(result => {
-                deferred.resolve(result.data.sort((a, b) => Date.parse(b.requestDate) - Date.parse(a.requestDate)), {
+                deferred.resolve(result.data, {
                     totalCount: result.totalCount,
                     summary: result.summary,
                     groupCount: result.groupCount,
@@ -57,6 +57,7 @@ function renderMassInput() {
                     store: itemStore,
                     filter: ['active', '=', true],
                     map: e => {
+                        e.qty = 1;
                         e.isFree = false
                         return e
                     }
@@ -119,6 +120,9 @@ function renderMassInput() {
                             newData.qty = value
                             grid.selectRows([currentRowData.id], true)
                         },
+                        editorOptions: {
+                            format: "#"
+                        },
                         allowFiltering: false,
                         allowSorting: false,
                     },
@@ -148,7 +152,7 @@ function renderMassInput() {
                     let selectedItem = e.component.getSelectedRowsData().map(obj => {
                         return {
                             ...obj,
-                            qty: e.changes.find(v => v.key === obj.id)?.data.qty || 0,
+                            qty: e.changes.find(v => v.key === obj.id)?.data.qty || 1,
                             isFree: e.changes.find(v => v.key === obj.id)?.data.isFree || false
                         }
                     }).filter(e => e.qty > 0)
@@ -166,7 +170,9 @@ function renderMassInput() {
             grid.clearSelection()
             loadingPanel.hide()
         },
-
+        onFocusedRowChanging: (e) => {
+            // e.newRowIndex
+        },
 
         toolbarItems: [
             {

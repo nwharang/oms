@@ -147,7 +147,6 @@
                         'responseType': 'blob'
                     },
                     success: (result) => {
-                        console.log(result);
                         let blob = new Blob([result]);
                         let a = document.createElement('a');
                         a.href = window.URL.createObjectURL(blob);
@@ -1008,7 +1007,6 @@
                 gridInfo.imageContent.selectedItem = e.itemData
             },
             onItemClick(e) {
-                console.log(e);
                 if (!gridInfo?.imageContent?.popupView) gridInfo.imageContent.popupView = $('<div/>').dxPopup({
                     hideOnOutsideClick: true,
                     onContentReady(e) {

@@ -11,7 +11,7 @@ let helper = async ({ companyId, mainStore }, option) => {
      * [{
      *  title : "example",
      *  icon : "add",
-     *  callback : () => {} // return element
+     *  callback : (data) => {} // return element
      * }]
      */
     if (option) var { docId, navigateData } = option
@@ -640,8 +640,8 @@ let helper = async ({ companyId, mainStore }, option) => {
                     lookup: {
                         dataSource: (e) => {
                             if (e?.data?.itemId) {
-                                let uomGroupId = e.data.uomGroupId
-                                let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === uomGroupId)?.data
+                                let baseUOMId = e.data.baseUOMId
+                                let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.baseUOMId === baseUOMId)?.data
                                 if (!validUom) return mainStore.uOMList
                                 let dataSource = mainStore.uOMList.filter(e => validUom.find(v => e.id === v.altUOMId))
                                 return dataSource
@@ -669,7 +669,7 @@ let helper = async ({ companyId, mainStore }, option) => {
                             let priceList = await salesOrderService.getPriceOfItemsForSO(priceListId, currentRowData.itemId, { dataType: 'json' }).then(({ result }) => result)
                             let price = priceList[currentRowData.itemId][value];
                             if (!price) {
-                                let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === currentRowData.uomGroupId)?.data?.find(v => v.altUOMId === value)
+                                let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.baseUOMId === currentRowData.baseUOMId)?.data?.find(v => v.altUOMId === value)
                                 price = priceList[currentRowData.itemId][validUom.baseUOMId] * validUom?.baseQty || 0
                             }
                             let priceAfterTax = price + (price * currentRowData.taxRate) / 100;
@@ -706,7 +706,7 @@ let helper = async ({ companyId, mainStore }, option) => {
                             let priceList = await salesOrderService.getPriceOfItemsForSO(priceListId, currentRowData.itemId, { dataType: 'json' }).then(({ result }) => result)
                             let price = priceList[currentRowData.itemId][currentRowData.uomId];
                             if (!price) {
-                                let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === currentRowData.uomGroupId)?.data?.find(v => v.altUOMId === currentRowData.uomId)
+                                let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.baseUOMId === currentRowData.baseUOMId)?.data?.find(v => v.altUOMId === currentRowData.uomId)
                                 price = priceList[currentRowData.itemId][validUom.baseUOMId] * validUom?.baseQty || 0
                             }
                             let priceAfterTax = price + (price * currentRowData.taxRate) / 100;
@@ -821,6 +821,9 @@ let helper = async ({ companyId, mainStore }, option) => {
                             default:
                                 newData.discountAmt = null
                                 newData.discountPerc = null
+                                newData.lineAmt = currentRowData.qty * currentRowData.price
+                                newData.lineAmtAfterTax = currentRowData.priceAfterTax * currentRowData.qty
+                                newData.lineDiscountAmt = 0;
                                 break;
                         }
                     },
@@ -1019,7 +1022,7 @@ let helper = async ({ companyId, mainStore }, option) => {
                 ...tabs.map(e => ({
                     title: e.title,
                     icon: e.icon || '',
-                    template: () => $('<div class="p-2"/>').append(e.callback())
+                    template: () => $('<div class="p-2"/>').append(e.callback(docData))
                 }))
             ]
         })
@@ -1059,7 +1062,7 @@ async function appendSelectedItems(selectedItems) {
         else
             var price = priceList[u.id][u.salesUOMId]
         if (!price) {
-            let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.id === u.uomGroupId)?.data?.find(v => v.altUOMId === u.salesUOMId)
+            let validUom = mainStore.uomGroupWithDetailsDictionary.find(v => v.baseUOMId === u.baseUOMId)?.data?.find(v => v.altUOMId === u.salesUOMId)
             price = priceList[u.id][validUom.baseUOMId] * validUom?.baseQty || 0
         }
         let priceAfterTax = price + (price * mainStore.vatList.find(x => x.id == u.vatId).rate) / 100;
