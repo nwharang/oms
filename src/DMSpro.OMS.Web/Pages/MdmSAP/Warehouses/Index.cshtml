@@ -4,18 +4,18 @@
 @inject IPageLayout PageLayout
 @{
     PageLayout.Content.Title = "Warehouse";
-    PageLayout.Content.MenuItemName = "Inventories.Warehouses";
+    PageLayout.Content.MenuItemName = "";
 }
 
 @section scripts {
     <script src="/js/devextreme/exceljs.min.js"></script>
     <script src="/js/devextreme/filesaver.min.js"></script>
-    <abp-script src="/Pages/Inventories/Warehouses/index.js" />
+    <abp-script src="/Pages/MdmSAP/Warehouses/index.js" />
 }
 
 @section breadcrumb {
     <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="javascript:void(0);">Inventory</a></li>
+        <li class="breadcrumb-item"><a href="javascript:void(0);">MDMSAP</a></li>
         <li class="breadcrumb-item active">Warehouse</li>
     </ol>
 }

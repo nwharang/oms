@@ -11,7 +11,7 @@
 @inject IPageLayout PageLayout
 @{
     PageLayout.Content.Title = L["Page.Title.Items"].Value;
-    PageLayout.Content.MenuItemName = MdmServiceMenus.Items;
+    PageLayout.Content.MenuItemName = "";
 }
 
 @section styles {
@@ -57,22 +57,21 @@
     <script src="/js/devextreme/exceljs.min.js"></script>
     <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script-bundle>
-        <abp-script src="/Pages/Mdm/ItemMasters/js/tabs/inventory.js" />
-        <abp-script src="/Pages/Mdm/ItemMasters/js/tabs/purchasing.js" />
-        <abp-script src="/Pages/Mdm/ItemMasters/js/tabs/sales.js" />
-        <abp-script src="/Pages/Mdm/ItemMasters/js/tabs/attribute.js" />
-        <abp-script src="/Pages/Mdm/ItemMasters/js/store.js" />
-        <abp-script src="/Pages/Mdm/ItemMasters/js/tabs.js" />
-        <abp-script src="/Pages/Mdm/ItemMasters/js/form.js" />
-        <abp-script src="/Pages/Mdm/ItemMasters/js/popup.js" />
-        <abp-script src="/Pages/Mdm/ItemMasters/index.js" />
+        <abp-script src="/Pages/MdmSAP/ItemMasters/js/tabs/inventory.js" />
+        <abp-script src="/Pages/MdmSAP/ItemMasters/js/tabs/purchasing.js" />
+        <abp-script src="/Pages/MdmSAP/ItemMasters/js/tabs/sales.js" />
+        <abp-script src="/Pages/MdmSAP/ItemMasters/js/tabs/attribute.js" />
+        <abp-script src="/Pages/MdmSAP/ItemMasters/js/store.js" />
+        <abp-script src="/Pages/MdmSAP/ItemMasters/js/tabs.js" />
+        <abp-script src="/Pages/MdmSAP/ItemMasters/js/form.js" />
+        <abp-script src="/Pages/MdmSAP/ItemMasters/js/popup.js" />
+        <abp-script src="/Pages/MdmSAP/ItemMasters/index.js" />
     </abp-script-bundle>
 }
 
 @section breadcrumb {
     <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
-        <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:Item"].Value</li>
+        <li class="breadcrumb-item"><a href="javascript:void(0);">MDMSAP</a></li>
         <li class="breadcrumb-item active">@L["Menu:MdmService:Items"].Value</li>
     </ol>
 }

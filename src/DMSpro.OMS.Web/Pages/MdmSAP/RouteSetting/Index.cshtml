@@ -12,25 +12,25 @@
 
 @inject IPageLayout PageLayout
 @{
-    PageLayout.Content.Title = "MCP";
-    PageLayout.Content.MenuItemName = MdmServiceMenus.MCPHeaders;
+    PageLayout.Content.Title = L["Page.Title.RouteSetting"].Value;
+    PageLayout.Content.MenuItemName = "";
 }
 
 @section scripts {
     <script src="/js/devextreme/exceljs.min.js"></script>
     <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script-bundle>
-        <abp-script src="/Pages/Mdm/MCPHeaders/js/popup.js" />
-        <abp-script src="/Pages/Mdm/MCPHeaders/js/form.js" />
-        <abp-script src="/Pages/Mdm/MCPHeaders/js/grid.js" />
-        <abp-script src="/Pages/Mdm/MCPHeaders/js/store.js" />
-        <abp-script src="/Pages/Mdm/MCPHeaders/index.js" />
+        <abp-script src="/Pages/MdmSAP/RouteSetting/js/popup.js" />
+        <abp-script src="/Pages/MdmSAP/RouteSetting/js/form.js" />
+        <abp-script src="/Pages/MdmSAP/RouteSetting/js/grid.js" />
+        <abp-script src="/Pages/MdmSAP/RouteSetting/js/store.js" />
+        <abp-script src="/Pages/MdmSAP/RouteSetting/index.js" />
     </abp-script-bundle>
 }
 
 @section breadcrumb {
     <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="javascript:void(0);">Mdm</a></li>
+        <li class="breadcrumb-item"><a href="javascript:void(0);">MDMSAP</a></li>
         <li class="breadcrumb-item active">MCP Header</li>
     </ol>
 }
