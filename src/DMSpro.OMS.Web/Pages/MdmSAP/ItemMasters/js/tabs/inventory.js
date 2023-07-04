@@ -97,18 +97,6 @@ let createInventory = () => {
                     Ordered: '0',
                     Available: '0',
                 }],
-                editing: {
-                    mode: 'row',
-                    allowAdding: !readOnly && abp.auth.isGranted('MdmService.Items.Create'),
-                    allowUpdating: !readOnly && abp.auth.isGranted('MdmService.Items.Edit'),
-                    allowDeleting: !readOnly && abp.auth.isGranted('MdmService.Items.Delete'),
-                    useIcons: true,
-                    texts: {
-                        editRow: l("Edit"),
-                        deleteRow: l("Delete"),
-                        confirmDeleteMessage: l("DeleteConfirmationMessage")
-                    },
-                },
                 allowColumnResizing: true,
                 columnResizingMode: 'widget',
                 columnAutoWidth: true,
@@ -170,22 +158,6 @@ let createInventory = () => {
                         'addRowButton',
                         'columnChooserButton',
                         "exportButton",
-                        !readOnly && {
-                            location: 'after',
-                            widget: 'dxButton',
-                            options: {
-                                icon: "import",
-                                elementAttr: {
-                                    class: "import-excel",
-                                },
-                                onClick(e) {
-                                    let gridControl = e.element.closest('div.dx-datagrid').parent();
-                                    let gridName = gridControl.attr('id');
-                                    let popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                                    if (popup) popup.show();
-                                },
-                            }
-                        },
                         "searchPanel"
                     ]
                 },

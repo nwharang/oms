@@ -68,15 +68,6 @@ let store = {
                 });
             return d.promise();
         },
-        insert(values) {
-            return rpcService.salesOrgHierarchyService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return rpcService.salesOrgHierarchyService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return rpcService.salesOrgHierarchyService.delete(key);
-        }
     }),
     mCPHeaderStore: new DevExpress.data.CustomStore({
         key: 'id',
@@ -109,9 +100,6 @@ let store = {
                 });
             return d.promise();
         },
-        remove(key) {
-            return mCPHeaderService.delete(key);
-        }
     }),
     mCPDetailsStore: new DevExpress.data.CustomStore({
         key: 'id',
@@ -144,9 +132,6 @@ let store = {
                 });
             return d.promise();
         },
-        remove(key) {
-            return mCPDetailsService.delete(key);
-        }
     }),
     customerStore: new DevExpress.data.CustomStore({
         key: 'customerId',

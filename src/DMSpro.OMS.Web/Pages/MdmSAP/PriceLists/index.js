@@ -1,7 +1,7 @@
 ﻿$(function () {
     let l = abp.localization.getResource("OMS");
     let readOnly = true
-    
+
     let priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
     let priceListDetailsService = window.dMSpro.oMS.mdmService.controllers.priceListDetails.priceListDetail;
 
@@ -35,18 +35,8 @@
                 })
             return d.promise();
         },
-        insert(values) {
-            return priceListService.create({ ...values, active: true }, { contentType: 'application/json' });
-        },
-        update(key, values) {
-            return priceListService.update(key, values, { contentType: 'application/json' });
-        },
-        remove(key) {
-            return priceListService.delete(key);
-        }
     });
 
-    // get detail store
     let detailStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
@@ -76,18 +66,8 @@
                 })
             return d.promise();
         },
-        insert(values) {
-            return priceListDetailsService.create(values, { contentType: 'application/json' });
-        },
-        update(key, values) {
-            return priceListDetailsService.update(key, values, { contentType: 'application/json' });
-        },
-        remove(key) {
-            return priceListDetailsService.delete(key);
-        }
     });
 
-    // get price list
     let getPriceList = new DevExpress.data.CustomStore({
         key: "id",
         useDefaultSearch: true,
@@ -205,48 +185,6 @@
             showInfo: true,
             showNavigationButtons: true
         },
-        editing: {
-            mode: "row",
-            allowAdding: !readOnly && abp.auth.isGranted('MdmService.PriceLists.Create'),
-            allowUpdating: !readOnly && abp.auth.isGranted('MdmService.PriceLists.Edit'),
-            allowDeleting: !readOnly && abp.auth.isGranted('MdmService.PriceLists.Delete'),
-            useIcons: true,
-            texts: {
-                editRow: l("Edit"),
-                deleteRow: l("Delete"),
-                confirmDeleteMessage: l("DeleteConfirmationMessage")
-            }
-        },
-        onRowUpdating: function (e) {
-            e.newData = Object.assign({}, e.oldData, e.newData);
-        },
-        onEditorPreparing: (e) => {
-            if (e.row?.rowType == "data" && e.row?.isNewRow) {
-                let itemsLength = e.component.getDataSource().items().length;
-                if (['isBase', 'isDefaultForCustomer', 'isDefaultForVendor'].indexOf(e.dataField) > -1 && itemsLength === 0) {
-                    e.editorOptions.onContentReady = (v) => {
-                        v.component.option('value', true)
-                    }
-                    e.editorOptions.readOnly = true
-                }
-            }
-            // Disable Edit some field if Base PriceList
-            if (e.row?.data.isBase) {
-                if (['name', 'isDefaultForCustomer', 'isDefaultForVendor'].indexOf(e.dataField) == -1) {
-                    e.editorOptions.readOnly = true
-                    e.editorOptions.placeholder = null
-                }
-            }
-        },
-        onInitNewRow: (e) => {
-            // on new row ,set 3 checkbox default value to false
-            e.data = {
-                ...e.data,
-                isBase: false,
-                isDefaultForCustomer: false,
-                isDefaultForVendor: false,
-            }
-        },
         toolbar: {
             items: [
                 "addRowButton",
@@ -259,20 +197,7 @@
             [
                 {
                     type: 'buttons',
-                    buttons: [
-                        'edit',
-                        {
-                            text: l('Button:MDMService:PriceListAssignment:Release'),
-                            icon: 'tags',
-                            onClick: (e) => {
-                                priceListService.release(e.row.data.id, { contentType: "application/json" }).then(() => {
-                                    dataGrid.refresh()
-                                })
-                            },
-                            visible: !readOnly,
-                            disabled: (e) => e.row.isNewRow || e.row.data.isReleased
-                        }
-                    ],
+                    buttons: [],
                     caption: l('Actions'),
                     name: "Actions",
                     fixedPosition: 'left'
@@ -504,14 +429,6 @@
                                 validationRules: [{ type: "required" }]
                             },
                         ],
-                        onRowUpdating: (e) => {
-                            let { uomId, itemId, concurrencyStamp, basedOnPrice } = e.oldData
-                            let newData = {
-                                uomId, itemId, concurrencyStamp, basedOnPrice,
-                                ...e.newData,
-                            }
-                            e.newData = newData;
-                        }
                     }).appendTo(container);
             }
         }

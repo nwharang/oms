@@ -5,18 +5,6 @@ let renderGrid = async () => {
             filter: ['mcpHeaderId', '=', gridInfo.data.id],
             map: (e) => ({ ...e, customerType: "C" })
         },
-        editing: {
-            mode: 'row',
-            allowAdding: !readOnly && abp.auth.isGranted('MdmService.MCPs.Create'),
-            allowUpdating: !readOnly && abp.auth.isGranted('MdmService.MCPs.Edit'),
-            allowDeleting: !readOnly && abp.auth.isGranted('MdmService.MCPs.Delete'),
-            useIcons: true,
-            texts: {
-                editRow: l("Edit"),
-                deleteRow: l("Delete"),
-                confirmDeleteMessage: l("DeleteConfirmationMessage")
-            },
-        },
         allowColumnResizing: true,
         columnResizingMode: 'widget',
         columnAutoWidth: true,
@@ -38,7 +26,6 @@ let renderGrid = async () => {
         headerFilter: {
             visible: true,
         },
-
         paging: {
             enabled: true,
             pageSize

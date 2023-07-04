@@ -65,8 +65,6 @@ let createPurchasing = () => {
                                 },
                                 dataField: 'PurchasingTaxGroup',
                                 editorType: 'dxSelectBox',
-                                editorOptions: {
-                                }
                             },
                         ]
                     },

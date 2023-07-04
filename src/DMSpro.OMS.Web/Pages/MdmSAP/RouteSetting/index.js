@@ -1,20 +1,9 @@
 ﻿$(function () {
     let l = abp.localization.getResource("OMS");
-    let readOnly = true
 
 
     gridInfo.instance.mainGrid = $('#dgMCPHeaders').dxDataGrid({
         dataSource: store.mCPHeaderStore,
-        editing: {
-            mode: "row",
-            allowDeleting: !readOnly && abp.auth.isGranted('MdmService.MCPs.Delete'),
-            useIcons: true,
-            texts: {
-                editRow: l("Edit"),
-                deleteRow: l("Delete"),
-                confirmDeleteMessage: l("DeleteConfirmationMessage")
-            }
-        },
         remoteOperations: true,
         export: {
             enabled: true,
@@ -91,22 +80,6 @@
                 },
                 "columnChooserButton",
                 "exportButton",
-                !readOnly && {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
                 "searchPanel",
             ],
         },
@@ -124,7 +97,6 @@
                             renderPopup()
                         }
                     },
-                    'delete'
                 ],
                 fixedPosition: "left",
             },

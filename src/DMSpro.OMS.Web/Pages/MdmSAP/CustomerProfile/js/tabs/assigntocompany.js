@@ -3,7 +3,6 @@ let createAssignToCompany = () => {
         title: "Assign To Company", // Localize
         icon: null,
         callback: () => {
-            console.log(gridInfo.data);
             let container = $('<div/>')
             let datagrid = $('<div/>').dxDataGrid({
                 dataSource: [
@@ -15,18 +14,6 @@ let createAssignToCompany = () => {
                         branchCode: gridInfo.data.linkedCompanyId,
                     }
                 ],
-                editing: {
-                    mode: 'row',
-                    allowAdding: !readOnly && abp.auth.isGranted('MdmService.Customers.Create'),
-                    allowUpdating: !readOnly && abp.auth.isGranted('MdmService.Customers.Edit'),
-                    allowDeleting: !readOnly && abp.auth.isGranted('MdmService.Customers.Delete'),
-                    useIcons: true,
-                    texts: {
-                        editRow: l("Edit"),
-                        deleteRow: l("Delete"),
-                        confirmDeleteMessage: l("DeleteConfirmationMessage")
-                    },
-                },
                 allowColumnResizing: true,
                 columnResizingMode: 'widget',
                 columnAutoWidth: true,
@@ -88,22 +75,6 @@ let createAssignToCompany = () => {
                         'addRowButton',
                         'columnChooserButton',
                         "exportButton",
-                        !readOnly && {
-                            location: 'after',
-                            widget: 'dxButton',
-                            options: {
-                                icon: "import",
-                                elementAttr: {
-                                    class: "import-excel",
-                                },
-                                onClick(e) {
-                                    let gridControl = e.element.closest('div.dx-datagrid').parent();
-                                    let gridName = gridControl.attr('id');
-                                    let popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                                    if (popup) popup.show();
-                                },
-                            }
-                        },
                         "searchPanel"
                     ]
                 },

@@ -1,10 +1,6 @@
 ﻿$(function () {
     var l = abp.localization.getResource("OMS");
     let readOnly = true
-    let rpcService = {
-
-    }
-
     let enumValue = {
         whseType: [
             { id: "N", text: "Normal" },
@@ -109,9 +105,6 @@
         },
         editing: {
             mode: 'popup',
-            allowAdding: !readOnly && abp.auth.isGranted("InventoryService.Warehouses.Create"),
-            allowUpdating: !readOnly && abp.auth.isGranted("InventoryService.Warehouses.Edit"),
-            allowDeleting: !readOnly && abp.auth.isGranted("InventoryService.Warehouses.Delete"),
             useIcons: true,
             texts: {
                 editRow: l("Edit"),
@@ -121,10 +114,23 @@
             popup: {
                 title: "Warehouses Details", // Localize
                 height: 'fit-content',
-                // width: "95%",
                 animation: null,
                 hideOnOutsideClick: false,
                 dragEnabled: false,
+                toolbarItems: [
+                    {
+                        widget: "dxButton",
+                        location: "after",
+                        toolbar: "bottom",
+                        options: {
+                            text: "Exit",
+                            icon: "return",
+                            onClick: function (e) {
+                                dataGridContainer.cancelEditData()
+                            }
+                        },
+                    },
+                ],
             },
             form: {
                 labelMode: "outside",
@@ -160,22 +166,6 @@
                 "addRowButton",
                 "columnChooserButton",
                 "exportButton",
-                !readOnly && {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
                 "searchPanel",
             ],
         },

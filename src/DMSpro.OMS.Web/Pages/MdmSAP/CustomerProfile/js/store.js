@@ -130,15 +130,6 @@ let store = {
         byKey: function (key) {
             return key == 0 ? rpcService.customerService.get(key) : null;
         },
-        insert(values) {
-            return rpcService.customerService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return rpcService.customerService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return rpcService.customerService.delete(key);
-        }
     }),
 
     getCusAttrValue: new DevExpress.data.CustomStore({

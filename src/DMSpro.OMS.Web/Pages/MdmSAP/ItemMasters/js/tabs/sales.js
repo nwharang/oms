@@ -65,8 +65,6 @@ let createSales = () => {
                                 },
                                 dataField: 'SalesTaxGroup',
                                 editorType: 'dxSelectBox',
-                                editorOptions: {
-                                }
                             },
                         ]
                     },

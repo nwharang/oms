@@ -10,16 +10,6 @@
 
     gridInfo.instance.mainGrid = $('#dataGridItemMasters').dxDataGrid({
         dataSource: store.itemStore,
-        editing: {
-            mode: 'row',
-            allowDeleting: !readOnly && abp.auth.isGranted('MdmService.Items.Delete'),
-            useIcons: true,
-            texts: {
-                editRow: l("Edit"),
-                deleteRow: l("Delete"),
-                confirmDeleteMessage: l("DeleteConfirmationMessage")
-            },
-        },
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
@@ -93,22 +83,6 @@
                 'addRowButton',
                 'columnChooserButton',
                 "exportButton",
-                !readOnly && {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            let gridControl = e.element.closest('div.dx-datagrid').parent();
-                            let gridName = gridControl.attr('id');
-                            let popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    }
-                },
                 "searchPanel"
             ]
         },

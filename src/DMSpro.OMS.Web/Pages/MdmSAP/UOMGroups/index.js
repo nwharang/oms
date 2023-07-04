@@ -3,9 +3,6 @@ var uomGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDet
 var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 $(function () {
     var l = abp.localization.getResource("OMS");
-    let detailDataSrc // Local varible for condition check
-    let editingComponent; // Local varible for close unfinish editor
-    let isEditing = false // Editing but not adding
     var uomGroupHeaderStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
@@ -36,15 +33,6 @@ $(function () {
                 })
             return d.promise();
         },
-        insert(values) {
-            return uomGroupService.create(values, { contentType: 'application/json' });
-        },
-        update(key, values) {
-            return uomGroupService.update(key, values, { contentType: 'application/json' });
-        },
-        remove(key) {
-            return uomGroupService.delete(key);
-        }
     });
 
     var uomGroupDetailsStore = new DevExpress.data.CustomStore({
@@ -76,15 +64,6 @@ $(function () {
                 })
             return d.promise();
         },
-        insert(values) {
-            return uomGroupDetailService.create(values, { contentType: 'application/json' });
-        },
-        update(key, values) {
-            return uomGroupDetailService.update(key, values, { contentType: 'application/json' });
-        },
-        remove(key) {
-            return uomGroupDetailService.delete(key);
-        }
     });
 
     // get UOMs
@@ -114,7 +93,6 @@ $(function () {
 
     const dataGrid = $('#gridUOMGroups').dxDataGrid({
         dataSource: uomGroupHeaderStore,
-        //keyExpr: 'id',
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
@@ -177,26 +155,8 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
-        editing: {
-            mode: "row",
-            allowAdding: false,
-            allowUpdating: false,
-            allowDeleting: false,
-            useIcons: true,
-            texts: {
-                editRow: l("Edit"),
-                deleteRow: l("Delete"),
-                confirmDeleteMessage: l("DeleteConfirmationMessage")
-            }
-        },
-        onRowUpdating: function (e) {
-            let { name, concurrencyStamp } = { ...e.oldData, ...e.newData }
-            e.newData = { name, concurrencyStamp }
-        },
-
         toolbar: {
             items: [
-                'addRowButton',
                 "exportButton",
                 "searchPanel"
             ],
@@ -204,7 +164,7 @@ $(function () {
         columns: [
             {
                 type: 'buttons',
-                buttons: ['edit', 'delete'],
+                buttons: [],
                 caption: l("Actions"),
                 width: 110,
                 fixedPosition: 'left'
@@ -241,7 +201,6 @@ $(function () {
         masterDetail: {
             enabled: true,
             template(container, options) {
-                const currentHeaderData = options.data;
                 const dataGridDetail = $('<div>')
                     .dxDataGrid({
                         dataSource: {
@@ -281,126 +240,6 @@ $(function () {
                         columnFixing: {
                             enabled: true,
                         },
-                        editing: {
-                            mode: "row",
-                            allowAdding: false,
-                            allowUpdating: false,
-                            allowDeleting: false,
-                            useIcons: true,
-                            texts: {
-                                editRow: l("Edit"),
-                                deleteRow: l("Delete"),
-                                confirmDeleteMessage: l("DeleteConfirmationMessage")
-                            }
-                        },
-                        onInitNewRow: async function (e) {
-                            // Get cache of DataSource , do not change
-                            detailDataSrc = this.getDataSource()._items
-                            // If there prev open add new row to header , cancel unfinished edit , use to check if editing ?
-                            if (editingComponent)
-                                editingComponent.cancelEditData()
-                            // Assign this edit to local varible for future close 
-                            editingComponent = e.component
-
-                            // Check if record exist
-                            let isRecord = detailDataSrc.length >= 1
-
-                            // No record
-                            if (!isRecord)
-                                e.data = {
-                                    ...e.data,
-                                    altQty: 1,
-                                    baseQty: 1,
-                                    isBase: true
-                                }
-
-                            // Record already exists
-                            if (isRecord) {
-                                e.data = {
-                                    ...e.data,
-                                    baseQty: 2,
-                                    baseUOMId: detailDataSrc[0].baseUOMId,
-                                    altQty: 1,
-                                }
-                            }
-                            e.data.active = true
-                        },
-                        onRowInserting: function (e) {
-                            e.data.uomGroupId = options.key
-                        },
-                        onEditCanceled: (e) => {
-                            editingComponent = undefined
-                            isEditing = false
-                        },
-
-                        onRowUpdating: (e) => {
-                            e.newData = Object.assign({}, e.oldData, e.newData);
-                            editingComponent = undefined
-                            isEditing = false
-                        },
-                        onEditingStart: (e) => {
-                            if (editingComponent)
-                                editingComponent.cancelEditData()
-                            // Assign this edit to local varible for future close 
-                            editingComponent = e.component
-                            isEditing = true
-                        },
-                        onEditorPreparing: (e) => {
-                            let isFirstRow = detailDataSrc?.length < 1
-                            let isBase = e.row?.data.baseUOMId === e.row?.data.altUOMId;
-                            // Disable cell base on folowing arrays
-                            let firstUomDetailDisableField = ["altQty", "baseQty", "baseUOMId", "active"]
-                            let addNewUomDetailDisableField = ["altQty", "baseUOMId"]
-                            let editBaseRowUOMDetailDisableField = ["altQty", "baseQty", "baseUOMId", "active"]
-                            let editRowUOMDetailDisableField = ["altQty", "baseUOMId"]
-
-                            // disable action cell on baseUOM row
-                            // if not adding then return
-                            if (!editingComponent || e.row?.rowType != "data") return
-                            // On edit cell but not adding
-                            if (isEditing) {
-                                isBase ? disableCell(e, editBaseRowUOMDetailDisableField.indexOf(e.dataField) > -1) : disableCell(e, editRowUOMDetailDisableField.indexOf(e.dataField) > -1)
-                                if (e.dataField === "altUOMId" && isBase) {
-                                    e.editorOptions.onValueChanged = (v) => {
-                                        // e.component.cellValue(e.component.getRowIndexByKey(e.row.key), 'altUOMId', v.value)
-                                        e.setValue(v.value)
-                                        e.component.cellValue(e.component.getRowIndexByKey(e.row.key), 'baseUOMId', v.value)
-                                    }
-                                }
-                            }
-
-                            // On first add new row
-                            if (isFirstRow && !isEditing) {
-                                disableCell(e, firstUomDetailDisableField.indexOf(e.dataField) > -1)
-                                if (e.dataField === "altUOMId") {
-                                    e.editorOptions.onValueChanged = (v) => {
-                                        e.component.cellValue(e.component.getRowIndexByKey(e.row.key), 'altUOMId', v.value)
-                                        e.component.cellValue(e.component.getRowIndexByKey(e.row.key), 'baseUOMId', v.value)
-                                    }
-                                }
-                            }
-
-                            // On add new row but not first time
-                            if (!isFirstRow && !isEditing) {
-                                disableCell(e, addNewUomDetailDisableField.indexOf(e.dataField) > -1)
-                            }
-
-
-                        },
-                        onEditorPrepared: (e) => {
-                            // if (isBase && e.row?.rowType != "data")
-
-                            if (!editingComponent || e.row?.rowType != "data") return
-                            let isFirstRow = detailDataSrc?.length < 1
-
-                            if (!isFirstRow && e.dataField === "altUOMId") {
-                                selectBox = e.editorElement.dxSelectBox('instance')
-                                // Fillter BASEUOMID option in cell selection , if it exists
-                                selectBox.getDataSource().loadOptions().filter = ['id', "<>", e.row?.data?.baseUOMId || 0]
-                            }
-                            if (isFirstRow && e.dataField === "active")
-                                e.component.getCellElement(e.component.getRowIndexByKey(e.row.key), 'active').html('').css('height', '42px')
-                        },
                         toolbar: {
                             items: [
                                 "addRowButton",
@@ -412,7 +251,7 @@ $(function () {
                             {
                                 type: 'buttons',
                                 caption: l('Actions'),
-                                buttons: ['edit', 'delete'],
+                                buttons: [],
                                 width: 110,
                                 fixedPosition: 'left'
                             },
@@ -507,26 +346,7 @@ $(function () {
                     }).appendTo(container);
             }
         },
-        onEditorPreparing: (e) => {
-            if (e.row?.rowType != 'data') return
-            if (e.row.data.id && e.dataField == 'code') {
-                e.editorOptions.readOnly = true
-            }
-        },
     }).dxDataGrid('instance');
 
     initImportPopup('api/mdm-service/u-oMGroups', 'UOMGroups_Template', 'gridUOMGroups');
-
-    /**
-     * Disable editing cell base on condition
-     * @param {Element} e 
-     * @param {Boolean} arg 
-     */
-    let disableCell = (e, arg) => {
-        if (arg) {
-            let element = e.editorElement
-            e.editorOptions.disabled = true
-            element.parent().css('backgroundColor', "#e2e8f0")
-        }
-    }
 });

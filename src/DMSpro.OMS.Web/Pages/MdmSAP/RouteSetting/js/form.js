@@ -7,7 +7,6 @@ let renderForm = async () => {
             routeMaster: gridInfo.data.salesOrgHierarchy.name
         },
         readOnly,
-        onFieldDataChanged: (e) => console.log(e),
         items: [
             {
                 label: {

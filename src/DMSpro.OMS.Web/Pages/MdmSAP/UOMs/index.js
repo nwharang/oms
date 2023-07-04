@@ -34,15 +34,6 @@ $(function () {
                 })
             return d.promise();
         },
-        insert(values) {
-            return uOMsService.create(values, { contentType: 'application/json' });
-        },
-        update(key, values) {
-            return uOMsService.update(key, values, { contentType: 'application/json' });
-        },
-        remove(key) {
-            return uOMsService.delete(key);
-        }
     });
 
     var gridUOMs = $('#gridUOMs').dxDataGrid({
@@ -109,31 +100,9 @@ $(function () {
             showInfo: true,
             showNavigationButtons: true
         },
-        editing: {
-            mode: "row",
-            allowAdding: false,
-            allowUpdating: false,
-            allowDeleting: false,
-            useIcons: true,
-            texts: {
-                editRow: l("Edit"),
-                deleteRow: l("Delete"),
-                confirmDeleteMessage: l("DeleteConfirmationMessage")
-            }
-        },
-        onRowUpdating: function (e) {
-            let { name, concurrencyStamp } = { ...e.oldData, ...e.newData }
-            e.newData = { name, concurrencyStamp }
-        },
-        onEditorPreparing: function (e) {
-            if (e.dataField == 'code' && e.value != null) {
-                e.editorOptions.disabled = true;
-            }
-        },
         toolbar: {
             items: [
                 "groupPanel",
-                "addRowButton",
                 "exportButton",
                 "searchPanel",
             ],
@@ -142,7 +111,7 @@ $(function () {
             {
                 type: 'buttons',
                 caption: l('Actions'),
-                buttons: ['edit', 'delete'],
+                buttons: [],
                 width: 110,
                 fixedPosition: 'left'
             },

@@ -13,30 +13,10 @@ let renderForm = async () => {
                 itemType: 'group',
                 colSpan: 2,
                 items: [
-                    {
-                        dataField: 'code',
-                        editorOptions: {
-                            readOnly,
-                        }
-                    },
-                    {
-                        dataField: 'name',
-                        editorOptions: {
-                            readOnly,
-                        }
-                    },
-                    {
-                        dataField: 'shortName',
-                        editorOptions: {
-                            readOnly,
-                        }
-                    },
-                    {
-                        dataField: 'erpCode',
-                        editorOptions: {
-                            readOnly,
-                        }
-                    },
+                    'code',
+                    'name',
+                    'shortName',
+                    'erpCode',
                     {
                         dataField: 'active',
                         label: {
@@ -105,7 +85,6 @@ let renderForm = async () => {
                             dataSource: enumValue.manageItem,
                             valueExpr: 'id',
                             displayExpr: 'text',
-                            readOnly,
                         }
                     },
                     {
@@ -115,7 +94,6 @@ let renderForm = async () => {
                             dataSource: store.getUOMsGroup,
                             valueExpr: "id",
                             displayExpr: "name",
-                            readOnly,
                         }
                     },
                     {
@@ -125,7 +103,6 @@ let renderForm = async () => {
                             dataSource: enumValue.itemTypes,
                             valueExpr: 'id',
                             displayExpr: 'text',
-                            readOnly,
                         }
                     },
                 ]

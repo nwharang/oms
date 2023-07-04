@@ -24,18 +24,6 @@ let createShipTo = () => {
                         longitude: `${parseFloat(Math.random() + 106).toFixed(4)}° E`,
                     }
                 ],
-                editing: {
-                    mode: 'row',
-                    allowAdding: !readOnly && abp.auth.isGranted('MdmService.Customers.Create'),
-                    allowUpdating: !readOnly && abp.auth.isGranted('MdmService.Customers.Edit'),
-                    allowDeleting: !readOnly && abp.auth.isGranted('MdmService.Customers.Delete'),
-                    useIcons: true,
-                    texts: {
-                        editRow: l("Edit"),
-                        deleteRow: l("Delete"),
-                        confirmDeleteMessage: l("DeleteConfirmationMessage")
-                    },
-                },
                 allowColumnResizing: true,
                 columnResizingMode: 'widget',
                 columnAutoWidth: true,
@@ -97,22 +85,6 @@ let createShipTo = () => {
                         'addRowButton',
                         'columnChooserButton',
                         "exportButton",
-                        !readOnly && {
-                            location: 'after',
-                            widget: 'dxButton',
-                            options: {
-                                icon: "import",
-                                elementAttr: {
-                                    class: "import-excel",
-                                },
-                                onClick(e) {
-                                    let gridControl = e.element.closest('div.dx-datagrid').parent();
-                                    let gridName = gridControl.attr('id');
-                                    let popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                                    if (popup) popup.show();
-                                },
-                            }
-                        },
                         "searchPanel"
                     ]
                 },
