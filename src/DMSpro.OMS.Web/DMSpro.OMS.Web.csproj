@@ -432,6 +432,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+		<Reference Include="DMSpro.OMS.Shared.Lib">
+			<HintPath>..\..\..\commondll\Development\Shared\DMSpro.OMS.Shared.Lib\DMSpro.OMS.Shared.Lib.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+  <ItemGroup>
     <Content Update="Pages\Mdm\MCPHeaders\Details.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
