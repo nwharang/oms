@@ -71,6 +71,7 @@ using Volo.Abp.Localization;
 using Volo.Abp.Validation;
 using Volo.Abp.Validation.Localization;
 using Microsoft.AspNetCore.Identity;
+using DMSpro.OMS.MdmSapService;
 
 namespace DMSpro.OMS.Web;
 
@@ -103,6 +104,7 @@ namespace DMSpro.OMS.Web;
     typeof(OMSSharedLocalizationModule),
     //typeof(MdmServiceWebModule),
     typeof(MdmServiceHttpApiClientModule),
+    typeof(MdmSapServiceHttpApiClientModule),
     typeof(InventoryServiceWebModule),
 
     typeof(InventoryServiceHttpApiClientModule),
@@ -216,6 +218,7 @@ public class OMSWebModule : AbpModule
                 options.Scope.Add("SurveyService");
                 options.Scope.Add("OrderService");
                 options.Scope.Add("FileManagementService");
+                options.Scope.Add("MdmSapService");
                 options.AccessDeniedPath = "/Account/AccessDenied2";
                 //options.UseTokenLifetime = true;
                 //options.AutomaticRefreshInterval = 1000;
