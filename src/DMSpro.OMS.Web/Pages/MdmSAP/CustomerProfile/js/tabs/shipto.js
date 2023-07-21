@@ -105,42 +105,42 @@ let createShipTo = () => {
                         dataType: 'string',
                     },
                     {
-                        dataField: "Region",
+                        dataField: "regionCode",
                         caption: "Region", // Localize
                         dataType: "string",
                     },
                     {
-                        dataField: "RegionName",
+                        dataField: "regionName",
                         caption: "RegionName", // Localize
                         dataType: "string",
                     },
                     {
-                        dataField: "Provine",
+                        dataField: "provinceCode",
                         caption: "Provine", // Localize
                         dataType: "string",
                     },
                     {
-                        dataField: "ProvineName",
+                        dataField: "provineName",
                         caption: "ProvineName", // Localize
                         dataType: "string",
                     },
                     {
-                        dataField: "District",
+                        dataField: "districtCode",
                         caption: "District", // Localize
                         dataType: "string",
                     },
                     {
-                        dataField: "DistrictName",
+                        dataField: "districtName",
                         caption: "DistrictName", // Localize
                         dataType: "string",
                     },
                     {
-                        dataField: "Ward",
+                        dataField: "wardCode",
                         caption: "Ward", // Localize
                         dataType: "string",
                     },
                     {
-                        dataField: "WardName",
+                        dataField: "wardName",
                         caption: "WardName", // Localize
                         dataType: "string",
                     },

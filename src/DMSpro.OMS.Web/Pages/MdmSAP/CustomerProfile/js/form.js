@@ -29,7 +29,7 @@ let renderForm = async () => {
                         dataField: 'phone2',
                     },
                     {
-                        dataField: 'taxCode'
+                        dataField: 'fedTaxID'
                     },
                     {
                         dataField: 'contactPerson'
@@ -41,16 +41,16 @@ let renderForm = async () => {
                 itemType: 'group',
                 items: [
                     {
-                        dataField: 'paymentTermId',
+                        dataField: 'paymentGroup',
                     },
                     {
                         dataField: 'parentCode',
                     },
                     {
-                        dataField: 'erpCode',
+                        dataField: 'eRPCusCode',
                     },
                     {
-                        dataField: 'priceListId',
+                        dataField: 'priceListCode',
                         editorType: "dxSelectBox",
                         editorOptions: {
                             dataSource: {
@@ -62,16 +62,13 @@ let renderForm = async () => {
                         }
                     },
                     {
-                        dataField: 'groupTax'
+                        dataField: 'taxGroupCode'
                     },
                     {
                         dataField: 'creditLimit'
                     },
                     {
                         dataField: 'active',
-                        label: {
-                            text: "Active"
-                        },
                         template: () => {
                             let container = $('<div/>').css({ display: 'flex', justifyContent: 'space-between' })
                             $('<div/>').css({ maxWidth: '119px', width: '100%' }).dxCheckBox({

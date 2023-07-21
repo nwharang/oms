@@ -1,10 +1,10 @@
 ﻿$(async function () {
 
-    let cusAttrStore = await rpcService.cusAttrService.getListDevextremes({ filter: JSON.stringify(['active', "=", true]) }).then(({ data }) => {
-        gridInfo.itemAttr = {
-            flat: data.filter(e => e.hierarchyLevel == null).sort((a, b) => a.attrNo - b.attrNo),
-        }
-    })
+    // let cusAttrStore = await rpcService.cusAttrService.getListDevextremes({ filter: JSON.stringify(['active', "=", true]) }).then(({ data }) => {
+    //     gridInfo.itemAttr = {
+    //         flat: data.filter(e => e.hierarchyLevel == null).sort((a, b) => a.attrNo - b.attrNo),
+    //     }
+    // })
 
     gridInfo.instance.mainGrid = $('#dgCustomers').dxDataGrid({
         dataSource: store.customStore,
@@ -121,25 +121,25 @@
             },
             {
                 dataField: 'code',
-                caption: l("Code"),
+                caption: l("MdmSAPService.Entity.Code"),
                 dataType: 'string',
                 showInColumnChooser: false,
             },
             {
                 dataField: 'name',
-                caption: l("Name"),
+                caption: l("MdmSAPService.Entity.Name"),
                 dataType: 'string',
                 validationRules: [{ type: "required" }],
                 showInColumnChooser: false,
             },
             {
                 dataField: 'foreignName',
-                caption: 'Foreign Name', // Localize
+                caption: l('MdmSAPService.Entity.ForeignName'), // Localize
                 dataType: 'string',
             },
             {
                 dataField: 'phone1',
-                caption: l("Phone1"),
+                caption: l("MdmSAPService.Entity.Phone1"),
                 dataType: 'string',
                 validationRules: [
                     {
@@ -151,7 +151,7 @@
             },
             {
                 dataField: 'phone2',
-                caption: l("Phone2"),
+                caption: l("MdmSAPService.Entity.Phone2"),
                 dataType: 'string',
                 validationRules: [
                     {
@@ -162,46 +162,46 @@
                 ],
             },
             {
-                dataField: 'paymentTermId',
-                caption: l("PaymentTerm"),
+                dataField: 'paymentGroup',
+                caption: l("MdmSAPService.Entity.PaymentGroup"),
                 dataType: 'string',
             },
             {
-                dataField: 'taxCode',
-                caption: l("TaxCode"),
+                dataField: 'fedTaxID',
+                caption: l("MdmSAPService.Entity.FedTaxID"),
                 dataType: 'string',
             },
             {
-                // dataField: 'contactPerson',
-                caption: "Contact Person", // Localize
-                dataType: 'string',
-                showInColumnChooser: false,
-            },
-            {
-                // dataField: 'parentCode',
-                caption: "Parent Code", // Localize
+                dataField: 'contactPerson',
+                caption: l("MdmSAPService.Entity.ContactPerson"), // Localize
                 dataType: 'string',
                 showInColumnChooser: false,
             },
             {
-                dataField: 'erpCode',
-                caption: l("ERPCode"),
+                dataField: 'parentCode',
+                caption: l("MdmSAPService.Entity.ParentCode"), // Localize
+                dataType: 'string',
+                showInColumnChooser: false,
+            },
+            {
+                dataField: 'erpCusCode',
+                caption: l("MdmSAPService.Entity.ERPCusCode"),
                 dataType: 'string',
             },
             {
-                dataField: 'priceList.name',
-                caption: l("PriceList"),
+                dataField: 'priceListCode',
+                caption: l("MdmSAPService.Entity.PriceListCode"),
                 dataType: 'string',
-                calculateDisplayValue: (e) => e.priceList?.name || null,
+                // calculateDisplayValue: (e) => e.priceList?.name || null,
             },
             {
-                // dataField: 'groupTax',
-                caption: 'Group Tax', // Localize
+                dataField: 'taxGroupCode',
+                caption: l('MdmSAPService.Entity.TaxGroupCode'), // Localize
                 dataType: 'string',
             },
             {
                 dataField: 'creditLimit',
-                caption: l("CreditLimit"),
+                caption: l("MdmSAPService.Entity.CreditLimit"),
                 dataType: 'number',
                 editorOptions: {
                     min: 0,
@@ -210,7 +210,7 @@
             },
             {
                 dataField: 'active',
-                caption: l("Active"),
+                caption: l("MdmSAPService.Entity.Active"),
                 width: 110,
                 alignment: 'center',
                 dataType: 'boolean',

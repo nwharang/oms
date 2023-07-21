@@ -31,16 +31,11 @@ let gridInfo = {
 }
 
 let rpcService = {
-    itemMasterService: window.dMSpro.oMS.mdmService.controllers.items.item,
-    itemAttrValueService: window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue,
-    itemAttrService: window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute,
-    itemImageService: window.dMSpro.oMS.mdmService.controllers.itemImages.itemImage,
-    itemAttachmentService: window.dMSpro.oMS.mdmService.controllers.itemAttachments.itemAttachment,
-    itemTypeService: window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData,
-    uomService: window.dMSpro.oMS.mdmService.controllers.uOMs.uOM,
-    uomGroupService: window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGroup,
-    uomGroupDetailService: window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail,
-    vatService: window.dMSpro.oMS.mdmService.controllers.vATs.vAT,
+    itemMasterService: dMSpro.oMS.mdmSapService.items.item,
+    uomService: dMSpro.oMS.mdmSapService.uoms.uom,
+    uomGroupService: dMSpro.oMS.mdmSapService.uomGroups.uomGroup,
+    uomGroupDetailService: dMSpro.oMS.mdmSapService.uomGroupDetails.uomGroupDetail,
+    vatService: dMSpro.oMS.mdmSapService.vats.vat,
 }
 
 let l = abp.localization.getResource("OMS");
@@ -56,7 +51,7 @@ let store = {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            return rpcService.itemImageService.getListDevextremes(args)
+            return rpcService.itemImageService.getListDevExtreme(args)
                 .then(({ data }) => Promise.all(data.map(async imageInfo => {
                     return {
                         ...imageInfo,
@@ -88,7 +83,7 @@ let store = {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            rpcService.vatService.getListDevextremes(args)
+            rpcService.vatService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -112,7 +107,7 @@ let store = {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            rpcService.uomService.getListDevextremes(args)
+            rpcService.uomService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -136,7 +131,7 @@ let store = {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            rpcService.uomGroupService.getListDevextremes(args)
+            rpcService.uomGroupService.getListDevExtreme(args)
                 .done(result => {
                     let lastResult = { ...result }
                     // Validate UOM group where UOM group must have asleast 1 row and have base UOM
@@ -163,7 +158,7 @@ let store = {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            rpcService.uomGroupDetailService.getListDevextremes(args)
+            rpcService.uomGroupDetailService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -186,7 +181,7 @@ let store = {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            rpcService.itemMasterService.getListDevextremes(args)
+            rpcService.itemMasterService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -216,31 +211,7 @@ let store = {
             return rpcService.itemMasterService.delete(key);
         }
     }),
-    getItemAttrValue: new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
 
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            rpcService.itemAttrValueService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        },
-    })
 }
 $(() => {
     enumValue = {

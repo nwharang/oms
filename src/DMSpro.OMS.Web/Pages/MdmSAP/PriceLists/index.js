@@ -153,7 +153,7 @@
         onExporting(e) {
             if (e.format === 'xlsx') {
                 const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('PriceLists');
+                const worksheet = workbook.addWorksheet('Data');
                 DevExpress.excelExporter.exportDataGrid({
                     component: e.component,
                     worksheet,
@@ -176,12 +176,12 @@
         // },
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -203,7 +203,7 @@
                     fixedPosition: 'left'
                 },
                 {
-                    dataField: 'code',
+                    dataField: 'priceListCode',
                     caption: l("EntityFieldName:MDMService:PriceList:Code"),
                     validationRules: [
                         {
@@ -220,17 +220,18 @@
                     }
                 },
                 {
-                    dataField: 'name',
+                    dataField: 'priceListName',
                     caption: l("EntityFieldName:MDMService:PriceList:Name"),
                     validationRules: [{ type: "required" }]
                 },
                 {
-                    dataField: 'active',
+                    dataField: 'validFor',
                     caption: l("EntityFieldName:MDMService:PriceList:Active"),
+                    calculateCellValue: (e) => e.validFor == 'Y',
                     dataType: 'boolean',
                     cellTemplate(container, options) {
                         $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                            .append($(options.value == "Y" ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
                             .appendTo(container);
                     }
                 },
@@ -248,15 +249,11 @@
                                 return {
                                     store: getPriceList,
                                     filter: ["isBase", "=", true],
-                                    paginate: true,
-                                    pageSize
                                 }
                             else {
                                 return {
                                     store: getPriceList,
                                     filter: ['id', '<>', null],
-                                    paginate: true,
-                                    pageSize
                                 }
                             }
                         },
@@ -265,8 +262,9 @@
                     },
                 },
                 {
-                    dataField: 'arithmeticOperation',
+                    // dataField: 'arithmeticOperation',
                     caption: l("EntityFieldName:MDMService:PriceList:ArithmeticOperation"),
+                    calculateCellValue: (e) => e.arithmeticOperation || 2,
                     lookup: {
                         dataSource: arithmeticOperation,
                         valueExpr: 'id',
@@ -274,7 +272,7 @@
                     },
                 },
                 {
-                    dataField: 'arithmeticFactor',
+                    dataField: 'factor',
                     caption: l("EntityFieldName:MDMService:PriceList:ArithmeticFactor"),
                     dataType: 'number',
                     editorOptions: {
@@ -282,8 +280,9 @@
                     },
                 },
                 {
-                    dataField: 'PriceMode',
+                    dataField: 'isGrossPrice',
                     caption: "Price Mode", // Localize
+                    calculateCellValue : (e) => e.isGrossPrice == "Y",
                     dataType: 'boolean',
                     cellTemplate(container, options) {
                         $('<div>')
@@ -395,7 +394,7 @@
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:PriceList"),
-                                dataField: "priceList.code",
+                                dataField: "priceListCode",
                                 allowEditing: false,
                             },
                             {

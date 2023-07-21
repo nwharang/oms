@@ -1,11 +1,13 @@
-var uomGroupService = window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGroup;
-var uomGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail;
-var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
+var uomGroupService = dMSpro.oMS.mdmSapService.uomGroups.uomGroup;
+var uomGroupDetailService = dMSpro.oMS.mdmSapService.uomGroupDetails.uomGroupDetail
+var uomService = dMSpro.oMS.mdmSapService.uoms.uom;
+
 $(function () {
     var l = abp.localization.getResource("OMS");
     var uomGroupHeaderStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
+            loadOptions.withDetails = false;
             const deferred = $.Deferred();
             const args = {};
             requestOptions.forEach((i) => {
@@ -13,7 +15,7 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            uomGroupService.getListDevextremes(args)
+            uomGroupService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -45,7 +47,7 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            uomGroupDetailService.getListDevextremes(args)
+            uomGroupDetailService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -79,7 +81,7 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            uomService.getListDevextremes(args)
+            uomService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -124,7 +126,7 @@ $(function () {
         },
         onExporting: function (e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Companies');
+            const worksheet = workbook.addWorksheet('Data');
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
                 worksheet,
@@ -170,7 +172,7 @@ $(function () {
                 fixedPosition: 'left'
             },
             {
-                caption: l("EntityFieldName:MDMService:UOM:Code"),
+                caption: l("MdmSAPService.Entity.Code"),
                 dataField: "code",
                 editorOptions: {
                     maxLength: 20,
@@ -187,7 +189,7 @@ $(function () {
                 ]
             },
             {
-                caption: l("EntityFieldName:MDMService:UOM:Name"),
+                caption: l("MdmSAPService.Entity.Name"),
                 dataField: "name",
                 validationRules: [
                     {
@@ -221,7 +223,7 @@ $(function () {
                         },
                         onExporting: function (e) {
                             const workbook = new ExcelJS.Workbook();
-                            const worksheet = workbook.addWorksheet('Companies');
+                            const worksheet = workbook.addWorksheet('Data');
                             DevExpress.excelExporter.exportDataGrid({
                                 component: e.component,
                                 worksheet,
@@ -330,7 +332,7 @@ $(function () {
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:Active"),
-                                dataField: "active",
+                                dataField: "isActive",
                                 width: 110,
                                 alignment: 'center',
                                 dataType: 'boolean',

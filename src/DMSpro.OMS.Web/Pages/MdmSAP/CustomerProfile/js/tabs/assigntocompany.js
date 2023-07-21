@@ -8,10 +8,6 @@ let createAssignToCompany = () => {
                 dataSource: [
                     {
                         ...gridInfo.data,
-                        shipToCode: "TEST",
-                        priceListCodeonDistribute: gridInfo.data.priceList?.name,
-                        companyCode: gridInfo.data.linkedCompanyId,
-                        branchCode: gridInfo.data.linkedCompanyId,
                     }
                 ],
                 allowColumnResizing: true,

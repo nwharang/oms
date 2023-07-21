@@ -29,13 +29,11 @@ let enumValue = {
 }
 
 let rpcService = {
-    customerService: window.dMSpro.oMS.mdmService.controllers.customers.customer,
-    cusAttributeValueService: window.dMSpro.oMS.mdmService.controllers.customerAttributeValues.customerAttributeValue,
-    cusAttrService: window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute,
-    customerImageService: window.dMSpro.oMS.mdmService.controllers.customerImages.customerImage,
-    geoMasterService: window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster,
-    priceListService: window.dMSpro.oMS.mdmService.controllers.priceLists.priceList,
-    companyService: window.dMSpro.oMS.mdmService.controllers.companies.company,
+    customerService: dMSpro.oMS.mdmSapService.customers.customer,
+    cusAttributeValueService: dMSpro.oMS.mdmSapService.customerAttributes.customerAttribute,
+    cusAttrService: dMSpro.oMS.mdmSapService.customerAttributes.customerAttribute,
+    priceListService: dMSpro.oMS.mdmSapService.priceLists.priceList,
+    companyService: dMSpro.oMS.mdmSapService.companies.company,
 }
 
 let store = {
@@ -49,7 +47,7 @@ let store = {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            rpcService.companyService.getListDevextremes(args)
+            rpcService.companyService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -83,7 +81,7 @@ let store = {
                 }
             });
 
-            rpcService.geoMasterService.getListDevextremes(args)
+            rpcService.geoMasterService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -116,7 +114,7 @@ let store = {
                 }
             });
 
-            rpcService.customerService.getListDevextremes(args)
+            rpcService.customerService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -138,7 +136,7 @@ let store = {
         cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
-            rpcService.cusAttributeValueService.getListDevextremes({})
+            rpcService.cusAttributeValueService.getListDevExtreme({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -158,7 +156,7 @@ let store = {
         cacheRawData: true,
         load(loadOptions) {
             const deferred = $.Deferred();
-            rpcService.priceListService.getListDevextremes({})
+            rpcService.priceListService.getListDevExtreme({})
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -218,21 +216,21 @@ let notify = (option) => {
 }
 
 function getAttrField(type) {
-    return gridInfo.itemAttr[type].map(({ attrNo, attrName: text, hierarchyLevel, id }, index) => {
-        return {
-            label: {
-                text,
-            },
-            dataField: 'attr' + attrNo + 'Id',
-            editorType: 'dxSelectBox',
-            editorOptions: {
-                valueExpr: "id",
-                displayExpr: "attrValName",
-                dataSource: {
-                    store: store.getItemAttrValue,
-                    filter: ['itemAttributeId', '=', id],
-                }
-            },
-        }
-    })
+    // return gridInfo.itemAttr[type].map(({ attrNo, attrName: text, hierarchyLevel, id }, index) => {
+    //     return {
+    //         label: {
+    //             text,
+    //         },
+    //         dataField: 'attr' + attrNo + 'Id',
+    //         editorType: 'dxSelectBox',
+    //         editorOptions: {
+    //             valueExpr: "id",
+    //             displayExpr: "attrValName",
+    //             dataSource: {
+    //                 store: store.getItemAttrValue,
+    //                 filter: ['itemAttributeId', '=', id],
+    //             }
+    //         },
+    //     }
+    // })
 }

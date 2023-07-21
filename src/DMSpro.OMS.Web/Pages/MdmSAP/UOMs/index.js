@@ -1,4 +1,4 @@
-﻿var uOMsService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
+﻿var uOMsService = dMSpro.oMS.mdmSapService.uoms.uom;
 $(function () {
     // language
     var l = abp.localization.getResource("OMS");
@@ -13,8 +13,8 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-
-            uOMsService.getListDevextremes(args)
+            args.withDetails = true;
+            uOMsService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -69,7 +69,7 @@ $(function () {
         },
         onExporting: function (e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Companies');
+            const worksheet = workbook.addWorksheet('Data');
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
                 worksheet,
@@ -91,12 +91,12 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -117,7 +117,7 @@ $(function () {
             },
             {
                 dataField: 'code',
-                caption: l("EntityFieldName:MDMService:UOM:Code"),
+                caption: l("MdmSAPService.Entity.Code"),
                 dataType: 'string',
                 editorOptions: {
                     maxLength: 20,
@@ -135,7 +135,7 @@ $(function () {
             },
             {
                 dataField: 'name',
-                caption: l("EntityFieldName:MDMService:UOM:Name"),
+                caption: l("MdmSAPService.Entity.Name"),
                 dataType: 'string',
                 validationRules: [
                     {
@@ -151,5 +151,4 @@ $(function () {
             }
         ]
     }).dxDataGrid('instance');
-    initImportPopup('api/mdm-service/u-oMs', 'UOMs_Template', 'gridUOMs');
 });

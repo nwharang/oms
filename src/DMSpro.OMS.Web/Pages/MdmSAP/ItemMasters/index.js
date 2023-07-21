@@ -1,12 +1,12 @@
 ﻿$(async function () {
 
-    await rpcService.itemAttrService.getListDevextremes({ filter: JSON.stringify(['active', '=', true]) }).then(({ data }) => {
-        gridInfo.itemAttr = {
-            hierarchy: data.filter(e => e.hierarchyLevel != null).sort((a, b) => a.attrNo - b.attrNo),
-            flat: data.filter(e => e.hierarchyLevel == null).sort((a, b) => a.attrNo - b.attrNo),
-            count: data.length
-        }
-    })
+    // await rpcService.itemAttrService.getListDevextremes({ filter: JSON.stringify(['active', '=', true]) }).then(({ data }) => {
+    //     gridInfo.itemAttr = {
+    //         hierarchy: data.filter(e => e.hierarchyLevel != null).sort((a, b) => a.attrNo - b.attrNo),
+    //         flat: data.filter(e => e.hierarchyLevel == null).sort((a, b) => a.attrNo - b.attrNo),
+    //         count: data.length
+    //     }
+    // })
 
     gridInfo.instance.mainGrid = $('#dataGridItemMasters').dxDataGrid({
         dataSource: store.itemStore,
@@ -47,7 +47,7 @@
         },
         onExporting: function (e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Companies');
+            const worksheet = workbook.addWorksheet('Data');
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
                 worksheet,
@@ -136,11 +136,6 @@
                 dataType: 'string'
             },
             {
-                dataField: 'erpCode',
-                caption: l("EntityFieldName:MDMService:Item:ERPCode"),
-                dataType: 'string'
-            },
-            {
                 dataField: 'manageItemBy',
                 caption: l('EntityFieldName:MDMService:Item:ManageItemBy'),
                 dataType: 'string',
@@ -156,11 +151,11 @@
                 caption: l('EntityFieldName:MDMService:Item:UOMGroupCode'),
                 dataType: 'string',
                 showInColumnChooser: false,
-                lookup: {
-                    dataSource: store.getUOMsGroup,
-                    valueExpr: "id",
-                    displayExpr: "name"
-                },
+                // lookup: {
+                //     dataSource: store.getUOMsGroup,
+                //     valueExpr: "id",
+                //     displayExpr: "name"
+                // },
             },
             {
                 dataField: 'itemType',

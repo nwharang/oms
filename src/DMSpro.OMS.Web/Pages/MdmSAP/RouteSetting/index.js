@@ -10,7 +10,7 @@
         },
         onExporting: function (e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Companies');
+            const worksheet = workbook.addWorksheet('Data');
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
                 worksheet,
