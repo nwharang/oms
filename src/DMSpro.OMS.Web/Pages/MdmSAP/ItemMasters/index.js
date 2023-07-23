@@ -1,13 +1,5 @@
 ﻿$(async function () {
 
-    // await rpcService.itemAttrService.getListDevextremes({ filter: JSON.stringify(['active', '=', true]) }).then(({ data }) => {
-    //     gridInfo.itemAttr = {
-    //         hierarchy: data.filter(e => e.hierarchyLevel != null).sort((a, b) => a.attrNo - b.attrNo),
-    //         flat: data.filter(e => e.hierarchyLevel == null).sort((a, b) => a.attrNo - b.attrNo),
-    //         count: data.length
-    //     }
-    // })
-
     gridInfo.instance.mainGrid = $('#dataGridItemMasters').dxDataGrid({
         dataSource: store.itemStore,
         remoteOperations: true,
@@ -131,23 +123,25 @@
                 showInColumnChooser: false,
             },
             {
-                dataField: 'shortName',
+                dataField: 'foreignName',
                 caption: l("EntityFieldName:MDMService:Item:ShortName"),
                 dataType: 'string'
             },
             {
-                dataField: 'manageItemBy',
                 caption: l('EntityFieldName:MDMService:Item:ManageItemBy'),
                 dataType: 'string',
-                lookup: {
-                    dataSource: enumValue.manageItem,
-                    valueExpr: "id",
-                    displayExpr: "text",
+                calculateCellValue: (e) => {
+                    if (e.manBatchNum == "Y")
+                        return "Lot"
+
+                    if (e.manSerialNum == "Y")
+                        return "Serial"
+                    return "None"
                 },
                 showInColumnChooser: false,
             },
             {
-                dataField: 'uomGroupId',
+                dataField: 'uomGroupCode',
                 caption: l('EntityFieldName:MDMService:Item:UOMGroupCode'),
                 dataType: 'string',
                 showInColumnChooser: false,
@@ -158,15 +152,15 @@
                 // },
             },
             {
-                dataField: 'itemType',
+                dataField: 'salesType',
                 caption: l("EntityFieldName:MDMService:Item:ItemTypeName"),
                 dataType: 'string',
                 showInColumnChooser: false,
-                lookup: {
-                    dataSource: enumValue.itemTypes,
-                    valueExpr: 'id',
-                    displayExpr: 'text'
-                }
+                // lookup: {
+                //     dataSource: enumValue.itemTypes,
+                //     valueExpr: 'id',
+                //     displayExpr: 'text'
+                // }
             },
             {
                 dataField: 'active',
@@ -175,7 +169,7 @@
                 showInColumnChooser: false,
                 cellTemplate(container, options) {
                     $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                        .append($(options.data.validFor == "Y" ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
                         .appendTo(container);
                 }
             },

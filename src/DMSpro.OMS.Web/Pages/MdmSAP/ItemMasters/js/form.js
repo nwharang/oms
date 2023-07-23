@@ -15,7 +15,7 @@ let renderForm = async () => {
                 items: [
                     'code',
                     'name',
-                    'shortName',
+                    'foreignName',
                     'erpCode',
                     {
                         dataField: 'active',
@@ -24,6 +24,7 @@ let renderForm = async () => {
                         },
                         template: () => {
                             let container = $('<div/>').css({ display: 'flex', justifyContent: 'space-between' })
+                            let isActive = gridInfo.data.validFor == "Y" && gridInfo.data.frozenFor == "N"
                             $('<div/>').css({ maxWidth: '119px', width: '100%' }).dxRadioGroup({
                                 readOnly,
                                 items: [
@@ -38,7 +39,7 @@ let renderForm = async () => {
                                 ],
                                 valueExpr: 'value',
                                 displayExpr: 'text',
-                                value: gridInfo.data.active
+                                value: isActive
                             }).appendTo(container)
                             $('<div/>').dxForm({
                                 labelMode: "outside",
@@ -51,18 +52,19 @@ let renderForm = async () => {
                                         dataField: 'startDate',
                                         editorType: 'dxDateBox',
                                         editorOptions: {
-                                            format: 'dd/MM/yyyy',
-                                        }
+                                            value: isActive ? gridInfo.data.validFrom : gridInfo.data.frozenFrom,
+                                            format: 'dd/mm/yyyy',
+                                        },
                                     },
                                     {
                                         label: {
                                             text: 'To' // Localize
-
                                         },
                                         dataField: 'endDate',
                                         editorType: 'dxDateBox',
                                         editorOptions: {
-                                            format: 'dd/MM/yyyy',
+                                            value: isActive ? gridInfo.data.validTo : gridInfo.data.frozenTo,
+                                            format: 'dd/mm/yyyy',
                                         }
                                     }
                                 ]
@@ -79,31 +81,45 @@ let renderForm = async () => {
                 colSpan: 2,
                 items: [
                     {
-                        dataField: 'manageItemBy',
-                        editorType: 'dxSelectBox',
+                        label: {
+                            text: "Manage By"
+                        },
+                        editorType: 'dxTextBox',
                         editorOptions: {
-                            dataSource: enumValue.manageItem,
-                            valueExpr: 'id',
-                            displayExpr: 'text',
+                            value: (() => {
+                                if (gridInfo.data.manBatchNum == "Y")
+                                    return "Lot"
+                                if (gridInfo.data.manSerialNum == "Y")
+                                    return "Serial"
+                                return "None"
+                            })()
                         }
                     },
                     {
-                        dataField: 'uomGroupId',
-                        editorType: 'dxSelectBox',
-                        editorOptions: {
-                            dataSource: store.getUOMsGroup,
-                            valueExpr: "id",
-                            displayExpr: "name",
-                        }
+                        label: {
+                            text: "Uom Group Code"
+                        },
+                        dataField: 'uomGroupCode',
+                        editorType: 'dxTextBox',
+                        // editorType: 'dxSelectBox',
+                        // editorOptions: {
+                        //     dataSource: store.getUOMsGroup,
+                        //     valueExpr: "id",
+                        //     displayExpr: "name",
+                        // }
                     },
                     {
-                        dataField: 'itemType',
-                        editorType: 'dxSelectBox',
-                        editorOptions: {
-                            dataSource: enumValue.itemTypes,
-                            valueExpr: 'id',
-                            displayExpr: 'text',
-                        }
+                        label: {
+                            text: "Item Type"
+                        },
+                        dataField: 'salesType',
+                        editorType: 'dxTextBox',
+                        // editorType: 'dxSelectBox',
+                        // editorOptions: {
+                        //     dataSource: enumValue.itemTypes,
+                        //     valueExpr: 'id',
+                        //     displayExpr: 'text',
+                        // }
                     },
                 ]
 
@@ -113,15 +129,24 @@ let renderForm = async () => {
                 itemType: 'group',
                 items: [
                     {
-                        dataField: 'isInventoriable',
+                        label : {
+                            text : "Inventory Item"
+                        },
+                        dataField: 'isInventoryItem',
                         editorType: 'dxCheckBox',
                     },
                     {
-                        dataField: 'isPurchasable',
+                        label : {
+                            text : "Purchase Item"
+                        },
+                        dataField: 'isPurchaseItem',
                         editorType: 'dxCheckBox',
                     },
                     {
-                        dataField: 'isSaleable',
+                        label : {
+                            text : "Sell Item"
+                        },
+                        dataField: 'isSellItem',
                         editorType: 'dxCheckBox',
                     }]
             },

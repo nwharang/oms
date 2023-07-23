@@ -7,9 +7,6 @@ let createPurchasing = () => {
             let form = $('<div/>').dxForm({
                 formData: {
                     ...gridInfo.data,
-                    PurchasingUOMCode: gridInfo.data.purUOMId,
-                    PurchasingUnit: gridInfo.data.purUOM.name,
-                    itemPerPurchasingUOM: gridInfo.data.purUnitRate
                 },
                 labelMode: "outside",
                 colCount: 2,
@@ -22,18 +19,19 @@ let createPurchasing = () => {
                                 label: {
                                     text: 'Purchasing UOM Code'
                                 },
-                                dataField: 'PurchasingUOMCode',
+                                dataField: 'purchaseUomCode',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
                                     dataSource: {
                                         store: store.getUOMsGroupDetailStore,
-                                        filter: [["uomGroupId", "=", gridInfo.data.uomGroupId || 0], 'and', ['active', '=', true]],
+                                        withDetails: true,
+                                        filter: ["uomGroupCode", "=", gridInfo.data.uomGroupCode],
                                     },
-                                    valueExpr: "altUOMId",
-                                    displayExpr: "altUOM.code",
+                                    valueExpr: "uomCode",
+                                    displayExpr: "uomCode",
                                     onContentReady: (e) => {
                                         e.component.option('onSelectionChanged', (e) => {
-                                            form.option('formData.PurchasingUnit', e.selectedItem.altUOM.name)
+                                            form.option('formData.PurchasingUnit', e.selectedItem.uomCode)
                                             form.option('formData.itemPerPurchasingUOM', e.selectedItem.baseQty)
                                         })
                                     }
@@ -43,7 +41,7 @@ let createPurchasing = () => {
                                 label: {
                                     text: 'Purchasing UOM Name'
                                 },
-                                dataField: 'PurchasingUnit',
+                                dataField: 'buyUnitMeasure',
                                 editorType: 'dxTextBox',
                                 editorOptions: {
                                     readOnly: true
@@ -53,7 +51,7 @@ let createPurchasing = () => {
                                 label: {
                                     text: 'Items per Purchasing Unit' // Localize
                                 },
-                                dataField: 'itemPerPurchasingUOM',
+                                dataField: 'numInBuy',
                                 editorType: 'dxNumberBox',
                                 editorOptions: {
                                     readOnly: true
@@ -63,8 +61,8 @@ let createPurchasing = () => {
                                 label: {
                                     text: 'Purchasing Tax Group' // Localize
                                 },
-                                dataField: 'PurchasingTaxGroup',
-                                editorType: 'dxSelectBox',
+                                dataField: 'purchaseVatGroupCode',
+                                editorType: 'dxTextBox',
                             },
                         ]
                     },

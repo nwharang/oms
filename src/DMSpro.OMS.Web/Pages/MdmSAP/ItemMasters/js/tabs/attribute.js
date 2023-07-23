@@ -1,4 +1,7 @@
+
+
 let createAttribute = () => {
+
     return {
         title: "Attribute", // Localize
         icon: null,
@@ -12,14 +15,14 @@ let createAttribute = () => {
                 colCount: 2,
                 readOnly,
                 items: [
-                    // {
-                    //     itemType: "group",
-                    //     items: getAttrField('hierarchy'),
-                    // },
-                    // {
-                    //     itemType: "group",
-                    //     items: getAttrField('flat')
-                    // },
+                    {
+                        itemType: "group",
+                        items: getAttrField('hierarchy'),
+                    },
+                    {
+                        itemType: "group",
+                        items: getAttrField('flat')
+                    },
                     {
                         itemType: 'empty',
                         colSpan: 2

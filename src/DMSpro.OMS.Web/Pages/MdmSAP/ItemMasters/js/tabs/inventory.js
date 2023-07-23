@@ -7,10 +7,8 @@ let createInventory = () => {
             let inventoryForm = $('<div/>').dxForm({
                 formData: {
                     ...gridInfo.data,
-                    valuationMethod: 'A',
-                    InventoryUOMCode: gridInfo.data.inventoryUOMId,
-                    InventoryUnit: gridInfo.data.inventoryUOM.name,
-                    itemPerInventoryUOM: 1
+                    inventoryUomCode: "CHAI",
+                    inventoryUomName: "CHAI"
                 },
                 labelMode: "outside",
                 colCount: 2,
@@ -23,18 +21,19 @@ let createInventory = () => {
                                 label: {
                                     text: 'Inventory UOM Code'
                                 },
-                                dataField: 'InventoryUOMCode',
+                                dataField: 'inventoryUomCode',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
                                     dataSource: {
                                         store: store.getUOMsGroupDetailStore,
-                                        filter: [["uomGroupId", "=", gridInfo.data.uomGroupId || 0], 'and', ['active', '=', true]],
+                                        withDetails: true,
+                                        filter: ["uomGroupCode", "=", gridInfo.data.uomGroupCode],
                                     },
-                                    valueExpr: "altUOMId",
-                                    displayExpr: "altUOM.code",
+                                    valueExpr: "uomCode",
+                                    displayExpr: "uomCode",
                                     onContentReady: (e) => {
                                         e.component.option('onSelectionChanged', (e) => {
-                                            inventoryForm.option('formData.InventoryUnit', e.selectedItem.altUOM.name)
+                                            inventoryForm.option('formData.InventoryUnit', e.selectedItem.uomCode)
                                             inventoryForm.option('formData.itemPerInventoryUOM', e.selectedItem.baseQty)
                                         })
                                     }
@@ -44,7 +43,7 @@ let createInventory = () => {
                                 label: {
                                     text: 'Inventory UOM Name'
                                 },
-                                dataField: 'InventoryUnit',
+                                dataField: 'inventoryUomName',
                                 editorType: 'dxTextBox',
                                 editorOptions: {
                                     readOnly: true

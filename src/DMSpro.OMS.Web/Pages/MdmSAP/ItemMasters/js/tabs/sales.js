@@ -7,9 +7,6 @@ let createSales = () => {
             let form = $('<div/>').dxForm({
                 formData: {
                     ...gridInfo.data,
-                    SalesUOMCode: gridInfo.data.salesUOMId,
-                    SalesUnit: gridInfo.data.salesUOM.name,
-                    itemPerSalesUOM: gridInfo.data.salesUnitRate
                 },
                 labelMode: "outside",
                 colCount: 2,
@@ -22,18 +19,19 @@ let createSales = () => {
                                 label: {
                                     text: 'Sales UOM Code'
                                 },
-                                dataField: 'SalesUOMCode',
+                                dataField: 'salesUomCode',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
                                     dataSource: {
                                         store: store.getUOMsGroupDetailStore,
-                                        filter: [["uomGroupId", "=", gridInfo.data.uomGroupId || 0], 'and', ['active', '=', true]],
+                                        withDetails: true,
+                                        filter: ["uomGroupCode", "=", gridInfo.data.uomGroupCode],
                                     },
-                                    valueExpr: "altUOMId",
-                                    displayExpr: "altUOM.code",
+                                    valueExpr: "uomCode",
+                                    displayExpr: "uomCode",
                                     onContentReady: (e) => {
                                         e.component.option('onSelectionChanged', (e) => {
-                                            form.option('formData.SalesUnit', e.selectedItem.altUOM.name)
+                                            form.option('formData.SalesUnit', e.selectedItem.uomCode)
                                             form.option('formData.itemPerSalesUOM', e.selectedItem.baseQty)
                                         })
                                     }
@@ -43,7 +41,7 @@ let createSales = () => {
                                 label: {
                                     text: 'Sales UOM Name'
                                 },
-                                dataField: 'SalesUnit',
+                                dataField: 'salesUnitMeasure',
                                 editorType: 'dxTextBox',
                                 editorOptions: {
                                     readOnly: true
@@ -53,7 +51,7 @@ let createSales = () => {
                                 label: {
                                     text: 'Items per Sales Unit' // Localize
                                 },
-                                dataField: 'itemPerSalesUOM',
+                                dataField: 'numInSale',
                                 editorType: 'dxNumberBox',
                                 editorOptions: {
                                     readOnly: true
@@ -63,8 +61,8 @@ let createSales = () => {
                                 label: {
                                     text: 'Sales Tax Group' // Localize
                                 },
-                                dataField: 'SalesTaxGroup',
-                                editorType: 'dxSelectBox',
+                                dataField: 'salesVatGroupCode',
+                                editorType: 'dxTextBox',
                             },
                         ]
                     },
