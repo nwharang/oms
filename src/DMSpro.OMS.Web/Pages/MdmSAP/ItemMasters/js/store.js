@@ -36,40 +36,14 @@ let rpcService = {
     uomGroupService: dMSpro.oMS.mdmSapService.uomGroups.uomGroup,
     uomGroupDetailService: dMSpro.oMS.mdmSapService.uomGroupDetails.uomGroupDetail,
     vatService: dMSpro.oMS.mdmSapService.vats.vat,
+    itemAttr: dMSpro.oMS.mdmSapService.attributeConfigs.attributeConfig,
+    itemAttrValue: dMSpro.oMS.mdmSapService.attributeValues.attributeValue
 }
 
 let l = abp.localization.getResource("OMS");
 
 
 let store = {
-    imageStore: new DevExpress.data.CustomStore({
-        key: 'id',
-        load: (loadOptions) => {
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            return rpcService.itemImageService.getListDevExtreme(args)
-                .then(({ data }) => Promise.all(data.map(async imageInfo => {
-                    return {
-                        ...imageInfo,
-                        url: await fetch("/api/mdm-service/item-images/get-file?id=" + imageInfo.fileId)
-                            .then(res => res.blob())
-                            .then(data => URL.createObjectURL(data))
-                    }
-                })))
-                .then(data => data.sort((a, b) => a.displayOrder - b.displayOrder));
-        },
-        byKey: (key) => key ? new Promise((resolve, reject) => rpcService.itemImageService.get(key)
-            .done(data => resolve(data))
-            .fail(err => reject(err))
-        ) : null,
-        insert: (values) => rpcService.itemImageService.create(values, { contentType: "application/json" }),
-        update: (key, values) => rpcService.itemImageService.update(key, values, { contentType: "application/json" }),
-        remove: (key) => rpcService.itemImageService.deleteMany(key)
-    }),
     getVATs: new DevExpress.data.CustomStore({
         key: 'id',
         loadMode: 'raw',
@@ -84,6 +58,31 @@ let store = {
                 }
             });
             rpcService.vatService.getListDevExtreme(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
+                    });
+                });
+            return deferred.promise();
+        },
+    }),
+    getItemAttrValue: new DevExpress.data.CustomStore({
+        key: 'id',
+        loadMode: 'raw',
+        cacheRawData: true,
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+
+            rpcService.itemAttrValue.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -133,13 +132,10 @@ let store = {
             });
             rpcService.uomGroupService.getListDevExtreme(args)
                 .done(result => {
-                    let lastResult = { ...result }
-                    // Validate UOM group where UOM group must have asleast 1 row and have base UOM
-                    lastResult.data = result.data.filter(e => e.details.filter(detail => detail.baseUOMId === detail.altUOMId).length > 0)
-                    deferred.resolve(lastResult.data, {
-                        totalCount: lastResult.totalCount,
-                        summary: lastResult.summary,
-                        groupCount: lastResult.groupCount,
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount,
                     });
                 });
             return deferred.promise();
@@ -171,7 +167,6 @@ let store = {
     }),
     itemStore: new DevExpress.data.CustomStore({
         key: 'id',
-        useDefaultSearch: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -322,25 +317,7 @@ let notify = (option) => {
     })
 }
 
-function getAttrField(type) {
-    return gridInfo.itemAttr[type].map(({ attrNo, attrName: text, hierarchyLevel, id }, index) => {
-        return {
-            label: {
-                text,
-            },
-            dataField: 'attr' + attrNo + 'Id',
-            editorType: 'dxSelectBox',
-            editorOptions: {
-                valueExpr: "id",
-                displayExpr: "attrValName",
-                dataSource: {
-                    store: store.getItemAttrValue,
-                    filter: ['itemAttributeId', '=', id],
-                }
-            },
-        }
-    })
-}
+
 
 function createNumberBox(label, dataField) {
     return {
@@ -367,4 +344,25 @@ function createNumberBox(label, dataField) {
             }
         ],
     }
+}
+rpcService.itemAttr.getListDevExtreme({ filter: JSON.stringify([['active', '=', 'Y'], 'and', ["type", "=", "IN"]]) })
+    .then(({ data }) => {
+        gridInfo.itemAttr = {
+            hierarchy: data.filter(e => e.hierarchyLevel != null).sort((a, b) => a.attributeNumber - b.attributeNumber),
+            flat: data.filter(e => e.hierarchyLevel == null).sort((a, b) => a.attributeNumber - b.attributeNumber),
+            count: data.length
+        }
+    })
+function getAttrField(type) {
+    return gridInfo.itemAttr[type].map(({ attributeNumber, name: text, id }) =>
+    ({
+        label: {
+            text,
+        },
+        dataField: 'attrID' + attributeNumber,
+        editorType: 'dxTextBox',
+        editorOptions: {
+            value: gridInfo.data['attrID' + attributeNumber]
+        },
+    }))
 }
