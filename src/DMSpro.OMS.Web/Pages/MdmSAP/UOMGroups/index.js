@@ -49,6 +49,8 @@ $(function () {
             });
             uomGroupDetailService.getListDevExtreme(args)
                 .done(result => {
+                    let baseUom = result.data.find(e => e.altQty == e.baseQty)
+                    result.data = result.data.map(e => ({ ...e, baseUomCode: baseUom?.uomCode }))
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
                         summary: result.summary,
@@ -207,7 +209,7 @@ $(function () {
                     .dxDataGrid({
                         dataSource: {
                             store: uomGroupDetailsStore,
-                            filter: ['uomGroupId', '=', options.key]
+                            filter: ['uomGroupId', '=', options.key],
                         },
                         remoteOperations: true,
                         showRowLines: true,
@@ -269,26 +271,13 @@ $(function () {
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:AltUomCode"),
-                                dataField: "altUOMId",
+                                dataField: "uomCode",
                                 validationRules: [
                                     {
                                         type: "required",
                                         message: 'Alt UOM Code is required'
                                     }
                                 ],
-                                editorType: 'dxSelectBox',
-                                lookup: {
-                                    dataSource: getUOMs,
-                                    valueExpr: 'id',
-                                    displayExpr(e) {
-                                        if (e) {
-                                            return `${e.code} - ${e.name}`
-                                        }
-                                        return "";
-                                    },
-                                    paginate: true,
-                                    pageSize: pageSizeForLookup
-                                },
                             },
                             {
                                 caption: '=',
@@ -314,33 +303,19 @@ $(function () {
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:BaseUomCode"),
-                                dataField: "baseUOMId",
+                                dataField: "baseUomCode",
                                 validationRules: [{ type: "required" }],
-                                editorType: 'dxSelectBox',
-                                lookup: {
-                                    dataSource: getUOMs,
-                                    valueExpr: 'id',
-                                    displayExpr(e) {
-                                        if (e) {
-                                            return `${e.code} - ${e.name}`
-                                        }
-                                        return "";
-                                    },
-                                    paginate: true,
-                                    pageSize: pageSizeForLookup
-                                },
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:Active"),
                                 dataField: "isActive",
                                 width: 110,
                                 alignment: 'center',
-                                dataType: 'boolean',
+                                dataType: 'string',
                                 cellTemplate(container, options) {
-                                    if (options.row.data.baseUOMId !== options.row.data.altUOMId)
-                                        $('<div>')
-                                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                                            .appendTo(container);
+                                    $('<div>')
+                                        .append($(options.value == "Y" ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+                                        .appendTo(container);
 
                                 }
                             }
