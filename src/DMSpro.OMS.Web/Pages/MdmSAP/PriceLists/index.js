@@ -258,10 +258,8 @@
                 {
                     dataField: 'validFor',
                     caption: l("EntityFieldName:MDMService:PriceList:Active"),
-                    calculateCellValue: (e) => e.validFor == 'Y',
-                    dataType: 'boolean',
                     cellTemplate(container, options) {
-                        $('<div>')
+                        $('<div class="text-center">')
                             .append($(options.value == "Y" ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
                             .appendTo(container);
                     }
@@ -313,10 +311,8 @@
                 {
                     dataField: 'isGrossPrice',
                     caption: "Price Mode", // Localize
-                    calculateCellValue: (e) => e.isGrossPrice == "Y",
-                    dataType: 'boolean',
                     cellTemplate(container, options) {
-                        $('<div>')
+                        $('<div class="text-center">')
                             .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
                             .appendTo(container);
                     }
