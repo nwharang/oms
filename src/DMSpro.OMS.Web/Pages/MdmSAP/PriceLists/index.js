@@ -2,9 +2,40 @@
     let l = abp.localization.getResource("OMS");
     let readOnly = true
 
-    let priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
-    let priceListDetailsService = window.dMSpro.oMS.mdmService.controllers.priceListDetails.priceListDetail;
+    let priceListService = dMSpro.oMS.mdmSapService.priceLists.priceList;
+    let priceListDetailsService = dMSpro.oMS.mdmSapService.priceListByItems.priceListByItem;
+    let itemService = dMSpro.oMS.mdmSapService.items.item
+    let itemStore = new DevExpress.data.CustomStore({
+        key: "id",
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            itemService.getListDevExtreme(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
 
+            let d = new $.Deferred();
+            itemService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
+        },
+    });
     let customStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
@@ -15,7 +46,7 @@
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            priceListService.getListDevextremes(args)
+            priceListService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -47,7 +78,7 @@
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-            priceListDetailsService.getListDevextremes(args)
+            priceListDetailsService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -282,7 +313,7 @@
                 {
                     dataField: 'isGrossPrice',
                     caption: "Price Mode", // Localize
-                    calculateCellValue : (e) => e.isGrossPrice == "Y",
+                    calculateCellValue: (e) => e.isGrossPrice == "Y",
                     dataType: 'boolean',
                     cellTemplate(container, options) {
                         $('<div>')
@@ -296,13 +327,11 @@
             enabled: true,
             template(container, options) {
                 const currentHeaderData = options.data;
-                const dataGridDetail = $(`<div id="grid_${currentHeaderData.id}">`)
+                const dataGridDetail = $(`<div>`)
                     .dxDataGrid({
                         dataSource: {
                             store: detailStore,
-                            filter: ['priceListId', '=', options.key],
-                            paginate: true,
-                            pageSize,
+                            filter: ['priceListCode', '=', currentHeaderData.priceListCode],
                         },
                         key: "id",
                         editing: {
@@ -399,21 +428,16 @@
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Item"),
-                                dataField: "item.code",
-                                sortIndex: 0,
-                                sortOrder: "asc",
+                                dataField: "itemCode",
                                 allowEditing: false,
                             },
                             {
                                 caption: "ItemDescription",
-                                dataField: "item.name",
-                                sortIndex: 0,
-                                sortOrder: "asc",
                                 allowEditing: false,
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:UOM"),
-                                dataField: "uom.name",
+                                dataField: "uomCode",
                                 allowEditing: false,
                             },
                             {
