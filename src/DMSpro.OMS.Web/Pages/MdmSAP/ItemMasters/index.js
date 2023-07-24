@@ -46,7 +46,7 @@
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `Exports.xlsx`);
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `Item.xlsx`);
                 });
             });
             e.cancel = true;

@@ -379,7 +379,7 @@
                                 autoFilterEnabled: true,
                             }).then(() => {
                                 workbook.xlsx.writeBuffer().then((buffer) => {
-                                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PriceListByItem.xlsx');
                                 });
                             });
                             e.cancel = true;

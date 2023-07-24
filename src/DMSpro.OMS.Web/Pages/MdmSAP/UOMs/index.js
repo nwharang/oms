@@ -76,7 +76,7 @@ $(function () {
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `Uom.xlsx`);
                 });
             });
             e.cancel = true;
@@ -84,11 +84,11 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'gridUOMs',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'gridUOMs',
+        // },
         paging: {
             enabled: true,
             pageSize

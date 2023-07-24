@@ -135,7 +135,7 @@ $(function () {
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `UomGroup.xlsx`);
                 });
             });
             e.cancel = true;
@@ -143,11 +143,11 @@ $(function () {
         headerFilter: {
             visible: true,
         },
-        stateStoring: {
-            enabled: true,
-            type: 'localStorage',
-            storageKey: 'gridUOMGroups',
-        },
+        // stateStoring: {
+        //     enabled: true,
+        //     type: 'localStorage',
+        //     storageKey: 'gridUOMGroups',
+        // },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -232,7 +232,7 @@ $(function () {
                                 autoFilterEnabled: true,
                             }).then(() => {
                                 workbook.xlsx.writeBuffer().then((buffer) => {
-                                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
+                                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `UomGroupDetail.xlsx`);
                                 });
                             });
                             e.cancel = true;
@@ -303,7 +303,7 @@ $(function () {
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:UOMGroupDetail:BaseUomCode"),
-                                dataField: "baseUomCode",
+                                calculateDisplayValue: "baseUomCode",
                                 validationRules: [{ type: "required" }],
                             },
                             {
