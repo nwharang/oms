@@ -1,4 +1,6 @@
 let renderForm = async () => {
+    console.log(gridInfo.data);
+
     gridInfo.instance.form = gridInfo.element.form.dxForm({
         labelMode: "outside",
         colCount: 2,
@@ -47,19 +49,10 @@ let renderForm = async () => {
                         dataField: 'parentCode',
                     },
                     {
-                        dataField: 'eRPCusCode',
+                        dataField: 'erpCusCode',
                     },
                     {
                         dataField: 'priceListCode',
-                        editorType: "dxSelectBox",
-                        editorOptions: {
-                            dataSource: {
-                                store: store.priceListStore,
-                                paginate: true,
-                            },
-                            valueExpr: "id",
-                            displayExpr: "name"
-                        }
                     },
                     {
                         dataField: 'taxGroupCode'
@@ -82,11 +75,10 @@ let renderForm = async () => {
                                     {
                                         label: {
                                             text: 'Valid To' // Localize
-
                                         },
-                                        dataField: 'endDate',
                                         editorType: 'dxDateBox',
                                         editorOptions: {
+                                            value: gridInfo.data.validTo,
                                             format: 'dd/MM/yyyy',
                                         }
                                     }
@@ -97,7 +89,6 @@ let renderForm = async () => {
                         }
                     },
                 ]
-
             },
             {
                 itemType: 'empty',

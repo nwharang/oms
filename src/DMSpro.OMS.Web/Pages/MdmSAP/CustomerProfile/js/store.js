@@ -21,7 +21,8 @@ let gridInfo = {
         form: null,
         tabs: null,
         mainGrid: null
-    }
+    },
+    shipToData: {}
 }
 
 let enumValue = {
@@ -30,79 +31,11 @@ let enumValue = {
 
 let rpcService = {
     customerService: dMSpro.oMS.mdmSapService.customers.customer,
-    cusAttributeValueService: dMSpro.oMS.mdmSapService.customerAttributes.customerAttribute,
-    cusAttrService: dMSpro.oMS.mdmSapService.customerAttributes.customerAttribute,
     priceListService: dMSpro.oMS.mdmSapService.priceLists.priceList,
     companyService: dMSpro.oMS.mdmSapService.companies.company,
 }
 
 let store = {
-    companiesLookup: new DevExpress.data.CustomStore({
-        key: "id",
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            rpcService.companyService.getListDevExtreme(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-            var d = new $.Deferred();
-            rpcService.companyService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                })
-            return d.promise();
-        }
-    }),
-    geoMasterStore: new DevExpress.data.CustomStore({
-        key: 'id',
-        useDefaultSearch: true,
-        // loadMode: "raw",
-        // cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            rpcService.geoMasterService.getListDevExtreme(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            rpcService.geoMasterService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    }),
     customStore: new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
@@ -113,7 +46,7 @@ let store = {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-
+            args.withDetails = true;
             rpcService.customerService.getListDevExtreme(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -128,27 +61,6 @@ let store = {
         byKey: function (key) {
             return key == 0 ? rpcService.customerService.get(key) : null;
         },
-    }),
-
-    getCusAttrValue: new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: "raw",
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            rpcService.cusAttributeValueService.getListDevExtreme({})
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            deferred.promise().then(attrVal => {
-                listAttrValue = attrVal;
-            })
-            return deferred.promise();
-        }
     }),
     priceListStore: new DevExpress.data.CustomStore({
         key: 'id',

@@ -57,7 +57,7 @@
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Customer.xlsx');
                 });
             });
             e.cancel = true;
@@ -173,13 +173,13 @@
             },
             {
                 dataField: 'contactPerson',
-                caption: l("MdmSAPService.Entity.ContactPerson"), // Localize
+                caption: l("MdmSAPService.Entity.ContactPerson"),
                 dataType: 'string',
                 showInColumnChooser: false,
             },
             {
                 dataField: 'parentCode',
-                caption: l("MdmSAPService.Entity.ParentCode"), // Localize
+                caption: l("MdmSAPService.Entity.ParentCode"),
                 dataType: 'string',
                 showInColumnChooser: false,
             },
@@ -196,7 +196,7 @@
             },
             {
                 dataField: 'taxGroupCode',
-                caption: l('MdmSAPService.Entity.TaxGroupCode'), // Localize
+                caption: l('MdmSAPService.Entity.TaxGroupCode'),
                 dataType: 'string',
             },
             {

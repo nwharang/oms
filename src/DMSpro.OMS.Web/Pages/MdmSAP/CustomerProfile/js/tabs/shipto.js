@@ -1,29 +1,11 @@
 let createShipTo = () => {
     return {
-        title: "Ship To", // Localize
+        title: "Ship To",
         icon: null,
         callback: () => {
             let container = $('<div/>')
             let datagrid = $('<div/>').dxDataGrid({
-                dataSource: [
-                    {
-                        ...gridInfo.data,
-                        shipToCode: "TEST",
-                        shipToName: "TEST",
-                        address: gridInfo.data.fullAddress,
-                        type: "C",
-                        Region: gridInfo.data.geoMaster0?.code,
-                        RegionName: gridInfo.data.geoMaster0?.name,
-                        Provine: gridInfo.data.geoMaster1?.code,
-                        ProvineName: gridInfo.data.geoMaster1?.name,
-                        District: gridInfo.data.geoMaster2?.code,
-                        DistrictName: gridInfo.data.geoMaster2?.name,
-                        Ward: gridInfo.data.geoMaster3?.code,
-                        WardName: gridInfo.data.geoMaster3?.name,
-                        latitude: `${parseFloat((Math.random() + 1) * 10).toFixed(4)}° N`,
-                        longitude: `${parseFloat(Math.random() + 106).toFixed(4)}° E`,
-                    }
-                ],
+                dataSource: gridInfo.data.customerAddress,
                 allowColumnResizing: true,
                 columnResizingMode: 'widget',
                 columnAutoWidth: true,
@@ -74,7 +56,7 @@ let createShipTo = () => {
                         autoFilterEnabled: true,
                     }).then(() => {
                         workbook.xlsx.writeBuffer().then((buffer) => {
-                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `ItemInventory.xlsx`);
+                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `CustomerAddress.xlsx`);
                         });
                     });
                     e.cancel = true;
@@ -90,63 +72,63 @@ let createShipTo = () => {
                 },
                 columns: [
                     {
-                        caption: "Ship To Code", // Localize
+                        caption: l("MdmSAPService.Entity.ShipToCode"),
                         dataField: "shipToCode",
                         dataType: 'string',
                     },
                     {
-                        caption: "Ship To Name", // Localize
+                        caption: l("MdmSAPService.Entity.ShipToName"),
                         dataField: "shipToName",
                         dataType: 'string',
                     },
                     {
-                        caption: "Address", // Localize
+                        caption: l("MdmSAPService.Entity.Address"),
                         dataField: "address",
                         dataType: 'string',
                     },
                     {
+                        caption: l("MdmSAPService.Entity.Region"),
                         dataField: "regionCode",
-                        caption: "Region", // Localize
                         dataType: "string",
                     },
                     {
+                        caption: l("MdmSAPService.Entity.RegionName"),
                         dataField: "regionName",
-                        caption: "RegionName", // Localize
                         dataType: "string",
                     },
                     {
+                        caption: l("MdmSAPService.Entity.Provine"),
                         dataField: "provinceCode",
-                        caption: "Provine", // Localize
                         dataType: "string",
                     },
                     {
+                        caption: l("MdmSAPService.Entity.ProvineName"),
                         dataField: "provineName",
-                        caption: "ProvineName", // Localize
                         dataType: "string",
                     },
                     {
+                        caption: l("MdmSAPService.Entity.District"),
                         dataField: "districtCode",
-                        caption: "District", // Localize
                         dataType: "string",
                     },
                     {
+                        caption: l("MdmSAPService.Entity.DistrictName"),
                         dataField: "districtName",
-                        caption: "DistrictName", // Localize
                         dataType: "string",
                     },
                     {
+                        caption: l("MdmSAPService.Entity.Ward"),
                         dataField: "wardCode",
-                        caption: "Ward", // Localize
                         dataType: "string",
                     },
                     {
+                        caption: l("MdmSAPService.Entity.WardName"),
                         dataField: "wardName",
-                        caption: "WardName", // Localize
                         dataType: "string",
                     },
                     {
+                        caption: l("MdmSAPService.Entity.Type"),
                         dataField: "type",
-                        caption: "Type", // Localize
                         dataType: 'string',
                         lookup: {
                             dataSource: enumValue.shipToType,
@@ -155,13 +137,13 @@ let createShipTo = () => {
                         }
                     },
                     {
+                        caption: l("MdmSAPService.Entity.Latitude"),
                         dataField: 'latitude',
-                        caption: l("Latitude"), // Localize
                         dataType: 'string',
                     },
                     {
+                        caption: l("MdmSAPService.Entity.Longitude"),
                         dataField: 'longitude',
-                        caption: l("Longitude"), // Localize
                         dataType: 'string',
                     },
                 ]

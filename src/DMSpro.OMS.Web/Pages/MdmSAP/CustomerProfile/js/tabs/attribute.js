@@ -5,11 +5,7 @@ let createAttribute = () => {
         callback: () => {
             let container = $('<div/>')
             let datagrid = $('<div/>').dxDataGrid({
-                dataSource: [
-                    {
-                        ...gridInfo.data,
-                    }
-                ],
+                dataSource: gridInfo.data.customerAttribute,
                 allowColumnResizing: true,
                 columnResizingMode: 'widget',
                 columnAutoWidth: true,
@@ -31,7 +27,6 @@ let createAttribute = () => {
                 headerFilter: {
                     visible: true,
                 },
-
                 paging: {
                     enabled: true,
                     pageSize
@@ -60,7 +55,7 @@ let createAttribute = () => {
                         autoFilterEnabled: true,
                     }).then(() => {
                         workbook.xlsx.writeBuffer().then((buffer) => {
-                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `ItemInventory.xlsx`);
+                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `CustomerAttribute.xlsx`);
                         });
                     });
                     e.cancel = true;
@@ -76,58 +71,58 @@ let createAttribute = () => {
                 },
                 columns: [
                     {
-                        caption: "Ship To Code", // Localize
-                        dataField: "ShipToCode",
+                        caption: l("MdmSAPService.Entity.ShipToCode"),
+                        dataField: "shipToCode",
                         dataType: 'string',
                     },
                     {
                         caption: "Attribute 0", // Localize
-                        dataField: "AttrName0",
+                        dataField: "attrID0",
                         dataType: 'string',
                     },
                     {
                         caption: "Attribute 1", // Localize
-                        dataField: "AttrName1",
+                        dataField: "attrID1",
                         dataType: 'string',
                     },
                     {
                         caption: "Attribute 2", // Localize
-                        dataField: "AttrName2",
+                        dataField: "attrID2",
                         dataType: 'string',
                     },
                     {
                         caption: "Attribute 3", // Localize
-                        dataField: "AttrName3",
+                        dataField: "attrID3",
                         dataType: 'string',
                     },
                     {
                         caption: "Attribute 4", // Localize
-                        dataField: "AttrName4",
+                        dataField: "attrID4",
                         dataType: 'string',
                     },
                     {
                         caption: "Attribute 5", // Localize
-                        dataField: "AttrName5",
+                        dataField: "attrID5",
                         dataType: 'string',
                     },
                     {
                         caption: "Attribute 6", // Localize
-                        dataField: "AttrName6",
+                        dataField: "attrID6",
                         dataType: 'string',
                     },
                     {
                         caption: "Attribute 7", // Localize
-                        dataField: "AttrName7",
+                        dataField: "attrID7",
                         dataType: 'string',
                     },
                     {
                         caption: "Attribute 8", // Localize
-                        dataField: "AttrName8",
+                        dataField: "attrID8",
                         dataType: 'string',
                     },
                     {
                         caption: "Attribute 9", // Localize
-                        dataField: "AttrName9",
+                        dataField: "attrID9",
                         dataType: 'string',
                     },
                 ]

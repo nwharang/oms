@@ -5,11 +5,7 @@ let createAssignToCompany = () => {
         callback: () => {
             let container = $('<div/>')
             let datagrid = $('<div/>').dxDataGrid({
-                dataSource: [
-                    {
-                        ...gridInfo.data,
-                    }
-                ],
+                dataSource: gridInfo.data.customerCompanyAssignment,
                 allowColumnResizing: true,
                 columnResizingMode: 'widget',
                 columnAutoWidth: true,
@@ -60,7 +56,7 @@ let createAssignToCompany = () => {
                         autoFilterEnabled: true,
                     }).then(() => {
                         workbook.xlsx.writeBuffer().then((buffer) => {
-                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `ItemInventory.xlsx`);
+                            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `CustomerCompanyAssignment.xlsx`);
                         });
                     });
                     e.cancel = true;
@@ -76,7 +72,7 @@ let createAssignToCompany = () => {
                 },
                 columns: [
                     {
-                        caption: "Ship To Code", // Localize
+                        caption: l("MdmSAPService.Entity.ShipToCode"),
                         dataField: "shipToCode",
                         dataType: 'string',
                     },
@@ -84,24 +80,15 @@ let createAssignToCompany = () => {
                         caption: "Company Code", // Localize
                         dataField: "companyCode",
                         dataType: 'string',
-                        lookup: {
-                            dataSource: {
-                                store: store.companiesLookup,
-                                paginate: true,
-                                pageSize
-                            },
-                            valueExpr: "id",
-                            displayExpr: "code",
-                        }
                     },
                     {
                         caption: "Branch Code", // Localize
-                        dataField: "BranchCode",
+                        dataField: "branchCode",
                         dataType: 'string',
                     },
                     {
                         caption: "Price List Code on Distribute", // Localize
-                        dataField: "priceListCodeonDistribute",
+                        dataField: "priceListCode",
                         dataType: 'string',
                     },
                     {
