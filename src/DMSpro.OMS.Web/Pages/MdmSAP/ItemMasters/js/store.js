@@ -360,9 +360,11 @@ function getAttrField(type) {
             text,
         },
         dataField: 'attrID' + attributeNumber,
-        editorType: 'dxTextBox',
+        editorType: 'dxSelectBox',
         editorOptions: {
-            value: gridInfo.data['attrID' + attributeNumber]
+            dataSource : store.getItemAttrValue,
+            valueExpr: "code",
+            displayExpr: "name",
         },
     }))
 }
