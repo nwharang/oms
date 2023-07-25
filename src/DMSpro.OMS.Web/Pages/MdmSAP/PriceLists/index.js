@@ -258,6 +258,7 @@
                 {
                     dataField: 'validFor',
                     caption: l("EntityFieldName:MDMService:PriceList:Active"),
+                    calculateCellValue: (e) => e.validFor == "Y",
                     cellTemplate(container, options) {
                         $('<div class="text-center">')
                             .append($(options.data.validFor == "Y" ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
@@ -266,7 +267,7 @@
                 },
                 {
                     caption: l("EntityFieldName:MDMService:PriceList:BasePriceList"),
-                    dataField: "basePriceListId",
+                    dataField: "basePriceListCode",
                 },
                 {
                     // dataField: 'arithmeticOperation',
