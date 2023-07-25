@@ -163,10 +163,11 @@
                 // }
             },
             {
-                dataField: 'active',
+                dataField: 'validFor',
                 caption: l('EntityFieldName:MDMService:Item:Active'),
                 alignment: 'center',
                 showInColumnChooser: false,
+                calculateCellValue: (e) => e.validFor == "Y",
                 cellTemplate(container, options) {
                     $('<div>')
                         .append($(options.data.validFor == "Y" ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))

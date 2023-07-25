@@ -258,6 +258,7 @@
                 {
                     dataField: 'validFor',
                     caption: l("EntityFieldName:MDMService:PriceList:Active"),
+                    calculateCellValue: (e) => e.validFor == "Y",
                     cellTemplate(container, options) {
                         $('<div class="text-center">')
                             .append($(options.value == "Y" ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
@@ -267,28 +268,6 @@
                 {
                     caption: l("EntityFieldName:MDMService:PriceList:BasePriceList"),
                     dataField: "basePriceListId",
-                    editorType: 'dxSelectBox',
-                    calculateDisplayValue: 'basePriceList.code',
-                    elementAttr: {
-                        class: "basePriceListSelectBox",
-                    },
-                    lookup: {
-                        dataSource: (e) => {
-                            if (e.data)
-                                return {
-                                    store: getPriceList,
-                                    filter: ["isBase", "=", true],
-                                }
-                            else {
-                                return {
-                                    store: getPriceList,
-                                    filter: ['id', '<>', null],
-                                }
-                            }
-                        },
-                        valueExpr: 'id',
-                        displayExpr: 'code'
-                    },
                 },
                 {
                     // dataField: 'arithmeticOperation',
