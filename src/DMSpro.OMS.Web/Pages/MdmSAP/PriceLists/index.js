@@ -416,7 +416,7 @@
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:BasedOnPrice"),
-                                dataField: "basedOnPrice",
+                                // dataField: "basedOnPrice",
                                 allowEditing: false,
                             },
                             {

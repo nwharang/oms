@@ -125,7 +125,8 @@
             {
                 dataField: 'foreignName',
                 caption: l("EntityFieldName:MDMService:Item:ShortName"),
-                dataType: 'string'
+                dataType: 'string',
+                showInColumnChooser: true,
             },
             {
                 caption: l('EntityFieldName:MDMService:Item:ManageItemBy'),
@@ -141,26 +142,21 @@
                 showInColumnChooser: false,
             },
             {
+                caption: l('ERP Code'),
+                dataType: 'string',
+                showInColumnChooser: true,
+            },
+            {
                 dataField: 'uomGroupCode',
                 caption: l('EntityFieldName:MDMService:Item:UOMGroupCode'),
                 dataType: 'string',
                 showInColumnChooser: false,
-                // lookup: {
-                //     dataSource: store.getUOMsGroup,
-                //     valueExpr: "id",
-                //     displayExpr: "name"
-                // },
             },
             {
                 dataField: 'salesType',
                 caption: l("EntityFieldName:MDMService:Item:ItemTypeName"),
                 dataType: 'string',
                 showInColumnChooser: false,
-                // lookup: {
-                //     dataSource: enumValue.itemTypes,
-                //     valueExpr: 'id',
-                //     displayExpr: 'text'
-                // }
             },
             {
                 dataField: 'validFor',
