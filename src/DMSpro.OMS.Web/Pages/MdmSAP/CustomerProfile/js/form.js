@@ -66,7 +66,7 @@ let renderForm = async () => {
                             let container = $('<div/>').css({ display: 'flex', justifyContent: 'space-between' })
                             $('<div/>').css({ maxWidth: '119px', width: '100%' }).dxCheckBox({
                                 readOnly,
-                                value: gridInfo.data.active
+                                value: gridInfo.data.active == "Y"
                             }).appendTo(container)
                             $('<div/>').dxForm({
                                 labelMode: "outside",

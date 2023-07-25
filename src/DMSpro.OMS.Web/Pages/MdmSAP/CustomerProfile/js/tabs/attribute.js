@@ -75,56 +75,7 @@ let createAttribute = () => {
                         dataField: "shipToCode",
                         dataType: 'string',
                     },
-                    {
-                        caption: "Attribute 0", // Localize
-                        dataField: "attrID0",
-                        dataType: 'string',
-                    },
-                    {
-                        caption: "Attribute 1", // Localize
-                        dataField: "attrID1",
-                        dataType: 'string',
-                    },
-                    {
-                        caption: "Attribute 2", // Localize
-                        dataField: "attrID2",
-                        dataType: 'string',
-                    },
-                    {
-                        caption: "Attribute 3", // Localize
-                        dataField: "attrID3",
-                        dataType: 'string',
-                    },
-                    {
-                        caption: "Attribute 4", // Localize
-                        dataField: "attrID4",
-                        dataType: 'string',
-                    },
-                    {
-                        caption: "Attribute 5", // Localize
-                        dataField: "attrID5",
-                        dataType: 'string',
-                    },
-                    {
-                        caption: "Attribute 6", // Localize
-                        dataField: "attrID6",
-                        dataType: 'string',
-                    },
-                    {
-                        caption: "Attribute 7", // Localize
-                        dataField: "attrID7",
-                        dataType: 'string',
-                    },
-                    {
-                        caption: "Attribute 8", // Localize
-                        dataField: "attrID8",
-                        dataType: 'string',
-                    },
-                    {
-                        caption: "Attribute 9", // Localize
-                        dataField: "attrID9",
-                        dataType: 'string',
-                    },
+                    ...getAttrField(),
                 ]
             }).appendTo(container)
             return container
