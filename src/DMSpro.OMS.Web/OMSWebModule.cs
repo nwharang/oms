@@ -354,8 +354,6 @@ public class OMSWebModule : AbpModule
         app.UseAuthorization();
         app.Use(async (httpContext,next) =>{
             var user = httpContext.User;
-            Console.WriteLine("SAAAAAAAA");
-            Console.WriteLine(user);
             await next(httpContext);
         });
         app.UseWebSockets();
