@@ -1,0 +1,69 @@
+@page
+@using DMSpro.OMS.Localization;
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using DMSpro.OMS.MdmService.Permissions
+@using DMSpro.OMS.Web.Navigation
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<OMSResource> L
+@inject IHtmlLocalizer<OMSResource> L1
+@inject IAuthorizationService Authorization
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = L["SellingZones"].Value;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.SellingZones;
+}
+
+@section scripts
+    {
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
+    <abp-script src="/Pages/Mdm/SellingZones/index.js" />
+}
+
+@section breadcrumb {
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
+        <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:SalesOrganization"].Value</li>
+        <li class="breadcrumb-item active">@L["SellingZones"].Value</li>
+    </ol>
+}
+
+<div class="col-lg-12">
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="ui-sortable-handle">
+                <i class="subheader-icon fa fa-check-square"></i> @L["SellingZones"].Value
+            </h2>
+        </div>
+        <div class="panel-container show">
+            <div class="panel-content jqvmap-bg-ocean p-0" style="min-height: 330px;">
+                <abp-card>
+                    <abp-card-body>
+                        <div class="dx-viewport">
+                            <div class="row pb-2">
+                                <div class="form-group col-2">
+                                    <div id="salesOrgHierarchy"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li class="nav-item"><a id="tab1" class="nav-link active" data-toggle="tab" href="#tab_company" role="tab">@L1["SellingZones.Tab.CompanyAssgin"]</a></li>
+                                    <li class="nav-item"><a id="tab2" class="nav-link" data-toggle="tab" href="#tab_customer" role="tab">@L1["SellingZones.Tab.CustomerAssgin"]</a></li>
+                                </ul>
+                                <div class="tab-content py-2">
+                                    <div class="tab-pane fade show active" id="tab_company" role="tabpanel">
+                                        <div id="companyAssgin"></div>
+                                    </div>
+                                    <div class="tab-pane fade" id="tab_customer" role="tabpanel">
+                                        <div id="customerAssgin"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </abp-card-body>
+                </abp-card>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,70 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using DMSpro.OMS.MdmService.Permissions 
+@using DMSpro.OMS.Web.Navigation
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.Localization
+@inject IHtmlLocalizer<OMSResource> L
+@inject IAuthorizationService Authorization
+
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = L["Page.Title.Currencies"].Value;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.Currencies;
+}
+
+@section scripts
+    {
+    <abp-script src="/Pages/Mdm/Currencies/index.js" />
+}
+
+@section breadcrumb
+    {
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
+        <li class="breadcrumb-item">@L["Menu:MdmService:GroupMenu:Company"].Value</li>
+        <li class="breadcrumb-item active">@L["Page.Title.Currencies"].Value</li>
+    </ol>
+}
+<div class="col-lg-12">
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="ui-sortable-handle">
+                <i class="subheader-icon fal fa-credit-card-front"></i> @L["Page.Title.Currencies"].Value
+            </h2>
+        </div>
+        <div class="panel-container show">
+            <div class="panel-content jqvmap-bg-ocean p-0"  >
+                <abp-card>
+                    <abp-card-body>
+                        <abp-row>
+                            <div style="padding-left:12px" class="buttons-header-grid">
+                                @if (await Authorization.IsGrantedAsync(MdmServicePermissions.Currencies.Create))
+                                {
+                                    <abp-button data-id="action-add-grid" data-effect-grid="dgCurrencies" text="Add new" icon="plus" size="Small" button-type="Success" />
+                                }
+                                <abp-button id="ExportToExcelButton" text="@L["ExportToExcel"].Value" icon="download" size="Small" button-type="Primary" />
+                                <div class="dx-datagrid-search-panel dx-show-invalid-badge dx-textbox dx-texteditor dx-editor-outlined dx-searchbox dx-show-clear-button dx-texteditor-empty dx-widget dx-state-hover" style="width: 250px;">
+                                    <div class="dx-texteditor-container">
+                                        <div class="dx-texteditor-input-container">
+                                            <div class="dx-icon dx-icon-search"></div>
+                                            <input autocomplete="off" aria-label="Search in the data grid" class="dx-texteditor-input" type="text" spellcheck="false" tabindex="0" role="textbox">
+
+                                        </div>
+                                        <div class="dx-texteditor-buttons-container">
+                                            <span class="dx-clear-button-area"><span class="dx-icon dx-icon-clear"></span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </abp-row>
+                        <div class="dx-viewport" style="padding: 12px; overflow: auto;">
+                            <div id="dgCurrencies"></div>
+                        </div>
+                    </abp-card-body>
+                </abp-card>
+            </div>
+        </div>
+    </div>
+</div>>

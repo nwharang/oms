@@ -515,3 +515,5 @@ etc/prometheus/storage/
 
 # tye files
 .tye/
+
+src/DMSpro.OMS.Web/Pages/MdmSAP/**/*[!min].js

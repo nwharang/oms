@@ -1,0 +1,34 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using DMSpro.OMS.MdmService.Permissions
+@using DMSpro.OMS.Web.Navigation
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.Localization
+@inject IHtmlLocalizer<OMSResource> L
+@inject IAuthorizationService Authorization
+
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = L["CustomerGroupByLists"].Value;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.CustomerGroups;
+}
+
+@section scripts
+{
+    <abp-script src="/Pages/Mdm/CustomerGroupByLists/index.js" />
+}
+
+@*@section content_toolbar {
+    <abp-button id="ExportToExcelButton" text="@L["ExportToExcel"].Value" icon="download" size="Small" button-type="Primary" />
+    @if (await Authorization.IsGrantedAsync(MdmServicePermissions.CustomerGroupByLists.Create))
+    {
+        <abp-button id="NewCustomerGroupByListButton" text="@L["NewCustomerGroupByList"].Value" icon="plus" size="Small" button-type="Primary" />
+    }
+}*@
+
+<abp-card>
+    <abp-card-body>
+		
+    </abp-card-body>
+</abp-card>
