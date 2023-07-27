@@ -1601,18 +1601,7 @@ public class OMSMenuContributor : IMenuContributor
             MdmServiceMenus.Prefix,
             context.GetLocalizer<OMSResource>()["Menu:MdmService:GroupMenu:MdmSAP"],
             icon: "fal fal fa-window"
-        )
-            .RequireFeatures(MdmFeatures.Enable)
-            .RequirePermissions(
-                false,
-                MdmServicePermissions.UOMs.Default,
-                MdmServicePermissions.UOMGroups.Default,
-                MdmServicePermissions.Items.Default,
-                MdmServicePermissions.Customers.Default,
-                MdmServicePermissions.PriceLists.Default,
-                MdmServicePermissions.MCPs.Default,
-                InventoryServicePermissions.Warehouses.Default
-            );
+        );
 
         context.Menu.Items.AddIfNotContains(moduleMenu);
 
@@ -1621,9 +1610,8 @@ public class OMSMenuContributor : IMenuContributor
                 MdmServiceMenus.UOMs,
                 context.GetLocalizer<OMSResource>()["Menu:MdmService:UOMs"],
                 "/MdmSAP/UOMs",
-                icon: "fa fa-cube",
-                requiredPermissionName: MdmServicePermissions.UOMs.Default
-            ).RequireFeatures(MdmFeatures.UOMs)
+                icon: "fa fa-cube"
+            )
         );
 
         moduleMenu.AddItem(
@@ -1631,53 +1619,47 @@ public class OMSMenuContributor : IMenuContributor
                 MdmServiceMenus.UOMGroups,
                 context.GetLocalizer<OMSResource>()["Menu:MdmService:UOMGroups"],
                 "/MdmSAP/UOMGroups",
-                icon: "fa fa-cubes",
-                requiredPermissionName: MdmServicePermissions.UOMGroups.Default
-            ).RequireFeatures(MdmFeatures.UOMGroups)
+                icon: "fa fa-cubes"
+            )
         );
         moduleMenu.AddItem(
             new ApplicationMenuItem(
                 MdmServiceMenus.Items,
                 context.GetLocalizer<OMSResource>()["Menu:MdmService:ItemMasters"],
                 "/MdmSAP/ItemMasters",
-                icon: "fa fa-folder-open",
-                requiredPermissionName: MdmServicePermissions.Items.Default
-            ).RequireFeatures(MdmFeatures.Items)
+                icon: "fa fa-folder-open"
+            )
         );
         moduleMenu.AddItem(
             new ApplicationMenuItem(
                 MdmServiceMenus.CustomerProfiles,
                 context.GetLocalizer<OMSResource>()["Menu:MdmService:CustomerProfile"],
                 "/MdmSAP/CustomerProfile",
-                icon: "fa fa-user",
-                requiredPermissionName: MdmServicePermissions.Customers.Default
-            ).RequireFeatures(MdmFeatures.CustomerProfiles)
+                icon: "fa fa-user"
+            )
         );
         moduleMenu.AddItem(
             new ApplicationMenuItem(
                 MdmServiceMenus.PriceLists,
                 context.GetLocalizer<OMSResource>()["Menu:MdmService:PriceLists"],
                 "/MdmSAP/PriceLists",
-                icon: "fa fa-money",
-                requiredPermissionName: MdmServicePermissions.PriceLists.Default
-            ).RequireFeatures(MdmFeatures.PriceLists)
+                icon: "fa fa-money"
+            )
         );
         moduleMenu.AddItem(
             new ApplicationMenuItem(
                 MdmServiceMenus.MCPHeaders,
                 context.GetLocalizer<OMSResource>()["Menu:MdmService:RouteSetting"],
                 "/MdmSAP/RouteSetting",
-                icon: "fa fa-calendar-minus-o",
-                requiredPermissionName: MdmServicePermissions.MCPs.Default
-            ).RequireFeatures(MdmFeatures.MCPs)
+                icon: "fa fa-calendar-minus-o"
+            )
         );
         moduleMenu.AddItem(
             new ApplicationMenuItem(
                 InventoryServiceMenus.Prefix,
                 context.GetLocalizer<OMSResource>()["Menu:InventoryService:Warehouses"],
                 "/MdmSAP/Warehouses",
-                icon: "fa fa-list-ul",
-                requiredPermissionName: InventoryServicePermissions.Warehouses.Default
+                icon: "fa fa-list-ul"
             )
         );
     }
