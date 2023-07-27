@@ -59,20 +59,20 @@
         $('#selected-company').text((await Common.getCurrentCompany()).name);
 
         //companyIdentityUserAssignment.getCurrentlySelectedCompany().done(({ name }) => $('#selected-company').text(name))
-        companyIdentityUserAssignment.getListCompanyByCurrentUser({})
-            .done(({ data }) => {
-                data.forEach(({ company }, index) => {
-                    $('table.companies > tbody').append(`<tr data-id=${company.id}><td>${index + 1}</td><td>${company.code}</td><td>${company.name}</td></tr>`);
-                });
-                $('table.companies > tbody > tr').click(function () {
-                    companyIdentityUserAssignment.setCurrentlySelectedCompany($(this).data('id')).then((result) => {
-                        let keyString = `${abp.currentTenant.name}|currentlySelectedCompany|${abp.currentUser.id}`;
-                        localStorage.removeItem(keyString);
-                        Common.saveToStorage(keyString, result);
-                        window.location.reload()
-                    })
-                });
-            });
+        // companyIdentityUserAssignment.getListCompanyByCurrentUser({})
+        //     .done(({ data }) => {
+        //         data.forEach(({ company }, index) => {
+        //             $('table.companies > tbody').append(`<tr data-id=${company.id}><td>${index + 1}</td><td>${company.code}</td><td>${company.name}</td></tr>`);
+        //         });
+        //         $('table.companies > tbody > tr').click(function () {
+        //             companyIdentityUserAssignment.setCurrentlySelectedCompany($(this).data('id')).then((result) => {
+        //                 let keyString = `${abp.currentTenant.name}|currentlySelectedCompany|${abp.currentUser.id}`;
+        //                 localStorage.removeItem(keyString);
+        //                 Common.saveToStorage(keyString, result);
+        //                 window.location.reload()
+        //             })
+        //         });
+        //     });
 
         //$('#selected-company').dxSelectBox({
         //    labelMode: 'hidden',
