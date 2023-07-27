@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using DMSpro.OMS.MdmService.Permissions
-@using DMSpro.OMS.MdmService.Web.Menus
+@using DMSpro.OMS.Web.Navigation
 @using Microsoft.AspNetCore.Mvc.Localization
 @using DMSpro.OMS.Localization
 @inject IHtmlLocalizer<OMSResource> L
@@ -11,7 +11,7 @@
 @inject IPageLayout PageLayout
 @{
     PageLayout.Content.Title = L["CustomerGroupByGeos"].Value;
-    PageLayout.Content.MenuItemName = MdmServiceMenus.CustomerGroupByGeos;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.CustomerGroups;
 }
 
 @section scripts

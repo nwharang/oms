@@ -30,7 +30,6 @@
         },
         byKey: function (key) {
             if (key == 0) return null;
-
             var d = new $.Deferred();
             geoMasterService.get(key)
                 .done(data => {
@@ -38,11 +37,11 @@
                 });
             return d.promise();
         },
-        insert(values) {
-            return geoMasterService.create(values, { contentType: "application/json" });
+        insert({ code, name, parentId }) {
+            return geoMasterService.create({ code, name, parentId }, { contentType: "application/json" });
         },
-        update(key, values) {
-            return geoMasterService.update(key, values, { contentType: "application/json" });
+        update(key, { name }) {
+            return geoMasterService.update(key, { name }, { contentType: "application/json" });
         },
         remove(key) {
             return geoMasterService.delete(key);
@@ -57,7 +56,7 @@
             filtering: true,
             sorting: true,
             grouping: true,
-          },
+        },
         keyExpr: 'id',
         parentIdExpr: 'parentId',
         rootValue: null,
@@ -115,17 +114,6 @@
             type: 'localStorage',
             storageKey: 'tlGeoMaster',
         },
-        // paging: {
-        //     enabled: true,
-        //     pageSize: 10
-        // },
-        // pager: {
-        //     visible: true,
-        //     showPageSizeSelector: true,
-        //     allowedPageSizes: [10, 20,50],
-        //     showInfo: true,
-        //     showNavigationButtons: true
-        // },
         editing: {
             mode: 'row',
             allowAdding: function (e) {
@@ -161,7 +149,6 @@
             }
         },
         onRowInserting: function (e) {
-            // for create first data - if parentId = 0, update parentId = null
             if (e.data && e.data.parentId == 0) {
                 e.data.parentId = null;
             }
@@ -219,12 +206,31 @@
                 fixedPosition: 'left'
             },
             {
+                caption: l("EntityFieldName:MDMService:GeoMaster:Id"),
+                dataField: "id",
+                allowEditing: false,
+                editorOptions: {
+                    readOnly: true,
+                },
+                visible: false,
+            },
+
+            {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Code"),
                 dataField: "code",
                 editorOptions: {
-                    maxLength: 10
+                    maxLength: 20,
                 },
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:GeoMaster:Name"),

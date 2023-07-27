@@ -86,17 +86,16 @@ $(function () {
         export: {
             enabled: true,
         },
-        onExporting(e) {
+        onExporting: function (e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
+            const worksheet = workbook.addWorksheet('Companies');
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
                 worksheet,
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
                 });
             });
             e.cancel = true;
@@ -134,23 +133,23 @@ $(function () {
                 "addRowButton",
                 "columnChooserButton",
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
+                // {
+                //     location: 'after',
+                //     widget: 'dxButton',
+                //     options: {
+                //         icon: "import",
+                //         elementAttr: {
+                //             //id: "import-excel",
+                //             class: "import-excel",
+                //         },
+                //         onClick(e) {
+                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //             var gridName = gridControl.attr('id');
+                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //             if (popup) popup.show();
+                //         },
+                //     },
+                // },
                 "searchPanel",
             ],
         },
@@ -167,9 +166,18 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:VAT:Code"),
                 dataType: 'string',
                 editorOptions: {
-                    maxLength: 20
+                    maxLength: 20,
                 },
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 dataField: 'name',
@@ -186,7 +194,7 @@ $(function () {
                 dataType: 'number',
                 editorOptions: {
                     min: 0,
-                    max : 100,
+                    max: 100,
                     format: "#0'%'",
                     inputAttr: {
                         maxLength: 6
@@ -200,5 +208,5 @@ $(function () {
         ],
     }).dxDataGrid("instance");
 
-    initImportPopup('api/mdm-service/v-aTs', 'Vats_Template', 'dgVATs');
+    // initImportPopup('api/mdm-service/v-aTs', 'Vats_Template', 'dgVATs');
 });

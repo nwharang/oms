@@ -1,29 +1,10 @@
 ﻿$(async function () {
-    let notify = (option) => {
-        obj = { type: "success", position: "bottom right", message: "Message Placeholder", ...option };
-        DevExpress.ui.notify({
-            message: obj.message,
-            height: 45,
-            width: 250,
-            minWidth: 250,
-            type: obj.type,
-            displayTime: 5000,
-            animation: {
-                show: {
-                    type: 'fade', duration: 400, from: 0, to: 1,
-                },
-                hide: { type: 'fade', duration: 40, to: 0 },
-            },
-        }, {
-            position: obj.position,
-        })
-        return obj
-    }
     var l = abp.localization.getResource("OMS");
-    let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
+    let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore, render } = store()
     let currentSelectedDoc = new Map();
-    let mainGrid = $('#dgDeliveryHeader').dxDataGrid({
-        dataSource: { store: mainStore },
+    let mainGrid = $('#dgSOHeader').dxDataGrid({
+        dataSource: mainStore,
+        remoteOperations: true,
         showRowLines: true,
         showBorders: true,
         cacheEnabled: true,
@@ -52,11 +33,10 @@
         },
         export: {
             enabled: true,
-            // allowExportSelectedData: true,
         },
         onExporting(e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('PurchaseRequests');
+            const worksheet = workbook.addWorksheet('Data');
 
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
@@ -64,7 +44,7 @@
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PurchaseRequests.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${render.permissionGroup}.xlsx`);
                 });
             });
             e.cancel = true;
@@ -73,18 +53,18 @@
             visible: true,
         },
         stateStoring: {
-            // enabled: true,
+            enabled: true,
             type: 'localStorage',
-            storageKey: 'dgDeliveryHeader',
+            storageKey: `dg${render.permissionGroup}Header`,
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 50, 100],
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -113,7 +93,7 @@
                                     mainService.createListARInvoiceDoc(array)
                                         .done(() => {
                                             notify({ type: 'success', message: `Create ${array.length} Ar Invoice` })
-                                            $('#dgDeliveryHeader').dxDataGrid('instance').getDataSource().reload()
+                                            $('#dgSOHeader').dxDataGrid('instance').getDataSource().reload()
                                         }
                                         ).fail(() => {
                                             notify({ type: 'error', message: "Create Failed" })
@@ -131,7 +111,7 @@
                                     mainService.createListRODoc(array)
                                         .done(() => {
                                             notify({ type: 'success', message: `Create ${array.length} RO` })
-                                            $('#dgDeliveryHeader').dxDataGrid('instance').getDataSource().reload()
+                                            $('#dgSOHeader').dxDataGrid('instance').getDataSource().reload()
                                         }
                                         ).fail(() => {
                                             notify({ type: 'error', message: "Create Failed" })
@@ -191,11 +171,9 @@
                     {
                         text: l('Button.ViewDetail'),
                         icon: "fieldchooser",
-                        onClick: function (e) {
-                            preLoad.then((data) => {
-                                helper(data).renderPopup(e.row.data.id)
-                            })
-
+                        onClick: (e) => {
+                            loadingPanel.show()
+                            preLoad.then((data) => helper(data, { docId: e.row.data.id }))
                         }
                     }
                 ],
@@ -210,26 +188,20 @@
                 validationRules: [{ type: 'required' }],
             },
             {
+                caption: l('EntityFieldName:OrderService:SalesRequest:BaseDoc'),
+                dataField: 'baseDocId',
+visible: false,
+                dataType: 'string',
+            },
+            {
                 caption: l('EntityFieldName:OrderService:SalesRequest:Route'),
-                dataField: 'routeId',
-                calculateDisplayValue: "routeDisplay",
-                lookup: {
-                    store: "routeDisplay",
-                    displayExpr: "name",
-                    valueExpr: 'id'
-                },
+                dataField: 'routeDisplay',
                 dataType: 'string',
                 validationRules: [{ type: 'required' }],
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:Employee'),
-                dataField: 'employeeId',
-                calculateDisplayValue: "employeeDisplay",
-                lookup: {
-                    store: "employeeDisplay",
-                    displayExpr: "name",
-                    valueExpr: 'id'
-                },
+                dataField: 'employeeDisplay',
                 dataType: 'string',
                 validationRules: [{ type: 'required' }],
             },
@@ -306,23 +278,6 @@
                 validationRules: [{ type: 'required' }],
                 allowEditing: false,
             },
-            // {
-            //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmt'),
-            //     dataField: 'docTotalLineAmt',
-            //     dataType: 'number',
-            //     visible: true,
-            //     validationRules: [{ type: 'required' }],
-            //     allowEditing: false,
-            // },
-            // {
-            //     caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalLineAmtAfterTax'),
-            //     dataField: 'docTotalLineAmtAfterTax',
-            //     dataType: 'number',
-            //     width: 100,
-            //     visible: true,
-            //     validationRules: [{ type: 'required' }],
-            //     allowEditing: false,
-            // },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocTotalAmt'),
                 dataField: 'docTotalAmt',
@@ -357,8 +312,11 @@
                 dataField: 'docDiscountPerc',
                 dataType: 'number',
                 validationRules: [{ type: 'required' }],
-                format: '#0.00 %',
                 width: 100,
+                calculateDisplayValue: (e) => {
+                    if (e)
+                        return e.docDiscountPerc + " %"
+                },
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:DocDiscountAmt'),
@@ -406,4 +364,5 @@
             })
         },
     }).dxDataGrid("instance");
+    $('body').append('<div id=popup>')
 })

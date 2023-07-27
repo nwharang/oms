@@ -30,22 +30,22 @@ $(function () {
         },
         insert(values) {
             return assignmentService.create({
-                companyId: values.companyIdentityUserAssignment.companyId,
-                identityUserId: values.companyIdentityUserAssignment.identityUserId,
+                companyId: values.companyId,
+                identityUserId: values.identityUserId,
             }, { contentType: "application/json" });
         },
         update(key, values) {
             // console.log(key);
             // console.log(values);
-            return assignmentService.update(key.companyIdentityUserAssignment.id,
+            return assignmentService.update(key.id,
                 {
-                    companyId: values.companyIdentityUserAssignment.companyId,
-                    identityUserId: values.companyIdentityUserAssignment.identityUserId
+                    companyId: values.companyId,
+                    identityUserId: values.identityUserId
                 }, { contentType: "application/json" });
         },
         remove(key) {
 
-            return assignmentService.delete(key.companyIdentityUserAssignment.id);
+            return assignmentService.delete(key.id);
         },
         byKey: function (key) {
             if (key == 0) return null;
@@ -84,7 +84,6 @@ $(function () {
         },
         byKey: function (key) {
             if (key == 0) return null;
-            console.log('byKey')
             var d = new $.Deferred();
             companyService.get(key)
                 .done(data => {
@@ -131,7 +130,7 @@ $(function () {
         editing: {
             mode: "row",
             allowAdding: abp.auth.isGranted('MdmService.CustomerAssignments.Create'),
-            allowUpdating: abp.auth.isGranted('MdmService.CustomerAssignments.Edit'),
+            // allowUpdating: abp.auth.isGranted('MdmService.CustomerAssignments.Edit'),
             allowDeleting: abp.auth.isGranted('MdmService.CustomerAssignments.Delete'),
             useIcons: true,
             texts: {
@@ -214,25 +213,7 @@ $(function () {
                 "groupPanel",
                 "addRowButton",
                 "columnChooserButton",
-                "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                },
-                "searchPanel"
+                "exportButton"
             ],
         },
         columns: [
@@ -240,17 +221,18 @@ $(function () {
                 type: 'buttons',
                 caption: l("Actions"),
                 width: 110,
-                buttons: ['edit', 'delete'],
+                buttons: ['delete', 'edit'],
                 fixedPosition: "left",
             },
             {
-                dataField: 'companyIdentityUserAssignment.identityUserId',
+                dataField: 'identityUserId',
                 caption: l("UserName"),
                 validationRules: [{ type: "required" }],
-                calculateDisplayValue(rowData){
-                    if (!rowData.identityUser || rowData.identityUser === null) return "";
-                    return rowData.identityUser.userName;
-                },
+                allowSearch: false,
+                // calculateDisplayValue(rowData){
+                //     if (!rowData.identityUser || rowData.identityUser === null) return "";
+                //     return rowData.identityUser.userName;
+                // },
                 lookup: {
                     dataSource() {
                         return {
@@ -268,10 +250,11 @@ $(function () {
                 }
             },
             {
-                dataField: 'companyIdentityUserAssignment.companyId',
+                dataField: 'companyId',
                 caption: l("EntityFieldName:MDMService:CustomerAssignment:CompanyName"),
                 validationRules: [{ type: "required" }],
-                calculateDisplayValue(rowData){
+                allowSearch: false,
+                calculateDisplayValue(rowData) {
                     if (rowData.company)
                         return rowData.company.name;
                     else return "";

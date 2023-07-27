@@ -269,7 +269,7 @@
                                     <i class="fal fa-search"></i>
                                 </a>
                             </div>
-                            <div class="wraper-select-company">
+                            <div class="wraper-select-company" style='display: none'>
                                 <button class="btn btn-primary btn-sm waves-effect waves-themed btn-select-company" 
                                 data-toggle="dropdown" aria-expanded="false">
                                     <i class="fa fa-sitemap"></i><span id="selected-company"></span>
@@ -1588,7 +1588,7 @@
 
             });
         </script>
-        <script src="/pages/shared/_Layout.js"></script>
+        <abp-script src="/pages/shared/_Layout.js"></abp-script>
         <abp-script src="/pages/shared/common.js" />
         <abp-script src="/js/common/common.js"/>
         @*
@@ -1607,7 +1607,11 @@
             //<script src="/pages/shared/dxconvert.js"></script>
         }
         @RenderSection("scripts", false)
-
+        <script>
+            $(async () => {
+                $('div.dx-texteditor-input-container div.dx-icon.dx-icon-search+input.dx-texteditor-input').attr('maxLength', 50)
+            })
+        </script>
         @await Component.InvokeLayoutHookAsync(LayoutHooks.PageContent.Last, StandardLayouts.Application)
     </div>
 

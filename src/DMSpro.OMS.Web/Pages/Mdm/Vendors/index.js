@@ -1,7 +1,6 @@
 $(function () {
     var l = abp.localization.getResource("OMS");
-    var l1 = abp.localization.getResource("OMS");
-	
+
     var vendorService = window.dMSpro.oMS.mdmService.controllers.vendors.vendor;
     var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
     var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
@@ -153,7 +152,7 @@ $(function () {
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             },
             popup: {
-                height: "fit-content"
+                height: 400
             },
         },
         onInitNewRow: function (e) {
@@ -180,6 +179,23 @@ $(function () {
         searchPanel: {
             visible: true
         },
+        export: {
+            enabled: true,
+        },
+        onExporting: function (e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Companies');
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
+                });
+            });
+            e.cancel = true;
+        },
         columnMinWidth: 50,
         columnChooser: {
             enabled: true,
@@ -188,35 +204,17 @@ $(function () {
         columnFixing: {
             enabled: true,
         },
-        export: {
-            enabled: true,
-        },
-        onExporting(e) {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-            DevExpress.excelExporter.exportDataGrid({
-                component: e.component,
-                worksheet,
-                autoFilterEnabled: true,
-            }).then(() => {
-                workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
-                });
-            });
-            e.cancel = true;
-        },
         headerFilter: {
             visible: true,
         },
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -226,23 +224,6 @@ $(function () {
                 "addRowButton",
                 "columnChooserButton",
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    },
-                }, 
                 "searchPanel"
             ],
         },
@@ -251,14 +232,14 @@ $(function () {
                 type: 'buttons',
                 caption: l("Actions"),
                 width: 90,
-                buttons: ['edit'],
+                buttons: ['edit', 'delete'],
                 fixedPosition: 'left'
             },
             {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:Vendor:Code"),
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                allowEditing: false,
             },
             {
                 dataField: 'name',
@@ -270,22 +251,46 @@ $(function () {
                 dataField: 'shortName',
                 caption: l("EntityFieldName:MDMService:Vendor:ShortName"),
                 dataType: 'string',
-                //validationRules: [{ type: "required" }]
+                validationRules: [{ type: "required" }]
             },
             {
                 dataField: 'phone1',
                 caption: l("EntityFieldName:MDMService:Vendor:Phone1"),
                 dataType: 'string',
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateError:Phone')
+                    }
+                ]
             },
             {
                 dataField: 'phone2',
                 caption: l("EntityFieldName:MDMService:Vendor:Phone2"),
                 dataType: 'string',
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateError:Phone')
+                    }
+                ]
             },
             {
                 dataField: 'erpCode',
                 caption: l("EntityFieldName:MDMService:Vendor:ERPCode"),
                 dataType: 'string',
+                editorOptions: {
+                    maxLength: 20,
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 dataField: 'active',
@@ -293,7 +298,6 @@ $(function () {
                 width: 70,
                 alignment: 'center',
                 dataType: 'boolean',
-                //validationRules: [{ type: "required" }],
                 cellTemplate(container, options) {
                     $('<div>')
                         .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
@@ -301,42 +305,33 @@ $(function () {
                 },
             },
             {
-                dataField: 'linkedCompany',
+                dataField: 'linkedCompanyId',
                 caption: l("EntityFieldName:MDMService:Vendor:LinkedCompany"),
-                //validationRules: [{ type: "required" }],
                 dataType: 'string',
-                // calculateDisplayValue: function (rowData) {
-                //     // if(rowData.geoLevel0){
-                //     //     return rowData.geoLevel0.name;
-                //     // }
-                //     // return "";
-                // },
                 lookup: {
-                   dataSource: {
-                       store: companiesLookup,
-                       paginate: true,
-                       pageSize: pageSizeForLookup
-                   },
-                   valueExpr: "id",
-                   displayExpr: "code"
-                }
+                    dataSource: {
+                        store: companiesLookup,
+                        paginate: true,
+                        pageSize
+                    },
+                    valueExpr: "id",
+                    displayExpr: "code"
+                },
+                editorOptions: {
+                    showClearButton: true
+                },
+                validationRules: [{ type: "required" }]
             },
-            //{
-            //    dataField: 'warehouseId',
-            //    caption: l("EntityFieldName:MDMService:Vendor:Warehouse"),
-            //    dataType: 'string',
-            //    validationRules: [{ type: "required" }],
-            //    lookup: {
-            //        dataSource: companiesLookup,
-            //        valueExpr: "id",
-            //        displayExpr: "displayName"
-            //    }
-            //},
             {
                 dataField: 'priceListId',
-                caption: l1("PriceListName"),
+                caption: l("PriceListName"),
                 dataType: 'string',
                 validationRules: [{ type: "required" }],
+                calculateDisplayValue: (e) => {
+                    if (e && e.priceList)
+                        return e.priceList.code
+                    return
+                },
                 lookup: {
                     dataSource: {
                         store: pricelistLookup,
@@ -345,7 +340,8 @@ $(function () {
                     },
                     valueExpr: "id",
                     displayExpr: "code"
-                }
+                },
+                allowSearch: false
             },
             // {
             //     dataField: "geoMaster0Id",
@@ -459,9 +455,16 @@ $(function () {
             // },
             {
                 dataField: 'address',
+                dataType: 'string',
                 caption: l("EntityFieldName:MDMService:CompanyProfile:Address"),
                 width: 150,
-                dataType: 'string',
+                validationRules: [
+                    {
+                        type: "stringLength",
+                        max: 255,
+                        message: l('WarnMessage.FieldLength').replace('{0}', 255),
+                    }
+                ]
             },
             // {
             //     dataField: 'latitude',
@@ -477,5 +480,4 @@ $(function () {
             // },
         ],
     }).dxDataGrid("instance");
-    initImportPopup('api/mdm-service/vendors', 'Vendors_Template', 'dgVendors');
 });

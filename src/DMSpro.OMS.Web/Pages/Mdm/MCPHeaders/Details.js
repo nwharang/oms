@@ -1,35 +1,48 @@
-﻿var l = abp.localization.getResource("OMS");
-var l1 = abp.localization.getResource("OMS");
-var MCPModel;
-var mcpDetailData = [];
-$(function () {
-
+﻿$(async () => {
+    let l = abp.localization.getResource("OMS");
+    let MCPModel = JSON.parse(sessionStorage.getItem("MCPModel")), mcpDetailData = [], sellingZoneId = null;
+    let rendingLoadingPopup = () => {
+        let loadingPopup = $('<div />')
+        loadingPopup.dxPopup({
+            height: 100,
+            width: 100,
+            showTitle: false,
+            contentTemplate: (e) => {
+                return e.dxLoadIndicator({
+                    height: 60,
+                    width: 60,
+                })
+            }
+        })
+        loadingPopup.appendTo('body')
+        return loadingPopup.dxPopup('instance')
+    }
+    let loadingPopup = rendingLoadingPopup()
     DevExpress.config({
         editorStylingMode: 'underlined',
     });
+    let salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
+    let itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
+    let companyInZoneService = window.dMSpro.oMS.mdmService.controllers.companyInZones.companyInZone;
+    let customerInZoneService = window.dMSpro.oMS.mdmService.controllers.customerInZones.customerInZone;
+    let customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
+    let mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
+    let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+    let mCPDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
+    let visitPlanService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
 
-    var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
-    var itemGroupService = window.dMSpro.oMS.mdmService.controllers.itemGroups.itemGroup;
-    var companyInZoneService = window.dMSpro.oMS.mdmService.controllers.companyInZones.companyInZone;
-    var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
-    var mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
-    var companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
-    var mCPDetailsService = window.dMSpro.oMS.mdmService.controllers.mCPDetails.mCPDetail;
-    var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
-    var visitPlanService = window.dMSpro.oMS.mdmService.controllers.visitPlans.visitPlan;
-
-    var customerStore = new DevExpress.data.CustomStore({
-        key: 'id',
+    let customerStore = new DevExpress.data.CustomStore({
+        key: 'customerId',
         load(loadOptions) {
             const deferred = $.Deferred();
+            loadOptions.filter = [...(loadOptions.filter && loadOptions.filter.length > 0 ? [loadOptions.filter, "and"] : []), [["endDate", ">=", moment().format('YYYY-MM-DD')], 'or', ['endDate', '=', null]], 'and', ["salesOrgHierarchyId", "=", sellingZoneId]]
             const args = {};
             requestOptions.forEach((i) => {
                 if (i in loadOptions && isNotEmpty(loadOptions[i])) {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-
-            customerService.getListDevextremes(args)
+            customerInZoneService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
                         totalCount: result.totalCount,
@@ -37,77 +50,20 @@ $(function () {
                         groupCount: result.groupCount,
                     });
                 });
-
             return deferred.promise();
         },
         byKey: function (key) {
-            if (key == 0) return null;
 
-            var d = new $.Deferred();
+            if (key == 0) return null;
+            let d = new $.Deferred();
             customerService.get(key)
                 .done(data => {
                     d.resolve(data);
                 });
             return d.promise();
-        }
-    });
-    var mCPDetailsStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            if (!MCPModel || !MCPModel.id) {
-                deferred.resolve([], {
-                    totalCount: -1,
-                    summary: null,
-                    groupCount: -1,
-                });
-                return deferred.promise();
-            }
-            if (loadOptions.filter == null) {
-                loadOptions.filter = ['mcpHeaderId', '=', MCPModel.id];
-            } else {
-                loadOptions.filter = [loadOptions.filter, "and", ['mcpHeaderId', '=', MCPModel.id]];
-            }
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            mCPDetailsService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            mCPDetailsService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        },
-        insert(values) {
-
-        },
-        update(key, values) {
-
-        },
-        remove(key) {
-
         },
     });
-    var companyInZoneStore = new DevExpress.data.CustomStore({
+    let companyInZoneStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
             const args = {};
@@ -119,7 +75,7 @@ $(function () {
             const deferred = $.Deferred();
             companyInZoneService.getListDevextremes(args)
                 .done(result => {
-                    var data = [];
+                    let data = [];
                     result.data.forEach(x => {
                         data.push({
                             id: x.company.id,
@@ -138,7 +94,7 @@ $(function () {
         byKey: function (key) {
             if (key == 0) return null;
 
-            var d = new $.Deferred();
+            let d = new $.Deferred();
             companyService.get(key)
                 .done(data => {
                     d.resolve(data);
@@ -147,7 +103,7 @@ $(function () {
         }
     });
 
-    var salesOrgHierarchyStore = new DevExpress.data.CustomStore({
+    let salesOrgHierarchyStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -170,7 +126,6 @@ $(function () {
             return deferred.promise();
         },
         byKey: function (key) {
-            console.log(key);
             if (key == undefined) return null;
             var d = new $.Deferred();
             salesOrgHierarchyService.get(key)
@@ -215,121 +170,112 @@ $(function () {
 
     $("#top-section").dxForm({
         labelMode: 'floating',
+        formData: await MCPModel,
         colCount: 4,
         items: [
             {
-                itemType: "group",
-                items: [
+                name: 'Code',
+                dataField: 'Code',
+                editorType: 'dxTextBox',
+                editorOptions: {
+                    readOnly: Boolean(await MCPModel?.id)
+                },
+                validationRules: [
                     {
-                        dataField: 'Code',
-                        editorType: 'dxTextBox',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        },
-                        {
-                            type: "pattern",
-                            pattern: /^[a-zA-Z0-9]*$/,
-                            message: l1('Message.NonSpecialCharacters').replace('{0}', 'Code')
-                        }]
+                        type: "required"
                     },
                     {
-                        dataField: 'Name',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        },
-                        {
-                            type: "stringLength",
-                            max: 100,
-                            message: l1('Message.MaximumLength').replace('{0}', 100)
-                        }],
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
                     }
                 ]
             },
             {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'Route',
-                        editorType: 'dxSelectBox',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        }],
-                        editorOptions: {
-                            dataSource: new DevExpress.data.DataSource({
-                                store: salesOrgHierarchyStore,
-                                filter: ["isRoute", "=", true],
-                                paginate: true,
-                                pageSize: pageSizeForLookup
-                            }),
-                            showClearButton: true,
-                            placeholder: '',
-                            valueExpr: "id",
-                            displayExpr: "name"
-                        }
+                dataField: 'Name',
+                validationRules: [{
+                    type: 'required',
+                }],
+            },
+            {
+                dataField: 'Route',
+                editorType: 'dxSelectBox',
+                validationRules: [{
+                    type: 'required',
+                    message: '',
+                }],
+                editorOptions: {
+                    dataSource: {
+                        store: salesOrgHierarchyStore,
+                        filter: [["isRoute", "=", true], 'and', ['salesOrgHeader.status', '=', 1]],
+                        paginate: true,
+                        pageSize
                     },
-                    {
-                        dataField: 'Company',
-                        editorType: 'dxSelectBox',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        }],
-                        editorOptions: {
-                            readOnly: true,
-                            showClearButton: true,
-                            placeholder: '',
-                            valueExpr: "id",
-                            displayExpr: "name",
-                        }
+                    showClearButton: true,
+                    valueExpr: "id",
+                    displayExpr: "name"
+                }
+            },
+            {
+                dataField: 'Company',
+                editorType: 'dxSelectBox',
+                validationRules: [{
+                    type: 'required',
+                    message: '',
+                }],
+                editorOptions: {
+                    readOnly: true,
+                    showClearButton: true,
+                    valueExpr: "id",
+                    displayExpr: "name",
+                }
+            },
+            {
+                dataField: 'EffectiveDate',
+                editorType: 'dxDateBox',
+                editorOptions: {
+                    displayFormat: 'dd/MM/yyyy',
+                    showClearButton: true,
+                    min: MCPModel?.creationTime ? new Date(MCPModel.creationTime) : new Date(),
+                    onValueChanged: (e) => {
+                        try {
+                            $("#top-section").data('dxForm').getEditor('EndDate').option('min', e.value ? moment(e.value).add(1, 'days') : moment().add(1, 'days'))
+                        } catch (err) { }
+                    },
+                },
+                validationRules: [{ type: 'required', message: '' }],
+            },
+            {
+                dataField: 'EndDate',
+                editorType: 'dxDateBox',
+                editorOptions: {
+                    displayFormat: 'dd/MM/yyyy',
+                    showClearButton: true,
+                    onValueChanged: (e) => {
+                        try {
+                            $("#top-section").data('dxForm').getEditor('EffectiveDate').option('max', moment(e.value).subtract(1, 'days'))
+                        } catch (err) { }
                     }
-                ]
+                }
             },
             {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'EffectiveDate',
-                        editorType: 'dxDateBox',
-                        validationRules: [{
-                            type: 'required',
-                            message: '',
-                        }],
-                        editorOptions: {
-                            //min: new Date(),
-                            displayFormat: 'dd/MM/yyyy',
-                            showClearButton: true
-                        }
-                    }, {
-                        dataField: 'EndDate',
-                        editorType: 'dxDateBox',
-                        editorOptions: {
-                            //min: new Date(),
-                            displayFormat: 'dd/MM/yyyy',
-                            showClearButton: true
-                        }
-                    }]
+                dataField: 'ItemGroup',
+                editorType: 'dxSelectBox',
+                editorOptions: {
+                    dataSource: {
+                        store: itemGroupStore,
+                        filter: [],
+                        paginate: true,
+                        pageSize
+                    },
+                    showClearButton: true,
+                    valueExpr: "id",
+                    displayExpr: "name",
+                }
             },
             {
-                itemType: "group",
-                items: [
-                    {
-                        dataField: 'ItemGroup',
-                        editorType: 'dxSelectBox',
-                        editorOptions: {
-                            dataSource: new DevExpress.data.DataSource({
-                                store: itemGroupStore,
-                                paginate: true,
-                                pageSize: pageSizeForLookup
-                            }),
-                            showClearButton: true,
-                            placeholder: '',
-                            valueExpr: "id",
-                            displayExpr: "name",
-                        }
-                    }]
+                dataField: 'gpsLock',
+                editorType: 'dxCheckBox',
             }
         ]
     });
@@ -352,404 +298,390 @@ $(function () {
         handles: "bottom"
     }).dxResizable('instance');
 
-    var dgMCPDetails = $('#dgMCPDetails')
-        .dxDataGrid({
-            dataSource: mcpDetailData,
-            onEditingStart: function (e) {
-                $('#SaveButton').data('dxButton').option('disabled', true);
-            },
-            onSaved: function (e) {
-                $('#SaveButton').data('dxButton').option('disabled', false);
-            },
-            onEditCanceled: function (e) {
-                $('#SaveButton').data('dxButton').option('disabled', false);
-            },
-            editing: {
-                mode: "row",
-                allowAdding: abp.auth.isGranted('MdmService.MCPs.Create'),
-                allowUpdating: abp.auth.isGranted('MdmService.MCPs.Edit'),
-                allowDeleting: abp.auth.isGranted('MdmService.MCPs.Delete'),
-                useIcons: true,
-                texts: {
-                    editRow: l("Edit"),
-                    deleteRow: l("Delete"),
-                    confirmDeleteMessage: l("DeleteConfirmationMessage")
-                }
-            },
-            remoteOperations: true,
-            export: {
-                enabled: true,
-            },
-            onExporting(e) {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('MCPDetails');
-
-                DevExpress.excelExporter.exportDataGrid({
-                    component: e.component,
-                    worksheet,
-                    autoFilterEnabled: true,
-                }).then(() => {
-                    workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'MCPDetails.xlsx');
-                    });
+    var dgMCPDetails = $('#dgMCPDetails').dxDataGrid({
+        dataSource: mcpDetailData,
+        onEditingStart: function (e) {
+            $('#SaveButton').data('dxButton').option('disabled', true);
+        },
+        onSaved: function (e) {
+            $('#SaveButton').data('dxButton').option('disabled', false);
+        },
+        onEditCanceled: function (e) {
+            $('#SaveButton').data('dxButton').option('disabled', false);
+        },
+        editing: {
+            mode: "row",
+            allowAdding: abp.auth.isGranted('MdmService.MCPs.Create') && Boolean(MCPModel?.id),
+            allowUpdating: abp.auth.isGranted('MdmService.MCPs.Edit'),
+            allowDeleting: abp.auth.isGranted('MdmService.MCPs.Delete'),
+            useIcons: true,
+            texts: {
+                editRow: l("Edit"),
+                deleteRow: l("Delete"),
+                confirmDeleteMessage: l("DeleteConfirmationMessage")
+            }
+        },
+        remoteOperations: true,
+        export: {
+            enabled: true,
+        },
+        onExporting: function (e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Companies');
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
                 });
-                e.cancel = true;
-            },
-            showRowLines: true,
-            showBorders: true,
-            allowColumnReordering: true,
-            allowColumnResizing: true,
-            columnResizingMode: 'widget',
-            columnMinWidth: 50,
-            columnAutoWidth: true,
-            columnChooser: {
-                enabled: true,
-                mode: "select"
-            },
-            columnFixing: {
-                enabled: true,
-            },
-            filterRow: {
-                visible: true,
-            },
-            groupPanel: {
-                visible: true,
-            },
-            headerFilter: {
-                visible: true,
-            },
-            rowAlternationEnabled: true,
-            searchPanel: {
-                visible: true
-            },
-            stateStoring: { //save state in localStorage
-                enabled: true,
-                type: 'localStorage',
-                storageKey: 'dgMCPDetails',
-            },
-            paging: {
-                enabled: true,
-                pageSize: pageSize
-            },
-            pager: {
-                visible: true,
-                showPageSizeSelector: true,
-                allowedPageSizes: allowedPageSizes,
-                showInfo: true,
-                showNavigationButtons: true
-            },
-            toolbar: {
-                items: [
-                    "groupPanel",
-                    "addRowButton",
-                    "columnChooserButton",
-                    "exportButton",
-                    {
-                        location: 'after',
-                        widget: 'dxButton',
-                        options: {
-                            icon: "import",
-                            elementAttr: {
-                                //id: "import-excel",
-                                class: "import-excel",
-                            },
-                            onClick(e) {
-                                var gridControl = e.element.closest('div.dx-datagrid').parent();
-                                var gridName = gridControl.attr('id');
-                                var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                                if (popup) popup.show();
-                            },
+            });
+            e.cancel = true;
+        },
+        showRowLines: true,
+        showBorders: true,
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        columnResizingMode: 'widget',
+        columnMinWidth: 50,
+        columnAutoWidth: true,
+        columnChooser: {
+            enabled: true,
+            mode: "select"
+        },
+        columnFixing: {
+            enabled: true,
+        },
+        filterRow: {
+            visible: true,
+        },
+        groupPanel: {
+            visible: true,
+        },
+        headerFilter: {
+            visible: true,
+        },
+        rowAlternationEnabled: true,
+        searchPanel: {
+            visible: true
+        },
+        stateStoring: { //save state in localStorage
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgMCPDetails',
+        },
+        paging: {
+            enabled: true,
+            pageSize
+        },
+        pager: {
+            visible: true,
+            showPageSizeSelector: true,
+            allowedPageSizes,
+            showInfo: true,
+            showNavigationButtons: true
+        },
+        toolbar: {
+            items: [
+                "groupPanel",
+                "addRowButton",
+                "columnChooserButton",
+                "exportButton",
+                {
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
+                        icon: "import",
+                        elementAttr: {
+                            class: "import-excel",
+                        },
+                        onClick: (e) => {
+                            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                            var gridName = gridControl.attr('id');
+                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            if (popup) popup.show();
                         },
                     },
-                    "searchPanel",
+                },
+                "searchPanel",
+            ],
+        },
+        onEditorPreparing: (e) => {
+            if (e.parentType === "dataRow" && e.dataField === "customerId") {
+                e.editorOptions.onValueChanged = function (ev) {
+                    let selectedItem = ev.component.option('selectedItem');
+                    e.setValue(selectedItem);
+                }
+            }
+        },
+        onRowUpdating: (e) => {
+            e.newData = Object.assign({}, e.oldData, e.newData);
+        },
+        onInitNewRow: (e) => {
+            $('#SaveButton').data('dxButton').option('disabled', true);
+            e.data.code = "1";
+            e.data.effectiveDate = new Date();
+            e.data.distance = 0;
+            e.data.visitOrder = 0;
+            e.data.monday = false;
+            e.data.tuesday = false;
+            e.data.wednesday = false;
+            e.data.thursday = false;
+            e.data.friday = false;
+            e.data.saturday = false;
+            e.data.sunday = false;
+            e.data.week1 = true;
+            e.data.week2 = true;
+            e.data.week3 = true;
+            e.data.week4 = true;
+        },
+        dateSerializationFormat: "yyyy-MM-dd",
+        columns: [
+            {
+                type: 'buttons',
+                caption: l("Actions"),
+                width: 110,
+                buttons: ['edit', 'delete'],
+                fixedPosition: "left",
+            },
+            {
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                formItem: {
+                    visible: false
+                },
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Customer"),
+                dataField: "customerId",
+                calculateDisplayValue: (rowData) => rowData?.customer?.name,
+                editorOptions: {
+                    dropDownOptions: {
+                        width: 500,
+                    },
+                },
+                setCellValue: (rowData, value) => {
+                    rowData.customerId = value.customerId;
+                    rowData.customer = value.customer;
+                },
+                validationRules: [{ type: "required" }],
+                lookup: {
+                    dataSource: {
+                        store: customerStore,
+                        paginate: true,
+                        pageSize
+                    },
+                    displayExpr: (e) => e.customer?.name || e?.name,
+                    valueExpr: (e) => e?.customer?.id || e?.id
+                },
+            },
+            {
+                caption: "Address",
+                dataField: "fullAddress",
+                dataType: 'string',
+                calculateDisplayValue: (rowData) => rowData?.customer?.fullAddress,
+                width: 150,
+                allowEditing: false,
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:EffectiveDate"),
+                dataField: "effectiveDate",
+                dataType: "date",
+                format: 'dd/MM/yyyy',
+                editorOptions: {
+                    min: MCPModel?.effectiveDate || new Date(),
+                },
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'async',
+                        validationCallback: (e) => {
+                            let effDate = new Date(e.data.effectiveDate)
+                            let endDate = e?.data?.endDate ? new Date(e?.data?.endDate) : null
+                            return new Promise((resolve, reject) => {
+                                if (!endDate || (endDate && effDate < endDate))
+                                    resolve(effDate)
+                                reject(l('ValidateError:EffectiveDate'))
+                            })
+                        }
+                    }
                 ],
             },
-            onEditorPreparing: function (e) {
-                var component = e.component,
-                    rowIndex = e.row && e.row.rowIndex;
-                if (e.dataField === "customerId") {
-                    e.editorOptions.placeholder = '';
-                    var onValueChanged = e.editorOptions.onValueChanged;
-                    e.editorOptions.onValueChanged = function (e) {
-                        onValueChanged.call(this, e);
-                        component.cellValue(rowIndex, "customerIdExtra", e.component.option('selectedItem').id);
-                    }
-                } else if (e.dataField == "effectiveDate" || e.dataField == "endDate") {
-                    e.editorOptions.displayFormat = "dd/MM/yyyy";
-                    e.editorOptions.min = new Date();
-                }
-            },
-            onRowUpdating: function (e) {
-                var objectRequire = ['customerId',
-                    'effectiveDate',
-                    'endDate',
-                    'distance',
-                    'visitOrder',
-                    'monday',
-                    "tuesday",
-                    "wednesday",
-                    "thursday",
-                    "friday",
-                    "saturday",
-                    "sunday",
-                    "week1",
-                    "week2",
-                    "week3",
-                    "week4"];
-                for (var property in e.oldData) {
-                    if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                        e.newData[property] = e.oldData[property];
-                    }
-                }
-            },
-            onInitNewRow: function (e) {
-                $('#SaveButton').data('dxButton').option('disabled', true);
-                e.data.code = "1";
-                e.data.effectiveDate = null;
-                e.data.endDate = null;
-                e.data.distance = 0;
-                e.data.visitOrder = 0;
-                e.data.monday = false;
-                e.data.tuesday = false;
-                e.data.wednesday = false;
-                e.data.thursday = false;
-                e.data.friday = false;
-                e.data.saturday = false;
-                e.data.sunday = false;
-                e.data.week1 = true;
-                e.data.week2 = true;
-                e.data.week3 = true;
-                e.data.week4 = true,
-                    e.data.customerId = null;
-                //e.data.mcpHeaderId = MCPModel ? MCPModel.id : null;
-            },
-            columns: [
-                {
-                    type: 'buttons',
-                    caption: l("Actions"),
-                    width: 110,
-                    buttons: ['edit', 'delete'],
-                    fixedPosition: "left",
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:EndDate"),
+                dataField: "endDate",
+                dataType: "date",
+                editorOptions: {
+                    showClearButton: true,
+                    min: MCPModel?.effectiveDate || new Date(),
+                    max: MCPModel?.endDate || null
                 },
-                {
-                    caption: l1("EntityFieldName:MDMService:MCPDetail:Customer"),
-                    dataField: "customerId",
-                    calculateDisplayValue: "customer.name",
-                    validationRules: [{ type: "required", message: '' }],
-                    lookup: {
-                        dataSource() {
-                            return {
-                                store: customerStore,
-                                /*  filter: ["employeeTypeId", "=", "4623cb59-c099-1615-149f-3a0861252b0d"],//salesman*/
-                                paginate: true,
-                                pageSize: pageSizeForLookup
-                            };
-                        },
-                        displayExpr: 'name',
-                        valueExpr: 'id',
-                        searchEnabled: true,
-                        searchMode: 'contains'
+                validationRules: [
+                    {
+                        type: 'async',
+                        validationCallback: (e) => {
+                            let customerEnddate = e.data?.customer?.endDate ? new Date(e.data.customer.endDate) : null
+                            let endDate = e?.data?.endDate ? new Date(e?.data?.endDate) : null
+
+                            return new Promise((resolve, reject) => {
+                                if (!e.value || !customerEnddate || e.value <= customerEnddate)
+                                    resolve(endDate)
+                                reject(l('ValidateError:MCPDetails:EffectiveDate'))
+                            })
+                        }
                     }
-                },
-                //{
-                //    caption: "Address",
-                //    dataField: "customer.address",
-                //    width: 150,
-                //    allowEditing: false,
-                //},
-                {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:EffectiveDate"),
-                    dataField: "effectiveDate",
-                    dataType: "date",
-                    format: 'dd/MM/yyyy',
-                    validationRules: [{ type: "required", message: '' }],
-                }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:EndDate"),
-                    dataField: "endDate",
-                    dataType: "date",
-                    format: 'dd/MM/yyyy',
-                    validationRules: [{ type: "required", message: '' }],
-                }, {
-
-                    caption: l1("EntityFieldName:MDMService:MCPDetail:Distance"),
-                    dataField: "distance",
-                    dataType: "number",
-                }, {
-
-                    caption: l("EntityFieldName:MDMService:MCPDetail:VisitOrder"),
-                    dataField: "visitOrder",
-                    dataType: "number",
-                }, {
-
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Monday"),
-                    dataField: "monday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Tuesday"),
-                    dataField: "tuesday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Wednesday"),
-                    dataField: "wednesday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Thursday"),
-                    dataField: "thursday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Friday"),
-                    dataField: "friday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Saturday"),
-                    dataField: "saturday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Sunday"),
-                    dataField: "sunday",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Week1"),
-                    dataField: "week1",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Week2"),
-                    dataField: "week2",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Week3"),
-                    dataField: "week3",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
-                }, {
-                    caption: l("EntityFieldName:MDMService:MCPDetail:Week4"),
-                    dataField: "week4",
-                    dataType: "boolean",
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : ''))
-                            .appendTo(container);
-                    },
+                ],
+                format: 'dd/MM/yyyy',
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Distance"),
+                dataField: "distance",
+                dataType: "number",
+                editorOptions: {
+                    min: 0,
                 }
-            ],
-        }).dxDataGrid("instance");
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:VisitOrder"),
+                dataField: "visitOrder",
+                dataType: "number",
+                editorOptions: {
+                    format: '#',
+                    min: 0
+                }
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Monday"),
+                dataField: "monday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Tuesday"),
+                dataField: "tuesday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Wednesday"),
+                dataField: "wednesday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Thursday"),
+                dataField: "thursday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Friday"),
+                dataField: "friday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Saturday"),
+                dataField: "saturday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Sunday"),
+                dataField: "sunday",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Week1"),
+                dataField: "week1",
+                dataType: "boolean",
 
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Week2"),
+                dataField: "week2",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Week3"),
+                dataField: "week3",
+                dataType: "boolean",
+            },
+            {
+                caption: l("EntityFieldName:MDMService:MCPDetail:Week4"),
+                dataField: "week4",
+                dataType: "boolean",
+            }
+        ],
+    }).dxDataGrid("instance");
 
-    function getNormalDate(currentDate) {
-        if (!currentDate || (typeof currentDate == "string")) return currentDate;
-
-        var date = currentDate.getFullYear() + "-" + pad(currentDate.getMonth() + 1, 2) + "-" + pad(currentDate.getDate(), 2) + "T00:00:00";
-        return date;
-    }
 
     $("#CloseButton").click(function (e) {
         e.preventDefault();
         window.close();
-        //var currentCode = salesOrgHeaderCode.option("value");
-        //var currentName = salesOrgHeaderName.option("value");
-        //var previousCode = SalesOrgHeaderModel != null ? SalesOrgHeaderModel.code : '';
-        //var previousName = SalesOrgHeaderModel != null ? SalesOrgHeaderModel.name : '';
-
-        //if (currentCode != previousCode || currentName != previousName) {
-        //    abp.message.confirm(l1('ConfirmationMessage.UnSavedAndLeave'), l1('ConfirmationMessage.UnSavedAndLeaveTitle')).then(function (confirmed) {
-        //        if (confirmed) {
-        //            window.close();
-        //        }
-        //    });
-        //} else {
-        //    window.close();
-        //}
     });
 
     $('#SaveButton').click(function (e) {
+        $('#SaveButton').dxButton('instance').option('disabled', true)
+        loadingPopup.show()
         e.preventDefault();
         var form = $("#top-section").data('dxForm');
         var valid = form.validate();
-        if (!valid.isValid) return;
+        if (!valid.isValid) {
+            $('#SaveButton').dxButton('instance').option('disabled', false)
+            loadingPopup.hide();
+            return
+        }
 
         var routeId = form.getEditor('Route').option('value');
         var companyId = form.getEditor('Company').option('value');
         var itemGroupId = form.getEditor('ItemGroup').option('value');
         var code = form.getEditor('Code').option('value');
         var name = form.getEditor('Name').option('value');
-        //var isGPSLocked = form.getEditor('IsGPSLocked').option('value');
+        var gpsLock = form.getEditor('gpsLock').option('value');
         var effectiveDate = form.getEditor('EffectiveDate').option('value');
         var endDate = form.getEditor('EndDate').option('value');
 
         var mcpHeaderDto = {
+            code,
+            name,
+            effectiveDate: effectiveDate ? moment(effectiveDate).format('YYYY-MM-DD[T12:00:00Z]') : null,
+            endDate: endDate ? moment(endDate).format('YYYY-MM-DD[T12:00:00Z]') : null,
             routeId,
             companyId,
             itemGroupId,
-            code,
-            name,
-            effectiveDate,
-            endDate
+            gpsLock
         };
         var mcpDetails = [];
 
         dgMCPDetails.getDataSource().items().forEach(u => {
-            mcpDetails.push(u);
+            mcpDetails.push({
+                code: u.code,
+                effectiveDate: u.effectiveDate ? moment(u.effectiveDate).format('YYYY-MM-DD[T12:00:00Z]') : null,
+                endDate: u.endDate ? moment(u.endDate).format('YYYY-MM-DD[T12:00:00Z]') : null,
+                distance: u.distance,
+                visitOrder: u.visitOrder,
+                monday: u.monday,
+                tuesday: u.tuesday,
+                wednesday: u.wednesday,
+                thursday: u.thursday,
+                friday: u.friday,
+                saturday: u.saturday,
+                sunday: u.sunday,
+                week1: u.week1,
+                week2: u.week2,
+                week3: u.week3,
+                week4: u.week4,
+                customerId: u.customerId,
+                mcpHeaderId: u.mcpHeaderId,
+                concurrencyStamp: u.concurrencyStamp,
+                id: u.id
+            });
         });
         var params = {
             mcpHeaderDto: mcpHeaderDto,
             mcpDetails: mcpDetails,
         }
-        params.mcpHeaderDto.effectiveDate = getNormalDate(params.mcpHeaderDto.effectiveDate);
-        params.mcpHeaderDto.endDate = getNormalDate(params.mcpHeaderDto.endDate);
-
-        params.mcpDetails.forEach(u => {
-            u.effectiveDate = getNormalDate(u.effectiveDate);
-            u.endDate = getNormalDate(u.endDate);
-        })
 
         if (!MCPModel)
             mCPHeaderService.createMCP(params, { contentType: "application/json" })
@@ -760,7 +692,20 @@ $(function () {
 
                     $('#GenerateButton').data('dxButton').option('disabled', false);
                     $('#EnddateButton').data('dxButton').option('disabled', false);
-                }).fail(() => { });
+                    $('#SaveButton').dxButton('instance').option('disabled', false)
+                    dgMCPDetails.option('editing.allowAdding', abp.auth.isGranted('MdmService.MCPs.Create') && Boolean(MCPModel?.id))
+                    salesOrgHierarchyService.get(MCPModel.routeId).done(u => {
+                        sellingZoneId = u.parentId;
+                    })
+                    $('top-section').data('dxForm')?.getEditor('Code')?.option('readOnly', true)
+                    loadingPopup.hide()
+                })
+                .fail(() => {
+                    $('#SaveButton').dxButton('instance').option('disabled', false)
+                    dgMCPDetails.refresh().then(() => {
+                        loadingPopup.hide()
+                    })
+                });
         else
             mCPHeaderService.updateMCP(MCPModel.id, params, { contentType: "application/json" })
                 .done(result => {
@@ -768,48 +713,56 @@ $(function () {
                     MCPModel = result.mcpHeaderDto;
                     sessionStorage.setItem("MCPModel", JSON.stringify(result.mcpHeaderDto));
 
-                    abp.message.confirm(l1('ConfirmationMessage.GenerateVisitPlan'), l('Congratulations')).then(function (answer) {
+                    abp.message.confirm(l('ConfirmationMessage.GenerateVisitPlan'), l('Congratulations')).then((answer) => {
                         if (answer) {
                             $('#GenerateButton').click();
                         }
                     });
+                    $('#SaveButton').dxButton('instance').option('disabled', false)
+                    salesOrgHierarchyService.get(MCPModel.routeId).done(u => {
+                        sellingZoneId = u.parentId;
+                    })
+                    loadingPopup.hide()
+                })
+                .fail(() => {
+                    $('#SaveButton').dxButton('instance').option('disabled', false)
+                    dgMCPDetails.refresh().then(() => {
+                        loadingPopup.hide()
+                    })
                 });
     })
 
     $("#CloseButton").click(function (e) {
         e.preventDefault();
 
-        var form = $("#top-section").data('dxForm');
+        let form = $("#top-section").data('dxForm');
 
-        var currentRouteId = form.getEditor('Route').option('value');
-        var currentCompanyId = form.getEditor('Company').option('value');
-        var currentItemGroupId = form.getEditor('ItemGroup').option('value');
-        var currentCode = form.getEditor('Code').option('value');
-        var currentName = form.getEditor('Name').option('value');
-        // var currentIsGPSLocked = form.getEditor('IsGPSLocked').option('value');
-        var currentEffectiveDate = form.getEditor('EffectiveDate').option('value');
-        var currentEndDate = form.getEditor('EndDate').option('value');
+        let currentRouteId = form.getEditor('Route').option('value');
+        let currentCompanyId = form.getEditor('Company').option('value');
+        let currentItemGroupId = form.getEditor('ItemGroup').option('value');
+        let currentCode = form.getEditor('Code').option('value');
+        let currentName = form.getEditor('Name').option('value');
+        let currentEffectiveDate = form.getEditor('EffectiveDate').option('value');
+        let currentEndDate = form.getEditor('EndDate').option('value');
 
 
-        var previousRouteId = MCPModel.routeId;
-        var previousCompanyId = MCPModel.companyId;
-        var previousItemGroupId = MCPModel.itemGroupId;
-        var previousCode = MCPModel.code;
-        var previousName = MCPModel.name;
-        // var previousIsGPSLocked = MCPModel.isGPSLocked;
-        var previousEffectiveDate = MCPModel.effectiveDate;
-        var previousEndDate = MCPModel.endDate;
+        let previousRouteId = MCPModel.routeId;
+        let previousCompanyId = MCPModel.companyId;
+        let previousItemGroupId = MCPModel.itemGroupId;
+        let previousCode = MCPModel.code;
+        let previousName = MCPModel.name;
+        let previousEffectiveDate = MCPModel.effectiveDate;
+        let previousEndDate = MCPModel.endDate;
 
         if (currentRouteId != previousRouteId
             || currentCompanyId != previousCompanyId
             || currentItemGroupId != previousItemGroupId
             || currentCode != previousCode
             || currentName != previousName
-            // || currentIsGPSLocked != previousIsGPSLocked
             || currentEffectiveDate != previousEffectiveDate
             || currentEndDate != previousEndDate
         ) {
-            abp.message.confirm(l1('ConfirmationMessage.UnSavedAndLeave'), l1('ConfirmationMessage.UnSavedAndLeaveTitle')).then(function (confirmed) {
+            abp.message.confirm(l('ConfirmationMessage.UnSavedAndLeave'), l('ConfirmationMessage.UnSavedAndLeaveTitle')).then(function (confirmed) {
                 if (confirmed) {
                     window.close();
                 }
@@ -828,44 +781,34 @@ $(function () {
             popupEnddateMCP.show();
     });
 
-    function LoadData() {
-        var jsonData = sessionStorage.getItem("MCPModel");
-        //console.log(jsonData);
-        if (jsonData) {
-            MCPModel = JSON.parse(jsonData);
-            var form = $("#top-section").data('dxForm');
-            form.getEditor('Route').option('value', MCPModel.routeId);
-            form.getEditor('Company').option('value', MCPModel.companyId);
-            form.getEditor('ItemGroup').option('value', MCPModel.itemGroupId);
-            form.getEditor('Code').option('value', MCPModel.code);
-            form.getEditor('Name').option('value', MCPModel.name);
+    // Load first data session data
+    if (MCPModel) {
+        let form = $("#top-section").data('dxForm');
+        form.getEditor('Route').option('value', MCPModel.routeId);
+        form.getEditor('Company').option('value', MCPModel.companyId);
+        form.getEditor('ItemGroup').option('value', MCPModel.itemGroupId);
+        form.getEditor('Code').option('value', MCPModel.code);
+        form.getEditor('Name').option('value', MCPModel.name);
+        form.getEditor('EffectiveDate').option('value', MCPModel.effectiveDate);
+        form.getEditor('EndDate').option('value', MCPModel.endDate);
 
-            form.getEditor('EffectiveDate').option('value', MCPModel.effectiveDate);
-            form.getEditor('EndDate').option('value', MCPModel.endDate);
+        $('#GenerateButton').data('dxButton').option('disabled', false);
+        $('#EnddateButton').data('dxButton').option('disabled', false);
 
-            $('#GenerateButton').data('dxButton').option('disabled', false);
-            $('#EnddateButton').data('dxButton').option('disabled', false);
+        salesOrgHierarchyService.get(MCPModel.routeId).done(u => {
+            sellingZoneId = u.parentId;
 
-            salesOrgHierarchyService.get(MCPModel.routeId).done(u => {
-                var dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
-                dxCompany.option('readOnly', false);
-                dxCompany.option('dataSource', new DevExpress.data.DataSource({
-                    store: companyInZoneStore,
-                    filter: ["salesOrgHierarchyId", "=", u.parentId],
-                    paginate: true,
-                    pageSize: pageSize
-                }));
-                dxCompany.option('value', MCPModel.companyId);
-            });
-
-            LoadDataGrid();
-        }
-
-        //sessionStorage.removeItem('MCPModel');
-    }
-    function LoadDataGrid() {
-
-        var loadOptions = {
+            let dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
+            dxCompany.option('readOnly', false);
+            dxCompany.option('dataSource', new DevExpress.data.DataSource({
+                store: companyInZoneStore,
+                filter: [["salesOrgHierarchyId", "=", u.parentId], 'and', ['company.active', '=', true], 'and', [['company.endDate', '>', moment().format('YYYY-MM-DD')], 'or', ['company.endDate', '=', null]]],
+                paginate: true,
+                pageSize: pageSize
+            }));
+            dxCompany.option('value', MCPModel.companyId);
+        });
+        let loadOptions = {
             filter: ['mcpHeaderId', '=', MCPModel.id]
         };
         const args = {};
@@ -875,18 +818,15 @@ $(function () {
                 args[i] = JSON.stringify(loadOptions[i]);
             }
         });
-
         mCPDetailsService.getListDevextremes(args)
             .done(result => {
-                var data = result.data;
+                let data = result.data;
                 mcpDetailData = data;
                 mcpDetailData.forEach(x => x.customerIdExtra = x.customerId);
 
                 dgMCPDetails.option('dataSource', mcpDetailData);
             });
-
     }
-    LoadData();
 
     function routeChangedHandler(data) {
         if (data.value !== null) {
@@ -894,12 +834,12 @@ $(function () {
 
             var dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
             dxCompany.option('readOnly', false);
-            dxCompany.option('dataSource', new DevExpress.data.DataSource({
+            dxCompany.option('dataSource', {
                 store: companyInZoneStore,
-                filter: ["salesOrgHierarchyId", "=", selectedItem.parentId],
+                filter: [["salesOrgHierarchyId", "=", selectedItem.parentId], 'and', ['company.active', '=', true], 'and', [['company.endDate', '>', moment().format('YYYY-MM-DD')], 'or', ['company.endDate', '=', null]]],
                 paginate: true,
-                pageSize: pageSize
-            }));
+                pageSize
+            });
 
         } else {
             var dxCompany = $('input[name=Company]').closest('.dx-selectbox').data('dxSelectBox');
@@ -912,31 +852,38 @@ $(function () {
     }
     $("#top-section").data('dxForm').getEditor('Route').on("valueChanged", routeChangedHandler);
 
-    function getNextDate(arg) {
-        const today = new Date()
-        let feature = new Date()
-        feature.setDate(today.getDate() + arg)
-        return feature;
-    }
     $('#StartDate').dxDateBox({
         type: 'date',
         showClearButton: true,
-        min: getNextDate(1),
+        min: new Date($("#top-section")
+            .dxForm('instance')
+            .getEditor('EffectiveDate')
+            .option('value')) > new Date() ?
+            new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value'))
+            : moment().add(1, 'days')._d,
+        max: $("#top-section").dxForm('instance').getEditor('EndDate').option('value') ? new Date($("#top-section").dxForm('instance').getEditor('EndDate').option('value')) : undefined,
         displayFormat: 'dd/MM/yyyy',
+        onValueChanged: (e) => {
+            $('#EndDate').dxDateBox('instance').option('min', e.value);
+        }
     });
     $('#EndDate').dxDateBox({
         type: 'date',
         showClearButton: true,
-        min: getNextDate(2),
+        min: new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) > new Date() ? new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) : moment().add(2, 'days')._d,
+        max: $("#top-section").dxForm('instance').getEditor('EndDate').option('value') ? new Date($("#top-section").dxForm('instance').getEditor('EndDate').option('value')) : undefined,
         displayFormat: 'dd/MM/yyyy',
+        onValueChanged: (e) => {
+            $('#StartDate').dxDateBox('instance').option('max', e.value);
+        }
     });
     $('#EndDateMCP').dxDateBox({
         type: 'date',
         showClearButton: true,
-        min: getNextDate(1),
+        min: new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) > new Date() ? new Date($("#top-section").dxForm('instance').getEditor('EffectiveDate').option('value')) : new Date(),
         displayFormat: 'dd/MM/yyyy',
     });
-    const popupGenMCP = $('#popupGenMCP').dxPopup({
+    let popupGenMCP = $('#popupGenMCP').dxPopup({
         width: 400,
         height: 280,
         container: '.panel-container',
@@ -960,19 +907,14 @@ $(function () {
                 icon: 'fa fa-check hvr-icon',
                 text: 'Generate',
                 onClick() {
-                    var dxStartDate = $('#StartDate').data('dxDateBox');
-                    var dxEndDate = $('#EndDate').data('dxDateBox');
-                    const dateStart = dxStartDate.option('value');
-                    const dateEnd = dxEndDate.option('value');
-                    //if (!dateStart)
-                    //    dxStartDate.
-                    var params = {
+                    let dateStart = $('#StartDate').data('dxDateBox').option('value');
+                    let dateEnd = $('#EndDate').data('dxDateBox').option('value');
+                    let params = {
                         mcpHeaderId: MCPModel.id,
-                        dateStart: dateStart,
-                        dateEnd: dateEnd
+                        dateStart: moment(dateStart).format('YYYY-MM-DD'),
+                        dateEnd: moment(dateEnd).format('YYYY-MM-DD')
                     };
-
-                    visitPlanService.generateWithPermission(params, { contentType: "application/json" }).done(result => {
+                    visitPlanService.generateWithPermission(params, { contentType: "application/json" }).done(() => {
                         abp.message.success(l('Congratulations'));
                         popupGenMCP.hide();
                     }).fail(() => { });
@@ -991,7 +933,7 @@ $(function () {
         }],
     }).dxPopup('instance');
 
-    const popupEnddateMCP = $('#popupEnddateMCP').dxPopup({
+    let popupEnddateMCP = $('#popupEnddateMCP').dxPopup({
         width: 400,
         height: 280,
         container: '.panel-container',
@@ -1015,19 +957,16 @@ $(function () {
                 icon: 'fa fa-check hvr-icon',
                 text: 'Submit',
                 onClick() {
-                    var dxEndDate = $('#EndDateMCP').data('dxDateBox');
-                    const endDate = dxEndDate.option('value');
-                    //if (!dateStart)
-                    //    dxStartDate.
-                    var params = {
-                        id: MCPModel.id,
-                        endDate: endDate
-                    };
-
-                    mCPHeaderService.setEndDate(params.id, params.endDate, { contentType: "application/json" }).done(result => {
-                        abp.message.success(l('Congratulations'));
-                        popupEnddateMCP.hide();
-                    }).fail(() => { });
+                    let dxEndDate = $('#EndDateMCP').data('dxDateBox');
+                    let endDate = dxEndDate.option('value');
+                    mCPHeaderService.setEndDate(MCPModel.id, moment(endDate).format('YYYY-MM-DD[T12:00:00Z]'), { contentType: "application/json" })
+                        .done(result => {
+                            abp.message.success(l('Congratulations'));
+                            popupEnddateMCP.hide();
+                            $("#top-section").dxForm('instance').getEditor('EndDate').option('value', moment(endDate).format('YYYY-MM-DD'))
+                            sessionStorage.setItem('MCPModel', JSON.stringify({ ...MCPModel, endDate: moment(endDate).format('YYYY-MM-DD') }))
+                        })
+                        .fail(() => { });
                 },
             },
         }, {
@@ -1045,7 +984,3 @@ $(function () {
 
     initImportPopup('api/mdm-service/m-cPDetails', 'MCPDetails_Template', 'dgMCPDetails');
 });
-
-//$(window).on("beforeunload", function () {
-//    sessionStorage.removeItem('MCPModel');
-//});

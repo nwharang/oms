@@ -1,11 +1,125 @@
-﻿$(function () {
-    var l = abp.localization.getResource("OMS");
-    var l1 = abp.localization.getResource("OMS");
-    var customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
-    var geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
-    var cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.cusAttributeValues.cusAttributeValue;
-    var cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
-    var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
+﻿$(async function () {
+    let l = abp.localization.getResource("OMS");
+    let customerService = window.dMSpro.oMS.mdmService.controllers.customers.customer;
+    let cusAttributeValueService = window.dMSpro.oMS.mdmService.controllers.customerAttributeValues.customerAttributeValue;
+    let cusAttrService = window.dMSpro.oMS.mdmService.controllers.customerAttributes.customerAttribute;
+    let customerImageService = window.dMSpro.oMS.mdmService.controllers.customerImages.customerImage;
+    let geoMasterService = window.dMSpro.oMS.mdmService.controllers.geoMasters.geoMaster;
+    let priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
+    let companyService = window.dMSpro.oMS.mdmService.controllers.companies.company;
+
+    let gridInfo = {}, endDateRowData;
+    let cusAttrStore = cusAttrService.getListDevextremes({ filter: JSON.stringify(['active', "=", true]) })
+
+    let loadingPanel = $('<div class"fixed"/>').dxPopup({
+        height: 100,
+        width: 100,
+        showTitle: false,
+        animation: null,
+        contentTemplate: (e) => $('<div/>').dxLoadIndicator({
+            height: 60,
+            width: 60,
+        })
+    })
+        .appendTo('body')
+        .dxPopup('instance')
+    loadingPanel.registerKeyHandler('escape', () => loadingPanel.hide())
+
+    let dialog = ({ header, body }, callBackIfTrue, callBackIfFalse) => {
+        DevExpress.ui.dialog.confirm(`<i>${body}</i>`, header)
+            .done((e) => {
+                if (e) {
+                    callBackIfTrue()
+                }
+                else {
+                    callBackIfFalse()
+                }
+            })
+    }
+
+
+    let endDatePopup = $('<div/>').dxPopup({
+        showTitle: false,
+        width: 400,
+        height: 150,
+        onShowing: () => {
+            $('#inactive-dateBox').dxDateBox('instance').option('value', moment().add(1, 'd').format('YYYY-MM-DD[T00:00:00Z]'))
+            // Reset Date Box Data Value to today + 1 
+        },
+        toolbarItems: [
+            {
+                widget: "dxButton",
+                location: "after",
+                toolbar: "bottom",
+                options: {
+                    text: l('Button.Inactive.Customer'),
+                    onClick: () => {
+                        // Localize This
+                        dialog({ header: l("Dialog:MDMService:Customer:Inactive.Header"), body: l("Dialog:MDMService:Customer:Inactive.Body").replace('{0}', endDateRowData.name) },
+                            () => {
+                                customerService.inactive(endDateRowData.id, moment($('#inactive-dateBox').dxDateBox('instance').option('value')).format('YYYY-MM-DD[T00:00:00Z]')).then(() => {
+                                    gridCustomers.refresh()
+                                    endDatePopup.hide()
+                                })
+                            },
+                            () => {
+                                endDateRowData = undefined
+                                endDatePopup.hide()
+                            }
+                        )
+                    }
+                },
+            },
+            {
+                widget: "dxButton",
+                location: "after",
+                toolbar: "bottom",
+                options: {
+                    text: l("Button.Cancel"),
+                    onClick: () => endDatePopup.hide()
+                },
+            },
+        ],
+        contentTemplate: () => {
+            return $('<div id="inactive-dateBox">').dxDateBox({
+                value: moment().add(1, 'd').format('YYYY-MM-DD[T00:00:00Z]'),
+                min: moment().add(1, 'd').format('YYYY-MM-DD[T00:00:00Z]'),
+                format: 'dd-MM-yyyy',
+            })
+        }
+    }).appendTo('body').dxPopup('instance')
+
+
+    let companiesLookup = new DevExpress.data.CustomStore({
+        key: "id",
+        load(loadOptions) {
+            const deferred = $.Deferred();
+            const args = {};
+            requestOptions.forEach((i) => {
+                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                    args[i] = JSON.stringify(loadOptions[i]);
+                }
+            });
+            companyService.getListDevextremes(args)
+                .done(result => {
+                    deferred.resolve(result.data, {
+                        totalCount: result.totalCount,
+                        summary: result.summary,
+                        groupCount: result.groupCount
+                    });
+                });
+            return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+            var d = new $.Deferred();
+            companyService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
+        }
+    });
     var geoMasterStore = new DevExpress.data.CustomStore({
         key: 'id',
         useDefaultSearch: true,
@@ -116,9 +230,6 @@
         }
     });
 
-
-    var cusProfile = {};
-
     var gridCustomers = $('#dgCustomers').dxDataGrid({
         dataSource: customStore,
         repaintChangesOnly: true,
@@ -140,26 +251,32 @@
                 height: "95%",
                 hideOnOutsideClick: false,
                 dragEnabled: false,
+                onHiding: (e) => {
+                    gridInfo.editingRowId = null;
+                    gridInfo.currentData = null;
+                    gridInfo.imageContent = null;
+                    gridInfo.generalContent = null;
+                    gridInfo.form = null
+                },
             },
             form: {
                 labelMode: "outside",
-                colCount: 3,
+                colCount: 2,
+                elementAttr: {
+                    id: "customerForm",
+                },
                 items: [
                     {
                         itemType: "group",
-                        caption: 'IMAGE',
-                        colSpan: 1,
-                        template: renderUserImage // Fix for future versions
+                        template: renderItemImage
                     },
                     {
                         itemType: "group",
-                        caption: 'GENERAL',
-                        colSpan: 2,
-                        items: ["code", 'name', 'phone1', 'phone2', 'erpCode', 'priceListId', 'active'],
+                        items: ["code", 'name', 'phone1', 'phone2', 'erpCode', 'priceListId'],
                     },
                     {
                         itemType: "tabbed",
-                        colSpan: 3,
+                        colSpan: 2,
                         tabs: [
                             {
                                 title: 'DATA',
@@ -176,35 +293,46 @@
                                         dataField: 'lastOrderDate',
                                         editorType: "dxDateBox"
                                     },
-                                    { dataField: 'creditLimit' },
-                                    { dataField: 'paymentTermId' },
-                                    { dataField: 'linkedCompanyId' },
+                                    {
+                                        dataField: 'creditLimit'
+                                    },
+                                    {
+                                        dataField: 'paymentTermId'
+                                    },
+                                    {
+                                        dataField: 'linkedCompanyId',
+                                        editorOptions: {
+                                            elementAttr: {
+                                                id: "linkedCompanyId",
+                                            }
+                                        }
+                                    },
+                                    {
+                                        dataField: 'isCompany',
+                                        elementAttr: {
+                                            id: "isCompany",
+                                        }
+                                    }
                                     // { dataField: 'sfaCustomerCode' },
-                                    { dataField: 'isCompany' }
                                 ]
                             },
                             {
                                 title: "SYSTEM",
-                                items: ['license', 'taxCode', 'vatName', 'vatAddress']
+                                items: ['license', 'taxCode', 'vatName', 'vatAddress', { itemType: 'empty' }]
                             },
                             {
                                 title: "ADDRESS",
-                                items: ['geoMaster0Id', 'geoMaster1Id', 'geoMaster2Id', 'geoMaster3Id', 'geoMaster4Id', 'street', 'address', 'latitude', 'longitude']
+                                items: ['geoMaster0Id', 'geoMaster1Id', 'geoMaster2Id', 'geoMaster3Id', 'geoMaster4Id', 'street', 'address', 'latitude', 'longitude', { itemType: 'empty' }]
                             },
                             {
                                 title: 'ATTRIBUTE',
                                 colCount: 2,
-                                items: getAttrOptions(),
+                                items: [...await getAttrOptions(), { itemType: 'empty' }, { itemType: 'empty' }],
                             }
                         ]
-                    }]
-
+                    }],
             }
         },
-        // onEditingStart(e) {
-        //     e.data.url = "https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_960_720.jpg";
-        //     cusProfile = e.data;
-        // },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
@@ -255,19 +383,19 @@
         headerFilter: {
             visible: true,
         },
-        // stateStoring: {
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'dgCustomerProfile',
-        // },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dgCustomerProfile',
+        },
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes, // ?? 
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -283,7 +411,6 @@
                     options: {
                         icon: "import",
                         elementAttr: {
-                            //id: "import-excel",
                             class: "import-excel",
                         },
                         onClick(e) {
@@ -301,49 +428,117 @@
             {
                 type: 'buttons',
                 caption: l("Actions"),
-                buttons: ['edit'],
+                alignment: 'left',
+                buttons: [
+                    {
+                        name: 'edit',
+                        onClick: (e) => {
+                            gridInfo.editingRowId = e.row.data.id;
+                            gridInfo.currentData = e.row.data
+                            gridCustomers.editRow(e.row.rowIndex);
+                        }
+                    },
+                    , 'delete', {
+                        name: 'inactive',
+                        text: l("EntityFieldValue:MDMService:Customer:Active:False"),
+                        icon: 'close',
+                        visible: (e) => e.row.data.active,
+                        onClick: (e) => {
+                            endDateRowData = e.row.data
+                            endDatePopup.show()
+                        },
+                    }],
                 fixed: true,
                 fixedPosition: "left",
             },
             {
-                //allowEditing: false,
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                formItem: {
+                    visible: false
+                },
+            },
+            {
                 dataField: 'code',
                 caption: l("Code"),
-                //allowEditing: false,
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                allowEditing: false,
             },
             {
                 dataField: 'name',
                 caption: l("Name"),
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                validationRules: [{ type: "required" }],
             },
             {
                 dataField: 'phone1',
                 caption: l("Phone1"),
                 dataType: 'string',
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateError:Phone')
+                    }
+                ]
             },
             {
                 dataField: 'phone2',
                 caption: l("Phone2"),
                 dataType: 'string',
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateError:Phone')
+                    }
+                ],
+                visible: false
             },
             {
                 dataField: 'erpCode',
                 caption: l("ERPCode"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                editorOptions: {
+                    maxLength: 20,
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ],
             },
             {
                 dataField: 'license',
                 caption: l("License"),
                 dataType: 'string',
+                visible: false,
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10,50}$',
+                        message: l('ValidateError:License')
+                    }
+                ],
             },
             {
                 dataField: 'taxCode',
                 caption: l("TaxCode"),
                 dataType: 'string',
+                visible: false,
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{1,13}$',
+                        message: l('ValidateError:TaxCode')
+                    }
+                ],
             },
             {
                 dataField: 'vatName',
@@ -355,27 +550,33 @@
                 dataField: 'vatAddress',
                 caption: l("VatAddress"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: "stringLength",
+                        max: 200,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 200)
+                    }
+                ]
             },
-            {
-                dataField: 'sfaCustomerCode',
-                caption: l("SfaCustomerCode"),
-                dataType: 'string',
-                validationRules: [{ type: "required" }]
-            },
-            {
-                dataField: 'active',
-                caption: l("Active"),
-                //allowEditing: false,
-                width: 110,
-                alignment: 'center',
-                dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                },
-            },
+            // {
+            //     dataField: 'sfaCustomerCode',
+            //     caption: l("SfaCustomerCode"),
+            //     dataType: 'string',
+            //     //validationRules: [{ type: "required" }]
+            // },
+            // {
+            //     dataField: 'active',
+            //     caption: l("Active"),
+            //     width: 110,
+            //     alignment: 'center',
+            //     dataType: 'boolean',
+            //     cellTemplate(container, options) {
+            //         $('<div>')
+            //             .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
+            //             .appendTo(container);
+            //     },
+            // },
             {
                 dataField: 'effectiveDate',
                 caption: l("EffectiveDate"),
@@ -384,18 +585,19 @@
                     displayFormat: 'dd/MM/yyyy',
                 },
                 format: 'dd/MM/yyyy',
-                validationRules: [{ type: "required" }]
+                visible: false,
+                validationRules: [{ type: "required" }],
             },
             {
                 dataField: 'endDate',
                 caption: l("EndDate"),
+                visible: false,
                 dataType: 'date',
-            },
-            {
-                dataField: 'creationTime',
-                caption: l("CreationTime"),
-                dataType: 'date',
-                visible: false
+                editorOptions: {
+                    displayFormat: 'dd/MM/yyyy',
+                },
+                format: 'dd/MM/yyyy',
+
             },
             {
                 dataField: 'isCompany',
@@ -403,55 +605,45 @@
                 dataType: 'boolean',
                 width: 110,
                 alignment: 'center',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                },
+                visible: false,
+                setCellValue(rowData, value) {
+                    rowData.isCompany = value;
+                    if (!value)
+                        rowData.linkedCompanyId = null;
+                }
             },
             {
                 dataField: 'creditLimit',
                 caption: l("CreditLimit"),
                 dataType: 'number',
-                visible: false
+                visible: false,
+                editorOptions: {
+                    min: 0,
+                    format: '#'
+                }
             },
             {
                 dataField: 'paymentTermId',
                 caption: l("PaymentTerm"),
                 dataType: 'string',
                 visible: false,
-                //lookup: {
-                //    dataSource: {
-                //        store: systemDataLookup,
-                //        paginate: true,
-                //        pageSize: pageSizeForLookup
-                //    },
-                //    valueExpr: "id",
-                //    displayExpr: function (e) {
-                //        return e.code + ' - ' + e.valueCode
-                //    }
-                //}
+                allowEditing: false,
             },
             {
                 dataField: 'linkedCompanyId',
                 caption: l("LinkedCompany"),
-                //dataType: 'string',
-                //lookup: {
-                //    dataSource: {
-                //        store: companyData,
-                //        paginate: true,
-                //        pageSize: pageSizeForLookup
-                //    },
-                //    valueExpr: "id",
-                //    displayExpr: "code"
-                //},
-                visible: false
-            },
-            {
-                dataField: 'warehouseId',
-                caption: l("Warehouse"),
-                dataType: 'string',
-                visible: false
+                lookup: {
+                    dataSource: {
+                        store: companiesLookup,
+                        paginate: true,
+                        pageSize
+                    },
+                    valueExpr: "id",
+                    displayExpr: "code",
+                },
+                editorOptions: {
+                    showClearButton: true,
+                }
             },
             {
                 dataField: 'lastOrderDate',
@@ -464,7 +656,6 @@
                 caption: l("PriceList"),
                 dataType: 'string',
                 visible: false,
-                validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource: {
                         store: priceListStore,
@@ -476,7 +667,8 @@
             },
             {
                 dataField: "geoMaster0Id",
-                caption: l1("GeoLevel0Name"),
+                caption: l("GeoLevel0Name"),
+                allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster0 || rowData.geoMaster0 === null) return "";
                     return rowData.geoMaster0.name;
@@ -488,7 +680,7 @@
                             store: geoMasterStore,
                             filter: ['level', '=', 0],
                             paginate: true,
-                            pageSize: pageSizeForLookup
+                            pageSize
                         };
                     },
                     valueExpr: "id",
@@ -504,7 +696,8 @@
             },
             {
                 dataField: "geoMaster1Id",
-                caption: l1("GeoLevel1Name"),
+                caption: l("GeoLevel1Name"),
+                allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster1 || rowData.geoMaster1 === null) return "";
                     return rowData.geoMaster1.name;
@@ -516,7 +709,7 @@
                             store: geoMasterStore,
                             filter: options.data ? [['level', '=', 1], 'and', ['parentId', '=', options.data.geoMaster0Id]] : ['level', '=', 1],
                             paginate: true,
-                            pageSize: pageSizeForLookup
+                            pageSize
                         };
                     },
                     valueExpr: 'id',
@@ -531,7 +724,8 @@
             },
             {
                 dataField: "geoMaster2Id",
-                caption: l1("GeoLevel2Name"),
+                caption: l("GeoLevel2Name"),
+                allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster2 || rowData.geoMaster2 === null) return "";
                     return rowData.geoMaster2.name;
@@ -543,7 +737,7 @@
                             store: geoMasterStore,
                             filter: options.data ? [['level', '=', 2], 'and', ['parentId', '=', options.data.geoMaster1Id]] : ['level', '=', 2],
                             paginate: true,
-                            pageSize: pageSizeForLookup
+                            pageSize
                         };
                     },
                     valueExpr: 'id',
@@ -557,7 +751,8 @@
             },
             {
                 dataField: "geoMaster3Id",
-                caption: l1("GeoLevel3Name"),
+                caption: l("GeoLevel3Name"),
+                allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster3 || rowData.geoMaster3 === null) return "";
                     return rowData.geoMaster3.name;
@@ -569,7 +764,7 @@
                             store: geoMasterStore,
                             filter: options.data ? [['level', '=', 3], 'and', ['parentId', '=', options.data.geoMaster2Id]] : ['level', '=', 3],
                             paginate: true,
-                            pageSize: pageSizeForLookup
+                            pageSize
                         };
                     },
                     valueExpr: 'id',
@@ -582,7 +777,8 @@
             },
             {
                 dataField: "geoMaster4Id",
-                caption: l1("GeoLevel4Name"),
+                caption: l("GeoLevel4Name"),
+                allowSearch: false,
                 calculateDisplayValue(rowData) {
                     if (!rowData.geoMaster4 || rowData.geoMaster4 === null) return "";
                     return rowData.geoMaster4.name;
@@ -594,7 +790,7 @@
                             store: geoMasterStore,
                             filter: options.data ? [['level', '=', 4], 'and', ['parentId', '=', options.data.geoMaster3Id]] : ['level', '=', 4],
                             paginate: true,
-                            pageSize: pageSizeForLookup
+                            pageSize
                         };
                     },
                     valueExpr: 'id',
@@ -608,13 +804,27 @@
                 dataField: 'street',
                 caption: l("Street"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: "stringLength",
+                        max: 200,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 200)
+                    }
+                ]
             },
             {
                 dataField: 'address',
                 caption: l("Address"),
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: "stringLength",
+                        max: 200,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 200)
+                    }
+                ]
             },
             {
                 dataField: 'latitude',
@@ -628,342 +838,86 @@
                 dataType: 'string',
                 visible: false
             },
-            {
-                dataField: "attribute0Id",
-                caption: l1("Attribute0Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(0)
-                    }
-                }
-            },
-            {
-                dataField: "attribute1Id",
-                caption: l1("Attribute1Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(1)
-                    },
-                }
-            },
-            {
-                dataField: "attribute2Id",
-                caption: l1("Attribute2Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(2)
-                    },
-                }
-            },
-            {
-                dataField: "attribute3Id",
-                caption: l1("Attribute3Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(3)
-                    },
-                }
-            },
-            {
-                dataField: "attribute4Id",
-                caption: l1("Attribute4Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(4)
-                    },
-                }
-            },
-            {
-                dataField: "attribute5Id",
-                caption: l1("Attribute5Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(5)
-                    },
-                }
-            },
-            {
-                dataField: "attribute6Id",
-                caption: l1("Attribute6Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(6)
-                    },
-                }
-            },
-            {
-                dataField: "attribute7Id",
-                caption: l1("Attribute7Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(7)
-                    },
-                }
-            },
-            {
-                dataField: "attribute8Id",
-                caption: l1("Attribute8Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(8)
-                    },
-                }
-            },
-            {
-                dataField: "attribute9Id",
-                caption: l1("Attribute9Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(9)
-                    },
-                }
-            },
-            {
-                dataField: "attribute10Id",
-                caption: l1("Attribute10Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(10)
-                    },
-                }
-            },
-            {
-                dataField: "attribute11Id",
-                caption: l1("Attribute11Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(11)
-                    },
-                }
-            },
-            {
-                dataField: "attribute12Id",
-                caption: l1("Attribute12Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(12)
-                    },
-                }
-            },
-            {
-                dataField: "attribute13Id",
-                caption: l1("Attribute13Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(13)
-                    },
-                }
-            },
-            {
-                dataField: "attribute14Id",
-                caption: l1("Attribute14Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(14)
-                    },
-                }
-            },
-            {
-                dataField: "attribute15Id",
-                caption: l1("Attribute15Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(15)
-                    },
-                }
-            },
-            {
-                dataField: "attribute16Id",
-                caption: l1("Attribute16Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(16)
-                    },
-                }
-            },
-            {
-                dataField: "attribute17Id",
-                caption: l1("Attribute17Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(17)
-                    },
-                }
-            },
-            {
-                dataField: "attribute18Id",
-                caption: l1("Attribute18Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(18)
-                    },
-                }
-            },
-            {
-                dataField: "attribute19Id",
-                caption: l1("Attribute19Name"),
-                visible: false,
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(19)
-                    },
-                }
-            },
+            ...await genCustomerAttrColumn()
         ],
         onInitNewRow: function (e) {
-            // e.data.sfaCustomerCode = "sfaCode";
-            e.data.effectiveDate = new Date().toString();
+            e.data.effectiveDate = new Date().toISOString();
             e.data.active = true;
         },
+        onEditorPreparing: (e) => {
+            if (e.row?.rowType != 'data') return
+            // ReadOnly when editing , allow when creating a new row
+            if (e.dataField == 'endDate' && !e.row.isNewRow)
+                e.editorOptions.readOnly = true
+            if (e.row?.data?.endDate && moment(e.row.data.endDate).isBefore(moment())) {
+                e.editorOptions.readOnly = true
+            }
+        },
+        onSaved: (e) => {
+            if (gridInfo.fileinput) gridInfo.fileinput(e);
+        }
     }).dxDataGrid("instance");
 
     initImportPopup('api/mdm-service/customers', 'Customers_Template', 'dgCustomers');
 
-    function dsAttrValue(n) {
-        return {
-            store: getCusAttrValue,
-            filter: ['customerAttribute.attrNo', '=', n],
-        };
-    }
-
-    //var listAttrValue = [];
-    function renderUserImage(data, itemElement) {
-        // change in future versions
-        function getuserImage(userId) {
-            var d = new $.Deferred();
-            /// Get avatar src attribute value here 
-            Promise.resolve(d.resolve(null))
-            return d.promise();
-        }
-
-        getuserImage("Customer Id Go Here").done(dataUrl => {
-            itemElement.addClass("d-flex flex-column justify-content-center align-items-center");
-            itemElement.append($("<img>").attr({
-                id: "img-avatar",
-                // https://source.unsplash.com/random/ for testing image size
-                // /images/default-avatar-image.jpg for default image size
-                src: dataUrl || "/images/default-avatar-image.jpg",
-                style: "object-fit:contain;object-position:center center;max-height:200px;max-width:200px;cursor:pointer;border-radius:50%",
-            }))
-            itemElement.append($("<div>").addClass('mt-3 w-100').attr("id", "file-uploader").dxFileUploader({
-                accept: 'image/*',
-                uploadMode: 'instantly',
-                uploadUrl: 'API_URL_POST', // Upload Image Endpoint Go Here
-                selectButtonText: "Choose Image",
-                onValueChanged(e) {
-                    const files = e.value;
-                    if (files.length > 0) {
-                        $('#selected-files .selected-item').remove();
-                        $.each(files, (i, file) => {
-                            const $selectedItem = $('<div />').addClass('selected-item');
-                            $selectedItem.append(
-                                $('<span />').html(`Name: ${file.name}<br/>`),
-                                $('<span />').html(`Size ${file.size} bytes<br/>`),
-                                $('<span />').html(`Type ${file.type}<br/>`),
-                                $('<span />').html(`Last Modified Date: ${file.lastModifiedDate}`),
-                            );
-                            $selectedItem.appendTo($('#selected-files'));
-                        });
-                        $('#selected-files').show();
-                    } else {
-                        $('#selected-files').hide();
+    function genCustomerAttrColumn() {
+        return cusAttrStore.then(({ data }) =>
+            data.map(({ attrNo, attrName }) => {
+                return {
+                    dataField: 'attr' + attrNo + 'Id',
+                    caption: attrName,
+                    lookup: {
+                        valueExpr: "id",
+                        displayExpr: "attrValName",
+                        dataSource: {
+                            store: getCusAttrValue,
+                            filter: ['customerAttribute.attrNo', '=', attrNo],
+                        }
                     }
-                },
-            }))
-        })
+                }
+            })
+        )
     }
-
     function getAttrOptions() {
-        const options = [];
-
-        const deferred = $.Deferred();
-        cusAttrService.getListDevextremes({})
-            .done(result => {
-                deferred.resolve(result.data, {
-                    totalCount: result.totalCount,
-                    summary: result.summary,
-                    groupCount: result.groupCount,
-                });
-            });
-        deferred.promise().then(u => {
-            var listAttrActive = u.filter(x => x.active == true);
-            listAttrActive.forEach((i) => {
-                options.push(generateAttrOptions(i))
-            });
-        });
-        return options;
+        return cusAttrStore.then(({ data }) => data.map(({ attrNo }) => 'attr' + attrNo + 'Id'))
     }
 
-    function generateAttrOptions(attr) {
-        return {
-            dataField: 'attribute' + attr.attrNo + 'Id',
-            label: {
-                text: attr.attrName
+    async function renderItemImage(e, itemElement) {
+        let fileId = await customerImageService.getListDevextremes({ filter: JSON.stringify([['customerId', '=', gridInfo.editingRowId], 'and', ['isAvatar', '=', true]]) }).then(({ data }) => data[0]?.fileId)
+        editingRowId = gridInfo.editingRowId
+        if (fileId) var imgURL = await customerImageService.getFile(fileId, {
+            dataType: 'binary',
+            xhrFields: {
+                'responseType': 'blob'
             },
-            editorOptions: {
-                dataSource: dsAttrValue(attr.attrNo), //listAttrValue.filter(x => x.itemAttributeId == attr.id),
-                valueExpr: 'id',
-                displayExpr: 'attrValName'
+        }).then((blob) => URL.createObjectURL(blob))
+        itemElement.addClass('d-flex flex-column justify-content-center align-items-center').css('height', '300px');
+        gridInfo.form = $('<div class="flex-column"/>').css({ 'height': '250px', 'display': 'flex' })
+        let imgContainer = $('<div/>').css({ 'min-height': '250px', 'min-width': "250px" }).appendTo(itemElement);
+        let img = $('<img class="w-100 h-100"/>').attr('src', imgURL || '/images/default-avatar-image.jpg').css({ 'object-fit': 'contain', 'object-position': 'center' }).appendTo(imgContainer)
+        if (!gridInfo.currentData?.endDate || new Date(gridInfo?.currentData?.endDate) > new Date())
+            var fileinput = $('<input class="form-control mt-2" type="file" id="avatar" name="avatar" accept="image/*">').appendTo(gridInfo.form)
+        fileinput?.on('change', () => {
+            if (fileinput.prop('files')[0].size > 1.5e7) return abp.message.error(l('ValidateError:UploadFileSize'), 500)
+            img.attr('src', URL.createObjectURL(fileinput.prop('files')[0]))
+            gridInfo.fileinput = (e) => {
+                let file = fileinput.prop('files')[0]
+                let form = new FormData();
+                form.append('inputFile', file, file.name);
+                let description = JSON.stringify({ name: file.name, size: file.size, type: file.type })
+                loadingPanel.show()
+                customerImageService[fileId ? 'updateAvatar' : 'createAvatar'](editingRowId || e.changes[0]?.data?.id, file, description,
+                    {
+                        contentType: false,
+                        processData: false,
+                        data: form,
+                        async: true,
+                    }).then(() => {
+                        loadingPanel.hide()
+                    })
+                gridInfo.fileinput = null
             }
-        }
+        })
+        gridInfo.form.appendTo(itemElement)
     }
 });

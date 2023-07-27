@@ -245,6 +245,10 @@
     <None Remove="Volo.FileManagement.Domain.Shared" />
     <None Remove="Volo.FileManagement.HttpApi.Client" />
     <None Remove="Volo.FileManagement.Web" />
+    <None Remove="DMSpro.OMS.MdmSapService.Application.Contracts" />
+    <None Remove="DMSpro.OMS.MdmSapService.Domain.Shared" />
+    <None Remove="DMSpro.OMS.MdmSapService.HttpApi.Client" />
+    <None Remove="DMSpro.OMS.MdmSapService.Web" />
   </ItemGroup>
 	
   <ItemGroup>
@@ -414,7 +418,24 @@
       <HintPath>..\..\..\commondll\Development\Services\filemanagement\Volo.FileManagement.Web.dll</HintPath>
     </Reference>
 
+    <Reference Include="DMSpro.OMS.MdmSapService.Application.Contracts">
+      <HintPath>..\..\..\commondll\Development\Services\mdmsap\DMSpro.OMS.MdmSapService.Application.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="DMSpro.OMS.MdmSapService.Domain.Shared">
+      <HintPath>..\..\..\commondll\Development\Services\mdmsap\DMSpro.OMS.MdmSapService.Domain.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="DMSpro.OMS.MdmSapService.HttpApi.Client">
+      <HintPath>..\..\..\commondll\Development\Services\mdmsap\DMSpro.OMS.MdmSapService.HttpApi.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="DMSpro.OMS.MdmSapService.Web">
+      <HintPath>..\..\..\commondll\Development\Services\mdmsap\DMSpro.OMS.MdmSapService.Web.dll</HintPath>
+    </Reference>
   </ItemGroup>
+  <ItemGroup>
+		<Reference Include="DMSpro.OMS.Shared.Lib">
+			<HintPath>..\..\..\commondll\Development\Shared\DMSpro.OMS.Shared.Lib\DMSpro.OMS.Shared.Lib.dll</HintPath>
+		</Reference>
+	</ItemGroup>
   <ItemGroup>
     <Content Update="Pages\Mdm\MCPHeaders\Details.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

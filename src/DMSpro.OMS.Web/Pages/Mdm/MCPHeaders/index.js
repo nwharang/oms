@@ -1,6 +1,5 @@
-﻿var l = abp.localization.getResource("OMS");
-var l1 = abp.localization.getResource("OMS");
-$(function () {
+﻿$(function () {
+    var l = abp.localization.getResource("OMS");
     var mCPHeaderService = window.dMSpro.oMS.mdmService.controllers.mCPHeaders.mCPHeader;
     var salesOrgHierarchyService = window.dMSpro.oMS.mdmService.controllers.salesOrgHierarchies.salesOrgHierarchy;
 
@@ -56,7 +55,6 @@ $(function () {
                     args[i] = JSON.stringify(loadOptions[i]);
                 }
             });
-
             mCPHeaderService.getListDevextremes(args)
                 .done(result => {
                     deferred.resolve(result.data, {
@@ -89,7 +87,6 @@ $(function () {
             editing: {
                 mode: "row",
                 allowAdding: abp.auth.isGranted('MdmService.MCPs.Create'),
-                // allowUpdating: abp.auth.isGranted('MdmService.MCPs.Edit'),
                 allowDeleting: abp.auth.isGranted('MdmService.MCPs.Delete'),
                 useIcons: true,
                 texts: {
@@ -98,21 +95,20 @@ $(function () {
                     confirmDeleteMessage: l("DeleteConfirmationMessage")
                 }
             },
-            //remoteOperations: true,
+            remoteOperations: true,
             export: {
                 enabled: true,
             },
-            onExporting(e) {
+            onExporting: function (e) {
                 const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Data');
-
+                const worksheet = workbook.addWorksheet('Companies');
                 DevExpress.excelExporter.exportDataGrid({
                     component: e.component,
                     worksheet,
                     autoFilterEnabled: true,
                 }).then(() => {
                     workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
                     });
                 });
                 e.cancel = true;
@@ -144,19 +140,19 @@ $(function () {
             searchPanel: {
                 visible: true
             },
-            stateStoring: { //save state in localStorage
+            stateStoring: {
                 enabled: true,
                 type: 'localStorage',
                 storageKey: 'dgMCPHeaders',
             },
             paging: {
                 enabled: true,
-                pageSize: pageSize
+                pageSize
             },
             pager: {
                 visible: true,
                 showPageSizeSelector: true,
-                allowedPageSizes: allowedPageSizes,
+                allowedPageSizes,
                 showInfo: true,
                 showNavigationButtons: true
             },
@@ -164,12 +160,15 @@ $(function () {
                 items: [
                     "groupPanel",
                     {
-                        location: 'after',
-                        template: '<button  id="AddNewButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                        onClick() {
-                            var w = window.open('/Mdm/MCPHeaders/Details', '_blank');
-                            w.sessionStorage.removeItem("MCPModel");
-                        },
+                        widget: 'dxButton',
+                        options: {
+                            hint: l('Button.New.MCPHeader'),
+                            icon: 'add',
+                            onClick: () => {
+                                var w = window.open('/Mdm/MCPHeaders/Details', '_blank');
+                                return w.sessionStorage.setItem("MCPModel", null);
+                            },
+                        }
                     },
                     "columnChooserButton",
                     "exportButton",
@@ -179,7 +178,6 @@ $(function () {
                         options: {
                             icon: "import",
                             elementAttr: {
-                                //id: "import-excel",
                                 class: "import-excel",
                             },
                             onClick(e) {
@@ -199,27 +197,53 @@ $(function () {
                     caption: l("Actions"),
                     width: 110,
                     buttons: [{
-                        text: "Edit",
-                        icon: "edit",
-                        hint: "Edit",
+                        text: l('Button.ViewDetail'),
+                        icon: "fieldchooser",
                         onClick: function (e) {
                             var w = window.open('/Mdm/MCPHeaders/Details', '_blank');
                             w.sessionStorage.setItem("MCPModel", JSON.stringify(e.row.data));
                         }
-                    }, 'delete'],
+                    }],
                     fixedPosition: "left",
+                },
+                {
+                    dataField: 'id',
+                    caption: l("Id"),
+                    dataType: 'string',
+                    allowEditing: false,
+                    visible: false,
+                    formItem: {
+                        visible: false
+                    },
+                },
+                {
+                    caption: l("EntityFieldName:MDMService:MCPHeader:Code"),
+                    dataField: "code",
+                    validationRules: [
+                        {
+                            type: "required"
+                        },
+                        {
+                            type: 'pattern',
+                            pattern: '^[a-zA-Z0-9]{1,20}$',
+                            message: l('ValidateError:Code')
+                        }
+                    ]
+                },
+                {
+                    caption: l("EntityFieldName:MDMService:MCPHeader:Name"),
+                    dataField: "name",
+                    dataType: 'string'
                 },
                 {
                     caption: "Route",
                     dataField: "routeId",
                     lookup: {
-                        dataSource() {
-                            return {
-                                store: salesOrgHierarchyStore,
-                                paginate: true,
-                                pageSize: pageSizeForLookup,
-                                filter: ["isRoute", "=", true]
-                            };
+                        dataSource: {
+                            store: salesOrgHierarchyStore,
+                            filter: ["isRoute", "=", true],
+                            paginate: true,
+                            pageSize,
                         },
                         displayExpr: 'name',
                         valueExpr: 'id',
@@ -232,23 +256,20 @@ $(function () {
                 {
                     caption: l("EntityFieldName:MDMService:MCPHeader:CompanyName"),
                     dataField: "company.name",
+                    dataType: 'string'
                 },
                 {
                     caption: l("EntityFieldName:MDMService:MCPHeader:ItemGroup"),
-                    dataField: "itemGroup.description",
+                    dataField: "itemGroup.name",
+                    dataType: 'string'
                 },
                 {
-                    caption: l("EntityFieldName:MDMService:MCPHeader:Code"),
-                    dataField: "code"
-                }, {
-                    caption: l("EntityFieldName:MDMService:MCPHeader:Name"),
-                    dataField: "name"
-                }, {
                     caption: l("EntityFieldName:MDMService:MCPHeader:EffectiveDate"),
                     dataField: "effectiveDate",
                     format: "dd/MM/yyyy",
                     dataType: "date"
-                }, {
+                },
+                {
                     caption: l("EntityFieldName:MDMService:MCPHeader:EndDate"),
                     dataField: "endDate",
                     format: "dd/MM/yyyy",
@@ -257,6 +278,6 @@ $(function () {
             ],
         })
 
-    initImportPopup('api/mdm-service/m-cPHeaders', 'MCPHeaders_Template', 'dgMCPHeaders'); 
+    initImportPopup('api/mdm-service/m-cPHeaders', 'MCPHeaders_Template', 'dgMCPHeaders');
 
 });

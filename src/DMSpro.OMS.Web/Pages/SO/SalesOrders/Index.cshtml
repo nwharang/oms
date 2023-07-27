@@ -35,15 +35,18 @@
             line-height: 1.5rem;
             color : #000
         }
+        .dx-popup-content {
+            padding : 20px 20px 0;
+        }
     </style>
 }
 @section scripts {
-    <abp-script src="/pages/shared/common.isp.js" />
+    <abp-script src="/pages/SO/shared/input.js" />
     <script src="/js/devextreme/exceljs.min.js"></script>
     <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/SO/SalesOrders/store.js" />
+    <abp-script src="/Pages/SO/Shared/helper.js" />
     <abp-script src="/Pages/SO/SalesOrders/index.js" />
-    <abp-script src="/Pages/SO/SalesOrders/helper.js" />
 
 }
 
@@ -64,7 +67,7 @@
         <div class="panel-container show">
             <div class="panel-content jqvmap-bg-ocean p-0">
                 <div class="dx-viewport p-2">
-                    <div id="dgSalesOrderHeader"></div>
+                    <div id="dgSOHeader"></div>
                 </div>
             </div>
         </div>

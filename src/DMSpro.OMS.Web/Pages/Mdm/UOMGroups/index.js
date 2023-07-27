@@ -6,7 +6,7 @@ $(function () {
     let detailDataSrc // Local varible for condition check
     let editingComponent; // Local varible for close unfinish editor
     let isEditing = false // Editing but not adding
-    var groupStore = new DevExpress.data.CustomStore({
+    var uomGroupHeaderStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -47,7 +47,7 @@ $(function () {
         }
     });
 
-    var detailStore = new DevExpress.data.CustomStore({
+    var uomGroupDetailsStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -113,7 +113,7 @@ $(function () {
     });
 
     const dataGrid = $('#gridUOMGroups').dxDataGrid({
-        dataSource: groupStore,
+        dataSource: uomGroupHeaderStore,
         //keyExpr: 'id',
         remoteOperations: true,
         showRowLines: true,
@@ -144,30 +144,19 @@ $(function () {
         export: {
             enabled: true,
         },
-        onExporting(e) {
-            if (e.format === 'xlsx') {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('UOMGroups');
-                DevExpress.excelExporter.exportDataGrid({
-                    component: e.component,
-                    worksheet,
-                    autoFilterEnabled: true,
-                }).then(() => {
-                    workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'UOMGroups.xlsx');
-                    });
+        onExporting: function (e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Companies');
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
                 });
-                e.cancel = true;
-            }
-            else if (e.format === 'pdf') {
-                const doc = new jsPDF();
-                DevExpress.pdfExporter.exportDataGrid({
-                    jsPDFDocument: doc,
-                    component: e.component,
-                }).then(() => {
-                    doc.save('UOMGroups.pdf');
-                });
-            }
+            });
+            e.cancel = true;
         },
         headerFilter: {
             visible: true,
@@ -201,7 +190,8 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            e.newData = Object.assign({}, e.oldData, e.newData);
+            let { name, concurrencyStamp } = { ...e.oldData, ...e.newData }
+            e.newData = { name, concurrencyStamp }
         },
 
         toolbar: {
@@ -239,10 +229,17 @@ $(function () {
             {
                 caption: l("EntityFieldName:MDMService:UOM:Code"),
                 dataField: "code",
+                editorOptions: {
+                    maxLength: 20,
+                },
                 validationRules: [
                     {
-                        type: "required",
-                        message: 'Code is required'
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
                     }
                 ]
             },
@@ -265,7 +262,7 @@ $(function () {
                 const dataGridDetail = $('<div>')
                     .dxDataGrid({
                         dataSource: {
-                            store: detailStore,
+                            store: uomGroupDetailsStore,
                             filter: ['uomGroupId', '=', options.key]
                         },
                         remoteOperations: true,
@@ -277,60 +274,30 @@ $(function () {
                         allowColumnResizing: true,
                         columnResizingMode: 'widget',
                         columnAutoWidth: true,
-                        // filterRow: {
-                        //     visible: true
-                        // },
-                        // groupPanel: {
-                        //     visible: true,
-                        // },
-                        searchPanel: {
-                            visible: true
-                        },
-                        columnMinWidth: 50,
-                        // columnChooser: {
-                        //     enabled: true,
-                        //     mode: "select"
-                        // },
-                        columnFixing: {
-                            enabled: true,
-                        },
                         export: {
                             enabled: true,
                         },
-                        onExporting(e) {
+                        onExporting: function (e) {
                             const workbook = new ExcelJS.Workbook();
-                            const worksheet = workbook.addWorksheet('Data');
-
+                            const worksheet = workbook.addWorksheet('Companies');
                             DevExpress.excelExporter.exportDataGrid({
                                 component: e.component,
                                 worksheet,
                                 autoFilterEnabled: true,
                             }).then(() => {
                                 workbook.xlsx.writeBuffer().then((buffer) => {
-                                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
                                 });
                             });
                             e.cancel = true;
                         },
-                        // headerFilter: {
-                        //     visible: true,
-                        // },
-                        stateStoring: {
-                            enabled: true,
-                            type: 'localStorage',
-                            storageKey: 'dgUOMGroupDetails' + options.key,
+                        searchPanel: {
+                            visible: true
                         },
-                        // paging: {
-                        //     enabled: true,
-                        //     pageSize: pageSize
-                        // },
-                        // pager: {
-                        //     visible: true,
-                        //     showPageSizeSelector: true,
-                        //     allowedPageSizes: allowedPageSizes,
-                        //     showInfo: true,
-                        //     showNavigationButtons: true
-                        // },
+                        columnMinWidth: 50,
+                        columnFixing: {
+                            enabled: true,
+                        },
                         editing: {
                             mode: "row",
                             allowAdding: abp.auth.isGranted('MdmService.UOMGroupDetails.Create'),
@@ -465,10 +432,8 @@ $(function () {
                         },
                         toolbar: {
                             items: [
-                                //"groupPanel",
                                 "addRowButton",
-                                //'columnChooserButton',
-                                //"exportButton",
+                                "exportButton",
                                 // {
                                 //     location: 'after',
                                 //     template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("ImportFromExcel")}" style="height: 36px;"> <i class="fa fa-upload"></i> <span></span> </button>`,
@@ -507,11 +472,15 @@ $(function () {
                                     }
                                 ],
                                 editorType: 'dxSelectBox',
-                                calculateDisplayValue: 'altUOM.code',
                                 lookup: {
                                     dataSource: getUOMs,
                                     valueExpr: 'id',
-                                    displayExpr: 'code',
+                                    displayExpr(e) {
+                                        if (e) {
+                                            return `${e.code} - ${e.name}`
+                                        }
+                                        return "";
+                                    },
                                     paginate: true,
                                     pageSize: pageSizeForLookup
                                 },
@@ -543,11 +512,15 @@ $(function () {
                                 dataField: "baseUOMId",
                                 validationRules: [{ type: "required" }],
                                 editorType: 'dxSelectBox',
-                                calculateDisplayValue: 'baseUOM.code',
                                 lookup: {
                                     dataSource: getUOMs,
                                     valueExpr: 'id',
-                                    displayExpr: 'code',
+                                    displayExpr(e) {
+                                        if (e) {
+                                            return `${e.code} - ${e.name}`
+                                        }
+                                        return "";
+                                    },
                                     paginate: true,
                                     pageSize: pageSizeForLookup
                                 },

@@ -1,151 +1,26 @@
 $(function () {
-    var l = abp.localization.getResource("OMS");
-    var priceUpdateService = window.dMSpro.oMS.mdmService.controllers.priceUpdates.priceUpdate;
-    var priceListService = window.dMSpro.oMS.mdmService.controllers.priceLists.priceList;
-
-    /****custom store*****/
-    var priceUpdateStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            priceUpdateService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            priceUpdateService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        },
-        insert(values) {
-            return priceUpdateService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return priceUpdateService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return priceUpdateService.delete(key);
-        }
-    });
-
-    var priceListStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            priceListService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            priceListService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
-
-    const statusStore = [
-        {
-            id: 0,
-            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:OPEN')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:CONFIRMED')
-        },
-        {
-            id: 2,
-            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:RELEASED')
-        },
-        {
-            id: 3,
-            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:CANCELLED')
-        },
-        {
-            id: 4,
-            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:COMPLETED')
-        },
-        {
-            id: 5,
-            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:FAILED')
-        },
-        {
-            id: 6,
-            text: l('EntityFieldValue:MDMService:PriceUpdate:Status:INCOMPLETED')
-        }
-    ];
-
     /****control*****/
     //Grid Price Update
-    const priceUpdateContainer = $('#priceUpdateContainer').dxDataGrid({
-        dataSource: priceUpdateStore,
+    mainGridInstance = $('#priceUpdateContainer').dxDataGrid({
+        dataSource: store.priceUpdateStore,
         remoteOperations: true,
         cacheEnabled: true,
         export: {
             enabled: true,
-            // allowExportSelectedData: true,
         },
-        onExporting(e) {
-            if (e.format === 'xlsx') {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('PriceUpdates');
-                DevExpress.excelExporter.exportDataGrid({
-                    component: e.component,
-                    worksheet,
-                    autoFilterEnabled: true,
-                }).then(() => {
-                    workbook.xlsx.writeBuffer().then((buffer) => {
-                        saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PriceUpdates.xlsx');
-                    });
+        onExporting: function (e) {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Companies');
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet,
+                autoFilterEnabled: true,
+            }).then(() => {
+                workbook.xlsx.writeBuffer().then((buffer) => {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
                 });
-                e.cancel = true;
-            }
-            else if (e.format === 'pdf') {
-                const doc = new jsPDF();
-                DevExpress.pdfExporter.exportDataGrid({
-                    jsPDFDocument: doc,
-                    component: e.component,
-                }).then(() => {
-                    doc.save('PriceUpdates.pdf');
-                });
-            }
+            });
+            e.cancel = true;
         },
         showRowLines: true,
         showBorders: true,
@@ -175,10 +50,7 @@ $(function () {
         searchPanel: {
             visible: true
         },
-        //scrolling: {
-        //    mode: 'standard'
-        //},
-        stateStoring: { //save state in localStorage
+        stateStoring: {
             enabled: true,
             type: 'localStorage',
             storageKey: 'priceUpdateContainer',
@@ -201,29 +73,30 @@ $(function () {
                     location: 'after',
                     template: `<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" title="${l("Button.New.PriceUpdate")}" style="height: 36px;"> <i class="fa fa-plus"></i> <span></span> </button>`,
                     onClick() {
-                        var newtab = window.open('/Mdm/PriceUpdates/Details', '_blank');
-                        newtab.sessionStorage.removeItem('PriceUpdateId');
+                        renderPopup({})
+                        // let newtab = window.open('/Mdm/PriceUpdates/Details', '_blank');
+                        // newtab.sessionStorage.removeItem('PriceUpdateId');
                     },
                     visible: abp.auth.isGranted('MdmService.PriceUpdates.Create')
                 },
                 'columnChooserButton',
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    }
-                },
+                // {
+                //     location: 'after',
+                //     widget: 'dxButton',
+                //     options: {
+                //         icon: "import",
+                //         elementAttr: {
+                //             class: "import-excel",
+                //         },
+                //         onClick(e) {
+                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //             var gridName = gridControl.attr('id');
+                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //             if (popup) popup.show();
+                //         },
+                //     }
+                // },
                 "searchPanel"
             ],
         },
@@ -236,8 +109,9 @@ $(function () {
                         text: l('Button.ViewDetail'),
                         icon: "fieldchooser",
                         onClick: function (e) {
-                            var newtab = window.open('/Mdm/PriceUpdates/Details', '_blank');
-                            newtab.sessionStorage.setItem("PriceUpdateId", e.row.data.id);
+                            renderPopup(e.row.data)
+                            // var newtab = window.open('/Mdm/PriceUpdates/Details', '_blank');
+                            // newtab.sessionStorage.setItem("PriceUpdateId", e.row.data.id);
                         }
                     }
                 ],
@@ -248,7 +122,20 @@ $(function () {
             {
                 caption: l('EntityFieldName:MDMService:PriceUpdate:Code'),
                 dataField: 'code',
-                dataType: 'string'
+                dataType: 'string',
+                editorOptions: {
+                    maxLength: 20,
+                },
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 caption: l('EntityFieldName:MDMService:PriceUpdate:Description'),
@@ -262,7 +149,7 @@ $(function () {
                 validationRules: [{ type: "required" }],
                 lookup: {
                     dataSource: {
-                        store: priceListStore,
+                        store: store.priceListStore,
                         paginate: true,
                         pageSize: pageSizeForLookup
                     },
@@ -270,25 +157,23 @@ $(function () {
                     valueExpr: 'id'
                 }
             },
-            {
-                caption: l('EntityFieldName:MDMService:PriceUpdate:EffectiveDate'),
-                dataField: 'effectiveDate',
-                dataType: 'datetime'
-            },
+            // {
+            //     caption: l('EntityFieldName:MDMService:PriceUpdate:EffectiveDate'),
+            //     dataField: 'effectiveDate',
+            //     dataType: 'datetime'
+            // },
             {
                 caption: l('EntityFieldName:MDMService:PriceUpdate:Status'),
                 dataField: 'status',
                 lookup: {
-                    dataSource: statusStore,
+                    dataSource: store.status,
                     displayExpr: 'text',
                     valueExpr: 'id'
-                }
+                },
+                allowEditing: false
             }
         ]
     }).dxDataGrid("instance");
 
-    /****button*****/
-
-    /****function*****/
-    initImportPopup('api/mdm-service/price-updates', 'PriceUpdateSchedules_Template', 'priceUpdateContainer');
+    // initImportPopup('api/mdm-service/price-updates', 'PriceUpdateSchedules_Template', 'priceUpdateContainer');
 });

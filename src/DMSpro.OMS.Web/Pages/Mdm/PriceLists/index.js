@@ -4,7 +4,16 @@ var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
 var itemService = window.dMSpro.oMS.mdmService.controllers.items.item;
 $(function () {
     var l = abp.localization.getResource("OMS");
-
+    var isReleasedStore = [
+        {
+            id: true,
+            text: l('EntityFieldValue:MDMService:PriceList:Status:Released')
+        },
+        {
+            id: false,
+            text: l('EntityFieldValue:MDMService:PriceList:Status:Open')
+        }
+    ]
     var customStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
@@ -36,7 +45,7 @@ $(function () {
             return d.promise();
         },
         insert(values) {
-            return priceListService.create(values, { contentType: 'application/json' });
+            return priceListService.create({ ...values, active: true }, { contentType: 'application/json' });
         },
         update(key, values) {
             return priceListService.update(key, values, { contentType: 'application/json' });
@@ -90,6 +99,7 @@ $(function () {
     // get price list
     var getPriceList = new DevExpress.data.CustomStore({
         key: "id",
+        useDefaultSearch: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -155,6 +165,7 @@ $(function () {
     // get item list
     var getItemList = new DevExpress.data.CustomStore({
         key: "id",
+        useDefaultSearch: true,
         load(loadOptions) {
             const deferred = $.Deferred();
             const args = {};
@@ -172,6 +183,15 @@ $(function () {
                     });
                 });
             return deferred.promise();
+        },
+        byKey: function (key) {
+            if (key == 0) return null;
+            var d = new $.Deferred();
+            uomService.get(key)
+                .done(data => {
+                    d.resolve(data);
+                })
+            return d.promise();
         }
     });
 
@@ -252,24 +272,15 @@ $(function () {
                 });
                 e.cancel = true;
             }
-            else if (e.format === 'pdf') {
-                const doc = new jsPDF();
-                DevExpress.pdfExporter.exportDataGrid({
-                    jsPDFDocument: doc,
-                    component: e.component,
-                }).then(() => {
-                    doc.save('PriceLists.pdf');
-                });
-            }
         },
         headerFilter: {
             visible: true,
         },
-        // stateStoring: {
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'gridPriceLists',
-        // },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'gridPriceLists',
+        },
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -297,68 +308,101 @@ $(function () {
             e.newData = Object.assign({}, e.oldData, e.newData);
         },
         onEditorPreparing: (e) => {
-            if (e.row?.rowType != "data" && !Boolean(e.dataField) && e.parentType != 'dataRow' && !e.row?.isNewRow){
-                return
+            if (e.row?.rowType == "data" && e.row?.isNewRow) {
+                let itemsLength = e.component.getDataSource().items().length;
+                if (['isBase', 'isDefaultForCustomer', 'isDefaultForVendor'].indexOf(e.dataField) > -1 && itemsLength === 0) {
+                    e.editorOptions.onContentReady = (v) => {
+                        v.component.option('value', true)
+                    }
+                    e.editorOptions.readOnly = true
+                }
             }
-            const items = e.component.getDataSource().items();
-            if (["action", 'name', 'code'].indexOf(e.dataField) === -1 && items.length < 1){
-                e.editorOptions.disabled = true
+            // Disable Edit some field if Base PriceList
+            if (e.row?.data.isBase) {
+                if (['name', 'isDefaultForCustomer', 'isDefaultForVendor'].indexOf(e.dataField) == -1) {
+                    e.editorOptions.readOnly = true
+                    e.editorOptions.placeholder = null
+                }
             }
-                
-            // if (e.dataField == 'basePriceListId')
-            //     e.editorOptions.disabled = true
         },
         onEditorPrepared: function (e) {
-            if (e.row?.rowType == "data" && Boolean(e.dataField) && e.parentType == 'dataRow' && e.row.isNewRow){
-                console.log("ThUY");
-                const items = e.component.getDataSource().items();
-                const value = e.component.option("value");
+            //if (e.row?.rowType == "data" && Boolean(e.dataField) && e.parentType == 'dataRow' && e.row.isNewRow){
+            //    const items = e.component.getDataSource().items();
+            //    const value = e.component.option("value");
+            //}
+        },
+        onInitNewRow: (e) => {
+            // on new row ,set 3 checkbox default value to false
+            e.data = {
+                ...e.data,
+                isBase: false,
+                isDefaultForCustomer: false,
+                isDefaultForVendor: false,
             }
         },
         toolbar: {
             items: [
-                "groupPanel",
-                {
-                    location: 'after',
-                    template: '<button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed" style="height: 36px;"> <i class="fa fa-plus"></i> </button>',
-                    onClick() {
-                        dataGrid.addRow();
-                    },
-                },
-                'columnChooserButton',
+                //"groupPanel",
+                "addRowButton",
+                "columnChooserButton",
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        },
-                    }
-                },
-                "searchPanel"
+                //{
+                //    location: 'after',
+                //    widget: 'dxButton',
+                //    options: {
+                //        icon: "import",
+                //        elementAttr: {
+                //            class: "import-excel",
+                //        },
+                //        onClick(e) {
+                //            var gridControl = e.element.closest('div.dx-datagrid').parent();
+                //            var gridName = gridControl.attr('id');
+                //            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                //            if (popup) popup.show();
+                //        },
+                //    }
+                //},
+                //"searchPanel"
             ],
         },
         columns:
             [
                 {
                     type: 'buttons',
-                    buttons: ['edit'],
+                    buttons: [
+                        'edit',
+                        {
+                            text: l('Button:MDMService:PriceListAssignment:Release'),
+                            icon: 'tags',
+                            onClick: (e) => {
+                                priceListService.release(e.row.data.id, { contentType: "application/json" }).then(() => {
+                                    dataGrid.refresh()
+                                })
+                            },
+                            disabled: (e) => e.row.isNewRow || e.row.data.isReleased
+                        }
+                    ],
                     caption: l('Actions'),
-                    width: 120,
+                    name: "Actions",
+                    width: 100,
                     fixedPosition: 'left'
                 },
                 {
                     dataField: 'code',
                     caption: l("EntityFieldName:MDMService:PriceList:Code"),
-                    validationRules: [{ type: "required" }]
+                    validationRules: [
+                        {
+                            type: "required"
+                        },
+                        {
+                            type: 'pattern',
+                            pattern: '^[a-zA-Z0-9]{1,20}$',
+                            message: l('ValidateError:Code')
+                        }
+                    ],
+                    cellTemplate: (cellElement, component, c) => {
+                        return $('<div />').text(component.value).css('color', component.data.isBase ? "#1d4ed8" : "")
+                    }
                 },
                 {
                     dataField: 'name',
@@ -366,15 +410,16 @@ $(function () {
                     validationRules: [{ type: "required" }]
                 },
                 {
-                    dataField: 'active',
+                    dataField: 'isReleased',
                     caption: l("EntityFieldName:MDMService:PriceList:Active"),
                     alignment: 'center',
-                    dataType: 'boolean',
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                            .appendTo(container);
+                    dataType: 'text',
+                    lookup: {
+                        dataSource: isReleasedStore,
+                        valueExpr: 'id',
+                        displayExpr: 'text',
                     },
+                    allowEditing: false,
                     width: 120
                 },
                 {
@@ -387,37 +432,27 @@ $(function () {
                         class: "basePriceListSelectBox",
                     },
                     lookup: {
-                        //dataSource: getPriceList,
-                        dataSource: {
-                            store: getPriceList,
-                            paginate: true,
-                            pageSize: pageSizeForLookup
+                        dataSource: (e) => {
+                            if (e.data)
+                                return {
+                                    store: getPriceList,
+                                    filter: ["isBase", "=", true],
+                                    paginate: true,
+                                    pageSize
+                                }
+                            else {
+                                return {
+                                    store: getPriceList,
+                                    filter: ['id', '<>', null],
+                                    paginate: true,
+                                    pageSize
+                                }
+                            }
                         },
                         valueExpr: 'id',
                         displayExpr: 'code'
                     },
-                    // editorOptions: {
-                    //     dataSource: {
-                    //         store: getPriceList,
-                    //         filter: ["isFirstPriceList", "=", true],
-                    //     },
-                    //     valueExpr: 'id',
-                    //     displayExpr: 'code'
-                    // },
                     width: 200
-                },
-                
-                {
-                    dataField: 'active',
-                    caption: l("EntityFieldName:MDMService:PriceList:Active"),
-                    alignment: 'center',
-                    dataType: 'boolean',
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                            .appendTo(container);
-                    },
-                    width: 120
                 },
                 {
                     dataField: 'arithmeticOperation',
@@ -435,6 +470,9 @@ $(function () {
                     caption: l("EntityFieldName:MDMService:PriceList:ArithmeticFactor"),
                     cssClass: 'fieldFactor',
                     dataType: 'number',
+                    editorOptions: {
+                        min: 0,
+                    },
                     width: 180
                 },
                 {
@@ -446,45 +484,40 @@ $(function () {
                         valueExpr: 'id',
                         displayExpr: 'text'
                     },
-                    width: 200
-                },
-                {
-                    dataField: 'isBase',
-                    caption: l("EntityFieldName:MDMService:PriceList:IsBase"),
-                    alignment: 'center',
-                    dataType: 'boolean',
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                            .appendTo(container);
-                    },
-                    width: 120
+                    width: 200,
                 },
                 {
                     dataField: 'isDefaultForCustomer',
                     caption: l("EntityFieldName:MDMService:PriceList:IsDefaultForCustomer"),
                     alignment: 'center',
-                    dataType: 'boolean',
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                            .appendTo(container);
-                    },
-                    width: 120
+                    allowEditing: false,
+                    cellTemplate: (container, options) => $('<div>')
+                        .append($(options.value ?
+                            '<i class="fa fa-check" style="color:#34b233"></i>' :
+                            $('<div/>').dxButton({
+                                text: l('Button:MDMService:PriceList:SetDefault'),
+                                hint: l("EntityFieldName:MDMService:PriceList:IsDefaultForCustomer"),
+                                type: 'default',
+                                onClick: () => priceListService.setDefaultForCustomer(options.data.id).then(() => dataGrid.getDataSource().reload())
+                            }))),
                 },
                 {
                     dataField: 'isDefaultForVendor',
                     caption: l("EntityFieldName:MDMService:PriceList:IsDefaultForVendor"),
                     alignment: 'center',
-                    dataType: 'boolean',
-                    cellTemplate(container, options) {
-                        $('<div>')
-                            .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                            .appendTo(container);
-                    },
-                    width: 120
-                }
+                    allowEditing: false,
+                    cellTemplate: (container, options) => $('<div>')
+                        .append($(options.value ?
+                            '<i class="fa fa-check" style="color:#34b233"></i>' :
+                            $('<div/>').dxButton({
+                                text: l('Button:MDMService:PriceList:SetDefault'),
+                                hint: l("EntityFieldName:MDMService:PriceList:IsDefaultForCustomer"),
+                                type: 'default',
+                                onClick: () => priceListService.setDefaultForVendor(options.data.id).then(() => dataGrid.getDataSource().reload())
+                            }))),
+                },
             ],
+
         masterDetail: {
             enabled: true,
             template(container, options) {
@@ -495,14 +528,17 @@ $(function () {
                             store: detailStore,
                             filter: ['priceListId', '=', options.key],
                             paginate: true,
-                            pageSize: pageSize,
+                            pageSize,
                         },
-                        // editing: {
-                        //     mode: 'row',
-                        //     allowUpdating: true,
-                        //     //allowDeleting: true,
-                        //     allowAdding: true,
-                        // },
+                        key: "id",
+                        editing: {
+                            mode: 'row',
+                            allowUpdating: !options.data.isReleased && abp.auth.isGranted('MdmService.PriceLists.Edit'),
+                            useIcons: true,
+                            texts: {
+                                editRow: l("Edit"),
+                            }
+                        },
                         remoteOperations: true,
                         showRowLines: true,
                         showBorders: true,
@@ -550,96 +586,87 @@ $(function () {
                         headerFilter: {
                             visible: true,
                         },
-                        // stateStoring: {
-                        //     enabled: true,
-                        //     type: 'localStorage',
-                        //     storageKey: 'dgPriceListDetails' + options.key,
-                        // },
+                        stateStoring: {
+                            enabled: true,
+                            type: 'localStorage',
+                            storageKey: 'dgPriceListDetails' + options.key,
+                        },
                         paging: {
                             enabled: true,
-                            pageSize: pageSize
+                            pageSize
                         },
                         pager: {
                             visible: true,
                             showPageSizeSelector: true,
-                            allowedPageSizes: allowedPageSizes,
+                            allowedPageSizes,
                             showInfo: true,
                             showNavigationButtons: true
                         },
                         toolbar: {
                             items: [
-                                //"addRowButton",
-                                "groupPanel", 
-                                "columnChooserButton",
+                                "addRowButton",
+                                "groupPanel",
+                                //"columnChooserButton",
                                 "exportButton",
                                 "searchPanel"
                             ],
                         },
                         columns: [
                             {
+                                type: 'buttons',
+                                buttons: [
+                                    'edit',
+                                ],
+                                caption: l('Actions'),
+                                width: 100,
+                                fixedPosition: 'left'
+                            },
+                            {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:PriceList"),
-                                dataField: "priceListId",
-                                lookup: {
-                                    //dataSource: getPriceList,
-                                    dataSource: {
-                                        store: getPriceList,
-                                        paginate: true,
-                                        pageSize: pageSizeForLookup
-                                    },
-                                    valueExpr: 'id',
-                                    displayExpr: 'code'
-                                }
+                                dataField: "priceList.code",
+                                allowEditing: false,
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Item"),
-                                dataField: "itemId",
-                                sortIndex: 0, sortOrder: "asc",
-                                lookup: {
-                                    //dataSource: getItemList,
-                                    dataSource: {
-                                        store: getItemList,
-                                        paginate: true,
-                                        pageSize: pageSizeForLookup
-                                    },
-                                    valueExpr: 'id',
-                                    displayExpr: function (e) {
-                                        return e.code + ' - ' + e.name
-                                    }
-                                }
+                                dataField: "item.name",
+                                sortIndex: 0,
+                                sortOrder: "asc",
+                                calculateDisplayValue: (e) => {
+                                    if (e)
+                                        return e.item.code + " - " + e.item.name
+                                },
+                                allowEditing: false,
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:UOM"),
-                                dataField: "uomId",
-                                lookup: {
-                                    //dataSource: getUOMs,
-                                    dataSource: {
-                                        store: getUOMs,
-                                        paginate: true,
-                                        pageSize: pageSizeForLookup
-                                    },
-                                    valueExpr: 'id',
-                                    displayExpr: 'code'
-                                }
+                                dataField: "uom.name",
+                                allowEditing: false,
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:BasedOnPrice"),
-                                dataField: "basedOnPrice"
+                                dataField: "basedOnPrice",
+                                allowEditing: false,
                             },
                             {
                                 caption: l("EntityFieldName:MDMService:PriceListDetail:Price"),
                                 dataField: "price",
+                                dataType: 'number',
+                                validationRules: [{ type: "required" }]
                             },
-                            {
-                                caption: l("EntityFieldName:MDMService:PriceListDetail:Description"),
-                                dataField: "description",
-                                dataType: "string"
+                        ],
+                        onRowUpdating: (e) => {
+                            let { uomId, itemId, concurrencyStamp, basedOnPrice } = e.oldData
+                            let newData = {
+                                uomId, itemId, concurrencyStamp, basedOnPrice,
+                                ...e.newData,
                             }
-                        ]
+                            e.newData = newData;
+                        }
                     }).appendTo(container);
                 // initImportPopup('api/mdm-service/price-list-details', 'PriceListDetails_Template', `grid_${currentHeaderData.id}`);
             }
         }
     }).dxDataGrid('instance');
 
-    initImportPopup('api/mdm-service/price-lists', 'PriceLists_Template', 'gridPriceLists');
+    // initImportPopup('api/mdm-service/price-lists', 'PriceLists_Template', 'gridPriceLists');
 });

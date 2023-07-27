@@ -3,7 +3,7 @@ $(function () {
     // language
     var l = abp.localization.getResource("OMS");
 
-    var customStore = new DevExpress.data.CustomStore({
+    var uomStore = new DevExpress.data.CustomStore({
         key: "id",
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -46,7 +46,7 @@ $(function () {
     });
 
     var gridUOMs = $('#gridUOMs').dxDataGrid({
-        dataSource: customStore,
+        dataSource: uomStore,
         remoteOperations: true,
         showRowLines: true,
         showBorders: true,
@@ -76,17 +76,16 @@ $(function () {
         export: {
             enabled: true,
         },
-        onExporting(e) {
+        onExporting: function (e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
+            const worksheet = workbook.addWorksheet('Companies');
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
                 worksheet,
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'UOMs.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
                 });
             });
             e.cancel = true;
@@ -123,7 +122,8 @@ $(function () {
             }
         },
         onRowUpdating: function (e) {
-            e.newData = Object.assign({}, e.oldData, e.newData);
+            let { name, concurrencyStamp } = { ...e.oldData, ...e.newData }
+            e.newData = { name, concurrencyStamp }
         },
         onEditorPreparing: function (e) {
             if (e.dataField == 'code' && e.value != null) {
@@ -168,10 +168,17 @@ $(function () {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:UOM:Code"),
                 dataType: 'string',
+                editorOptions: {
+                    maxLength: 20,
+                },
                 validationRules: [
                     {
-                        type: 'required',
-                        message: 'Code is required'
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
                     }
                 ]
             },
@@ -183,6 +190,11 @@ $(function () {
                     {
                         type: 'required',
                         message: 'Name is required'
+                    },
+                    {
+                        type: "stringLength",
+                        max: 50,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 50)
                     }
                 ]
             }

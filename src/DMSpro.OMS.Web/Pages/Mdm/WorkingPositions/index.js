@@ -79,17 +79,16 @@
         export: {
             enabled: true,
         },
-        onExporting(e) {
+        onExporting: function (e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
+            const worksheet = workbook.addWorksheet('Companies');
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
                 worksheet,
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
                 });
             });
             e.cancel = true;
@@ -125,11 +124,8 @@
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             }
         },
-        onInitNewRow(e) {
-            e.data.active = true;
-        },
         onRowUpdating: function (e) {
-            var objectRequire = ['code', 'name', 'description', 'active'];
+            var objectRequire = ['name', 'description'];
             for (var property in e.oldData) {
                 if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
                     e.newData[property] = e.oldData[property];
@@ -148,23 +144,6 @@
                 },
                 'columnChooserButton',
                 "exportButton",
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: "import",
-                        elementAttr: {
-                            //id: "import-excel",
-                            class: "import-excel",
-                        },
-                        onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                            if (popup) popup.show();
-                        }
-                    }
-                },
                 "searchPanel"
             ],
         },
@@ -180,6 +159,19 @@
                 caption: l("EntityFieldName:MDMService:WorkingPosition:Code"),
                 dataField: "code",
                 dataType: 'string',
+                editorOptions: {
+                    maxLength: 20,
+                },
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:WorkingPosition:Name"),
@@ -191,41 +183,12 @@
                 caption: l("EntityFieldName:MDMService:WorkingPosition:Description"),
                 dataField: "description",
                 dataType: 'string',
-            },
-            {
-                caption: l("EntityFieldName:MDMService:WorkingPosition:Active"),
-                dataField: "active",
-                dataType: 'boolean'
             }
-        ]
+        ],
+        onEditorPreparing: function (e) {
+            if (e.dataField === "code" && e.parentType === "dataRow") {
+                e.editorOptions.disabled = !e.row.isNewRow;
+            }
+        },
     }).dxDataGrid("instance");
-
-    /****event*****/
-    //$("input#Search").on("input", function () {
-    //    dataGridContainer.searchByText($(this).val());
-    //});
-
-    ///****button*****/
-    //$("#NewWorkingPositionButton").click(function () {
-    //    dataGridContainer.addRow();
-    //});
-
-    //$("#ExportToExcelButton").click(function (e) {
-    //    e.preventDefault();
-
-    //    workingPositionService.getDownloadToken().then(
-    //        function (result) {
-    //            var url = abp.appPath + 'api/mdm-service/working-positions/as-excel-file' +
-    //                abp.utils.buildQueryString([
-    //                    { name: 'downloadToken', value: result.token }
-    //                ]);
-
-    //            var downloadWindow = window.open(url, '_blank');
-    //            downloadWindow.focus();
-    //        }
-    //    )
-    //});
-
-    /****function*****/
-    initImportPopup('api/mdm-service/working-positions', 'WorkingPositions_Template', 'dataGridContainer');
 });

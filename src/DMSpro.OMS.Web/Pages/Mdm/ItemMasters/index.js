@@ -1,306 +1,347 @@
-﻿$(function () {
-    var l = abp.localization.getResource("OMS");
-    var itemMasterService = window.dMSpro.oMS.mdmService.controllers.items.item;
-    var itemAttrValueService = window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue;
-    var itemAttrService = window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute;
-    var itemTypeService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
+﻿$(async function () {
+    let l = abp.localization.getResource("OMS");
+    let rpcService = {
+        itemMasterService: window.dMSpro.oMS.mdmService.controllers.items.item,
+        itemAttrValueService: window.dMSpro.oMS.mdmService.controllers.itemAttributeValues.itemAttributeValue,
+        itemAttrService: window.dMSpro.oMS.mdmService.controllers.itemAttributes.itemAttribute,
+        itemImageService: window.dMSpro.oMS.mdmService.controllers.itemImages.itemImage,
+        itemAttachmentService: window.dMSpro.oMS.mdmService.controllers.itemAttachments.itemAttachment,
+        itemTypeService: window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData,
+        uomService: window.dMSpro.oMS.mdmService.controllers.uOMs.uOM,
+        uomGroupService: window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGroup,
+        uomGroupDetailService: window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail,
+        vatService: window.dMSpro.oMS.mdmService.controllers.vATs.vAT,
+    }
+    let enumValue = {
+        manageItem: [
+            {
+                id: 0,
+                text: l('EntityFieldValue:MDMService:Item:ManageItemBy:NONE')
+            },
+            {
+                id: 1,
+                text: l('EntityFieldValue:MDMService:Item:ManageItemBy:LOT')
+            },
+            {
+                id: 2,
+                text: l('EntityFieldValue:MDMService:Item:ManageItemBy:SERIAL')
+            }
+        ],
+        expiredType: [
+            {
+                id: 0,
+                text: l('EntityFieldValue:MDMService:Item:ExpiredType:DAY')
+            },
+            {
+                id: 1,
+                text: l('EntityFieldValue:MDMService:Item:ExpiredType:WEEK')
+            },
+            {
+                id: 2,
+                text: l('EntityFieldValue:MDMService:Item:ExpiredType:MONTH')
+            },
+            {
+                id: 3,
+                text: l('EntityFieldValue:MDMService:Item:ExpiredType:YEAR')
+            }
+        ],
+        issueMethod: [
+            {
+                id: 0,
+                text: l('EntityFieldValue:MDMService:Item:IssueMethod:FEFO')
+            },
+            {
+                id: 1,
+                text: l('EntityFieldValue:MDMService:Item:IssueMethod:SERIAL')
+            }
+        ],
+        issueMethod1: [
+            {
+                id: 0,
+                text: l('EntityFieldValue:MDMService:Item:IssueMethod:FEFO')
+            },
+        ],
+        itemTypes: [
+            {
+                id: 0,
+                text: l('EntityFieldValue:MDMService:Item:ItemTypes:Item'),
+            },
+            {
+                id: 1,
+                text: l('EntityFieldValue:MDMService:Item:ItemTypes:POSM'),
+            },
+            {
+                id: 2,
+                text: l('EntityFieldValue:MDMService:Item:ItemTypes:Discount'),
+            },
+            {
+                id: 3,
+                text: l('EntityFieldValue:MDMService:Item:ItemTypes:Voucher'),
+            }
+        ]
+    }
+    let store = {
+        imageStore: new DevExpress.data.CustomStore({
+            key: 'id',
+            load: (loadOptions) => {
+                const args = {};
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+                return rpcService.itemImageService.getListDevextremes(args)
+                    .then(({ data }) => Promise.all(data.map(async imageInfo => {
+                        return {
+                            ...imageInfo,
+                            url: await fetch("/api/mdm-service/item-images/get-file?id=" + imageInfo.fileId)
+                                .then(res => res.blob())
+                                .then(data => URL.createObjectURL(data))
+                        }
+                    })))
+                    .then(data => data.sort((a, b) => a.displayOrder - b.displayOrder));
+            },
+            byKey: (key) => key ? new Promise((resolve, reject) => rpcService.itemImageService.get(key)
+                .done(data => resolve(data))
+                .fail(err => reject(err))
+            ) : null,
+            insert: (values) => rpcService.itemImageService.create(values, { contentType: "application/json" }),
+            update: (key, values) => rpcService.itemImageService.update(key, values, { contentType: "application/json" }),
+            remove: (key) => rpcService.itemImageService.deleteMany(key)
+        }),
+        attachmentStore: new DevExpress.fileManagement.CustomFileSystemProvider({
+            keyExpr: 'id',
+            getItems: () => rpcService.itemAttachmentService.getListDevextremes({
+                filter: JSON.stringify(['itemId', '=', gridInfo.editingItem]),
+            }).then(({ data }) => {
+                gridInfo.attachment.fileSource = data?.map(e => {
+                    return {
+                        id: e.id,
+                        fileId: e.fileId,
+                        isDirectory: false,
+                        ...JSON.parse(e.description)
+                    };
+                })
+                return gridInfo.attachment.fileSource
+            }),
+            uploadFileChunk: (file, uploadInfo, destinationDirectory) => {
+                let form = new FormData();
+                form.append('inputFile', file, file.name);
+                let description = JSON.stringify({ name: file.name, size: file.size, type: file.type })
+                return rpcService.itemAttachmentService.create(gridInfo.editingItem, file, description, true,
+                    {
+                        contentType: false,
+                        processData: false,
+                        data: form,
+                        async: true,
+                    })
+            },
+            deleteItem: ({ dataItem }) => {
+                return rpcService.itemAttachmentService.deleteMany(dataItem.id)
+            },
+            // Don't change arguments
+            downloadItems: ([{ dataItem }]) => {
+                return rpcService.itemAttachmentService.getFile(dataItem.fileId, {
+                    dataType: 'binary',
+                    xhrFields: {
+                        'responseType': 'blob'
+                    },
+                    success: (result) => {
+                        let blob = new Blob([result]);
+                        let a = document.createElement('a');
+                        a.href = window.URL.createObjectURL(blob);
+                        a.download = dataItem.name;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(a.href);
+                    }
+                })
+            }
 
-    var uomService = window.dMSpro.oMS.mdmService.controllers.uOMs.uOM;
-    var uomGroupService = window.dMSpro.oMS.mdmService.controllers.uOMGroups.uOMGroup;
-    var uomGroupDetailService = window.dMSpro.oMS.mdmService.controllers.uOMGroupDetails.uOMGroupDetail;
-    var vatService = window.dMSpro.oMS.mdmService.controllers.vATs.vAT;
-    let disableColumn = ["inventoryUOMId", "purUOMId", "salesUOMId"]
-    /****custom store*****/
-    let defaultItemType;
-    let getUOMsGroupDetaiArr
-    var getVATs = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
+        }),
+        getVATs: new DevExpress.data.CustomStore({
+            key: 'id',
+            loadMode: 'raw',
+            cacheRawData: true,
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                const args = {};
 
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            vatService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+                rpcService.vatService.getListDevextremes(args)
+                    .done(result => {
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount,
+                        });
                     });
+                return deferred.promise();
+            },
+        }),
+        getUOMs: new DevExpress.data.CustomStore({
+            key: 'id',
+            loadMode: 'raw',
+            cacheRawData: true,
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                const args = {};
+
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
                 });
-            return deferred.promise();
-        },
-    });
-    var getItemTypes = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            itemTypeService.getListDevextremes(args)
-                .done(result => {
-                    defaultItemType = result
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
+                rpcService.uomService.getListDevextremes(args)
+                    .done(result => {
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount,
+                        });
                     });
-                });
-            return deferred.promise();
-        },
-    });
-    var getUOMs = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
+                return deferred.promise();
+            },
+        }),
+        getUOMsGroup: new DevExpress.data.CustomStore({
+            key: 'id',
+            loadMode: 'raw',
+            cacheRawData: true,
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                const args = {};
 
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            uomService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+                rpcService.uomGroupService.getListDevextremes(args)
+                    .done(result => {
+                        let lastResult = { ...result }
+                        // Validate UOM group where UOM group must have asleast 1 row and have base UOM
+                        lastResult.data = result.data.filter(e => e.details.filter(detail => detail.baseUOMId === detail.altUOMId).length > 0)
+                        deferred.resolve(lastResult.data, {
+                            totalCount: lastResult.totalCount,
+                            summary: lastResult.summary,
+                            groupCount: lastResult.groupCount,
+                        });
                     });
-                });
-            return deferred.promise();
-        },
-    });
-    var getUOMsGroup = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
+                return deferred.promise();
+            },
+        }),
+        getUOMsGroupDetailStore: new DevExpress.data.CustomStore({
+            key: 'id',
+            loadMode: 'raw',
+            cacheRawData: true,
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                const args = {};
 
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            uomGroupService.getListDevextremes(args)
-                .done(result => {
-                    let lastResult = { ...result }
-                    // Validate UOM group where UOM group must have asleast 1 row and have base UOM
-                    lastResult.data = result.data.filter(e => e.details.filter(detail => detail.baseUOMId === detail.altUOMId).length > 0)
-                    deferred.resolve(lastResult.data, {
-                        totalCount: lastResult.totalCount,
-                        summary: lastResult.summary,
-                        groupCount: lastResult.groupCount,
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+                rpcService.uomGroupDetailService.getListDevextremes(args)
+                    .done(result => {
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount,
+                        });
                     });
-                });
-            return deferred.promise();
-        },
-    });
-    var getUOMsGroupDetailStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
+                return deferred.promise();
+            },
+        }),
+        itemStore: new DevExpress.data.CustomStore({
+            key: 'id',
+            useDefaultSearch: true,
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                const args = {};
 
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            uomGroupDetailService.getListDevextremes(args)
-                .done(result => {
-                    getUOMsGroupDetaiArr = result.data
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
+                });
+                rpcService.itemMasterService.getListDevextremes(args)
+                    .done(result => {
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount,
+                        });
                     });
-                });
-            return deferred.promise();
-        },
-    });
-    // get Item Master
-    var itemStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
+                return deferred.promise();
+            },
+            byKey: function (key) {
+                if (!key) return null;
 
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            itemMasterService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
+                let d = new $.Deferred();
+                rpcService.itemMasterService.get(key)
+                    .done(data => {
+                        d.resolve(data);
                     });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
+                return d.promise();
+            },
+            insert(values) {
+                return rpcService.itemMasterService.create(values, { contentType: "application/json" });
+            },
+            update(key, values) {
+                return rpcService.itemMasterService.update(key, values, { contentType: "application/json" });
+            },
+            remove(key) {
+                return rpcService.itemMasterService.delete(key);
+            }
+        }),
+        getItemAttrValue: new DevExpress.data.CustomStore({
+            key: 'id',
+            loadMode: 'raw',
+            cacheRawData: true,
+            load(loadOptions) {
+                const deferred = $.Deferred();
+                const args = {};
 
-            var d = new $.Deferred();
-            itemMasterService.get(key)
-                .done(data => {
-                    d.resolve(data);
+                requestOptions.forEach((i) => {
+                    if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+                        args[i] = JSON.stringify(loadOptions[i]);
+                    }
                 });
-            return d.promise();
-        },
-        insert(values) {
-            return itemMasterService.create(values, { contentType: "application/json" });
-        },
-        update(key, values) {
-            return itemMasterService.update(key, values, { contentType: "application/json" });
-        },
-        remove(key) {
-            return itemMasterService.delete(key);
+
+                rpcService.itemAttrValueService.getListDevextremes(args)
+                    .done(result => {
+                        deferred.resolve(result.data, {
+                            totalCount: result.totalCount,
+                            summary: result.summary,
+                            groupCount: result.groupCount,
+                        });
+                    });
+                return deferred.promise();
+            },
+        })
+    }
+    let getUOMsGroupDetaiArr, disableColumn = ["inventoryUOMId", "purUOMId", "salesUOMId"], gridInfo = {}
+
+    store.getUOMsGroupDetailStore.load({}).then(data => {
+        getUOMsGroupDetaiArr = data
+    })
+    await rpcService.itemAttrService.getListDevextremes({ filter: JSON.stringify(['active', '=', true]) }).then(({ data }) => {
+        gridInfo.itemAttr = {
+            hierarchy: data.filter(e => e.hierarchyLevel != null).sort((a, b) => a.attrNo - b.attrNo),
+            flat: data.filter(e => e.hierarchyLevel == null).sort((a, b) => a.attrNo - b.attrNo),
+            count: data.length
         }
-    });
+    })
 
-    // get item attribute value
-    var getItemAttrValue = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            itemAttrValueService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-            var d = new $.Deferred();
-            itemAttrValueService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        },
-    });
-
-    var getItemAttr = new DevExpress.data.CustomStore({
-        key: 'id',
-        loadMode: 'raw',
-        cacheRawData: true,
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-            itemAttrService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-            var d = new $.Deferred();
-            itemAttrService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        },
-    });
-
-    const manageItem = [
-        {
-            id: 0,
-            text: l('EntityFieldValue:MDMService:Item:ManageItemBy:NONE')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldValue:MDMService:Item:ManageItemBy:LOT')
-        },
-        {
-            id: 2,
-            text: l('EntityFieldValue:MDMService:Item:ManageItemBy:SERIAL')
-        }
-    ];
-
-    const expiredType = [
-        {
-            id: 0,
-            text: l('EntityFieldValue:MDMService:Item:ExpiredType:DAY')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldValue:MDMService:Item:ExpiredType:WEEK')
-        },
-        {
-            id: 2,
-            text: l('EntityFieldValue:MDMService:Item:ExpiredType:MONTH')
-        },
-        {
-            id: 3,
-            text: l('EntityFieldValue:MDMService:Item:ExpiredType:YEAR')
-        }
-    ];
-
-    const issueMethod = [
-        {
-            id: 0,
-            text: l('EntityFieldValue:MDMService:Item:IssueMethod:FEFO')
-        },
-        {
-            id: 1,
-            text: l('EntityFieldValue:MDMService:Item:IssueMethod:SERIAL')
-        }
-    ];
-
-    /****control*****/
-
-    var gridItemMasters = $('#dataGridItemMasters').dxDataGrid({
-        dataSource: itemStore,
+    let gridItemMasters = $('#dataGridItemMasters').dxDataGrid({
+        dataSource: store.itemStore,
         editing: {
             mode: 'popup',
             allowAdding: abp.auth.isGranted('MdmService.Items.Create'),
@@ -313,80 +354,108 @@
                 confirmDeleteMessage: l("DeleteConfirmationMessage")
             },
             popup: {
-                title: 'Item Info',
-                showTitle: true,
-                height: '99%',
-                width: '99%',
+                height: '95%',
+                width: '95%',
                 hideOnOutsideClick: false,
                 dragEnabled: false,
+                onHiding: (e) => {
+                    gridInfo.editingItem = null;
+                    gridInfo.currentData = null;
+                    gridInfo.description = null;
+                    gridInfo.imageContent = null;
+                    gridInfo.attachment = null;
+                    gridInfo.generalContent = null;
+                    gridInfo.imageDataSource = null;
+                },
+                onContentReady: (e) => {
+                    let toolbarPopup = [...e.component.option('toolbarItems'),
+                    {
+                        widget: 'dxButton',
+                        toolbar: 'bottom',
+                        location: 'before',
+                        options: {
+                            text: 'Genarel Information',
+                            disabled: !Boolean(gridInfo.editingItem),
+                            onClick: () => {
+                                gridInfo.generalContent.show()
+                                gridInfo.imageContent.container.hide()
+                                gridInfo.attachment.container.hide()
+                            },
+                        },
+                    },
+                    {
+                        widget: 'dxButton',
+                        toolbar: 'bottom',
+                        location: 'before',
+                        options: {
+                            text: 'Item Image',
+                            disabled: !Boolean(gridInfo.editingItem),
+                            onClick: (e) => {
+                                gridInfo.imageContent.container.show()
+                                gridInfo.generalContent.hide()
+                                gridInfo.attachment.container.hide()
+                                if (!gridInfo.imageContent.isRender)
+                                    renderImageContent()
+                            },
+                        },
+                    },
+                    {
+                        widget: 'dxButton',
+                        toolbar: 'bottom',
+                        location: 'before',
+                        options: {
+                            text: 'Item Attachment',
+                            disabled: !Boolean(gridInfo.editingItem),
+                            onClick: (e) => {
+                                gridInfo.attachment.container.show()
+                                gridInfo.generalContent.hide()
+                                gridInfo.imageContent.container.hide()
+                                if (!gridInfo.attachment.isRender)
+                                    renderAttachmentContent()
+                            },
+                        },
+                    },
+                    ]
+                    e.component.option('toolbarItems', toolbarPopup)
+                    $('#formGridAddItemMaster').parent().addClass('d-flex flex-column')
+                    gridInfo.generalContent = $('#formGridAddItemMaster');
+                    gridInfo.imageContent = {
+                        container: $('<div style="display:flex;" class="flex-grow-1"/>').insertAfter($('#formGridAddItemMaster')),
+                        list: $('<div class="d-flex"/>').css({ 'flex': '1 0 65%' }),
+                        controller: $('<div class="border-start p-2"/>').css('flex-basis', "35%"),
+                    };
+                    gridInfo.imageContent.list.appendTo(gridInfo.imageContent.container)
+                    gridInfo.imageContent.controller.appendTo(gridInfo.imageContent.container)
+                    gridInfo.imageContent.container.hide()
+                    gridInfo.attachment = {
+                        container: $('<div style="display:flex;" class="flex-grow-1"/>').insertAfter($('#formGridAddItemMaster')),
+                    };
+                }
             },
             form: {
-                labelMode: "outside",
-                colCount: 6,
+                labelMode: "static",
+                colCount: 3,
                 elementAttr: {
                     id: 'formGridAddItemMaster',
-                    class: "p-3 mx-auto"
+                    class: "flex-grow-1 px-3"
                 },
                 items: [
-                    // Image Placeholder
                     {
+                        caption: '',
                         itemType: "group",
-                        caption: 'IMAGE',
-                        colSpan: 1,
                         template: renderItemImage // Fix for future versions
                     },
-                    // Genaral Info
                     {
+                        caption: '',
                         itemType: 'group',
-                        caption: "GENERAL",
-                        colSpan: 2,
-                        items: [
-                            {
-                                dataField: 'code',
-                                dataType: 'string',
-                                validationRules: [{ type: 'required' }]
-                            },
-                            {
-                                dataField: 'name',
-                                dataType: 'string',
-                                validationRules: [{ type: 'required' }]
-                            },
-                            {
-                                dataField: 'shortName',
-                                dataType: 'string'
-                            },
-                            {
-                                dataField: 'itemTypeId',
-                                // label: l('ItemTypeName'),
-                                editorType: 'dxSelectBox',
-                            },
-                            {
-                                dataField: 'barcode',
-                                // label: l('Barcode'),
-                                dataType: 'string'
-                            },
-                            {
-                                dataField: 'erpCode',
-                                // label: l('ERPCode'),
-                                dataType: 'string'
-                            },
-                            {
-                                dataField: 'active',
-                                dataType: 'boolean',
-                                editorType: 'dxCheckBox'
-                            }
-                        ]
+                        items: ['code', 'name', 'shortName', 'itemType', 'barcode', 'erpCode', 'active']
                     },
-                    // System properties
                     {
-                        caption: "MANAGEMENT",
+                        caption: '',
                         itemType: 'group',
-                        colSpan: 2,
                         items: [
                             {
                                 dataField: 'manageItemBy',
-                                validationRules: [{ type: 'required' }],
-                                editorType: 'dxSelectBox',
                                 editorOptions: {
                                     onSelectionChanged: (e) => {
                                         let formInstance = $("#formGridAddItemMaster").dxForm('instance')
@@ -397,16 +466,27 @@
                                             switch (e.selectedItem.id) {
                                                 case 0:
                                                     expiredType.option('readOnly', true)
+                                                    expiredType.option('value', null)
                                                     expiredValue.option('readOnly', true)
+                                                    expiredValue.option('value', null)
+                                                    issueMethod.option('dataSource', enumValue.issueMethod)
+                                                    issueMethod.option('readOnly', false)
+                                                    issueMethod.option('value', 0)
                                                     break;
                                                 case 1:
                                                     expiredType.option('readOnly', false)
                                                     expiredValue.option('readOnly', false)
+                                                    issueMethod.option('dataSource', enumValue.issueMethod1)
+                                                    issueMethod.option('readOnly', false)
                                                     issueMethod.option('value', 0)
                                                     break;
                                                 case 2:
                                                     expiredType.option('readOnly', true)
+                                                    expiredType.option('value', null)
                                                     expiredValue.option('readOnly', true)
+                                                    expiredValue.option('value', null)
+                                                    issueMethod.option('dataSource', enumValue.issueMethod)
+                                                    issueMethod.option('readOnly', true)
                                                     issueMethod.option('value', 1)
                                                     break;
                                                 default:
@@ -423,11 +503,11 @@
                                     elementAttr: {
                                         id: 'expiredType'
                                     },
+                                    placeholder: "",
                                     readOnly: true,
                                 }
                             },
                             {
-                                name: 'expiredValue',
                                 dataField: 'expiredValue',
                                 editorType: 'dxNumberBox',
                                 editorOptions: {
@@ -439,11 +519,10 @@
                                 }
                             },
                             {
-                                name: 'issueMethod',
                                 dataField: 'issueMethod',
                                 editorType: 'dxSelectBox',
                                 editorOptions: {
-                                    items: issueMethod,
+                                    items: enumValue.issueMethod,
                                     elementAttr: {
                                         id: 'issueMethod'
                                     },
@@ -454,87 +533,44 @@
                                     value: 0
                                 }
                             },
-                        ]
-
-                    },
-                    {
-                        itemType: 'group',
-                        caption: 'OPTIONS',
-                        colSpan: 1,
-                        items: [
                             {
-                                dataField: 'isInventoriable',
-                                dataType: 'boolean',
-                                editorType: 'dxCheckBox'
+                                itemType: 'empty',
                             },
                             {
-                                dataField: 'isPurchasable',
-                                dataType: 'boolean',
-                                editorType: 'dxCheckBox'
-                            },
-                            {
-                                dataField: 'isSaleable',
-                                dataType: 'boolean',
-                                editorType: 'dxCheckBox'
-                            },
-                        ]
-
-                    },
-                    // Tabs Groups
-                    {
-                        caption: 'OPTIONS',
-                        itemType: 'group',
-                        colSpan: 3,
-                        items: [
-                            {
-                                dataField: 'uomGroupId',
-                                editorType: 'dxSelectBox',
-                            },
-                            {
-                                dataField: 'inventoryUOMId',
-                                validationRules: [{ type: 'required' }],
-                                editorType: 'dxSelectBox',
-                            },
-                            {
-                                dataField: 'purUOMId',
-                                validationRules: [{ type: 'required' }],
-                                editorType: 'dxSelectBox',
-                            },
-                            {
-                                dataField: 'salesUOMId',
-                                validationRules: [{ type: 'required' }],
-                                editorType: 'dxSelectBox',
-                            },
-                            {
-                                dataField: 'vatId',
-                                validationRules: [{ type: 'required' }],
-                                editorType: 'dxSelectBox',
-                                editorOptions: {
-                                    dataSource: {
-                                        store: getVATs,
-                                        paginate: true,
-                                    },
-                                    valueExpr: 'id',
-                                    displayExpr: 'code'
-                                }
-                            },
-                            {
-                                dataField: 'basePrice',
-                                editorOptions: {
-                                    format: '#,##0.##',
+                                itemType: 'group',
+                                colCountByScreen: {
+                                    xs: 3,
+                                    sm: 2,
+                                    md: 2,
+                                    lg: 2,
                                 },
-                                validationRules: [{ type: 'required' }]
-                            },
-                        ],
+                                items: ['isInventoriable', 'isPurchasable', 'isSaleable']
+                            }
+                        ]
+
                     },
                     {
-                        caption: 'ATTRIBUTE',
+                        caption: '',
                         itemType: 'group',
-                        colSpan: 3,
-                        items: getAttrOptions()
-                        // DMS Attributes
+                        items: ['uomGroupId', 'inventoryUOMId', 'purUOMId', 'salesUOMId', 'vatId', 'basePrice',],
                     },
-                ]
+                    {
+                        caption: '',
+                        itemType: 'group',
+                        colCount: 2,
+                        colSpan: 2,
+                        items: [
+                            {
+                                itemType: 'group',
+                                items: getAttrField('hierarchy'),
+                            },
+                            {
+                                itemType: 'group',
+                                items: getAttrField('flat')
+                            },
+                        ]
+                    },
+                ],
             },
         },
         remoteOperations: true,
@@ -564,20 +600,24 @@
         columnFixing: {
             enabled: true,
         },
+        stateStoring: {
+            enabled: true,
+            type: 'localStorage',
+            storageKey: 'dataGridItemMasters',
+        },
         export: {
             enabled: true,
         },
-        onExporting(e) {
+        onExporting: function (e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
+            const worksheet = workbook.addWorksheet('Companies');
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
                 worksheet,
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `Exports.xlsx`);
                 });
             });
             e.cancel = true;
@@ -585,11 +625,7 @@
         headerFilter: {
             visible: true,
         },
-        // stateStoring: {
-        //     enabled: true,
-        //     type: 'localStorage',
-        //     storageKey: 'dataGridItemMasters',
-        // },
+
         paging: {
             enabled: true,
             pageSize: pageSize
@@ -608,8 +644,7 @@
             e.data.isPurchasable = true;
             e.data.isSaleable = true;
             e.data.manageItemBy = 0
-            e.data.itemTypeId = defaultItemType.data.find(e => e.code == 'MD02' && e.valueCode == "I").id;
-            // getItemTypes.
+            e.data.itemType = 0
         },
         onRowUpdating: function (e) {
             e.newData = Object.assign({}, e.oldData, e.newData);
@@ -635,9 +670,9 @@
                             class: "import-excel",
                         },
                         onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            let gridControl = e.element.closest('div.dx-datagrid').parent();
+                            let gridName = gridControl.attr('id');
+                            let popup = $(`div.${gridName}.popupImport`).data('dxPopup');
                             if (popup) popup.show();
                         },
                     }
@@ -649,15 +684,36 @@
             {
                 type: 'buttons',
                 caption: l("Actions"),
-                buttons: ['edit'],
+                buttons: [
+                    {
+                        name: 'edit',
+                        onClick: (e) => {
+                            gridInfo.editingItem = e.row.data.id;
+                            gridItemMasters.editRow(e.row.rowIndex);
+                        }
+                    },
+                    {
+                        name: 'delete',
+                    }
+                ],
                 fixed: true,
                 fixedPosition: "left",
+            },
+            {
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                formItem: {
+                    visible: false
+                },
             },
             {
                 dataField: 'code',
                 caption: l("EntityFieldName:MDMService:Item:Code"),
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                allowEditing: false,
             },
             {
                 dataField: 'name',
@@ -676,17 +732,14 @@
                 dataType: 'string'
             },
             {
-                dataField: 'itemTypeId',
+                dataField: 'itemType',
                 caption: l("EntityFieldName:MDMService:Item:ItemTypeName"),
-                editorType: 'dxSelectBox',
+                dataType: 'string',
                 validationRules: [{ type: "required" }],
                 lookup: {
-                    dataSource: {
-                        store: getItemTypes,
-                        filter: ['code', '=', 'MD02'],
-                    },
+                    dataSource: enumValue.itemTypes,
                     valueExpr: 'id',
-                    displayExpr: 'valueName'
+                    displayExpr: 'text'
                 }
             },
             {
@@ -700,7 +753,7 @@
                 dataType: 'string',
                 visible: false,
                 lookup: {
-                    dataSource: getUOMsGroup,
+                    dataSource: store.getUOMsGroup,
                     valueExpr: "id",
                     displayExpr: "name"
                 },
@@ -718,11 +771,6 @@
                 editorType: 'dxCheckBox',
                 alignment: 'center',
                 dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                },
                 visible: false
             },
             {
@@ -731,11 +779,6 @@
                 editorType: 'dxCheckBox',
                 alignment: 'center',
                 dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                },
                 visible: false
             },
             {
@@ -744,11 +787,6 @@
                 editorType: 'dxCheckBox',
                 alignment: 'center',
                 dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                },
                 visible: false
             },
             {
@@ -757,7 +795,7 @@
                 validationRules: [{ type: "required" }],
                 dataType: 'string',
                 lookup: {
-                    dataSource: manageItem,
+                    dataSource: enumValue.manageItem,
                     valueExpr: "id",
                     displayExpr: "text",
                 },
@@ -768,7 +806,7 @@
                 caption: l('EntityFieldName:MDMService:Item:ExpiredType'),
                 dataType: 'string',
                 lookup: {
-                    dataSource: expiredType,
+                    dataSource: enumValue.expiredType,
                     valueExpr: "id",
                     displayExpr: "text"
                 },
@@ -779,15 +817,13 @@
                 caption: l('EntityFieldName:MDMService:Item:ExpiredValue'),
                 dataType: 'number',
                 visible: false,
-                editorOptions: {
-                    // disabled: true
-                }
             },
             {
                 dataField: 'issueMethod',
                 caption: l('EntityFieldName:MDMService:Item:IssueMethod'),
+                dataType: 'string',
                 lookup: {
-                    dataSource: issueMethod,
+                    dataSource: enumValue.issueMethod,
                     valueExpr: "id",
                     displayExpr: "text"
                 },
@@ -797,340 +833,92 @@
                 dataField: 'inventoryUOMId',
                 caption: l('EntityFieldName:MDMService:Item:InventoryUnitName'),
                 validationRules: [{ type: "required" }],
+                dataType: 'string',
                 visible: false,
-                editorOptions: {
-                    readOnly: true
-                },
+                calculateDisplayValue: (e) => e?.inventoryUOM?.name,
                 lookup: {
-                    dataSource(options) {
-                        if (options?.data)
-                            return {
-                                store: getUOMsGroupDetailStore,
-                                filter: ["uomGroupId", "=", options.data.uomGroupId || 0],
-                            }
-                        return getUOMsGroupDetailStore
+                    dataSource: (options) => {
+                        return {
+                            store: store.getUOMsGroupDetailStore,
+                            filter: options?.data?.uomGroupId ? [["uomGroupId", "=", options.data.uomGroupId || 0], 'and', ['active', '=', true]] : null,
+                        }
                     },
                     valueExpr: "altUOMId",
                     displayExpr: "altUOM.name",
                 },
+                allowSearch: false
             },
             {
                 dataField: 'purUOMId',
                 caption: l('EntityFieldName:MDMService:Item:PurUnitName'),
                 validationRules: [{ type: "required" }],
-                visible: false,
+                dataType: 'string',
+                calculateDisplayValue: (e) => e?.purUOM?.name,
                 lookup: {
-                    dataSource(options) {
-                        if (options?.data)
-                            return {
-                                store: getUOMsGroupDetailStore,
-                                filter: ["uomGroupId", "=", options.data.uomGroupId || 0]
-                            }
-                        return getUOMsGroupDetailStore
+                    dataSource: (options) => {
+                        return {
+                            store: store.getUOMsGroupDetailStore,
+                            filter: options?.data?.uomGroupId ? [["uomGroupId", "=", options.data.uomGroupId || 0], 'and', ['active', '=', true]] : null,
+                        }
                     },
                     valueExpr: "altUOMId",
                     displayExpr: "altUOM.name",
                 },
+                allowSearch: false
             },
             {
                 dataField: 'salesUOMId',
                 caption: l('EntityFieldName:MDMService:Item:SalesUnitName'),
                 validationRules: [{ type: "required" }],
+                dataType: 'string',
                 visible: false,
+                calculateDisplayValue: (e) => e?.salesUOM?.name,
                 lookup: {
-                    dataSource(options) {
-                        if (options?.data)
-                            return {
-                                store: getUOMsGroupDetailStore,
-                                filter: ["uomGroupId", "=", options.data.uomGroupId || 0]
-                            }
-                        return getUOMsGroupDetailStore
+                    dataSource: (options) => {
+                        return {
+                            store: store.getUOMsGroupDetailStore,
+                            filter: options?.data?.uomGroupId ? [["uomGroupId", "=", options.data.uomGroupId || 0], 'and', ['active', '=', true]] : null,
+                        }
                     },
                     valueExpr: "altUOMId",
                     displayExpr: "altUOM.name",
                 },
+                allowSearch: false
             },
             {
                 dataField: 'vatId',
                 caption: l('EntityFieldName:MDMService:Item:VATName'),
                 calculateDisplayValue: 'vat.name',
+                dataType: 'string',
                 lookup: {
-                    dataSource: 'vat.name',
-                    valueExpr: "id",
-                    displayExpr: "code",
-                },
-                editorOptions : {
-                    searchEnabled :true
+                    dataSource: {
+                        store: store.getVATs,
+                    },
+                    valueExpr: 'id',
+                    displayExpr: 'code'
                 },
                 validationRules: [{ type: "required" }],
                 visible: false,
             },
             {
                 dataField: 'basePrice',
-                caption: 'Base Price',
+                caption: l("EntityFieldName:MDMService:Item:BasePrice"),
                 validationRules: [{ type: "required" }],
-                visible: false
+                dataType: 'number',
+                visible: false,
             },
             {
                 dataField: 'active',
                 caption: l('EntityFieldName:MDMService:Item:Active'),
-                editorType: 'dxCheckBox',
                 alignment: 'center',
                 dataType: 'boolean',
-                cellTemplate(container, options) {
-                    $('<div>')
-                        .append($(options.value ? '<i class="fa fa-check" style="color:#34b233"></i>' : '<i class= "fa fa-times" style="color:red"></i>'))
-                        .appendTo(container);
-                }
             },
-            {
-                dataField: 'attr0Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr0Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(0)
-                    },
-                },
-            },
-            {
-                dataField: 'attr1Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr1Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(1)
-                    },
-                },
-            },
-            {
-                dataField: 'attr2Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr2Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(2)
-                    },
-                },
-            },
-            {
-                dataField: 'attr3Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr3Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(3)
-                    },
-                },
-            },
-            {
-                dataField: 'attr4Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr4Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(4)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr5Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr5Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(5)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr6Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr6Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(6)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr7Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr7Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(7)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr8Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr8Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(8)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr9Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr9Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(9)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr10Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr10Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(10)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr11Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr11Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(11)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr12Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr12Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(12)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr13Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr13Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(13)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr14Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr14Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(14)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr15Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr15Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(15)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr16Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr16Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(16)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr17Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr17Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(17)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr18Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr18Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(18)
-                    },
-                },
-                visible: false,
-            },
-            {
-                dataField: 'attr19Id',
-                caption: l('EntityFieldName:MDMService:Item:Attr19Name'),
-                lookup: {
-                    valueExpr: "id",
-                    displayExpr: "attrValName",
-                    dataSource(options) {
-                        return dsAttrValue(19)
-                    },
-                },
-                visible: false,
-            }
+            ...getAttrColumn("hierarchy"),
+            ...getAttrColumn("flat"),
         ]
     }).dxDataGrid('instance');
 
-    /****function*****/
     initImportPopup('api/mdm-service/items', 'Items_Template', 'dataGridItemMasters');
-
-    function dsAttrValue(n) {
-        return {
-            store: getItemAttrValue,
-            filter: ['itemAttribute.attrNo', '=', n],
-        };
-    }
 
     let disableCell = (e, arg) => {
         if (arg) {
@@ -1139,83 +927,195 @@
         }
     }
 
-    /**
-     * Fetch Attribute Item API
-     * @returns {Array} Array Item's dataFields
-     */
-    function getAttrOptions() {
-        let obj = []
-        let deferred = $.Deferred();
-        itemAttrService
-            .getListDevextremes({})
-            .done(result => {
-                deferred.resolve(result.data);
-            })
-        deferred.promise().then(data => {
-            data.filter(e => e.active).forEach(e => obj.push(generateAttrOptions(e)))
+    function getAttrField(type) {
+        return gridInfo.itemAttr[type].map(({ attrNo, attrName, hierarchyLevel, id }, index) => {
+            return {
+                dataField: 'attr' + attrNo + 'Id',
+            }
         })
-        return obj
     }
-    /**
-     * Get Attribute Item's dataField
-     * @param {Number} attrNo - Attribute Id
-     * @returns {object}
-     */
-    function generateAttrOptions({ attrNo, attrName }) {
-        return {
-            dataField: 'attr' + attrNo + 'Id',
-            label: { text: l(`${attrName}`) },
-            editorOptions: {
-                valueExpr: "id",
-                displayExpr: "attrValName",
-                dataSource: dsAttrValue(attrNo)
-            },
-        }
-    }
-
-
-    function renderItemImage(data, itemElement) {
-        // change in future versions
-        function getuserImage(userId) {
-            var d = new $.Deferred();
-            /// Get item src attribute value here 
-            Promise.resolve(d.resolve(null))
-            return d.promise();
-        }
-
-        getuserImage("Customer Id Go Here").done(dataUrl => {
-            itemElement.addClass("d-flex flex-column justify-content-center align-items-center");
-            itemElement.append($("<img>").attr({
-                // https://source.unsplash.com/random/ for testing image size
-                // /images/default-avatar-image.jpg for default image size
-                src: dataUrl || "/images/default-avatar-image.jpg",
-                style: "object-fit:contain;object-position:center center;max-height:150px;max-width:150px;cursor:pointer;border-radius:50%",
-            }))
-            itemElement.append($("<div>").addClass('mt-3 w-75').attr("id", "file-uploader").dxFileUploader({
-                accept: 'image/*',
-                uploadMode: 'instantly',
-                uploadUrl: 'API_URL_POST', // Upload Image Endpoint Go Here
-                selectButtonText: "Choose Image",
-                onValueChanged(e) {
-                    const files = e.value;
-                    if (files.length > 0) {
-                        $('#selected-files .selected-item').remove();
-                        $.each(files, (i, file) => {
-                            const $selectedItem = $('<div />').addClass('selected-item');
-                            $selectedItem.append(
-                                $('<span />').html(`Name: ${file.name}<br/>`),
-                                $('<span />').html(`Size ${file.size} bytes<br/>`),
-                                $('<span />').html(`Type ${file.type}<br/>`),
-                                $('<span />').html(`Last Modified Date: ${file.lastModifiedDate}`),
-                            );
-                            $selectedItem.appendTo($('#selected-files'));
-                        });
-                        $('#selected-files').show();
-                    } else {
-                        $('#selected-files').hide();
+    function getAttrColumn(type) {
+        return gridInfo.itemAttr[type].map(({ attrNo, attrName, hierarchyLevel, id }, index, arr) => {
+            let referenceArrayNo = arr.map(e => e.attrNo)
+            referenceArrayNo.shift()
+            return {
+                dataField: 'attr' + attrNo + 'Id',
+                caption: attrName,
+                dataType: 'string',
+                lookup: {
+                    valueExpr: "id",
+                    displayExpr: "attrValName",
+                    dataSource: {
+                        store: store.getItemAttrValue,
+                        filter: ['itemAttributeId', '=', id],
                     }
                 },
-            }))
+            }
         })
+    }
+
+    function renderAttachmentContent() {
+        $('<div class="flex-grow-1"/>').css('height', 'auto')
+            .appendTo(gridInfo.attachment.container)
+            .dxFileManager({
+                rootFolderName: "Item Attachment",
+                fileSystemProvider: store.attachmentStore,
+                permissions: {
+                    delete: true,
+                    upload: true,
+                    download: true,
+                },
+                upload: {
+                    chunkSize: 5e6,
+                    maxFileSize: 5e6,
+                },
+                selectionMode: "single",
+                onFileUploading: (e) => {
+                    if (gridInfo.attachment.fileSource.find(v => v.name === e.fileData.name)) {
+                        e.errorCode = 1
+                        e.cancel = true
+                    }
+                }
+            })
+        gridInfo.attachment.isRender = true;
+    }
+
+    function renderImageContent() {
+        gridInfo.ContextMenu = $('<div/>').dxContextMenu({
+            dataSource: [
+                {
+                    text: "Delete",
+                    action: (e) => store.imageStore.remove(e.id).then(() => gridInfo.imageDataSource.reload())
+                },
+            ],
+            target: '.dx-item.dx-tile',
+            onItemClick: (e) => e.itemData.action(gridInfo.imageContent.selectedItem)
+        }).appendTo('body').dxContextMenu('instance')
+        gridInfo.imageContent.list.dxTileView({
+            dataSource: gridInfo.imageDataSource,
+            direction: 'vertical',
+            width: '100%',
+            showScrollbar: "always",
+            itemTemplate(itemData, itemIndex, itemElement) {
+                let image = $('<div>')
+                    .addClass('image')
+                    .css('background-image', `url(${itemData.url})`);
+                $('<span />').addClass('position-absolute badge rounded-pill text-bg-primary').css({ 'top': '0.25rem', 'left': '0.25rem' }).text(itemData.displayOrder).appendTo(image)
+                itemElement.append(image);
+            },
+            onItemContextMenu: (e) => {
+                gridInfo.imageContent.selectedItem = e.itemData
+            },
+            onItemClick(e) {
+                if (!gridInfo?.imageContent?.popupView) gridInfo.imageContent.popupView = $('<div/>').dxPopup({
+                    hideOnOutsideClick: true,
+                    onContentReady(e) {
+                        const $contentElement = e.component.content();
+                        $contentElement.addClass('photo-popup-content');
+                    },
+                }).appendTo('body').dxPopup('instance');
+                gridInfo.imageContent.popupView.option({
+                    title: l('EntityFieldName:MDMService:ItemImage:DisplayOrder') + ': ' + e.itemData.displayOrder,
+                    maxHeight: '600px',
+                    width: 500,
+                    contentTemplate: () => {
+                        let container = $('<div />').css('height', 'auto')
+
+                        $(`<img src="${e.itemData.url}" class="photo-popup-image" />`).css({ 'height': '400px', 'width': '400px' }).appendTo(container)
+                        $($('<div/>').dxTextArea({
+                            value: e.itemData.description,
+                            readOnly: true,
+                            height: '100px',
+                            label: l("EntityFieldName:MDMService:ItemImage:Description")
+                        })).appendTo(container)
+                        return container
+                    }
+                });
+                gridInfo.imageContent.popupView.show()
+            }
+        }).dxTileView('instance');
+        gridInfo.imageContent.controller
+        let form = $('<div/>')
+            .appendTo(gridInfo.imageContent.controller)
+
+        let description = $('<div class="dx-field-value"/>').dxTextBox({
+            name: 'description',
+            valueChangeEvent: 'keyup',
+            onValueChanged: () => uploadUrl()
+        }).dxTextBox('instance')
+        $('<div class="dx-field"/>')
+            .append($('<div class="dx-field-label"/>').text(l('EntityFieldName:MDMService:ItemImage:Description')))
+            .append(description.element())
+            .appendTo(form)
+
+        let displayOrder = $('<div class="dx-field-value"/>').dxNumberBox({
+            name: 'displayOrder',
+            valueChangeEvent: 'keyup',
+            format: '#',
+            min: 0,
+            onValueChanged: () => uploadUrl()
+        }).dxNumberBox('instance')
+        $('<div class="dx-field"/>')
+            .append($('<div class="dx-field-label"/>').text(l('EntityFieldName:MDMService:ItemImage:DisplayOrder')))
+            .append(displayOrder.element())
+            .appendTo(form)
+
+        let fileUploader = $('<div/>').dxFileUploader({
+            accept: 'image/*',
+            labelText: "",
+            uploadMode: 'useButtons',
+            uploadUrl: `/api/mdm-service/item-images?itemId=${gridInfo.editingItem}`,
+            selectButtonText: l('Button.New.ItemImage'),
+            name: 'inputFile',
+            onBeforeSend: (e) => {
+                e.request.setRequestHeader('RequestVerificationToken', abp.utils.getCookieValue('XSRF-TOKEN'))
+            },
+            onUploaded: () => gridInfo.imageDataSource.reload(),
+            onUploadError: (e) => {
+                let { code, message } = JSON.parse(e.error.response).error
+                return abp.message.error(message, code)
+            }
+        })
+            .appendTo(form)
+            .dxFileUploader('instance')
+        gridInfo.imageContent.isRender = true;
+
+
+        function uploadUrl() {
+            fileUploader.option('uploadUrl', `/api/mdm-service/item-images?itemId=${gridInfo.editingItem}&description=${description.option('value')}&displayOrder=${displayOrder.option('value')}`)
+        }
+    }
+
+
+    function renderItemImage(e, itemElement) {
+        itemElement.addClass('d-flex justify-content-center align-items-center').css('height', '300px');
+        let loadingState = $("<div style='w-100 h-100'/>").dxLoadIndicator({
+            height: 75,
+            width: 75,
+        }).appendTo(itemElement)
+        gridInfo.imageDataSource = new DevExpress.data.DataSource({
+            store: store.imageStore,
+            filter: ['itemId', '=', gridInfo.editingItem],
+        })
+        gridInfo.imageGallery = $("<div>").hide().dxGallery({
+            dataSource: gridInfo.imageDataSource,
+            height: 'auto',
+            itemTemplate: (item) => {
+                let result = $('<div>');
+                $('<img>/').attr('src', item.url).css({ 'object-fit': 'contain', 'object-position': 'top', 'height': '300px', 'width': '100%' }).appendTo(result);
+                $('<div class="mb-4"/>').dxTextArea({
+                    value: item.description,
+                    readOnly: true,
+                    label: l("EntityFieldName:MDMService:ItemImage:Description")
+
+                }).appendTo(result);
+                return result;
+            },
+            onContentReady: (e) => {
+                loadingState.remove()
+                itemElement.height('auto')
+                e.element.show()
+            }
+        }).appendTo(itemElement).dxGallery('instance')
     }
 });

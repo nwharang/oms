@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.AspNetCore.Mvc.UI.Layout
 @using DMSpro.OMS.MdmService.Permissions
-@using DMSpro.OMS.MdmService.Web.Menus
+@using DMSpro.OMS.Web.Navigation
 @using Microsoft.AspNetCore.Mvc.Localization
 @using DMSpro.OMS.Localization
 @inject IHtmlLocalizer<OMSResource> L
@@ -15,6 +15,8 @@
 }
 
 @section scripts {
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
     <abp-script src="/Pages/Mdm/GeoMasters/index.js" />
 }
 

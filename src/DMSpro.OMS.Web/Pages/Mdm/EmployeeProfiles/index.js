@@ -1,17 +1,44 @@
 $(function () {
-    var l = abp.localization.getResource("OMS");
-    var employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
-    var workingPositionService = window.dMSpro.oMS.mdmService.controllers.workingPositions.workingPosition;
-    var systemDataService = window.dMSpro.oMS.mdmService.controllers.systemDatas.systemData;
-    var employeeProfileImageService = window.dMSpro.oMS.mdmService.controllers.employeeImages.employeeImage;
+    let l = abp.localization.getResource("OMS"), gridInfo = {}
 
-    var urlUploadFile = `${abp.appPath}api/mdm-service/employee-images/avatar`;
-    var urlGetFile = `${abp.appPath}api/mdm-service/employee-images/get-file`;
-    var files = [];
-    var rowEditing = -1;
+    let employeeProfileService = window.dMSpro.oMS.mdmService.controllers.employeeProfiles.employeeProfile;
+    let employeeImageService = window.dMSpro.oMS.mdmService.controllers.employeeImages.employeeImage;
+    let workingPositionService = window.dMSpro.oMS.mdmService.controllers.workingPositions.workingPosition;
 
-    /****custom store*****/
-    var employeeProfileStore = new DevExpress.data.CustomStore({
+    let loadingPanel = $('<div class"fixed"/>').dxPopup({
+        height: 100,
+        width: 100,
+        showTitle: false,
+        animation: null,
+        contentTemplate: (e) => $('<div/>').dxLoadIndicator({
+            height: 60,
+            width: 60,
+        })
+    })
+        .appendTo('body')
+        .dxPopup('instance')
+    loadingPanel.registerKeyHandler('escape', () => loadingPanel.hide())
+
+    let employeeTypeStore = [
+        {
+            id: 0,
+            displayName: l('EntityFieldValue:MDMService:EmployeeType:Salesman')
+        },
+        {
+            id: 1,
+            displayName: l('EntityFieldValue:MDMService:EmployeeType:Deliveryman')
+        },
+        {
+            id: 2,
+            displayName: l('EntityFieldValue:MDMService:EmployeeType:Supervisor')
+        },
+        {
+            id: 3,
+            displayName: l('EntityFieldValue:MDMService:EmployeeType:PromotionGirl')
+        },
+    ];
+
+    let employeeProfileStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -32,14 +59,12 @@ $(function () {
 
             return deferred.promise();
         },
+        byKey: (key) => key ? new Promise((resolve, reject) => employeeProfileService.getEmployeeProfile(key)
+            .done(data => resolve(data))
+            .fail(err => reject(err))
+        ) : null,
         insert(values) {
-            const deferred = $.Deferred();
-            employeeProfileService.create(values, { contentType: "application/json" }).done(result => {
-                //uploadAvatar(result.data.id);
-                deferred.resolve(result.data);
-            });;
-
-            return deferred.promise();
+            return employeeProfileService.create(values, { contentType: "application/json" })
         },
         update(key, values) {
             return employeeProfileService.update(key, values, { contentType: "application/json" });
@@ -49,7 +74,7 @@ $(function () {
         }
     });
 
-    var workingPositionStore = new DevExpress.data.CustomStore({
+    let workingPositionStore = new DevExpress.data.CustomStore({
         key: 'id',
         load(loadOptions) {
             const deferred = $.Deferred();
@@ -74,7 +99,7 @@ $(function () {
         byKey: function (key) {
             if (key == 0) return null;
 
-            var d = new $.Deferred();
+            let d = new $.Deferred();
             workingPositionService.get(key)
                 .done(data => {
                     d.resolve(data);
@@ -83,43 +108,7 @@ $(function () {
         }
     });
 
-    var employeeTypeStore = new DevExpress.data.CustomStore({
-        key: 'id',
-        load(loadOptions) {
-            const deferred = $.Deferred();
-            const args = {};
-            requestOptions.forEach((i) => {
-                if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-                    args[i] = JSON.stringify(loadOptions[i]);
-                }
-            });
-
-            systemDataService.getListDevextremes(args)
-                .done(result => {
-                    deferred.resolve(result.data, {
-                        totalCount: result.totalCount,
-                        summary: result.summary,
-                        groupCount: result.groupCount,
-                    });
-                });
-
-            return deferred.promise();
-        },
-        byKey: function (key) {
-            if (key == 0) return null;
-
-            var d = new $.Deferred();
-            systemDataService.get(key)
-                .done(data => {
-                    d.resolve(data);
-                });
-            return d.promise();
-        }
-    });
-
-    /****control*****/
-    //DataGrid - Employee Profile
-    const dataGridContainer = $('#dataGridContainer').dxDataGrid({
+    let dataGridContainer = $('#dataGridContainer').dxDataGrid({
         dataSource: employeeProfileStore,
         remoteOperations: true,
         showRowLines: true,
@@ -130,6 +119,7 @@ $(function () {
         allowColumnResizing: true,
         columnResizingMode: 'widget',
         columnAutoWidth: true,
+        dateSerializationFormat: "yyyy-MM-dd",
         filterRow: {
             visible: true
         },
@@ -150,17 +140,16 @@ $(function () {
         export: {
             enabled: true,
         },
-        onExporting(e) {
+        onExporting: function (e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
+            const worksheet = workbook.addWorksheet('Companies');
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
                 worksheet,
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Export.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${name || "Exports"}.xlsx`);
                 });
             });
             e.cancel = true;
@@ -175,20 +164,14 @@ $(function () {
         },
         paging: {
             enabled: true,
-            pageSize: pageSize
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: allowedPageSizes,
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
-        },
-        initNewRow(e) {
-            rowEditing = -1;
-        },
-        onEditingStart(e) {
-            rowEditing = e.component.getRowIndexByKey(e.key);
         },
         editing: {
             mode: 'popup',
@@ -203,54 +186,76 @@ $(function () {
             },
             popup: {
                 title: l("Page.Title.EmployeeProfiles"),
-                showTitle: false,
-                width: 1000,
-                height: 580
+                height: '95%',
+                width: '95%',
+                hideOnOutsideClick: false,
+                dragEnabled: false,
+                onHiding: (e) => {
+                    gridInfo.editingRowId = null;
+                    gridInfo.currentData = null;
+                    gridInfo.imageContent = null;
+                    gridInfo.generalContent = null;
+                    gridInfo.form = null
+                },
             },
             form: {
+                labelMode: "static",
+                elementAttr: {
+                    id: 'formGridAddItemMaster',
+                    class: "flex-grow-1 px-3"
+                },
                 items: [
                     {
                         itemType: 'group',
-                        colCount: 1,
-                        colSpan: 1,
-                        items: [
-                            {
-                                dataField: 'Avatar',
-                                template: function (data, itemElement) {
-                                    renderAvatarField(data, itemElement);
-                                }
-                            }
-                        ]
+                        template: renderItemImage // Fix for future versions
                     },
                     {
                         itemType: 'group',
-                        colCount: 1,
                         colSpan: 2,
-                        items:
-                            ['code', 'erpCode', 'firstName', 'lastName', 'workingPositionId']
+                        items: ['code', 'erpCode', 'firstName', 'lastName', 'workingPositionId', 'employeeType']
                     },
                     {
                         itemType: 'group',
                         colCount: 2,
                         colSpan: 2,
                         caption: '',
-                        items: ['dateOfBirth', 'employeeTypeId', 'idCardNumber', 'address', 'phone', 'email', 'effectiveDate', 'endDate', 'active']
+                        items: ['dateOfBirth', 'idCardNumber', 'address', 'phone', 'email',
+                            {
+                                dataField: 'effectiveDate',
+                                editorOptions: {
+                                    format: 'dd/MM/yyyy',
+                                }
+                            },
+                            {
+                                dataField: 'endDate',
+                                editorOptions: {
+                                    format: 'dd/MM/yyyy',
+                                },
+                            }, 'active'
+                        ]
                     }
                 ],
             }
         },
-        onRowUpdating: function (e) {
-            var objectRequire = ["code", "erpCode", "firstName", "lastName", "dateOfBirth", "idCardNumber", "email", "phone", "address", "active", "effectiveDate", "endDate", "workingPositionId", "employeeTypeId"];
-            for (var property in e.oldData) {
-                if (!e.newData.hasOwnProperty(property) && objectRequire.includes(property)) {
-                    e.newData[property] = e.oldData[property];
-                }
-            }
+        onInitNewRow(e) {
+            e.data.active = true;
+            e.data.effectiveDate = moment().format('YYYY-MM-DD')
+        },
+        onRowInserting: e => {
+            if (!e.data.effectiveDate) e.data.effectiveDate = moment().format('yyyy-MM-DD')
+        },
+        onRowUpdating: (e) => {
+            let { erpCode, firstName, lastName, dateOfBirth, idCardNumber, email, phone, address, active, effectiveDate, endDate, workingPositionId, employeeType } = Object.assign({}, e.oldData, e.newData);
+            if (!email) email = null
+            e.newData = { erpCode, firstName, lastName, dateOfBirth, idCardNumber, email, phone, address, active, effectiveDate, endDate, workingPositionId, employeeType }
         },
         onEditorPreparing: function (e) {
-            if (e.dataField == "workingPositionId" || e.dataField == "employeeTypeId") {
+            if (e.dataField == "workingPositionId") {
                 e.editorOptions.showClearButton = true;
             }
+        },
+        onSaved: (e) => {
+            if (gridInfo.fileinput) gridInfo.fileinput(e);
         },
         toolbar: {
             items: [
@@ -264,16 +269,15 @@ $(function () {
                     options: {
                         icon: "import",
                         elementAttr: {
-                            //id: "import-excel",
                             class: "import-excel",
                         },
                         onClick(e) {
-                            var gridControl = e.element.closest('div.dx-datagrid').parent();
-                            var gridName = gridControl.attr('id');
-                            var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
+                            let gridControl = e.element.closest('div.dx-datagrid').parent();
+                            let gridName = gridControl.attr('id');
+                            let popup = $(`div.${gridName}.popupImport`).data('dxPopup');
                             if (popup) popup.show();
-                        }
-                    }
+                        },
+                    },
                 },
                 "searchPanel",
             ],
@@ -283,8 +287,51 @@ $(function () {
                 caption: l("Actions"),
                 type: 'buttons',
                 width: 120,
-                buttons: ['edit', 'delete'],
+                buttons: [
+                    {
+                        name: 'edit',
+                        onClick: (e) => {
+                            gridInfo.editingRowId = e.row.data.id;
+                            dataGridContainer.editRow(e.row.rowIndex);
+                        }
+                    },
+                    , 'delete'],
                 fixedPosition: 'left'
+            },
+            {
+                dataField: 'id',
+                caption: l("Id"),
+                dataType: 'string',
+                allowEditing: false,
+                visible: false,
+                formItem: {
+                    visible: false
+                },
+            },
+            {
+                caption: l("EntityFieldName:MDMService:EmployeeProfile:ERPCode"),
+                dataField: "erpCode",
+                dataType: 'string',
+                visible: false,
+                editorOptions: {
+                    maxLength: 20,
+                },
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[a-zA-Z0-9]{1,20}$',
+                        message: l('ValidateError:Code')
+                    }
+                ]
+            },
+            {
+                caption: l("EntityFieldName:MDMService:EmployeeProfile:Code"),
+                dataField: "code",
+                dataType: 'string',
+                editorOptions: {
+                    maxLength: 20,
+                },
+                allowEditing: false,
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:ERPCode"),
@@ -293,32 +340,54 @@ $(function () {
                 visible: false
             },
             {
-                caption: l("EntityFieldName:MDMService:EmployeeProfile:Code"),
-                dataField: "code",
-                dataType: 'string',
-                validationRules: [{ type: "required" }]
-            },
-            {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:FirstName"),
                 dataField: "firstName",
                 dataType: 'string',
-                validationRules: [{ type: "required" }]
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: "stringLength",
+                        max: 100,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 100)
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:LastName"),
                 dataField: "lastName",
-                dataType: 'string'
+                dataType: 'string',
+                validationRules: [
+                    {
+                        type: "stringLength",
+                        max: 100,
+                        message: l('WarnMessage.FieldLength').replace("{0}", 100)
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:DateOfBirth"),
                 dataField: "dateOfBirth",
-                dataType: 'date'
+                dataType: 'date',
+                editorOptions: {
+                    max: new Date(),
+                    format: 'dd/MM/yyyy'
+                },
+                format: 'dd/MM/yyyy'
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:IdCardNumber"),
                 dataField: "idCardNumber",
                 dataType: 'string',
-                visible: false
+                visible: false,
+                validationRules: [
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{12}$',
+                        message: l('ValidateError:IdCardNumber')
+                    }
+                ]
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:Email"),
@@ -335,6 +404,16 @@ $(function () {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:Phone"),
                 dataField: "phone",
                 dataType: 'string',
+                validationRules: [
+                    {
+                        type: "required"
+                    },
+                    {
+                        type: 'pattern',
+                        pattern: '^[0-9]{10}$',
+                        message: l('ValidateError:Phone')
+                    }
+                ],
                 visible: false
             },
             {
@@ -344,45 +423,47 @@ $(function () {
                 visible: false
             },
             {
+                caption: l("EntityFieldName:MDMService:EmployeeProfile:EmployeeTypeName"),
+                dataField: "employeeType",
+                lookup: {
+                    dataSource: employeeTypeStore,
+                    valueExpr: 'id',
+                    displayExpr: 'displayName',
+                },
+                dataType: 'string',
+                visible: false
+            },
+            {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:JobTittle"),
                 dataField: "workingPositionId",
-                calculateDisplayValue: "workingPosition.name",
+                allowSearch: false,
+                calculateDisplayValue: (e) => e?.workingPosition?.name,
                 dataType: 'string',
                 lookup: {
-                    dataSource() {
+                    dataSource(e) {
                         return {
                             store: workingPositionStore,
-                            filer: ["active", "=", "true"],
+                            filter: ["active", "=", true],
                             paginate: true,
-                            pageSize: pageSizeForLookup
+                            pageSize
                         };
                     },
                     displayExpr: 'name',
                     valueExpr: 'id',
                 }
             },
-            {
-                caption: l("EntityFieldName:MDMService:EmployeeProfile:EmployeeTypeName"),
-                dataField: "employeeTypeId",
-                calculateDisplayValue: "employeeType.valueName",
-                dataType: 'string',
-                lookup: {
-                    dataSource: {
-                        store: "employeeType.valueName",
-                    },
-                    displayExpr: 'valueName',
-                    valueExpr: 'id',
-                }
-            },
+
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:EffectiveDate"),
                 dataField: "effectiveDate",
                 dataType: 'date',
+                format: 'dd/MM/yyyy',
                 visible: false
             },
             {
                 caption: l("EntityFieldName:MDMService:EmployeeProfile:EndDate"),
                 dataField: "endDate",
+                format: 'dd/MM/yyyy',
                 dataType: 'date',
                 visible: false
             },
@@ -391,102 +472,46 @@ $(function () {
                 dataField: "active",
                 dataType: 'boolean',
                 alignment: 'center',
-                cellTemplate(container, options) {
-                    $('<div>').append($(options.value ? '<i class="fa fa-check"></i>' : '<i class= "fa fa-times"></i>')).appendTo(container);
-                }
             }
         ]
     }).dxDataGrid("instance");
 
-    function uploadAvatar(employeeProfileId) {
-        if (files.length === 0)
-            return;
-
-        var formData = new FormData();
-        formData.append("file", files[0]);
-
-        $.ajax({
-            type: "POST",
-            url: `${urlUploadFile}?EmployeeProfileId=${employeeProfileId}`,
-            async: true,
-            processData: false,
-            mimeType: 'multipart/form-data',
-            contentType: false,
-            data: formData,
-            success: function (data) {
-                files = [];
+    async function renderItemImage(e, itemElement) {
+        let fileId = await employeeImageService.getListDevextremes({ filter: JSON.stringify([['employeeProfileId', '=', gridInfo.editingRowId], 'and', ['isAvatar', '=', true]]) }).then(({ data }) => data[0]?.fileId)
+        editingRowId = gridInfo.editingRowId
+        if (fileId) var imgURL = await employeeImageService.getFile(fileId, {
+            dataType: 'binary',
+            xhrFields: {
+                'responseType': 'blob'
             },
-            error: function (msg) {
-                console.log(msg.responseText.error);
-            },
-        });
-    }
-
-    function renderAvatarField(data, itemElement) {
-        itemElement.append($("<img>").attr({
-            id: "img-avatar",
-            src: "/images/default-avatar-image.jpg",
-            style: "border-radius: 50%",
-        }));
-        var selectedRowsData = dataGridContainer.getVisibleRows()[rowEditing];
-
-        if (selectedRowsData) {
-            getEmployeeImageAvatar(selectedRowsData.data.id).done(fileId => {
-                if (fileId !== "") {
-                    getFileAvatar(fileId, function (dataUrl) {
-                        $("#img-avatar").attr("src", dataUrl);
-                    });
-                }
-            });
-        }
-
-        itemElement.append($("<div>").attr("id", "file-uploader").dxFileUploader({
-            selectButtonText: 'Select photo',
-            labelText: '',
-            accept: 'image/*',
-            uploadMethod: 'POST',
-            uploadMode: selectedRowsData ? 'instantly' : 'useButtons',
-            onValueChanged(e) {
-                files = e.value;
-                $("#img-avatar").attr("src", URL.createObjectURL(files[0]));
-            },
-            uploadFile: function (file, progressCallback) {
-                if (!selectedRowsData)
-                    return;
-
-                uploadAvatar(selectedRowsData.data.id);
+        }).then((blob) => URL.createObjectURL(blob))
+        itemElement.addClass('d-flex flex-column justify-content-center align-items-center').css('height', '300px');
+        gridInfo.form = $('<div class="flex-column"/>').css({ 'height': '250px', 'display': 'flex' })
+        let imgContainer = $('<div/>').css({ 'min-height': '250px', 'min-width': "250px" }).appendTo(itemElement);
+        let img = $('<img class="w-100 h-100"/>').attr('src', imgURL || '/images/default-avatar-image.jpg').css({ 'object-fit': 'contain', 'object-position': 'center' }).appendTo(imgContainer)
+        let fileinput = $('<input class="form-control mt-2" type="file" id="avatar" name="avatar" accept="image/*">').appendTo(gridInfo.form)
+        fileinput.on('change', (e) => {
+            if (fileinput.prop('files')[0].size > 1.5e7) return abp.message.error(l('ValidateError:UploadFileSize'), 500)
+            img.attr('src', URL.createObjectURL(fileinput.prop('files')[0]))
+            gridInfo.fileinput = (e) => {
+                let file = fileinput.prop('files')[0]
+                let form = new FormData();
+                form.append('inputFile', file, file.name);
+                let description = JSON.stringify({ name: file.name, size: file.size, type: file.type })
+                loadingPanel.show()
+                employeeImageService[fileId ? 'updateAvatar' : 'createAvatar'](editingRowId || e.changes[0]?.data?.id, file, description, true,
+                    {
+                        contentType: false,
+                        processData: false,
+                        data: form,
+                        async: true,
+                    }).then(() =>
+                        loadingPanel.hide()
+                    )
+                gridInfo.fileinput = null
             }
-        }));
-    }
-
-    function getFileAvatar(fileId, callback) {
-        toDataURL(`${urlGetFile}?id=${fileId}`, callback);
-    }
-
-    function toDataURL(url, callback) {
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-            var reader = new FileReader();
-            reader.onloadend = function () {
-                callback(reader.result);
-            }
-            reader.readAsDataURL(xhr.response);
-        };
-        xhr.open('GET', url);
-        xhr.responseType = 'blob';
-        xhr.send();
-    }
-
-    function getEmployeeImageAvatar(employeeProfileId) {
-        var d = new $.Deferred();
-        employeeProfileImageService.getList({ isAvatar: true, employeeProfileId: employeeProfileId }).done(result => {
-            if (result.items.length > 0) {
-                d.resolve(result.items[0].employeeImage.fileId);
-            }
-            d.resolve("");
-        });
-
-        return d.promise();
+        })
+        gridInfo.form.appendTo(itemElement)
     }
 
     initImportPopup('api/mdm-service/employee-profiles', 'EmployeeProfiles_Template', 'dataGridContainer');

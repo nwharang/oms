@@ -281,6 +281,7 @@ $(function () {
                         {
                             dataField: 'companyId',
                             dataType: 'string',
+                            allowSearch: false,
                             calculateDisplayValue(rowData) {
                                 if (!rowData.company || rowData.company === null) return "";
                                 return rowData.company.name;

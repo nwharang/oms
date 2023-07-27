@@ -1,30 +1,10 @@
 ﻿$(async function () {
-    let notify = (option) => {
-        obj = { type: "success", position: "bottom right", message: "Message Placeholder", ...option };
-        DevExpress.ui.notify({
-            message: obj.message,
-            height: 45,
-            width: 250,
-            minWidth: 250,
-            type: obj.type,
-            displayTime: 5000,
-            animation: {
-                show: {
-                    type: 'fade', duration: 400, from: 0, to: 1,
-                },
-                hide: { type: 'fade', duration: 40, to: 0 },
-            },
-        }, {
-            position: obj.position,
-        })
-        return obj
-    }
-
     var l = abp.localization.getResource("OMS");
-    let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore } = store()
+    let { mainStore, docTypeStore, docStatusStore, docSourceStore, discountTypeStore, render } = store()
     let currentSelectedDoc = new Map();
-    let mainGrid = $('#dgSalesOrderHeader').dxDataGrid({
-        dataSource: { store: mainStore },
+    let mainGrid = $('#dgSOHeader').dxDataGrid({
+        dataSource: mainStore,
+        remoteOperations: true,
         showRowLines: true,
         showBorders: true,
         cacheEnabled: true,
@@ -57,7 +37,7 @@
         },
         onExporting(e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('PurchaseRequests');
+            const worksheet = workbook.addWorksheet('Data');
 
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
@@ -65,7 +45,7 @@
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PurchaseRequests.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${render.permissionGroup}.xlsx`);
                 });
             });
             e.cancel = true;
@@ -76,16 +56,16 @@
         stateStoring: {
             enabled: true,
             type: 'localStorage',
-            storageKey: 'dgSalesOrderHeader',
+            storageKey: `dg${render.permissionGroup}Header`,
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 50, 100],
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -97,11 +77,10 @@
                     options: {
                         icon: 'add',
                     },
-                    onClick(e) {
-                        preLoad.then((data) => {
-                            helper(data).renderPopup()
-                        })
-                    },
+                    onClick: (e) => {
+                        loadingPanel.show()
+                        preLoad.then((data) => helper(data))
+                    }
                 },
                 {
                     widget: "dxDropDownButton",
@@ -123,11 +102,11 @@
                                     })
                                     mainService.createListDODoc(array)
                                         .done(() => {
-                                            notify({ type: 'success', message: `${array.length} SRs Approved` })
-                                            $('#dgSalesOrderHeader').dxDataGrid('instance').getDataSource().reload()
+                                            notify({ type: 'success', message: `${array.length} SOs Approved` })
+                                            $('#dgSOHeader').dxDataGrid('instance').getDataSource().reload()
                                         }
                                         ).fail(() => {
-                                            notify({ type: 'error', message: "SRs Approve Failed" })
+                                            notify({ type: 'error', message: "SOs Approve Failed" })
                                         })
                                 }
                             },
@@ -137,22 +116,6 @@
                 },
                 'columnChooserButton',
                 "exportButton",
-                // {
-                //     location: 'after',
-                //     widget: 'dxButton',
-                //     options: {
-                //         icon: "import",
-                //         elementAttr: {
-                //             class: "import-excel",
-                //         },
-                //         onClick(e) {
-                //             var gridControl = e.element.closest('div.dx-datagrid').parent();
-                //             var gridName = gridControl.attr('id');
-                //             var popup = $(`div.${gridName}.popupImport`).data('dxPopup');
-                //             if (popup) popup.show();
-                //         },
-                //     },
-                // },
                 "searchPanel"
             ],
         },
@@ -200,11 +163,9 @@
                     {
                         text: l('Button.ViewDetail'),
                         icon: "fieldchooser",
-                        onClick: function (e) {
-                            preLoad.then((data) => {
-                                helper(data).renderPopup(e.row.data.id)
-                            })
-
+                        onClick: (e) => {
+                            loadingPanel.show()
+                            preLoad.then((data) => helper(data, { docId: e.row.data.id }))
                         }
                     }
                 ],
@@ -219,26 +180,20 @@
                 validationRules: [{ type: 'required' }],
             },
             {
+                caption: l('EntityFieldName:OrderService:SalesRequest:BaseDoc'),
+                dataField: 'baseDocId',
+visible: false,
+                dataType: 'string',
+            },
+            {
                 caption: l('EntityFieldName:OrderService:SalesRequest:Route'),
-                dataField: 'routeId',
-                calculateDisplayValue: "routeDisplay",
-                lookup: {
-                    store: "routeDisplay",
-                    displayExpr: "name",
-                    valueExpr: 'id'
-                },
+                dataField: 'routeDisplay',
                 dataType: 'string',
                 validationRules: [{ type: 'required' }],
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:Employee'),
-                dataField: 'employeeId',
-                calculateDisplayValue: "employeeDisplay",
-                lookup: {
-                    store: "employeeDisplay",
-                    displayExpr: "name",
-                    valueExpr: 'id'
-                },
+                dataField: 'employeeDisplay',
                 dataType: 'string',
                 validationRules: [{ type: 'required' }],
             },
@@ -349,7 +304,10 @@
                 dataField: 'docDiscountPerc',
                 dataType: 'number',
                 validationRules: [{ type: 'required' }],
-                format: '#0.00 %',
+                calculateDisplayValue: (e) => {
+                    if (e)
+                        return e.docDiscountPerc + " %"
+                },
                 width: 100,
             },
             {
@@ -398,8 +356,5 @@
             })
         },
     }).dxDataGrid("instance");
-    preLoad.then((data) => {
-        initChooseItemsPopup([...data.mainStore.itemList].map(e => { e.isFree = false; return e }))
-    })
-    // initImportPopup('', 'SalesRequest_Template', 'dgSalesOrderHeader');
+    $('body').append('<div id=popup>')
 })

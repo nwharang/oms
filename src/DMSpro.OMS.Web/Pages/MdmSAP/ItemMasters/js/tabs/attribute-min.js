@@ -1,0 +1,1 @@
+let createAttribute=()=>({title:"Attribute",icon:null,callback:()=>{let t=$("<div/>");$("<div/>").dxForm({formData:{...gridInfo.data},labelMode:"outside",colCount:2,readOnly:readOnly,items:[{itemType:"group",items:getAttrField("hierarchy")},{itemType:"group",items:getAttrField("flat")},{itemType:"empty",colSpan:2}]}).appendTo(t).dxForm("instance");return t}});

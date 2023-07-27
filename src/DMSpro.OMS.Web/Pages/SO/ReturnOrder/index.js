@@ -1,8 +1,9 @@
 ﻿$(async function () {
     var l = abp.localization.getResource("OMS");
-    let { mainStore, docTypeStore, docStatusStore, docSourceStore } = store()
-    let mainGrid = $('#dgReturnOrderHeader').dxDataGrid({
-        dataSource: { store: mainStore },
+    let { mainStore, docTypeStore, docStatusStore, docSourceStore, render } = store()
+    let mainGrid = $('#dgSOHeader').dxDataGrid({
+        dataSource: mainStore,
+        remoteOperations: true,
         showRowLines: true,
         showBorders: true,
         cacheEnabled: true,
@@ -35,7 +36,7 @@
         },
         onExporting(e) {
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('PurchaseRequests');
+            const worksheet = workbook.addWorksheet('Data');
 
             DevExpress.excelExporter.exportDataGrid({
                 component: e.component,
@@ -43,7 +44,7 @@
                 autoFilterEnabled: true,
             }).then(() => {
                 workbook.xlsx.writeBuffer().then((buffer) => {
-                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'PurchaseRequests.xlsx');
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `${render.permissionGroup}.xlsx`);
                 });
             });
             e.cancel = true;
@@ -52,18 +53,18 @@
             visible: true,
         },
         stateStoring: {
-            // enabled: true,
+            enabled: true,
             type: 'localStorage',
-            storageKey: 'dgReturnOrderHeader',
+            storageKey: `dg${render.permissionGroup}Header`,
         },
         paging: {
             enabled: true,
-            pageSize: 10
+            pageSize
         },
         pager: {
             visible: true,
             showPageSizeSelector: true,
-            allowedPageSizes: [10, 50, 100],
+            allowedPageSizes,
             showInfo: true,
             showNavigationButtons: true
         },
@@ -83,11 +84,9 @@
                     {
                         text: l('Button.ViewDetail'),
                         icon: "fieldchooser",
-                        onClick: function (e) {
-                            preLoad.then((data) => {
-                                helper(data).renderPopup(e.row.data.id)
-                            })
-
+                        onClick: (e) => {
+                            loadingPanel.show()
+                            preLoad.then((data) => helper(data, { docId: e.row.data.id }))
                         }
                     }
                 ],
@@ -102,26 +101,20 @@
                 validationRules: [{ type: 'required' }],
             },
             {
+                caption: l('EntityFieldName:OrderService:SalesRequest:BaseDoc'),
+                dataField: 'baseDocId',
+visible: false,
+                dataType: 'string',
+            },
+            {
                 caption: l('EntityFieldName:OrderService:SalesRequest:Route'),
-                dataField: 'routeId',
-                calculateDisplayValue: "routeDisplay",
-                lookup: {
-                    store: "routeDisplay",
-                    displayExpr: "name",
-                    valueExpr: 'id'
-                },
+                dataField: 'routeDisplay',
                 dataType: 'string',
                 validationRules: [{ type: 'required' }],
             },
             {
                 caption: l('EntityFieldName:OrderService:SalesRequest:Employee'),
-                dataField: 'employeeId',
-                calculateDisplayValue: "employeeDisplay",
-                lookup: {
-                    store: "employeeDisplay",
-                    displayExpr: "name",
-                    valueExpr: 'id'
-                },
+                dataField: 'employeeDisplay',
                 dataType: 'string',
                 validationRules: [{ type: 'required' }],
             },
@@ -232,4 +225,5 @@
             ],
         },
     }).dxDataGrid("instance");
+    $('body').append('<div id=popup>')
 })
