@@ -37,26 +37,26 @@
     if (!abp.currentTenant?.id) {
         return
     }
-    $('.wraper-select-company').css('display', 'block')
-    let companyIdentityUserAssignment = window.dMSpro.oMS.mdmService.controllers.companyIdentityUserAssignments.companyIdentityUserAssignment
-    $('button[data-id=action-add-grid]').click(function () {
-        var controlName = $(this).attr('data-effect-grid');
-        var controlType = $(this).attr('data-effect-type');
-        controlType = controlType ? controlType : 'dxDataGrid';
-        if ($(`#${controlName}`).length > 0) {
-            $(`#${controlName}`).data(`${controlType}`).addRow();
-            $(`#${controlName}`).data(`${controlType}`).deselectAll();
-        }
-    });
+    // $('.wraper-select-company').css('display', 'block')
+    // let companyIdentityUserAssignment = window.dMSpro.oMS.mdmService.controllers.companyIdentityUserAssignments.companyIdentityUserAssignment
+    // $('button[data-id=action-add-grid]').click(function () {
+    //     var controlName = $(this).attr('data-effect-grid');
+    //     var controlType = $(this).attr('data-effect-type');
+    //     controlType = controlType ? controlType : 'dxDataGrid';
+    //     if ($(`#${controlName}`).length > 0) {
+    //         $(`#${controlName}`).data(`${controlType}`).addRow();
+    //         $(`#${controlName}`).data(`${controlType}`).deselectAll();
+    //     }
+    // });
 
     // function changeSelectedCompany(arg) {
     //     $('#selected-company').text($(arg).find('td:nth-child(3)').text());
     // }
 
-    if (!$.isEmptyObject(abp.auth.grantedPolicies)) {
+    // if (!$.isEmptyObject(abp.auth.grantedPolicies)) {
         //if (abp.auth.isAnyGranted()) { };
         // return;
-        $('#selected-company').text((await Common.getCurrentCompany()).name);
+        // $('#selected-company').text((await Common.getCurrentCompany()).name);
 
         //companyIdentityUserAssignment.getCurrentlySelectedCompany().done(({ name }) => $('#selected-company').text(name))
         // companyIdentityUserAssignment.getListCompanyByCurrentUser({})
@@ -98,9 +98,9 @@
         //});
 
 
-    } else {
+    // } else {
         //window.location = '/account/logout';
-    }
+    // }
     //DevExpress.config({
     //    //rtlEnabled: true,
     //    //forceIsoDateParsing: false,
