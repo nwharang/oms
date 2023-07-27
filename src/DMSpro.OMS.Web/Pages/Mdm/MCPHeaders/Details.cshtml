@@ -1,0 +1,110 @@
+@page
+@using DMSpro.OMS.Localization;
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using DMSpro.OMS.MdmService.Permissions
+@using DMSpro.OMS.MdmService.Web.Menus
+@using DMSpro.OMS.MdmService.Companies;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<OMSResource> L
+@inject IHtmlLocalizer<OMSResource> L1
+@inject IAuthorizationService Authorization
+
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = @L1["Page.Title.MCP"].Value;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.MCPHeaders;
+}
+
+@section styles {
+    <abp-style src="/Pages/Mdm/MCPHeaders/Details.css" />
+}
+@section scripts {
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
+    <abp-script src="/Pages/Mdm/MCPHeaders/Details.js" />
+}
+
+@section breadcrumb {
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:MdmService:MdmService"].Value</a></li>
+        <li class="breadcrumb-item ">@L["Menu:MdmService:RouteAndMCP"].Value</li>
+        <li class="breadcrumb-item active">@L1["Page.Title.MCP"].Value</li>
+    </ol>
+}
+
+<div class="col-lg-12">
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="ui-sortable-handle">
+                <i class="subheader-icon fa fa-file-alt"></i>
+            </h2>
+        </div>
+        <div class="panel-container show" style="padding-top:10px">
+            <div class="panel-content jqvmap-bg-ocean p-0" style="">
+                <div style="padding-left:10px" class="buttons-header-grid">
+                    @if (await Authorization.IsGrantedAsync(MdmServicePermissions.MCPs.Create))
+                    {
+                          <button id="SaveButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed hvr-icon-pop">
+                            <i class="fa fa-check hvr-icon" style="padding-right: 2px"></i>
+                            @L1["Button.Save.MCPHeader"].Value
+                        </button>
+                    }
+                   @if (await Authorization.IsGrantedAsync(MdmServicePermissions.VisitPlans.GenerateVisitPlanFromMCP))
+                    {
+                        <button id="GenerateButton" type="button" class="btn btn-light btn-sm hvr-icon-pop">
+                            <i class="fa fa-random hvr-icon" style="padding-right: 2px"></i>
+                            <span class=""> @L1["Button.GenerateVisitPlans.MCPHeader"].Value </span>
+                        </button>
+                    }
+                     
+                    <button id="EnddateButton" type="button" class="btn btn-light btn-sm hvr-icon-pop">
+                        <i class="fa fa-power-off hvr-icon" style="padding-right: 2px"></i>
+                        <span class="">Enddate MCP</span>
+                    </button>
+                    <button id="CloseButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                        <i class="fa fa-times" style="padding-right: 2px"></i>
+                        <span>Close</span>
+                    </button>
+                </div>
+                <div id="importPanel"></div>
+                <div id="popupImport"></div>
+                <div class="dx-viewport">
+                    <div class="py-3" id="resizable">
+                        <div id="top-section"></div>
+                    </div>
+                    <div class=" py-2">
+                        <div id="dgMCPDetails"> </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="popupGenMCP" style="display:none">
+                <div class="dx-fieldset">
+                    <div class="dx-field">
+                        <div class="dx-field-label">Start Date</div>
+                        <div class="dx-field-value">
+                            <div id="StartDate"></div>
+                        </div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label">End Date</div>
+                        <div class="dx-field-value">
+                            <div id="EndDate"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="popupEnddateMCP" style="display:none">
+                <div class="dx-fieldset">
+                    <div class="dx-field">
+                        <div class="dx-field-label">End Date</div>
+                        <div class="dx-field-value">
+                            <div id="EndDateMCP"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

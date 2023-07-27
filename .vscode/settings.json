@@ -1,0 +1,17 @@
+{
+    "sqltools.connections": [
+        {
+            "mssqlOptions": {
+                "appName": "SQLTools",
+                "useUTC": true,
+                "encrypt": true
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "MSSQL",
+            "connectString": "Server=109.123.235.194\\\\SQLEXPRESS,1433;Database=ServerMdmSapService;User Id=sa;password=myPassw0rd;MultipleActiveResultSets=true;TrustServerCertificate=True",
+            "name": "OMSSAP"
+        }
+    ],
+    "dotnet.defaultSolution": "DMSpro.OMS.Web.sln"
+}

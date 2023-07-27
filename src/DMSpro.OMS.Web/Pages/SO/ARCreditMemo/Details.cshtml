@@ -1,0 +1,99 @@
+@page
+@using DMSpro.OMS.OrderService.Web.Menus;
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using DMSpro.OMS.MdmService.Permissions
+@using DMSpro.OMS.MdmService.Web.Menus
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.Localization;
+@inject IHtmlLocalizer<OMSResource> L
+@inject IAuthorizationService Authorization
+
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = L["Menu:SOService:ArCreditMemo"].Value;
+    PageLayout.Content.MenuItemName = OrderServiceMenus.ArCreditMemoDetails;
+}
+
+@section styles {
+    <style>
+        #resizable {
+            height: 200px;
+        }
+
+        #dgItems {
+            max-width: none !important;
+        }
+
+        div.dx-toolbar.dx-popup-bottom > div.dx-toolbar-items-container {
+            margin-top: 7px;
+        }
+
+        div.dx-popup-content,
+        div.panel-container.show div.dx-overlay-content.dx-popup-normal {
+            /*height: auto!important;*/
+        }
+    </style>
+}
+
+@section scripts {
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
+    <abp-script src="/pages/shared/common.isp.js" />
+    <abp-script src="/Pages/SO/ARCreditMemo/details.js" />
+}
+
+@section breadcrumb {
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:SOService:GroupMenu:SO"].Value</a></li>
+        <li class="breadcrumb-item active">@L["Menu:SOService:ArCreditMemo"].Value</li>
+        <li class="breadcrumb-item active">@L["Details"].Value</li>
+    </ol>
+}
+
+<div class="col-lg-12">
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="ui-sortable-handle">
+                <i class="subheader-icon fa fa-info-circle"></i> @L["Details"].Value
+            </h2>
+        </div>
+        <div class="panel-container show">
+            <div class="panel-content jqvmap-bg-ocean p-0">
+                <div class="buttons-header-grid pl-2">
+                    <div class="btn-group">
+                        <button id="btnActions" type="button" class="btn btn-light btn-sm dropdown-toggle hvr-icon-pop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-gear hvr-icon"></i>
+                            <span class="">@L["Button.Action"]</span>
+                        </button>
+                        <div class="dropdown-menu fadeindown">
+                            @*<button id="SaveButton" class="dropdown-item" type="button">@L["Button.Save"]</button>*@
+                            <button id="CloseButton" class="dropdown-item" type="button">@L["Button.Close"]</button>
+                        </div>
+                    </div>
+                    <button id="SaveButton" type="submit" class="btn btn-sm btn-outline-default waves-effect waves-themed" form="form-container">
+                        <i class="fa fa-check"></i>
+                        @L["Button.Save"].Value
+                    </button>
+                    <button id="CancelButton" class="btn btn-sm btn-outline-default waves-effect waves-themed" type="button" style="display: none">
+                        <i class="fa fa-ban"></i>
+                        Cancel
+                    </button>
+                </div>
+                <div class="dx-viewport">
+                    <div id="resizable" class="p-2">
+                        <form id="form-container">
+                            <div id="frmArCreditMemoHeaders"></div>
+                        </form>
+                    </div>
+                    <div class="border-top p-2">
+                        <div id="dgArCreditMemoDetails"></div>
+                    </div>
+                    <div id="popupItems">
+                        <div id="dgItems"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

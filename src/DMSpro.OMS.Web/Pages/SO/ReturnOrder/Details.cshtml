@@ -1,0 +1,150 @@
+@page
+@using DMSpro.OMS.OrderService.Web.Menus;
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using DMSpro.OMS.MdmService.Permissions
+@using DMSpro.OMS.MdmService.Web.Menus
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.Localization;
+@inject IHtmlLocalizer<OMSResource> L
+@inject IAuthorizationService Authorization
+
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = L["Menu:SOService:ReturnOrder"].Value;
+    PageLayout.Content.MenuItemName = OrderServiceMenus.ReturnOrderHeaders;
+}
+
+@section styles {
+    <style>
+        #resizable {
+            height: 300px;
+        }
+
+        #dgItems {
+            max-width: none !important;
+        }
+
+        div.dx-toolbar.dx-popup-bottom > div.dx-toolbar-items-container {
+            margin-top: 7px;
+        }
+
+        div.dx-popup-content,
+        div.panel-container.show div.dx-overlay-content.dx-popup-normal {
+            /*height: auto!important;*/
+        }
+    </style>
+}
+
+@section scripts
+{
+    <script src="/js/devextreme/exceljs.min.js"></script>
+    <script src="/js/devextreme/filesaver.min.js"></script>
+    <abp-script src="/pages/shared/common.isp.js" />
+    <abp-script src="/Pages/SO/ReturnOrder/details.js" />
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">@L["Menu:SOService:GroupMenu:SO"].Value</a></li>
+        <li class="breadcrumb-item"><a href="/SO/ReturnOrder/">@L["Menu:SOService:ReturnOrder"].Value</a></li>
+        <li class="breadcrumb-item active">@L["Details"].Value</li>
+    </ol>
+}
+<div class="col-lg-12">
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="ui-sortable-handle">
+                <i class="subheader-icon fa fa-info-circle"></i> @L["Details"].Value
+            </h2>
+        </div>
+
+        <div class="panel-container show">
+            <div class="panel-content jqvmap-bg-ocean p-0">
+                <div class="buttons-header-grid pl-2">
+                    <div class="btn-group">
+                        <button id="btnActions" type="button" class="btn btn-light btn-sm dropdown-toggle hvr-icon-pop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-gear hvr-icon"></i>
+                            <span class="">@L["Button.Action"]</span>
+                        </button>
+                        <div class="dropdown-menu fadeindown">
+                            @*<button id="SaveButton" class="dropdown-item" type="button">@L["Button.Save"]</button>*@
+                            <button id="CloseButton" class="dropdown-item" type="button">@L["Button.Close"]</button>
+                            @*<button class="dropdown-item" type="button">@L["Button.Cancel"]</button>*@
+                        </div>
+                    </div>
+                    <button id="CancelButton" class="btn btn-sm btn-outline-default waves-effect waves-themed" type="button">
+                        <i class="fa fa-ban"></i>
+                        Cancel
+                    </button>
+                </div>
+                <div class="dx-viewport">
+                    <div id="resizable" class="p-2">
+                        <form id="form-container">
+                            <div id="frmReturnOrderDetails"></div>
+                        </form>
+                    </div>
+                    <div class="border-top p-2">
+                        <div id="dgReturnOrderDetails"></div>
+                    </div>
+                    <div id="popupItems">
+                        <div id="dgItems"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*<div class="panel-container show">
+            <div class="panel-content jqvmap-bg-ocean p-0"  >
+                <abp-card>
+                    <abp-card-body>
+                        <abp-row>
+                            <div style="padding:12px" class="buttons-header-grid">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-primary btn-sm waves-effect waves-themed dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Action
+                                    </button>
+                                    <div class="dropdown-menu fadeindown">
+                                        <button class="dropdown-item" type="button">Create Invocie</button>
+                                        <button class="dropdown-item" type="button">Create Return</button>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                        </abp-row>
+                        <div class="dx-viewport" style="overflow: auto;">
+                            <div class="dx-fieldset-header">Return Order</div>
+                            <div id="frmSalesOrders" class="mb-3"></div>
+                            <div class="border-top py-2">
+                                <div class="dx-fieldset-header">Detail</div>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <button id="ExportToExcelButton" type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                            <i class="fa fa-download"></i> <span>Export From Excel</span>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-default waves-effect waves-themed">
+                                            <i class="fa fa-upload"></i> <span>Import From Excel</span>
+                                        </button>
+                                    </div>
+                                    <div class="dx-datagrid-search-panel dx-show-invalid-badge dx-textbox dx-texteditor dx-editor-outlined dx-searchbox dx-show-clear-button dx-texteditor-empty dx-widget dx-state-hover" style="width: 250px;">
+                                        <div class="dx-texteditor-container">
+                                            <div class="dx-texteditor-input-container">
+                                                <div class="dx-icon dx-icon-search"></div>
+                                                <input autocomplete="off" aria-label="Search in the data grid" class="dx-texteditor-input" type="text" spellcheck="false" tabindex="0" role="textbox">
+                                            </div>
+                                            <div class="dx-texteditor-buttons-container">
+                                                <span class="dx-clear-button-area"><span class="dx-icon dx-icon-clear"></span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="dgSalesOrders"></div>
+                            </div>
+                        </div>
+                    </abp-card-body>
+                </abp-card>
+            </div>
+        </div>*@
+    </div>
+</div>

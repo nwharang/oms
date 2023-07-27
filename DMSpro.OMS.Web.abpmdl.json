@@ -1,0 +1,13 @@
+{
+  "folders": {
+    "items": {
+      "src": {}
+    }
+  },
+  "packages": {
+    "DMSpro.OMS.Web": {
+      "path": "src/DMSpro.OMS.Web/DMSpro.OMS.Web.abppkg.json",
+      "folder": "src"
+    }
+  }
+}

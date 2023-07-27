@@ -1,0 +1,36 @@
+﻿@page
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = "Inventories";
+    PageLayout.Content.MenuItemName = "Inventories.InventoryAdjustment";
+}
+
+@section scripts {
+    <abp-script src="/Pages/Inventories/InventoryAdjustment/index.js" />
+}
+
+@section breadcrumb {
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0);">Inventory</a></li>
+        <li class="breadcrumb-item active">Inventory Adjustment</li>
+    </ol>
+}
+
+<div class="col-lg-12">
+    <div id="panel-1" class="panel">
+        <div class="panel-hdr">
+            <h2 class="ui-sortable-handle">
+                <i class="subheader-icon fa fa-adjust"></i> Inventory Adjustment
+            </h2>
+        </div>
+        <div class="panel-container show" style="padding: 10px">
+            <div class="panel-content jqvmap-bg-ocean p-0"  >
+                <div class="dx-viewport" style="overflow: auto">
+                    <div id="dataGridInventoryAdjustment"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

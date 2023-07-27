@@ -1,0 +1,35 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Mvc.UI.Layout
+@using DMSpro.OMS.MdmService.Permissions
+@using DMSpro.OMS.MdmService.Web.Menus
+@using Microsoft.AspNetCore.Mvc.Localization
+@using DMSpro.OMS.Localization
+@inject IHtmlLocalizer<OMSResource> L
+@inject IAuthorizationService Authorization
+
+@inject IPageLayout PageLayout
+@{
+    PageLayout.Content.Title = L["Customers"].Value;
+    PageLayout.Content.MenuItemName = MdmServiceMenus.Customers;
+}
+
+@section scripts
+{
+
+    <abp-script src="/Pages/Customers/index.js" />
+
+}
+
+@section content_toolbar {
+    <abp-button id="ExportToExcelButton" text="@L["ExportToExcel"].Value" icon="download" size="Small" button-type="Primary" />
+    @if (await Authorization.IsGrantedAsync(MdmServicePermissions.Customers.Create))
+    {
+        <abp-button id="NewCustomerButton" text="@L["NewCustomer"].Value" icon="plus" size="Small" button-type="Primary" />
+    }
+}
+
+<abp-card>
+    <abp-card-body>
+    </abp-card-body>
+</abp-card>
