@@ -95,7 +95,6 @@ namespace DMSpro.OMS.Web;
     typeof(SurveyServiceHttpApiClientModule),
     typeof(OrderServiceWebModule),
     typeof(OrderServiceHttpApiClientModule),
-
     typeof(IdentityServiceWebModule),
     typeof(IdentityServiceHttpApiClientModule),
     typeof(AdministrationServiceWebModule),
@@ -106,40 +105,36 @@ namespace DMSpro.OMS.Web;
     typeof(MdmServiceHttpApiClientModule),
     typeof(MdmSapServiceHttpApiClientModule),
     typeof(InventoryServiceWebModule),
-
     typeof(InventoryServiceHttpApiClientModule),
     //typeof(AbpAccountPublicWebModule),
     //typeof(AbpAccountPublicHttpApiClientModule),
     typeof(AbpIdentityHttpApiClientModule),
     typeof(AbpLocalizationModule)
-
 )]
-
 [DependsOn(typeof(AbpAspNetCoreMvcUiBasicThemeModule))]
-
 public class OMSWebModule : AbpModule
 {
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
         context.Services.PreConfigure<AbpMvcDataAnnotationsLocalizationOptions>(options =>
         {
-            options.AddAssemblyResource(
-                typeof(OMSResource),
-                typeof(OMSWebModule).Assembly
-            );
+            options.AddAssemblyResource(typeof(OMSResource), typeof(OMSWebModule).Assembly);
         });
 
         PreConfigure<AbpHttpClientBuilderOptions>(options =>
         {
-            options.ProxyClientBuildActions.Add((remoteServiceName, clientBuilder) =>
-            {
-                clientBuilder.AddTransientHttpErrorPolicy(policyBuilder =>
-                    policyBuilder.WaitAndRetryAsync(
-                        4,
-                        i => TimeSpan.FromSeconds(Math.Pow(2, i))
-                    )
-                );
-            });
+            options.ProxyClientBuildActions.Add(
+                (remoteServiceName, clientBuilder) =>
+                {
+                    clientBuilder.AddTransientHttpErrorPolicy(
+                        policyBuilder =>
+                            policyBuilder.WaitAndRetryAsync(
+                                4,
+                                i => TimeSpan.FromSeconds(Math.Pow(2, i))
+                            )
+                    );
+                }
+            );
         });
     }
 
@@ -153,6 +148,7 @@ public class OMSWebModule : AbpModule
 
         Configure<AbpBundlingOptions>(options =>
         {
+            options.Mode = BundlingMode.BundleAndMinify;
             options.StyleBundles.Configure(
                 LeptonXThemeBundles.Styles.Global,
                 bundle =>
@@ -177,87 +173,106 @@ public class OMSWebModule : AbpModule
             options.Applications["MVC"].RootUrl = configuration["App:SelfUrl"];
         });
 
-        context.Services.AddAuthentication(options =>
+        context.Services
+            .AddAuthentication(options =>
             {
                 options.DefaultScheme = "Cookies";
                 options.DefaultChallengeScheme = "oidc";
             })
-            .AddCookie("Cookies", options =>
-            {
-                
-                options.ExpireTimeSpan = TimeSpan.FromHours(1);
-                options.AccessDeniedPath = "/Account/AccessDenied2";
-                options.ForwardChallenge = "oidc";
-                options.SlidingExpiration = true;
-                //options.ForwardAuthenticate
+            .AddCookie(
+                "Cookies",
+                options =>
+                {
+                    options.ExpireTimeSpan = TimeSpan.FromHours(1);
+                    options.AccessDeniedPath = "/Account/AccessDenied2";
+                    options.ForwardChallenge = "oidc";
+                    options.SlidingExpiration = true;
+                    //options.ForwardAuthenticate
 
-                //options.SessionStore
-            })
-            .AddAbpOpenIdConnect("oidc", options =>
-            {
-                options.Authority = configuration["AuthServer:Authority"];
-                options.RequireHttpsMetadata = Convert.ToBoolean(configuration["AuthServer:RequireHttpsMetadata"]);
-                options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
+                    //options.SessionStore
+                }
+            )
+            .AddAbpOpenIdConnect(
+                "oidc",
+                options =>
+                {
+                    options.Authority = configuration["AuthServer:Authority"];
+                    options.RequireHttpsMetadata = Convert.ToBoolean(
+                        configuration["AuthServer:RequireHttpsMetadata"]
+                    );
+                    options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
 
-                options.ClientId = configuration["AuthServer:ClientId"];
-                options.ClientSecret = configuration["AuthServer:ClientSecret"];
+                    options.ClientId = configuration["AuthServer:ClientId"];
+                    options.ClientSecret = configuration["AuthServer:ClientSecret"];
 
-                options.SaveTokens = true;
-                options.GetClaimsFromUserInfoEndpoint = true;
+                    options.SaveTokens = true;
+                    options.GetClaimsFromUserInfoEndpoint = true;
 
-                options.Scope.Add("roles");
-                options.Scope.Add("email");
-                options.Scope.Add("phone");
-                options.Scope.Add("AccountService");
-                options.Scope.Add("IdentityService");
-                options.Scope.Add("AdministrationService");
-                options.Scope.Add("SaasService");
-                options.Scope.Add("ProductService");
-                options.Scope.Add("MdmService");
-                options.Scope.Add("InventoryService");
-                options.Scope.Add("SurveyService");
-                options.Scope.Add("OrderService");
-                options.Scope.Add("FileManagementService");
-                options.Scope.Add("MdmSapService");
-                options.AccessDeniedPath = "/Account/AccessDenied2";
-                //options.UseTokenLifetime = true;
-                //options.AutomaticRefreshInterval = 1000;
-            });
-        context.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.FromHours(24));
+                    options.Scope.Add("roles");
+                    options.Scope.Add("email");
+                    options.Scope.Add("phone");
+                    options.Scope.Add("AccountService");
+                    options.Scope.Add("IdentityService");
+                    options.Scope.Add("AdministrationService");
+                    options.Scope.Add("SaasService");
+                    options.Scope.Add("ProductService");
+                    options.Scope.Add("MdmService");
+                    options.Scope.Add("InventoryService");
+                    options.Scope.Add("SurveyService");
+                    options.Scope.Add("OrderService");
+                    options.Scope.Add("FileManagementService");
+                    options.Scope.Add("MdmSapService");
+                    options.AccessDeniedPath = "/Account/AccessDenied2";
+                    //options.UseTokenLifetime = true;
+                    //options.AutomaticRefreshInterval = 1000;
+                }
+            );
+        context.Services.Configure<SecurityStampValidatorOptions>(
+            options => options.ValidationInterval = TimeSpan.FromHours(24)
+        );
 
         if (Convert.ToBoolean(configuration["AuthServer:IsOnK8s"]))
         {
-            context.Services.Configure<OpenIdConnectOptions>("oidc", options =>
-            {
-                options.MetadataAddress = configuration["AuthServer:MetaAddress"].EnsureEndsWith('/') +
-                                          ".well-known/openid-configuration";
-
-                var previousOnRedirectToIdentityProvider = options.Events.OnRedirectToIdentityProvider;
-                options.Events.OnRedirectToIdentityProvider = async ctx =>
+            context.Services.Configure<OpenIdConnectOptions>(
+                "oidc",
+                options =>
                 {
-                    // Intercept the redirection so the browser navigates to the right URL in your host
-                    ctx.ProtocolMessage.IssuerAddress = configuration["AuthServer:Authority"].EnsureEndsWith('/') +
-                                                        "connect/authorize";
+                    options.MetadataAddress =
+                        configuration["AuthServer:MetaAddress"].EnsureEndsWith('/')
+                        + ".well-known/openid-configuration";
 
-                    if (previousOnRedirectToIdentityProvider != null)
+                    var previousOnRedirectToIdentityProvider = options
+                        .Events
+                        .OnRedirectToIdentityProvider;
+                    options.Events.OnRedirectToIdentityProvider = async ctx =>
                     {
-                        await previousOnRedirectToIdentityProvider(ctx);
-                    }
-                };
-                var previousOnRedirectToIdentityProviderForSignOut =
-                    options.Events.OnRedirectToIdentityProviderForSignOut;
-                options.Events.OnRedirectToIdentityProviderForSignOut = async ctx =>
-                {
-                    // Intercept the redirection for signout so the browser navigates to the right URL in your host
-                    ctx.ProtocolMessage.IssuerAddress = configuration["AuthServer:Authority"].EnsureEndsWith('/') +
-                                                        "connect/logout";
+                        // Intercept the redirection so the browser navigates to the right URL in your host
+                        ctx.ProtocolMessage.IssuerAddress =
+                            configuration["AuthServer:Authority"].EnsureEndsWith('/')
+                            + "connect/authorize";
 
-                    if (previousOnRedirectToIdentityProviderForSignOut != null)
+                        if (previousOnRedirectToIdentityProvider != null)
+                        {
+                            await previousOnRedirectToIdentityProvider(ctx);
+                        }
+                    };
+                    var previousOnRedirectToIdentityProviderForSignOut = options
+                        .Events
+                        .OnRedirectToIdentityProviderForSignOut;
+                    options.Events.OnRedirectToIdentityProviderForSignOut = async ctx =>
                     {
-                        await previousOnRedirectToIdentityProviderForSignOut(ctx);
-                    }
-                };
-            });
+                        // Intercept the redirection for signout so the browser navigates to the right URL in your host
+                        ctx.ProtocolMessage.IssuerAddress =
+                            configuration["AuthServer:Authority"].EnsureEndsWith('/')
+                            + "connect/logout";
+
+                        if (previousOnRedirectToIdentityProviderForSignOut != null)
+                        {
+                            await previousOnRedirectToIdentityProviderForSignOut(ctx);
+                        }
+                    };
+                }
+            );
         }
 
         var dataProtectionBuilder = context.Services.AddDataProtection().SetApplicationName("OMS");
@@ -308,20 +323,21 @@ public class OMSWebModule : AbpModule
                 .AddBaseTypes(typeof(AbpValidationResource))
                 .AddVirtualJson("/Localization/OMSWeb");
             //options.DefaultResourceType = typeof(OMSWebResource);
-            });
-            
-        }
+        });
+    }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
     {
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
 
-        app.Use((ctx, next) =>
-        {
-            ctx.Request.Scheme = "https";
-            return next();
-        });
+        app.Use(
+            (ctx, next) =>
+            {
+                ctx.Request.Scheme = "https";
+                return next();
+            }
+        );
 
         if (env.IsDevelopment())
         {
@@ -339,9 +355,12 @@ public class OMSWebModule : AbpModule
             //app.UseErrorPage();
         }
 
-        app.UseForwardedHeaders(new ForwardedHeadersOptions {
-            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-        });
+        app.UseForwardedHeaders(
+            new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            }
+        );
 
         app.UseCorrelationId();
         app.UseAbpSecurityHeaders();
@@ -352,12 +371,15 @@ public class OMSWebModule : AbpModule
         app.UseMultiTenancy();
         app.UseAbpSerilogEnrichers();
         app.UseAuthorization();
-        app.Use(async (httpContext,next) =>{
-            var user = httpContext.User;
-            Console.WriteLine("SAAAAAAAA");
-            Console.WriteLine(user);
-            await next(httpContext);
-        });
+        app.Use(
+            async (httpContext, next) =>
+            {
+                var user = httpContext.User;
+                Console.WriteLine("SAAAAAAAA");
+                Console.WriteLine(user);
+                await next(httpContext);
+            }
+        );
         app.UseWebSockets();
         app.UseConfiguredEndpoints(endpoints =>
         {
